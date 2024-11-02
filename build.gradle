@@ -1,0 +1,64 @@
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version '3.3.5'
+	id 'io.spring.dependency-management' version '1.1.6'
+}
+
+group = 'de.hsrm.mi.web'
+version = '0.0.1-SNAPSHOT'
+
+java {
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(21)
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	developmentOnly 'org.springframework.boot:spring-boot-devtools'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}
+// Frontend-Erstellung soll zusätzlich bei "./gradlew bootJar" ausgeführt werden
+// task build_frontend {
+//      doLast {
+// 		// JS-Pakete in Vue-Projekt installieren
+// 		exec {
+// 			workingDir "./frontend"
+// 			commandLine "npm install".split()
+// 		}
+// 		// Vue-Frontend bauen
+// 		exec {
+// 			workingDir "./frontend"
+// 			commandLine "npm run build".split()
+// 		}
+// 		// eventuell vorhandenes public/fe (Frontend)-Verzeichnis loeschen
+// 		delete files("./src/main/resources/public/")
+
+// 		// dist-Ordner aus Vue-Projekt als Spring "public"-Ordner in src/main/resources kopieren
+// 		copy {
+// 			from "./frontend/dist"
+// 			into "./src/main/resources/public/"
+// 		}
+// 	}
+// }
+// bootJar.dependsOn build_frontend
+
+// task clean_frontend {
+//     delete files("${projectDir}/src/main/resources/public/")
+//     delete files("${projectDir}/frontend/node_modules/")
+//     delete files("${projectDir}/frontend/dist/")
+//     delete files("${projectDir}/bin/")
+// }
+// clean.dependsOn clean_frontend
+
+
+
