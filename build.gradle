@@ -28,38 +28,39 @@ dependencies {
 tasks.named('test') {
 	useJUnitPlatform()
 }
+
 // Frontend-Erstellung soll zusätzlich bei "./gradlew bootJar" ausgeführt werden
-// task build_frontend {
-//      doLast {
-// 		// JS-Pakete in Vue-Projekt installieren
-// 		exec {
-// 			workingDir "./frontend"
-// 			commandLine "npm install".split()
-// 		}
-// 		// Vue-Frontend bauen
-// 		exec {
-// 			workingDir "./frontend"
-// 			commandLine "npm run build".split()
-// 		}
-// 		// eventuell vorhandenes public/fe (Frontend)-Verzeichnis loeschen
-// 		delete files("./src/main/resources/public/")
+task build_frontend {
+     doLast {
+		// JS-Pakete in Vue-Projekt installieren
+		exec {
+			workingDir "./frontend"
+			commandLine "npm install".split()
+		}
+		// Vue-Frontend bauen
+		exec {
+			workingDir "./frontend"
+			commandLine "npm run build".split()
+		}
+		// eventuell vorhandenes public/fe (Frontend)-Verzeichnis loeschen
+		delete files("./src/main/resources/public/")
 
-// 		// dist-Ordner aus Vue-Projekt als Spring "public"-Ordner in src/main/resources kopieren
-// 		copy {
-// 			from "./frontend/dist"
-// 			into "./src/main/resources/public/"
-// 		}
-// 	}
-// }
-// bootJar.dependsOn build_frontend
+		// dist-Ordner aus Vue-Projekt als Spring "public"-Ordner in src/main/resources kopieren
+		copy {
+			from "./frontend/dist"
+			into "./src/main/resources/public/"
+		}
+	}
+}
+bootJar.dependsOn build_frontend
 
-// task clean_frontend {
-//     delete files("${projectDir}/src/main/resources/public/")
-//     delete files("${projectDir}/frontend/node_modules/")
-//     delete files("${projectDir}/frontend/dist/")
-//     delete files("${projectDir}/bin/")
-// }
-// clean.dependsOn clean_frontend
+task clean_frontend {
+    delete files("${projectDir}/src/main/resources/public/")
+    delete files("${projectDir}/frontend/node_modules/")
+    delete files("${projectDir}/frontend/dist/")
+    delete files("${projectDir}/bin/")
+}
+clean.dependsOn clean_frontend
 
 
 
