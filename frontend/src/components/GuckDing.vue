@@ -13,11 +13,11 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 import * as THREE from "three"
-import { ArcballControls } from 'three/addons/controls/ArcballControls.js';
-import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { TransformControls } from 'three/addons/controls/TransformControls.js'
 
 const canvasRef = ref()
 let renderer: THREE.WebGLRenderer;
+let controls: TransformControls
 const scene = new THREE.Scene()
 
 const camera = new THREE.PerspectiveCamera(45, window.innerWidth/window.innerHeight, 0.1, 100)
@@ -39,6 +39,23 @@ box.receiveShadow = true
 scene.add(box)
 
 
+document.addEventListener("keypress", (e)=>{
+  const angle = 0.1
+  if(e.code === "KeyD"){
+    box.rotation.y += angle
+  }
+  if(e.code === "KeyW"){
+    box.rotation.x -= angle
+  }
+  if(e.code === "KeyA"){
+    box.rotation.y -= angle
+  }
+  if(e.code === "KeyS"){
+    box.rotation.x += angle
+  }
+  renderer.render(scene, camera)
+})
+
 onMounted(()=>{
   renderer = new THREE.WebGLRenderer({ 
     canvas: canvasRef.value, 
@@ -51,9 +68,6 @@ onMounted(()=>{
   renderer.shadowMap.enabled = true
   
 
-  const controls = new ArcballControls(camera, renderer.domElement)
-  controls.addEventListener("change", function(){renderer.render(scene, camera)})
-  
   
   renderer.render(scene, camera)
 })
