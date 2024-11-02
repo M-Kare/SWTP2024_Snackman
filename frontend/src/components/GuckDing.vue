@@ -76,7 +76,7 @@ document.addEventListener("keypress", (e) => {
   try {
     stompclient.publish({
       destination: DEST, headers: {},
-      body: JSON.stringify(box.rotation.y)
+      body: `${box.rotation.x};${box.rotation.y}`
     });
   } catch (fehler) {
     console.log(fehler)
@@ -85,8 +85,13 @@ document.addEventListener("keypress", (e) => {
 })
 
 function updateBox(value:string){
-  const angle = parseFloat(value)
-  box.rotation.y = angle
+  const v =  value.split(";")
+  const angleX = parseFloat(v[0])
+  const angleY = parseFloat(v[1])
+  console.log("angleX:"+angleX)
+  console.log("angleY:"+angleY)
+  box.rotation.x = angleX
+  box.rotation.y = angleY
   renderer.render(scene, camera)
 }
 
