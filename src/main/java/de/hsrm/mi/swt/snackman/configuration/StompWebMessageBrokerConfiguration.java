@@ -1,4 +1,4 @@
-package de.hsrm.mi.swt.snackman.STOMP;
+package de.hsrm.mi.swt.snackman.configuration;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
@@ -8,7 +8,7 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 
 @Configuration
 @EnableWebSocketMessageBroker
-public class STOMPBrokerConfig implements WebSocketMessageBrokerConfigurer {
+public class StompWebMessageBrokerConfiguration implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {

@@ -1,35 +1,30 @@
 <template>
   <canvas ref="canvasRef"></canvas>
-  <!-- <div>
-    <h1>Testabfrage</h1>
-    <button @click="infoholen">Server-Anfrage</button>
-    <p />
-    Anfrager-IP-Adresse: {{ anfragerip }}
-    <p />
-    Server-Zeit: {{ zeitstempel }}
-  </div> -->
 </template>
 
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 import * as THREE from "three"
 import { TransformControls } from 'three/addons/controls/TransformControls.js'
-import { Client, type Message } from '@stomp/stompjs';
+import { Client } from '@stomp/stompjs';
+import type {IFrontendNachrichtEvent} from "@/services/IFrontendNachrichtEvent";
 
 const wsurl = `ws://${window.location.host}/stompbroker`
-const DEST = '/topic/coordination'
+const DEST = '/topic/cube'
 
 const stompclient = new Client({ brokerURL: wsurl })
 stompclient.onWebSocketError = (event) => { console.log(event) }
 stompclient.onStompError = (frame) => { console.log(frame) }
 stompclient.onConnect = (frame) => {
   // Callback: erfolgreicher Verbindugsaufbau zu Broker
-  stompclient.subscribe(DEST, (message) => {
+  stompclient.subscribe (DEST, (message) => {
     // Callback: Nachricht auf DEST empfangen
     // empfangene Nutzdaten in message.body abrufbar,
     // ggf. mit JSON.parse(message.body) zu JS konvertieren
-    updateBox(message.body)
-    console.log(message.body)
+    const event: IFrontendNachrichtEvent = JSON.parse(message.body)
+    console.log("ERHALTENES CHANGE: ")
+    console.log(event)
+    updateBox(event)
   });
 };
 stompclient.activate()
@@ -74,9 +69,18 @@ document.addEventListener("keypress", (e) => {
     box.rotation.x += angle
   }
   try {
+    const cubeData = {
+      width: box.geometry.parameters.width,
+      height: box.geometry.parameters.height,
+      depth: box.geometry.parameters.depth,
+      rotationAngleX: box.rotation.x,
+      rotationAngleY: box.rotation.y
+    };
+
+    //Sende and /topic/cube/update
     stompclient.publish({
-      destination: DEST, headers: {},
-      body: `${box.rotation.x};${box.rotation.y}`
+      destination: DEST+"/update", headers: {},
+      body: JSON.stringify(cubeData)
     });
   } catch (fehler) {
     console.log(fehler)
@@ -84,17 +88,11 @@ document.addEventListener("keypress", (e) => {
   renderer.render(scene, camera)
 })
 
-function updateBox(value:string){
-  const v =  value.split(";")
-  const angleX = parseFloat(v[0])
-  const angleY = parseFloat(v[1])
-  console.log("angleX:"+angleX)
-  console.log("angleY:"+angleY)
-  box.rotation.x = angleX
-  box.rotation.y = angleY
+function updateBox(event : IFrontendNachrichtEvent){
+  box.rotation.x = event.cubeDTO.rotationAngleX
+  box.rotation.y = event.cubeDTO.rotationAngleY
   renderer.render(scene, camera)
 }
-
 
 onMounted(() => {
   renderer = new THREE.WebGLRenderer({
@@ -107,8 +105,6 @@ onMounted(() => {
 
   renderer.shadowMap.enabled = true
 
-
-
   renderer.render(scene, camera)
   window.addEventListener("resize", resizeCallback)
 })
@@ -118,32 +114,4 @@ function resizeCallback(){
         camera.aspect = window.innerWidth/window.innerHeight
         camera.updateProjectionMatrix()
     }
-
-
-
-
-
-// // Java: record BeispielDTO(String anfragerip, String zeitstempel) {}
-// interface IBeispielDTO {
-//   anfragerip: string
-//   zeitstempel: string
-// }
-
-// const anfragerip = ref('???')
-// const zeitstempel = ref('??:??')
-
-// async function infoholen() {
-//   try {
-//     const response = await fetch('/api/getinfo')
-//     if (!response.ok) throw new Error(response.statusText)
-//     const bspdto: IBeispielDTO = await response.json()
-
-//     anfragerip.value = bspdto.anfragerip
-//     zeitstempel.value = bspdto.zeitstempel
-//   } catch (e) {
-//     anfragerip.value = `ERROR - ${e}`
-//     zeitstempel.value = '??:??'
-//     alert(e)
-//   }
-// }
 </script>
