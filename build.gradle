@@ -19,6 +19,7 @@ repositories {
 
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
+	//implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
@@ -30,6 +31,7 @@ tasks.named('test') {
 }
 
 // Frontend-Erstellung soll zusätzlich bei "./gradlew bootJar" ausgeführt werden
+/*
 task build_frontend {
      doLast {
 		// JS-Pakete in Vue-Projekt installieren
@@ -61,6 +63,6 @@ task clean_frontend {
     delete files("${projectDir}/bin/")
 }
 clean.dependsOn clean_frontend
-
+*/
 
 
