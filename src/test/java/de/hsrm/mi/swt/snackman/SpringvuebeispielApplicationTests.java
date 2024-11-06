@@ -1,10 +1,10 @@
-package de.hsrm.mi.web.springvuebeispiel;
+package de.hsrm.mi.swt.snackman;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class SpringvuebeispielApplicationTests {
+class SnackmanApplicationTests {
 
 	@Test
 	void contextLoads() {

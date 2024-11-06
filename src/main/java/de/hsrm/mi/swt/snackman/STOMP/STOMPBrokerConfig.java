@@ -1,4 +1,4 @@
-package de.hsrm.mi.web.springvuebeispiel.STOMP;
+package de.hsrm.mi.swt.snackman.STOMP;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;

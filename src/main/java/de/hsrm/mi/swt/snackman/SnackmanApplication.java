@@ -1,13 +1,13 @@
-package de.hsrm.mi.web.springvuebeispiel;
+package de.hsrm.mi.swt.snackman;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class SpringvuebeispielApplication {
+public class SnackmanApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(SpringvuebeispielApplication.class, args);
+		SpringApplication.run(SnackmanApplication.class, args);
 	}
 
 }

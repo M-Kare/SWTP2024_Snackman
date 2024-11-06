@@ -1,4 +1,4 @@
-package de.hsrm.mi.web.springvuebeispiel.STOMP;
+package de.hsrm.mi.swt.snackman.STOMP;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

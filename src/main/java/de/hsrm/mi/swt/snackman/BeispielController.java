@@ -1,4 +1,4 @@
-package de.hsrm.mi.web.springvuebeispiel;
+package de.hsrm.mi.swt.snackman;
 
 
 import java.util.Date;
