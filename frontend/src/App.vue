@@ -1,9 +1,9 @@
 <template>
   <main>
-    <GuckDing />
+    <MainView />
   </main>
 </template>
 
 <script setup lang="ts">
-import GuckDing from './views/CubeExampleView.vue'
+import MainView from './views/MainView.vue'
 </script>
