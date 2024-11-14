@@ -5,13 +5,13 @@ package de.hsrm.mi.swt.snackman.entities.Snack;
  */
 public class Snack {
     private int id;
-    private SnackTyp snackTyp;
-    private int kalorien;
+    private SnackType snackType;
+    private int calories;
 
-    public Snack(int id, SnackTyp snackTyp) {
+    public Snack(int id, SnackType snackType) {
         this.id = id;
-        this.snackTyp = snackTyp;
-        this.kalorien = snackTyp.getKalorien();
+        this.snackType = snackType;
+        this.calories = snackType.getCalories();
     }
 
     public int getId() {
@@ -22,19 +22,19 @@ public class Snack {
         this.id = id;
     }
 
-    public SnackTyp getSnackTyp() {
-        return snackTyp;
+    public SnackType getSnackType() {
+        return snackType;
     }
 
-    public void setSnackTyp(SnackTyp snackTyp) {
-        this.snackTyp = snackTyp;
+    public void setSnackType(SnackType snackType) {
+        this.snackType = snackType;
     }
 
-    public int getKalorien() {
-        return kalorien;
+    public int getCalories() {
+        return calories;
     }
 
-    public void setKalorien(int kalorien) {
-        this.kalorien = kalorien;
+    public void setCalories(int calories) {
+        this.calories = calories;
     }
 }
