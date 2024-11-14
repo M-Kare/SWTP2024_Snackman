@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, defineProps, defineEmits } from 'vue'
+import { onMounted } from 'vue'
 import * as THREE from 'three'
 
 const props = withDefaults(defineProps<{
