@@ -5,5 +5,5 @@
 </template>
 
 <script setup lang="ts">
-import MapView from './views/CubeExampleView.vue'
+import MapView from './views/MapView.vue'
 </script>
