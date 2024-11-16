@@ -42,16 +42,27 @@ async  function getSnacks(): Promise<ISnackDTD[]>{
 
 onMounted(async () => {
   const snackData: Array<ISnackDTD> = await getSnacks()
+  const cherryMap: Map<number, THREE.Mesh> = new Map();
 
   snackData.forEach((snack: ISnackDTD) =>  {
     if(snack.snackType == SnackType.STRAWBERRY){
-      scene.add(createSnack(snack.position.x, snack.position.y, snack.position.z, 'purple'))
+      const createdSnack = createSnack(snack.position.x, snack.position.y, snack.position.z, 'purple')
+      cherryMap.set(snack.id, createdSnack)
+      scene.add(createdSnack)
     }  else if (snack.snackType == SnackType.ORANGE){
-      scene.add(createSnack(snack.position.x, snack.position.y, snack.position.z, 'orange'))
+      const createdSnack = createSnack(snack.position.x, snack.position.y, snack.position.z, 'orange')
+      cherryMap.set(snack.id, createdSnack)
+      scene.add(createdSnack)
     } else {
-      scene.add(createSnack(snack.position.x, snack.position.y, snack.position.z))
+      const createdSnack = createSnack(snack.position.x, snack.position.y, snack.position.z)
+      cherryMap.set(snack.id, createdSnack)
+      scene.add(createdSnack)
     }
   })
+
+  //entfernt cube.
+  cherryMap.get(3)?.removeFromParent()
+
 
   console.log(snackData)
 

@@ -1,4 +1,5 @@
 export interface ISnackDTD {
+  id: number,
   position: Position,
   snackType: SnackType
 }
