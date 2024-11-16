@@ -14,6 +14,7 @@ public class Snack {
     public Snack(int id, SnackType snackType, Position position) {
         this.id = id;
         this.snackType = snackType;
+        this.position = position;
         this.calories = snackType.getCalories();
     }
 

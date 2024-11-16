@@ -25,7 +25,7 @@ public class SnackController {
         log.info("Hole Snacks");
         var snacks = snackService.getSnacks();
 
-        List<SnackDTO> snackDTOS = snackService.getSnacks()
+        List<SnackDTO> snackDTOS = snacks
                 .stream()
                 .map(SnackDTO::fromSnack)
                 .collect(Collectors.toList());
