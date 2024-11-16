@@ -6,8 +6,7 @@
 import {onMounted, ref} from 'vue'
 import * as THREE from "three"
 import {ArcballControls} from 'three/addons/controls/ArcballControls.js';
-import {type ISnackDTD, SnackType} from '@/stores/Snack/ISnackDTD'
-import {createSnack} from "@/components/Snack";
+import {addSnacksToScene} from "@/services/SnackService";
 
 
 const canvasRef = ref()
@@ -21,50 +20,14 @@ camera.lookAt(0, 0, 0)
 scene.add(camera)
 
 //Helper
-const axesHelper = new THREE.AxesHelper( 5 );
-const gridHelper = new THREE.GridHelper( 10, 10 );
+const axesHelper = new THREE.AxesHelper(5);
+const gridHelper = new THREE.GridHelper(10, 10);
 
-function addSnackToScene(snack: THREE.Mesh) {
-  scene.add(snack)
-}
-scene.add( axesHelper );
-scene.add( gridHelper );
-
-async  function getSnacks(): Promise<ISnackDTD[]>{
-  const url = '/api/snack'
-  const snackResponse = await fetch(url)
-
-  if(!snackResponse.ok) throw new Error(snackResponse.statusText)
-  const snackData = await snackResponse.json()
-
-  return snackData
-}
+scene.add(axesHelper);
+scene.add(gridHelper);
 
 onMounted(async () => {
-  const snackData: Array<ISnackDTD> = await getSnacks()
-  const cherryMap: Map<number, THREE.Mesh> = new Map();
-
-  snackData.forEach((snack: ISnackDTD) =>  {
-    if(snack.snackType == SnackType.STRAWBERRY){
-      const createdSnack = createSnack(snack.position.x, snack.position.y, snack.position.z, 'purple')
-      cherryMap.set(snack.id, createdSnack)
-      scene.add(createdSnack)
-    }  else if (snack.snackType == SnackType.ORANGE){
-      const createdSnack = createSnack(snack.position.x, snack.position.y, snack.position.z, 'orange')
-      cherryMap.set(snack.id, createdSnack)
-      scene.add(createdSnack)
-    } else {
-      const createdSnack = createSnack(snack.position.x, snack.position.y, snack.position.z)
-      cherryMap.set(snack.id, createdSnack)
-      scene.add(createdSnack)
-    }
-  })
-
-  //entfernt cube.
-  cherryMap.get(3)?.removeFromParent()
-
-
-  console.log(snackData)
+  await addSnacksToScene(scene)
 
   renderer = new THREE.WebGLRenderer({
     canvas: canvasRef.value,

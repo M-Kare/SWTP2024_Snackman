@@ -22,7 +22,7 @@ public class SnackController {
 
     @GetMapping("/snack")
     public List<SnackDTO> getSnacks() {
-        log.info("Hole Snacks");
+        log.info("Get Snacks");
         var snacks = snackService.getSnacks();
 
         List<SnackDTO> snackDTOS = snacks
