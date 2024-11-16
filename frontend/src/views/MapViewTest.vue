@@ -8,10 +8,11 @@ import * as THREE from 'three'
 import { Client } from '@stomp/stompjs'
 import type { IFrontendNachrichtEvent } from '@/services/IFrontendNachrichtEvent'
 import { Player } from '@/components/Player';
+import type { IPlayerDTD } from '@/stores/IPlayerDTD';
 
 const GROUNDSIZE = 1000
 const DECELERATION = 20.0
-const ACCELERATION = 200.0
+const ACCELERATION = 300.0
 const WSURL = `ws://${window.location.host}/stompbroker`
 const DEST = '/topic/cube'
 
@@ -86,25 +87,28 @@ box02.position.set(-10, 5, 10)
 scene.add(box02)
 
 document.addEventListener('keypress', e => {
-  if (e.code === 'KeyD') {
+  if (e.code === 'KeyR') {
+    try {
+      //Sende and /topic/player/update
+      const lookDir = new THREE.Vector3();
+      player.getControls().getDirection(lookDir);
+      const messageObject = {
+        x:player.getCamera().position.x,
+        y:player.getCamera().position.y,
+        z:player.getCamera().position.z,
+        lookX:lookDir.x,
+        lookY:lookDir.y,
+        lookZ:lookDir.z
+      };
+      messageObject.x = player.getCamera().position.x;
+      stompclient.publish({
+        destination: DEST+"/update", headers: {},
+        body: JSON.stringify(messageObject)
+      });
+    } catch (fehler) {
+      console.log(fehler)
+    }
   }
-  if (e.code === 'KeyW') {
-  }
-  if (e.code === 'KeyA') {
-  }
-  if (e.code === 'KeyS') {
-  }
-  // try {
-
-  //   //Sende and /topic/cube/update
-  //   stompclient.publish({
-  //     destination: DEST+"/update", headers: {},
-  //     // body: JSON.stringify(cubeData)
-  //   });
-  // } catch (fehler) {
-  //   console.log(fehler)
-  // }
-  // renderer.render(scene, camera)
 })
 
 // is called every frame, changes camera position and velocity

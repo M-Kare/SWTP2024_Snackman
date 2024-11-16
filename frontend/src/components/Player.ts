@@ -18,7 +18,7 @@ export class Player {
     private controls: PointerLockControls;
 
     private velocity: THREE.Vector3;
-    private cameraDirection: THREE.Vector3;
+    private movementDirection: THREE.Vector3;
 
     constructor(renderer: WebGLRenderer, deceleration: number, acceleration: number){
         this.DECELERATION = deceleration;
@@ -32,7 +32,7 @@ export class Player {
         this.canJump = true;
 
         this.velocity = new THREE.Vector3();
-        this.cameraDirection = new THREE.Vector3();
+        this.movementDirection = new THREE.Vector3();
 
         this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100)
         this.camera.position.set(0, 2, 10)
@@ -54,8 +54,8 @@ export class Player {
         return this.velocity;
     }
 
-    public getCameraDirection(){
-        return this.cameraDirection;
+    public getMovementDirection(){
+        return this.movementDirection;
     }
 
     public onKeyUp(event: any) {
@@ -112,13 +112,13 @@ export class Player {
 
         this.velocity.x -= this.velocity.x * this.DECELERATION * delta
         this.velocity.z -= this.velocity.z * this.DECELERATION * delta
-        this.cameraDirection.z = Number(this.moveForward) - Number(this.moveBackward)
-        this.cameraDirection.x = Number(this.moveRight) - Number(this.moveLeft)
-        this.cameraDirection.normalize()
+        this.movementDirection.z = Number(this.moveForward) - Number(this.moveBackward)
+        this.movementDirection.x = Number(this.moveRight) - Number(this.moveLeft)
+        this.movementDirection.normalize()
         if (this.moveForward || this.moveBackward)
-            this.velocity.z -= this.cameraDirection.z * this.ACCELERATION * delta
+            this.velocity.z -= this.movementDirection.z * this.ACCELERATION * delta
         if (this.moveLeft || this.moveRight)
-            this.velocity.x -= this.cameraDirection.x * this.ACCELERATION * delta
+            this.velocity.x -= this.movementDirection.x * this.ACCELERATION * delta
         this.controls.moveRight(-this.velocity.x * delta)
         this.controls.moveForward(-this.velocity.z * delta)
         this.prevTime = time
