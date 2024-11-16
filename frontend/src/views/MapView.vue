@@ -3,13 +3,26 @@
   </template>
   
   <script setup lang="ts">
-  import { onMounted, ref } from 'vue'
+  import { onMounted, onUnmounted, ref } from 'vue'
   import * as THREE from "three"
   import { Client } from '@stomp/stompjs';
   import { PointerLockControls } from 'three/addons/controls/PointerLockControls.js';
   import type {IFrontendNachrichtEvent} from "@/services/IFrontendNachrichtEvent";
   
   const GROUNDSIZE = 1000
+  const BRAKEFACTOR = 20.0
+  const ACCELERATION = 200.0
+
+  let moveForward = false;
+	let moveBackward = false;
+	let moveLeft = false;
+	let moveRight = false;
+	let canJump = false;
+
+  let prevTime = performance.now()
+
+  const velocity = new THREE.Vector3();
+  const direction = new THREE.Vector3();
   
   const wsurl = `ws://${window.location.host}/stompbroker`
   const DEST = '/topic/cube'
@@ -99,16 +112,84 @@ scene.add(box02)
     // }
     // renderer.render(scene, camera)
   })
-
+new THREE.Raycaster()
   document.addEventListener( 'click', function () {
-
     controls.lock();
-
   } );
+  document.addEventListener( 'keydown', onKeyDown );
+  document.addEventListener( 'keyup', onKeyUp );
   
-  function animate(){
-        renderer.render(scene, camera)
+  function onKeyDown(event:any){
+    switch ( event.code ) {
+
+    case 'ArrowUp':
+    case 'KeyW':
+      moveForward = true;
+      break;
+
+    case 'ArrowLeft':
+    case 'KeyA':
+      moveLeft = true;
+      break;
+
+    case 'ArrowDown':
+    case 'KeyS':
+      moveBackward = true;
+      break;
+
+    case 'ArrowRight':
+    case 'KeyD':
+      moveRight = true;
+      break;
+
+    case 'Space':
+      if ( canJump === true ) velocity.y += 350;
+        canJump = false;
+      break;
     }
+  }
+
+  function onKeyUp(event:any){
+    switch ( event.code ) {
+
+    case 'ArrowUp':
+    case 'KeyW':
+      moveForward = false;
+      break;
+
+    case 'ArrowLeft':
+    case 'KeyA':
+      moveLeft = false;
+      break;
+
+    case 'ArrowDown':
+    case 'KeyS':
+      moveBackward = false;
+      break;
+
+    case 'ArrowRight':
+    case 'KeyD':
+      moveRight = false;
+      break;
+    }
+  }
+
+  function animate(){
+    const time = performance.now()
+    const delta = (time - prevTime) / 1000
+
+    velocity.x -= velocity.x * BRAKEFACTOR * delta;
+		velocity.z -= velocity.z * BRAKEFACTOR * delta;
+    direction.z = Number( moveForward ) - Number( moveBackward );
+		direction.x = Number( moveRight ) - Number( moveLeft );
+    direction.normalize();
+    if ( moveForward || moveBackward ) velocity.z -= direction.z * ACCELERATION * delta;
+    if ( moveLeft || moveRight ) velocity.x -= direction.x * ACCELERATION * delta;
+    controls.moveRight( - velocity.x * delta );
+    controls.moveForward( - velocity.z * delta );
+    prevTime = time
+    renderer.render(scene, camera)
+  }
   
   onMounted(() => {
     renderer = new THREE.WebGLRenderer({
@@ -128,6 +209,10 @@ scene.add(box02)
     renderer.setAnimationLoop(animate)
     window.addEventListener("resize", resizeCallback)
   })
+
+  onUnmounted(()=>{
+        renderer.setAnimationLoop(null)
+    })
   
   function resizeCallback(){
           renderer.setSize(window.innerWidth, window.innerHeight)
