@@ -5,9 +5,11 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 import * as THREE from "three"
-import { TransformControls } from 'three/addons/controls/TransformControls.js'
 import { Client } from '@stomp/stompjs';
+import { PointerLockControls } from 'three/addons/controls/PointerLockControls.js';
 import type {IFrontendNachrichtEvent} from "@/services/IFrontendNachrichtEvent";
+
+const GROUNDSIZE = 1000
 
 const wsurl = `ws://${window.location.host}/stompbroker`
 const DEST = '/topic/cube'
@@ -24,7 +26,6 @@ stompclient.onConnect = (frame) => {
     const event: IFrontendNachrichtEvent = JSON.parse(message.body)
     console.log("ERHALTENES CHANGE: ")
     console.log(event)
-    updateBox(event)
   });
 };
 stompclient.activate()
@@ -32,7 +33,7 @@ stompclient.activate()
 
 const canvasRef = ref()
 let renderer: THREE.WebGLRenderer;
-let controls: TransformControls
+  let controls: PointerLockControls;
 const scene = new THREE.Scene()
 
 const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100)
@@ -46,53 +47,43 @@ light.castShadow = true
 scene.add(light)
 
 
-const boxGeometry = new THREE.BoxGeometry(1, 1, 1)
-const boxMaterial = new THREE.MeshMatcapMaterial({ color: "blue" })
-const box = new THREE.Mesh(boxGeometry, boxMaterial)
-box.castShadow = true
-box.receiveShadow = true
-scene.add(box)
+const groundGeometry = new THREE.PlaneGeometry(GROUNDSIZE, GROUNDSIZE)
+const groundMaterial = new THREE.MeshMatcapMaterial({ color: "lightgrey" })
+const ground = new THREE.Mesh(groundGeometry, groundMaterial)
+ground.castShadow = true
+ground.receiveShadow = true
+ground.rotateX(-Math.PI/2) 
+ground.position.set(0, 0, 0);
+scene.add(ground)
 
 
 document.addEventListener("keypress", (e) => {
   const angle = 0.1
   if (e.code === "KeyD") {
-    box.rotation.y += angle
+
   }
   if (e.code === "KeyW") {
-    box.rotation.x -= angle
+
   }
   if (e.code === "KeyA") {
-    box.rotation.y -= angle
+
   }
   if (e.code === "KeyS") {
-    box.rotation.x += angle
-  }
-  try {
-    const cubeData = {
-      width: box.geometry.parameters.width,
-      height: box.geometry.parameters.height,
-      depth: box.geometry.parameters.depth,
-      rotationAngleX: box.rotation.x,
-      rotationAngleY: box.rotation.y
-    };
 
-    //Sende and /topic/cube/update
-    stompclient.publish({
-      destination: DEST+"/update", headers: {},
-      body: JSON.stringify(cubeData)
-    });
-  } catch (fehler) {
-    console.log(fehler)
   }
-  renderer.render(scene, camera)
+  // try {
+
+  //   //Sende and /topic/cube/update
+  //   stompclient.publish({
+  //     destination: DEST+"/update", headers: {},
+  //     // body: JSON.stringify(cubeData)
+  //   });
+  // } catch (fehler) {
+  //   console.log(fehler)
+  // }
+  // renderer.render(scene, camera)
 })
 
-function updateBox(event : IFrontendNachrichtEvent){
-  box.rotation.x = event.cubeDTO.rotationAngleX
-  box.rotation.y = event.cubeDTO.rotationAngleY
-  renderer.render(scene, camera)
-}
 
 onMounted(() => {
   renderer = new THREE.WebGLRenderer({
