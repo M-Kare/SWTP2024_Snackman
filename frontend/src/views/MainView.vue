@@ -1,16 +1,14 @@
 <template>
   <canvas ref="canvasRef"></canvas>
-  <Snack color="blue" :x-pos=2 :y-pos=2 :z-pos=2  @meshCreated="addSnackToScene" ></Snack>
-  <Snack color="green" :x-pos=3 :y-pos=3 :z-pos=3 @meshCreated="addSnackToScene"></Snack>
-  <Snack color="yellow" :x-pos=1 :y-pos=1 :z-pos=1 @meshCreated="addSnackToScene"></Snack>
-  <Snack :x-pos=-2 :y-pos=-1 :z-pos=3 @meshCreated="addSnackToScene"></Snack>
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import {onMounted, ref} from 'vue'
 import * as THREE from "three"
-import Snack from "@/components/Snack.vue";
-import { ArcballControls } from 'three/addons/controls/ArcballControls.js';
+import {ArcballControls} from 'three/addons/controls/ArcballControls.js';
+import {type ISnackDTD, SnackType} from '@/stores/Snack/ISnackDTD'
+import {createSnack} from "@/components/Snack";
+
 
 const canvasRef = ref()
 
@@ -32,17 +30,41 @@ function addSnackToScene(snack: THREE.Mesh) {
 scene.add( axesHelper );
 scene.add( gridHelper );
 
-onMounted(() => {
+async  function getSnacks(): Promise<ISnackDTD[]>{
+  const url = '/api/snack'
+  const snackResponse = await fetch(url)
+
+  if(!snackResponse.ok) throw new Error(snackResponse.statusText)
+  const snackData = await snackResponse.json()
+
+  return snackData
+}
+
+onMounted(async () => {
+  const snackData: Array<ISnackDTD> = await getSnacks()
+
+  snackData.forEach((snack: ISnackDTD) =>  {
+    if(snack.snackType == SnackType.STRAWBERRY){
+      scene.add(createSnack(snack.position.x, snack.position.y, snack.position.z, 'purple'))
+    }  else if (snack.snackType == SnackType.ORANGE){
+      scene.add(createSnack(snack.position.x, snack.position.y, snack.position.z, 'orange'))
+    } else {
+      scene.add(createSnack(snack.position.x, snack.position.y, snack.position.z))
+    }
+  })
+
+  console.log(snackData)
+
   renderer = new THREE.WebGLRenderer({
     canvas: canvasRef.value,
     alpha: true,
     antialias: true,
   })
 
-  const controls = new ArcballControls( camera, renderer.domElement, scene );
-  controls.addEventListener( 'change', function () {
-    renderer.render( scene, camera );
-  } );
+  const controls = new ArcballControls(camera, renderer.domElement, scene);
+  controls.addEventListener('change', function () {
+    renderer.render(scene, camera);
+  });
 
   renderer.setSize(window.innerWidth, window.innerHeight)
   renderer.render(scene, camera)

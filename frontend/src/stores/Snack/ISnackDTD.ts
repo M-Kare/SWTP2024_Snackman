@@ -9,6 +9,6 @@ interface Position{
   z: number
 }
 
-enum SnackType{
-  CHERRY, STRAWBERRY, ORANGE
+export enum SnackType{
+  CHERRY = 'CHERRY', STRAWBERRY = 'STRAWBERRY', ORANGE = 'ORANGE'
 }
