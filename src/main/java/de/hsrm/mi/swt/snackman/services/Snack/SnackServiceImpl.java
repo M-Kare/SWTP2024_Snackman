@@ -11,9 +11,9 @@ import java.util.List;
 public class SnackServiceImpl implements SnackService {
     @Override
     public List<Snack> getSnacks() {
-        var snack1 = new Snack(1, SnackType.CHERRY, new Position(2, 0, 2));
-        var snack2 = new Snack(2, SnackType.ORANGE, new Position(3, 0, 3));
-        var snack3 = new Snack(3, SnackType.STRAWBERRY, new Position(1, 0, 1));
+        var snack1 = new Snack(1, SnackType.CHERRY, new Position(5, 1, 5));
+        var snack2 = new Snack(2, SnackType.ORANGE, new Position(3, 1, 3));
+        var snack3 = new Snack(3, SnackType.STRAWBERRY, new Position(4, 1, 4));
 
         return List.of(snack1, snack2, snack3);
     }

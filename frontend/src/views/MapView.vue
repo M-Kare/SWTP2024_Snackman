@@ -8,6 +8,7 @@ import * as THREE from 'three'
 import { Client } from '@stomp/stompjs'
 import { PointerLockControls } from 'three/addons/controls/PointerLockControls.js'
 import type { IFrontendNachrichtEvent } from '@/services/IFrontendNachrichtEvent'
+import {addSnacksToScene} from "@/services/SnackService";
 
 const GROUNDSIZE = 1000
 const DECELERATION = 20.0
@@ -97,6 +98,12 @@ box02.receiveShadow = true
 box02.position.set(-10, 5, 10)
 scene.add(box02)
 
+const axesHelper = new THREE.AxesHelper(5);
+const gridHelper = new THREE.GridHelper(10, 10);
+
+scene.add(axesHelper);
+scene.add(gridHelper);
+
 document.addEventListener('keypress', e => {
   if (e.code === 'KeyD') {
   }
@@ -175,6 +182,9 @@ function onKeyUp(event: any) {
 
 // is called every frame, changes camera position and velocity
 function animate() {
+  box.position.set(camera.position.x + 3, camera.position.y - 1, camera.position.z)
+  console.log(camera.position.y)
+
   const time = performance.now()
   const delta = (time - prevTime) / 1000
 
@@ -193,7 +203,17 @@ function animate() {
   renderer.render(scene, camera)
 }
 
-onMounted(() => {
+//Examplebox
+const BOX_SIZE = 1
+const boxGeometry = new THREE.BoxGeometry(BOX_SIZE, BOX_SIZE, BOX_SIZE)
+const boxMaterial = new THREE.MeshMatcapMaterial({color: 'green'})
+const box = new THREE.Mesh(boxGeometry, boxMaterial)
+box.position.set(camera.position.x,camera.position.y,camera.position.z)
+scene.add(box)
+
+onMounted(async () => {
+  await addSnacksToScene(scene)
+
   renderer = new THREE.WebGLRenderer({
     canvas: canvasRef.value,
     alpha: true,

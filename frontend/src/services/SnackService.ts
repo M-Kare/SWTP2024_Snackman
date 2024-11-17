@@ -23,8 +23,8 @@ export async function addSnacksToScene(scene: THREE.Scene) {
     }
   })
 
-  //entfernt cube.
-  snackMap.get(3)?.removeFromParent()
+  //entfernt snack.
+  //snackMap.get(3)?.removeFromParent()
 
   console.log(snackData)
 }
