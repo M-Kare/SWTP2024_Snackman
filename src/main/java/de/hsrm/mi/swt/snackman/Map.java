@@ -12,13 +12,9 @@ public class Map {
     char[][] mazeArray;
     int wallSize = 1; //(Höhe, Breite, Tiefe der Wand)erstmal 1, später bitte anpassen
 
-    int arrayWidth;
-    int arrayHeight;
+    int size;
     
-    public Map(int size){
-        this.arrayWidth = size;
-        this.arrayHeight = size;
-        mazeArray = new char[arrayWidth][arrayHeight];
+    public Map(){
         
         try {
             maze = Files.readAllLines(Paths.get("Maze.txt"));
@@ -26,6 +22,9 @@ public class Map {
             e.printStackTrace();
         }
 
+        this.size = maze.size();
+        mazeArray = new char[size][size];
+        
         //erstelle Labyrinth als Array
         for(int j = 0; j < maze.size(); j++){
             String line = maze.get(j);
