@@ -1,0 +1,47 @@
+package de.hsrm.mi.swt.snackman;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.LinkedList;
+import java.util.List;
+
+public class Map {
+
+    List<String> maze = new LinkedList<>();
+    char[][] mazeArray;
+    int wallSize = 1; //(Höhe, Breite, Tiefe der Wand)erstmal 1, später bitte anpassen
+
+    int arrayWidth;
+    int arrayHeight;
+    
+    public Map(int size){
+        this.arrayWidth = size;
+        this.arrayHeight = size;
+        mazeArray = new char[arrayWidth][arrayHeight];
+        
+        try {
+            maze = Files.readAllLines(Paths.get("Maze.txt"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        //erstelle Labyrinth als Array
+        for(int j = 0; j < maze.size(); j++){
+            String line = maze.get(j);
+            for(int i = 0; i < line.length(); i++){
+                mazeArray[j][i] = line.charAt(i);
+            }
+        }
+    }
+
+    public char[][] getMazeAsArray(){
+        return mazeArray;
+    }
+
+    public void printMap(){
+        for(String line: maze){
+            System.out.println(line);
+        }
+    }
+}
