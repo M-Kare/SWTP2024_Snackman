@@ -16,7 +16,7 @@ public class PlayerMovementExampleController {
     public void spreadCubeUpdate(PlayerDTO player) {
 
         // Sende das Event explizit an das Ziel "/topic/cube"
-        messagingTemplate.convertAndSend("/topic/cube", new PlayerDTO(0.0,2.0,0.0,0.0,0.0,0.0));
+        messagingTemplate.convertAndSend("/topic/cube", player);
     }
 
 }
