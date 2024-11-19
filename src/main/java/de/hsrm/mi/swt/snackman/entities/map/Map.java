@@ -11,4 +11,8 @@ public class Map {
     public char[][] getMapData() {
         return mapData;
     }
+
+    public void setMapData(char[][] mapData) {
+        this.mapData = mapData;
+    }
 }

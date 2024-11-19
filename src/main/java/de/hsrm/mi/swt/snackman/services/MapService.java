@@ -1,18 +1,15 @@
 package de.hsrm.mi.swt.snackman.services;
 
 import de.hsrm.mi.swt.snackman.entities.map.Map;
-import de.hsrm.mi.swt.snackman.entities.map.Wall;
-import jakarta.annotation.PostConstruct;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
-@Slf4j
 @Service
 public class MapService {
 
@@ -20,13 +17,9 @@ public class MapService {
 
     private char[][] mazeData;
 
-    @PostConstruct
-    public void init() {
-        this.mazeData = readMazeFromFile("mini-maze.txt");
-    }
-
     public MapService() {
-        this.map = new Map(mazeData);
+        this.mazeData = readMazeFromFile("mini-maze.txt");
+        this.map = new Map(this.mazeData);
     }
 
     private char[][] readMazeFromFile(String filePath) {
@@ -47,21 +40,7 @@ public class MapService {
         for (int i = 0; i < rows; i++) {
             maze[i] = lines.get(i).toCharArray();
         }
-
         return maze;
-    }
-
-    public List<Wall> getWalls() {
-        List<Wall> walls = new ArrayList<>();
-        char[][] mazeData = map.getMapData();
-        for (int y = 0; y < mazeData.length; y++) {
-            for (int x = 0; x < mazeData[y].length; x++) {
-                if (mazeData[y][x] == '#') {
-                    walls.add(new Wall(x, y, 0, 1, 1, 1));
-                }
-            }
-        }
-        return walls;
     }
 
     public char[][] getMazeAsArray() {
