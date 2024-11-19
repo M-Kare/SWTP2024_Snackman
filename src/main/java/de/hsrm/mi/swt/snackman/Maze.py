@@ -27,12 +27,12 @@ def erstelleLabyrinth(width, height):
 
     return laby
 
-def speicherInFile(laby, filename="Maze.txt"):
+def speicherInFile(laby, filename="mini-maze.txt"):
     with open(filename, "w") as file:
         for row in laby:
             file.write("".join(row) + "\n")
 
-width, height = 99, 99
+width, height = 15, 15
 laby = erstelleLabyrinth(width, height)
 #laby = Labyrinth(width, height)
 speicherInFile(laby)

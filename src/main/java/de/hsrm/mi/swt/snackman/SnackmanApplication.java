@@ -7,9 +7,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class SnackmanApplication {
 
 	public static void main(String[] args) {
-		//SpringApplication.run(SnackmanApplication.class, args);
+		SpringApplication.run(SnackmanApplication.class, args);
 
-		Map map = new Map(99);
+		Map map = new Map();
         //map.printMap();
 
         char[][] laby = map.getMazeAsArray();
