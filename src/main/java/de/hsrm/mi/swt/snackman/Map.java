@@ -12,19 +12,17 @@ public class Map {
     char[][] mazeArray;
     int wallSize = 1; //(Höhe, Breite, Tiefe der Wand)erstmal 1, später bitte anpassen
 
-    int arrayWidth;
-    int arrayHeight;
-    
-    public Map(int size){
-        this.arrayWidth = size;
-        this.arrayHeight = size;
-        mazeArray = new char[arrayWidth][arrayHeight];
-        
+    public Map(){
+        int size;
+
         try {
-            maze = Files.readAllLines(Paths.get("Maze.txt"));
+            maze = Files.readAllLines(Paths.get("mini-maze.txt"));
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        size = maze.size();
+        mazeArray = new char[size][size];
 
         //erstelle Labyrinth als Array
         for(int j = 0; j < maze.size(); j++){
