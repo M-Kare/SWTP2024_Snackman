@@ -106,6 +106,14 @@ export class Player {
         }
       }
 
+    public setPosition(x: number,y: number,z: number) {
+      this.camera.position.set(x,y,z);
+    }
+
+    public setCameraRotation(x: number,y: number,z: number) {
+      this.camera.rotation.set(x,y,z);
+    }
+
     public updatePlayer() {
         const time = performance.now()
         const delta = (time - this.prevTime) / 1000
