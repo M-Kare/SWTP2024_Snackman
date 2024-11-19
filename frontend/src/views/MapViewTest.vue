@@ -30,9 +30,13 @@ stompclient.onConnect = frame => {
     // Callback: Nachricht auf DEST empfangen
     // empfangene Nutzdaten in message.body abrufbar,
     // ggf. mit JSON.parse(message.body) zu JS konvertieren
-    const event: IFrontendNachrichtEvent = JSON.parse(message.body)
+    const event: IPlayerDTD = JSON.parse(message.body)
     console.log('ERHALTENES CHANGE: ')
     console.log(event)
+    console.log(Number(event.posX))
+    player.setPosition(event.posX, event.posY, event.posZ);
+    player.setCameraRotation(event.dirX, event.dirY, event.dirZ);
+    
   })
 }
 stompclient.activate()
@@ -100,9 +104,9 @@ document.addEventListener('keypress', e => {
         lookY:lookDir.y,
         lookZ:lookDir.z
       };
-      messageObject.x = player.getCamera().position.x;
+      console.log(`sent: ${messageObject.lookX}, ${messageObject.lookY}, ${messageObject.lookZ},`)
       stompclient.publish({
-        destination: DEST+"/update", headers: {},
+        destination: DEST+"/player", headers: {},
         body: JSON.stringify(messageObject)
       });
     } catch (fehler) {
@@ -113,6 +117,7 @@ document.addEventListener('keypress', e => {
 
 // is called every frame, changes camera position and velocity
 function animate() {
+  console.log(`new position: ${player.getCamera().position.x}, ${player.getCamera().position.y}, ${player.getCamera().position.z}`)
   player.updatePlayer();
   renderer.render(scene, camera)
 }
