@@ -31,12 +31,8 @@ stompclient.onConnect = frame => {
     // empfangene Nutzdaten in message.body abrufbar,
     // ggf. mit JSON.parse(message.body) zu JS konvertieren
     const event: IPlayerDTD = JSON.parse(message.body)
-    console.log('ERHALTENES CHANGE: ')
-    console.log(event)
-    console.log(Number(event.posX))
     player.setPosition(event.posX, event.posY, event.posZ);
     player.setCameraRotation(event.dirX, event.dirY, event.dirZ);
-    
   })
 }
 stompclient.activate()
@@ -90,36 +86,27 @@ box02.receiveShadow = true
 box02.position.set(-10, 5, 10)
 scene.add(box02)
 
-document.addEventListener('keypress', e => {
-  if (e.code === 'KeyR') {
-    try {
-      //Sende and /topic/player/update
-      const lookDir = new THREE.Vector3();
-      player.getControls().getDirection(lookDir);
-      const messageObject = {
-        x:player.getCamera().position.x,
-        y:player.getCamera().position.y,
-        z:player.getCamera().position.z,
-        lookX:lookDir.x,
-        lookY:lookDir.y,
-        lookZ:lookDir.z
-      };
-      console.log(`sent: ${messageObject.lookX}, ${messageObject.lookY}, ${messageObject.lookZ},`)
-      stompclient.publish({
-        destination: DEST+"/player", headers: {},
-        body: JSON.stringify(messageObject)
-      });
+// is called every frame, changes camera position and velocity
+function animate() {
+  player.updatePlayer();
+  renderer.render(scene, camera)
+  try {
+    //Sende and /topic/player/update
+    const messageObject = {
+      posX:player.getCamera().position.x,
+      posY:player.getCamera().position.y,
+      posZ:player.getCamera().position.z,
+      dirX:player.getCamera().rotation.x,
+      dirY:player.getCamera().rotation.y,
+      dirZ:player.getCamera().rotation.z
+    };
+    stompclient.publish({
+      destination: DEST+"/player", headers: {},
+      body: JSON.stringify(messageObject)
+    });
     } catch (fehler) {
       console.log(fehler)
     }
-  }
-})
-
-// is called every frame, changes camera position and velocity
-function animate() {
-  console.log(`new position: ${player.getCamera().position.x}, ${player.getCamera().position.y}, ${player.getCamera().position.z}`)
-  player.updatePlayer();
-  renderer.render(scene, camera)
 }
 
 onMounted(() => {
