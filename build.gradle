@@ -2,6 +2,7 @@ plugins {
 	id 'java'
 	id 'org.springframework.boot' version '3.3.5'
 	id 'io.spring.dependency-management' version '1.1.6'
+	id 'org.sonarqube' version '6.0.0.5145'
 }
 
 group = 'de.hsrm.mi.web'
@@ -15,6 +16,13 @@ java {
 
 repositories {
 	mavenCentral()
+}
+
+sonar {
+	properties {
+		property 'sonar.token', 'sqa_3dc52c217568dc01c177ee6647816b7f4ff8c0dd'
+		property 'sonar.host.url', 'http://localhost:9000/sonar'
+	}
 }
 
 dependencies {
