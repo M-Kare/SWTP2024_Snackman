@@ -18,6 +18,15 @@ public class Snack {
         this.calories = snackType.getCalories();
     }
 
+    /*Test Berreich*/
+    public Snack ( int id, SnackType snacktype ){
+        this.id =id;
+        this.snackType = snacktype;
+        this.calories = snacktype.getCalories();
+    }
+
+    /*Test*/
+
     public int getId() {
         return id;
     }
