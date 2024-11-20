@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Map;
+
 /**
  * REST Controller for handling map-related API requests
  * This controller provides endpoints for retrieving maze data
@@ -24,7 +26,7 @@ public class MapAPIController {
     private MapService mapService;
 
     @GetMapping("/maze")
-    public ResponseEntity<char[][]> getMaze() {
-        return ResponseEntity.ok(mapService.getMazeAsArray());
+    public ResponseEntity<Map<String, Object>> getMaze() {
+        return ResponseEntity.ok(mapService.prepareMazeForJson());
     }
 }

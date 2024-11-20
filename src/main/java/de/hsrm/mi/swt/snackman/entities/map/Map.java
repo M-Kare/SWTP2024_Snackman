@@ -1,27 +1,22 @@
 package de.hsrm.mi.swt.snackman.entities.map;
 
+import de.hsrm.mi.swt.snackman.entities.square.Square;
+
 /**
  * Represents a game map
  */
 public class Map {
 
-    // representing map data with [x][z] coordinates
-    private char[][] mapData;
+    // representing the map which have squares with [x][z] coordinates
+    private Square[][] maze;
 
     /**
      * Constructs a new Map with the given map data
      *
-     * @param mapData A char array representing the initial state of the map
+     * @param maze A square array representing the map
      */
-    public Map(char[][] mapData) {
-        this.mapData = mapData;
+    public Map(Square[][] maze) {
+        this.maze = maze;
     }
 
-    public char[][] getMapData() {
-        return mapData;
-    }
-
-    public void setMapData(char[][] mapData) {
-        this.mapData = mapData;
-    }
 }

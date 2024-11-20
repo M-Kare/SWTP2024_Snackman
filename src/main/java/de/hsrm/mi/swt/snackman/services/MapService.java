@@ -1,13 +1,18 @@
 package de.hsrm.mi.swt.snackman.services;
 
-import de.hsrm.mi.swt.snackman.entities.map.Map;
+import de.hsrm.mi.swt.snackman.entities.mapObject.floor.Floor;
+import de.hsrm.mi.swt.snackman.entities.mapObject.MapObject;
+import de.hsrm.mi.swt.snackman.entities.mapObject.wall.Wall;
+import de.hsrm.mi.swt.snackman.entities.square.Square;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Service class for managing the game map
@@ -17,11 +22,15 @@ import java.util.List;
 public class MapService {
 
     // map is currently "unnecessary", it will probably be needed as soon as snacks and other items are added
-    private final Map map;
+    //private final Map map;
 
     private String filePath;
 
     private char[][] mazeData;
+
+    private Square[][] maze;
+
+    private List<MapObject> mapObjects;
 
     /**
      * Constructs a new MapService
@@ -30,7 +39,8 @@ public class MapService {
     public MapService() {
         this.filePath = "mini-maze.txt";
         this.mazeData = readMazeFromFile(this.filePath);
-        this.map = new Map(this.mazeData);
+        this.maze = new Square[this.mazeData.length][this.mazeData[0].length];
+        switchMazeDataIntoMapObjectsInMaze();
     }
 
     /**
@@ -40,7 +50,7 @@ public class MapService {
      * @return a char array representing the maze
      * @throws RuntimeException if there's an error reading the file
      */
-    char[][] readMazeFromFile(String filePath) {
+    private char[][] readMazeFromFile(String filePath) {
         List<String> lines = new ArrayList<>();
         try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
             String line;
@@ -61,19 +71,58 @@ public class MapService {
         return maze;
     }
 
-    public char[][] getMazeAsArray() {
-        return this.mazeData;
+    private void switchMazeDataIntoMapObjectsInMaze() {
+        for (int i = 0; i < this.mazeData.length; i++) {
+            for (int j = 0; j < this.mazeData[0].length; j++) {
+                switch (this.mazeData[i][j]) {
+                    case '#':
+                        Wall wall = new Wall();
+                        this.mapObjects = new ArrayList<>();
+                        this.mapObjects.add(wall);
+                        this.maze[i][j] = new Square(mapObjects);
+                        break;
+                    case ' ':
+                        Floor floor = new Floor();
+                        this.maze[i][j] = new Square(new ArrayList<>());
+                        this.mapObjects = new ArrayList<>();
+                        this.mapObjects.add(floor);
+                        this.maze[i][j] = new Square(mapObjects);
+                        break;
+                    // TODO hier weitere mögliche mapObjects hinzufügen mit ihren Zeichen
+                    default:
+                        System.out.println("CAN'T BUILD! " + this.mazeData[i][j] + " doesn't exist");
+                }
+            }
+        }
     }
 
-    public String getFilePath() {
-        return filePath;
+    public Map<String, Object> prepareMazeForJson() {
+        List<Map<String, Object>> mapList = new ArrayList<>();
+
+        for (int i = 0; i < maze.length; i++) {
+            for (int j = 0; j < maze[i].length; j++) {
+                Map<String, Object> squareInfo = new HashMap<>();
+                squareInfo.put("x", j);
+                squareInfo.put("y", i);
+
+                if (maze[i][j].getMapObjects().getFirst() instanceof Wall) {
+                    squareInfo.put("type", "wall");
+                } else if (maze[i][j].getMapObjects().getFirst() instanceof Floor) {
+                    squareInfo.put("type", "floor");
+                }
+                mapList.add(squareInfo);
+            }
+        }
+
+        Map<String, Object> responseMap = new HashMap<>();
+        responseMap.put("map", mapList);
+        responseMap.put("height", Wall.DEFAULT_HEIGHT);
+        responseMap.put("default-side-length", Square.DEFAULT_SIDE_LENGTH);
+
+        return responseMap;
     }
 
-    public void setMazeData(char[][] mazeData) {
-        this.mazeData = mazeData;
-    }
-
-    public void setFilePath(String filePath) {
-        this.filePath = filePath;
+    public char[][] getMazeData() {
+        return mazeData;
     }
 }
