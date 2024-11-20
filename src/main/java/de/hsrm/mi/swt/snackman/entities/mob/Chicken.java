@@ -1,25 +1,44 @@
 package de.hsrm.mi.swt.snackman.entities.mob;
 
+import java.util.Random;
 import java.util.Timer;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
+import de.hsrm.mi.swt.snackman.entities.MapObject.Egg;
+import de.hsrm.mi.swt.snackman.entities.map.Square;
+import de.hsrm.mi.swt.snackman.services.MapService;
 
 public class Chicken extends EatingMob {
 
     private boolean blockingPath = false;
     private Thickness thickness = Thickness.THIN;
-    private Timer layEggTimer;
+    private ChickenTimer layEggTimer;
+    private final int ADDITIONAL_TIME_WHEN_SCARED = 30;
+    private Square currentPosition;
+    private boolean isScared = false;
+    private ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+    private long initialDelay = 0;
+    private long delayIncrease = 0;
+    private final int MIN_DELAY = 30;
+    private final int MAX_DELAY = 30;
+    private int eggIndexX = 0;
+    private int eggIndexZ = 0;
 
-    private Chicken() {
-        this.layEggTimer = new Timer();
+    private Chicken(Square currentPosition) {
+        this.layEggTimer = new ChickenTimer();
+        this.currentPosition = currentPosition;
+        startTimer();
     }
 
     @Override
     protected void move() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'move'");
+        chooseWalkingPath();
     }
 
     private void chooseWalkingPath() {
-
+        /* pyhton script here -> increment timer when scared */
     }
 
     private void incrementThickness() {
@@ -44,16 +63,65 @@ public class Chicken extends EatingMob {
         }
     }
 
+    /**
+     * Lays egg and restarts the timer
+     */
     private void layEgg() {
-
+        this.layEggTimer.layEgg();
     }
 
+    /**
+     * starts the timer
+     */
     private void startTimer() {
-
+        this.layEggTimer.start();
     }
 
+    /**
+     * adds a delay to the timer, so that the egg is layed later
+     */
     private void addTimeToTimerWhenScared() {
+        this.layEggTimer.setDelayIncrease(ADDITIONAL_TIME_WHEN_SCARED);
+    }
 
+    public void start() {
+        initialDelay = getRandomDelayInSeconds();
+        scheduleTask(initialDelay + delayIncrease);
+    }
+
+    private void scheduleTask(long delay) {
+        scheduler.schedule(this::layEgg, delay, TimeUnit.SECONDS);
+    }
+
+    public void layEgg() {
+        MapService.layEgg(eggIndexX, eggIndexZ, generateEgg());
+        stop();
+        start();
+    }
+
+    private Egg generateEgg() {
+        Random random = new Random();
+        return new Egg((10 + random.nextInt(51)) * 10); // kcal between 100 and 600
+    }
+
+    private long getRandomDelayInSeconds() {
+        return MIN_DELAY + (int) (Math.random() * ((MAX_DELAY - MIN_DELAY) + 1));
+    }
+
+    public void stop() {
+        scheduler.shutdownNow();
+    }
+
+    public void setDelayIncrease(long delayIncrease) {
+        this.delayIncrease = delayIncrease;
+    }
+
+    public void setEggIndexX(int eggIndexX) {
+        this.eggIndexX = eggIndexX;
+    }
+
+    public void setEggIndexZ(int eggIndexZ) {
+        this.eggIndexZ = eggIndexZ;
     }
 
 }
