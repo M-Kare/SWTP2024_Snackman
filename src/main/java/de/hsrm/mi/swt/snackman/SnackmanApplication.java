@@ -17,10 +17,16 @@ public class SnackmanApplication {
 		SpringApplication.run(SnackmanApplication.class, args);
 	}
 
+    /**
+     * for initializing the maze
+     * will be executed when the application is started by @Bean
+     *
+     * @return CommandLineRunner that prints a startup message and initializes the maze
+     */
     @Bean
     public CommandLineRunner commandLineRunner() {
         return args -> {
-            System.out.println("Anwendung gestartet. Labyrinth wird initialisiert...");
+            System.out.println("Application started. Labyrinth is initialized ...");
             char[][] maze = mapService.getMazeAsArray();
             printMaze(maze);
         };
