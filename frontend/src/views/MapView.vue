@@ -9,6 +9,7 @@ import { Client } from '@stomp/stompjs'
 import { PointerLockControls } from 'three/addons/controls/PointerLockControls.js'
 import type { IFrontendNachrichtEvent } from '@/services/IFrontendNachrichtEvent'
 import {addSnacksToScene} from "@/services/SnackService";
+import {addSquareToScene} from "@/services/SquareService";
 
 const GROUNDSIZE = 1000
 const DECELERATION = 20.0
@@ -212,7 +213,8 @@ box.position.set(camera.position.x,camera.position.y,camera.position.z)
 scene.add(box)
 
 onMounted(async () => {
-  await addSnacksToScene(scene)
+  //await addSnacksToScene(scene)
+  await addSquareToScene(scene)
 
   renderer = new THREE.WebGLRenderer({
     canvas: canvasRef.value,
