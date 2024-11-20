@@ -5,13 +5,13 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 import * as THREE from 'three'
-import axios from 'axios'
 
 const canvasRef = ref()
 let renderer: THREE.WebGLRenderer
 const scene = new THREE.Scene()
 
-const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100)
+const camera = new THREE.PerspectiveCamera(
+  45, window.innerWidth / window.innerHeight, 0.1, 100)
 camera.position.set(5, 5, 10)
 camera.lookAt(0, 0, 0)
 scene.add(camera)
@@ -23,8 +23,11 @@ scene.add(light)
 
 async function fetchMaze() {
   try {
-    const response = await axios.get('http://localhost:8080/api/maze')
-    const mazeData = response.data;
+    const response = await fetch('http://localhost:8080/api/maze')
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const mazeData = await response.json();
 
     for (let y = 0; y < mazeData.length; y++) {
       for (let x = 0; x < mazeData[y].length; x++) {
@@ -43,7 +46,7 @@ async function fetchMaze() {
 function createWall(x: number, y: number, z: number) {
   const wallMaterial = new THREE.MeshStandardMaterial({ color: 'blue' })
 
-  const cubeGeometry = new THREE.BoxGeometry(1, 3, 1) // Höhe auf 3 setzen
+  const cubeGeometry = new THREE.BoxGeometry(1, 3, 1)
   const cube = new THREE.Mesh(cubeGeometry, wallMaterial)
 
   // Positioniere den Cube
