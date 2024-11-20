@@ -10,8 +10,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-
+/**
+ * REST Controller for handling map-related API requests
+ * This controller provides endpoints for retrieving maze data
+ */
 @Slf4j
 @RestController
 @CrossOrigin(origins = "http://localhost:5173")
