@@ -19,6 +19,7 @@ class SnackmanApplicationTests {
 		//SpringApplication.run(SnackmanApplicationTests.class, args);
 		mazeExists();
 		mazeHasContent();
+		mazeHasDefindesCharacters();
 		
 	}
 
@@ -45,5 +46,24 @@ class SnackmanApplicationTests {
 
 		Assertions.assertTrue(maze.size() > 0, "Die Maze.txt ist leer");
 		System.out.println();
+	}
+
+	@Test
+	static void mazeHasDefindesCharacters(){
+		List<String> maze = new LinkedList<String>();
+		try {
+			maze = Files.readAllLines(Paths.get("./Maze.txt"));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		for(int i = 0; i <= maze.size()- 1; i++){
+			String line = maze.get(i);
+			for(char c : line.toCharArray()){
+				Assertions.assertTrue(c == ' ' || c == '#' || c == 'o' || c == '0' || c == 'S' || c == 'G' || c == 'C', "Ungültiges Zeichen :" + c + " im Maze in Zeile : " + i);
+			}
+		}
+
 	}
 }
