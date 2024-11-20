@@ -19,6 +19,8 @@ public class MapService {
     // map is currently "unnecessary", it will probably be needed as soon as snacks and other items are added
     private final Map map;
 
+    private String filePath;
+
     private char[][] mazeData;
 
     /**
@@ -26,7 +28,8 @@ public class MapService {
      * Initializes the maze data by reading from a file and creates a Map object
      */
     public MapService() {
-        this.mazeData = readMazeFromFile("mini-maze.txt");
+        this.filePath = "mini-maze.txt";
+        this.mazeData = readMazeFromFile(this.filePath);
         this.map = new Map(this.mazeData);
     }
 
@@ -37,7 +40,7 @@ public class MapService {
      * @return a char array representing the maze
      * @throws RuntimeException if there's an error reading the file
      */
-    private char[][] readMazeFromFile(String filePath) {
+    char[][] readMazeFromFile(String filePath) {
         List<String> lines = new ArrayList<>();
         try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
             String line;
@@ -60,5 +63,17 @@ public class MapService {
 
     public char[][] getMazeAsArray() {
         return this.mazeData;
+    }
+
+    public String getFilePath() {
+        return filePath;
+    }
+
+    public void setMazeData(char[][] mazeData) {
+        this.mazeData = mazeData;
+    }
+
+    public void setFilePath(String filePath) {
+        this.filePath = filePath;
     }
 }
