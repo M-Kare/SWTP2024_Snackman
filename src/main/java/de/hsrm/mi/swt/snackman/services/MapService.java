@@ -7,21 +7,36 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
+/**
+ * Service class for managing the game map
+ * This class is responsible for loading and providing access to the maze data
+ */
 @Service
 public class MapService {
 
-    private Map map;
+    // map is currently "unnecessary", it will probably be needed as soon as snacks and other items are added
+    private final Map map;
 
     private char[][] mazeData;
 
+    /**
+     * Constructs a new MapService
+     * Initializes the maze data by reading from a file and creates a Map object
+     */
     public MapService() {
         this.mazeData = readMazeFromFile("mini-maze.txt");
         this.map = new Map(this.mazeData);
     }
 
+    /**
+     * Reads maze data from a file and converts it into a char array with [x][z]-coordinates
+     *
+     * @param filePath the path to the file containing the maze data
+     * @return a char array representing the maze
+     * @throws RuntimeException if there's an error reading the file
+     */
     private char[][] readMazeFromFile(String filePath) {
         List<String> lines = new ArrayList<>();
         try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
