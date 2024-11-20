@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import MainMenuView from '@/views/MainViewMenu.vue'
+import MainMenuView from '@/views/MainMenuView.vue'
 import GameView from '@/views/GameView.vue'
 
 
