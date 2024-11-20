@@ -103,7 +103,7 @@ public class MapService {
             for (int j = 0; j < maze[i].length; j++) {
                 Map<String, Object> squareInfo = new HashMap<>();
                 squareInfo.put("x", j);
-                squareInfo.put("y", i);
+                squareInfo.put("z", i);
 
                 if (maze[i][j].getMapObjects().getFirst() instanceof Wall) {
                     squareInfo.put("type", "wall");
