@@ -14,12 +14,12 @@
   .main-menu-button {
     position: relative;
     z-index: 2;
-    padding: 1.5rem 3.125rem;
+    padding: 1.75rem 4rem;
     border: none;
     border-radius: 0.3125rem;
     background: #fff;
     color: #000;
-    font-size: 1.25rem;
+    font-size: 2rem;
     font-weight: bold;
     cursor: pointer;
     transition: box-shadow 0.3s ease, transform 0.3s ease;
