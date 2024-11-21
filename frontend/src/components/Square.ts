@@ -1,16 +1,13 @@
 import * as THREE from "three"
+import type {ISquareDTD} from "@/stores/Square/ISquareDTD";
 
-export  function createSquare(
-  xPos: number,
-  zPos: number,
-  color: string = 'red',
-  visible: boolean = true) {
+export function createSquare(square: ISquareDTD,
+                             color: string = 'green') {
 
-  const BOX_SIZE = 1
-  const boxGeometry = new THREE.BoxGeometry(1,0.1, 1)
-  const boxMaterial = new THREE.MeshMatcapMaterial({color: color})
-  const square = new THREE.Mesh(boxGeometry, boxMaterial)
-  square.position.set(xPos-1,0, zPos-1)
+  const squareGeometry = new THREE.BoxGeometry(square.sideLength, 0.1, square.sideLength)
+  const squareMaterial = new THREE.MeshMatcapMaterial({color: color})
+  const squareMesh = new THREE.Mesh(squareGeometry, squareMaterial)
+  squareMesh.position.set(square.position.x, 0, square.position.z)
 
-  return square
+  return squareMesh
 }

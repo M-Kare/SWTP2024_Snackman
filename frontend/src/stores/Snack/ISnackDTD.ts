@@ -1,12 +1,11 @@
 export interface ISnackDTD {
-  id: number,
+  height: number,
   position: Position,
   snackType: SnackType
 }
 
-interface Position{
+export interface Position{
   x: number,
-  y: number,
   z: number
 }
 

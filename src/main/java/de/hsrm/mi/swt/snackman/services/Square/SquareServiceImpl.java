@@ -14,7 +14,7 @@ public class SquareServiceImpl implements SquareService {
     @Override
     public Square getSquare() {
         ArrayList<Snack> snackList = new ArrayList<Snack>();
-        Snack snack = new Snack(SnackType.CHERRY);
+        Snack snack = new Snack(SnackType.ORANGE);
         snackList.add(snack);
 
         return new Square(snackList, new Position(0,0));

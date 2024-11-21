@@ -8,8 +8,7 @@ import * as THREE from 'three'
 import { Client } from '@stomp/stompjs'
 import { PointerLockControls } from 'three/addons/controls/PointerLockControls.js'
 import type { IFrontendNachrichtEvent } from '@/services/IFrontendNachrichtEvent'
-import {addSnacksToScene} from "@/services/SnackService";
-import {addSquareToScene} from "@/services/SquareService";
+import {addSquareAndSnackToScene} from "@/services/SquareService";
 
 const GROUNDSIZE = 1000
 const DECELERATION = 20.0
@@ -184,7 +183,6 @@ function onKeyUp(event: any) {
 // is called every frame, changes camera position and velocity
 function animate() {
   box.position.set(camera.position.x + 3, camera.position.y - 1, camera.position.z)
-  console.log(camera.position.y)
 
   const time = performance.now()
   const delta = (time - prevTime) / 1000
@@ -213,8 +211,7 @@ box.position.set(camera.position.x,camera.position.y,camera.position.z)
 scene.add(box)
 
 onMounted(async () => {
-  //await addSnacksToScene(scene)
-  await addSquareToScene(scene)
+  await addSquareAndSnackToScene(scene)
 
   renderer = new THREE.WebGLRenderer({
     canvas: canvasRef.value,

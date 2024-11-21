@@ -5,12 +5,13 @@ import de.hsrm.mi.swt.snackman.entities.Snack.Snack;
 import java.util.List;
 
 public class Square {
-    private final double HEIGHT = 0.1;
+    private final double DEFAULT_SIDE_LENGTH = 1;
     private Position position;
     private List<Snack> snacks;
 
     public Square( List<Snack> snacks, Position position ) {
         this.snacks = snacks;
+        this.position = position;
         setSnackPositions();
     }
 
@@ -20,12 +21,12 @@ public class Square {
         }
     }
 
-    public List<Snack> getSnacks() {
-        return snacks;
+    public double getDEFAULT_SIDE_LENGTH() {
+        return DEFAULT_SIDE_LENGTH;
     }
 
-    public double getHEIGHT() {
-        return HEIGHT;
+    public List<Snack> getSnacks() {
+        return snacks;
     }
 
     public Position getPosition() {

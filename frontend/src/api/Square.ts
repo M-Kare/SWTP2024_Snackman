@@ -6,7 +6,7 @@ export async  function getSquare(): Promise<ISquareDTD>{
   const squareResponse = await fetch(url)
 
   if ( !squareResponse.ok)throw new Error(squareResponse.statusText)
-  const squareData = await squareResponse.json()
+  const squareData: ISquareDTD = await squareResponse.json()
 
   return squareData
 }

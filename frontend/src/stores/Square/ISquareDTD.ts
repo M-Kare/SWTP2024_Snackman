@@ -1,9 +1,7 @@
-import type {ISnackDTD} from "@/stores/Snack/ISnackDTD";
+import type {ISnackDTD, Position} from "@/stores/Snack/ISnackDTD";
 
 export interface ISquareDTD {
   snacks: Array<ISnackDTD>,
-  depthZ: number,
-  widthX: number
-
-
+  position: Position,
+  sideLength: number
 }
