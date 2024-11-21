@@ -6,33 +6,18 @@ import de.hsrm.mi.swt.snackman.Types.Position;
  * Class that defines Snack, that can be eaten by Snackman
  */
 public class Snack {
-    private int id;
+    private final double HEIGHT = 1.0;
     private Position position;
     private SnackType snackType;
     private int calories;
 
-    public Snack(int id, SnackType snackType, Position position) {
-        this.id = id;
+    public Snack(SnackType snackType) {
         this.snackType = snackType;
-        this.position = position;
         this.calories = snackType.getCalories();
     }
 
-    /*Test Berreich*/
-    public Snack ( int id, SnackType snacktype ){
-        this.id =id;
-        this.snackType = snacktype;
-        this.calories = snacktype.getCalories();
-    }
-
-    /*Test*/
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
+    public double getHEIGHT() {
+        return HEIGHT;
     }
 
     public SnackType getSnackType() {
@@ -47,11 +32,11 @@ public class Snack {
         return calories;
     }
 
-    public void setCalories(int calories) {
-        this.calories = calories;
+    public Position getPosition() {
+        return position;
     }
 
-    public Position getPosition() { return position; }
-
-    public void setPosition(Position position) { this.position = position; }
+    public void setPosition(Position position) {
+        this.position = position;
+    }
 }
