@@ -13,7 +13,11 @@ const scene = new THREE.Scene()
 
 // set up camera
 const camera = new THREE.PerspectiveCamera(
-  45, window.innerWidth / window.innerHeight, 0.1, 100)
+  45,
+  window.innerWidth / window.innerHeight,
+  0.1,
+  100,
+)
 // switch y to 2 for having the right perspective to play
 // switch z to 0 for being in the maze
 camera.position.set(0, 8, 15)
@@ -27,34 +31,40 @@ light.castShadow = true
 scene.add(light)
 
 // add more natural outdoor lighting
-const hemiLight = new THREE.HemisphereLight(0xffffbb, 0x080820, 1);
-scene.add(hemiLight);
+const hemiLight = new THREE.HemisphereLight(0xffffbb, 0x080820, 1)
+scene.add(hemiLight)
 
 /**
  * fetch maze data and create walls
  */
-async function fetchMaze() {
+async function fetchMaze(): Promise<void> {
+  let mazeData: IMazeDTD
+
   try {
     // rest endpoint from backend
-    const response = await fetch('http://localhost:8080/api/maze')
+    const response = await fetch('/api/maze')
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      throw new Error(`HTTP error! status: ${response.status}`)
     }
-    const mazeData = await response.json();
+    const mazeData: IMazeDTD = await response.json()
+    console.info(mazeData)
+
+    const DEFAULT_SIDE_LENGTH = mazeData['default-side-length']
+    console.info(DEFAULT_SIDE_LENGTH)
+    const WALL_HEIGHT = mazeData.height
+    console.info(WALL_HEIGHT)
 
     // Iterate through maze data and create walls
-    for (let y = 0; y < mazeData.length; y++) {
-      for (let x = 0; x < mazeData[y].length; x++) {
-        if (mazeData[y][x] === '#') {
-          // Create wall at position (x, 0, -y) -> z = 0 because of 'floor'
-          createWall(x, 0, -y);
-        }
+    for (const item of mazeData.map) {
+      if (item.type === 'wall') {
+        // Create wall at position (x, 0, -z) -> y = 0 because of 'floor'
+        createWall(item.x, 0, item.z, WALL_HEIGHT, DEFAULT_SIDE_LENGTH)
       }
     }
     // Render after creating walls
     renderer.render(scene, camera)
   } catch (error) {
-    console.error("Fehler beim Abrufen des Labyrinths:", error)
+    console.error('Fehler beim Abrufen des Labyrinths:', error)
   }
 }
 
@@ -64,10 +74,18 @@ async function fetchMaze() {
  * @param x x-coordinate
  * @param y y-coordinate
  * @param z z-coordinate
+ * @param height wall-height
+ * @param sideLength side-length for width and depth
  */
-function createWall(x: number, y: number, z: number) {
+function createWall(
+  x: number,
+  y: number,
+  z: number,
+  height: number,
+  sideLength: number,
+) {
   const wallMaterial = new THREE.MeshStandardMaterial({ color: 'orange' })
-  const cubeGeometry = new THREE.BoxGeometry(1, 3, 1)
+  const cubeGeometry = new THREE.BoxGeometry(sideLength, height, sideLength)
   const cube = new THREE.Mesh(cubeGeometry, wallMaterial)
 
   // Position the cube
