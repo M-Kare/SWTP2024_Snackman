@@ -11,5 +11,13 @@ public abstract class EatingMob extends Mob{
     private void loseKcal(int consumedKcal) {
         this.kcal -= consumedKcal;
     }
+
+    public int getKcal() {
+        return this.kcal; 
+    }
+
+    public void setKcal(int kcal) {
+        this.kcal = kcal;
+    }
     
 }

@@ -14,7 +14,7 @@ public class Chicken extends EatingMob {
 
     private boolean blockingPath = false;
     private Thickness thickness = Thickness.THIN;
-    private ChickenTimer layEggTimer;
+    //private ChickenTimer layEggTimer;
     private final int ADDITIONAL_TIME_WHEN_SCARED = 30;
     private Square currentPosition;
     private boolean isScared = false;
@@ -27,9 +27,13 @@ public class Chicken extends EatingMob {
     private int eggIndexZ = 0;
 
     private Chicken(Square currentPosition) {
-        this.layEggTimer = new ChickenTimer();
+        //this.layEggTimer = new ChickenTimer();
         this.currentPosition = currentPosition;
-        startTimer();
+        //startTimer();
+    }
+
+    public Chicken() {
+
     }
 
     @Override
@@ -65,24 +69,24 @@ public class Chicken extends EatingMob {
 
     /**
      * Lays egg and restarts the timer
-     */
-    private void layEgg() {
+     private void layEgg() {
         this.layEggTimer.layEgg();
     }
+    */
 
     /**
      * starts the timer
-     */
-    private void startTimer() {
+     private void startTimer() {
         this.layEggTimer.start();
     }
+    */
 
     /**
      * adds a delay to the timer, so that the egg is layed later
-     */
-    private void addTimeToTimerWhenScared() {
+     private void addTimeToTimerWhenScared() {
         this.layEggTimer.setDelayIncrease(ADDITIONAL_TIME_WHEN_SCARED);
     }
+    */
 
     public void start() {
         initialDelay = getRandomDelayInSeconds();
@@ -122,6 +126,30 @@ public class Chicken extends EatingMob {
 
     public void setEggIndexZ(int eggIndexZ) {
         this.eggIndexZ = eggIndexZ;
+    }
+
+    public boolean getBlockingPath() {
+        return this.blockingPath;
+    }
+
+    public Thickness getThickness() {
+        return this.thickness;
+    }
+
+    public Square getCurrentPosition() {
+        return this.getCurrentPosition();
+    }
+
+    public void setBlockingPath(boolean blockingPath) {
+        this.blockingPath = blockingPath;
+    }
+
+    public void setThickness(Thickness thickness) {
+        this.thickness = thickness;
+    }
+
+    public void setCurrentPosition(Square currentPosition) {
+        this.currentPosition = currentPosition;
     }
 
 }

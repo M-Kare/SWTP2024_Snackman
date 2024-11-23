@@ -5,5 +5,5 @@
 </template>
 
 <script setup lang="ts">
-import GuckDing from './views/CubeExampleView.vue'
+import GuckDing from './views/ChickenTestView.vue'
 </script>
