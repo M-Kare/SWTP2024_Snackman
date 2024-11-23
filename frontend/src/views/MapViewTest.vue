@@ -6,7 +6,6 @@
 import { onMounted, onUnmounted, ref } from 'vue'
 import * as THREE from 'three'
 import { Client } from '@stomp/stompjs'
-import type { IFrontendNachrichtEvent } from '@/services/IFrontendNachrichtEvent'
 import { Player } from '@/components/Player';
 import type { IPlayerDTD } from '@/stores/IPlayerDTD';
 
