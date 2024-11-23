@@ -1,7 +1,10 @@
 package de.hsrm.mi.swt.snackman.entities.mob.Chicken;
 
+import java.io.IOException;
+import java.io.StringWriter;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Properties;
 import java.util.Random;
 import java.util.Timer;
 import java.util.concurrent.Executors;
@@ -15,6 +18,7 @@ import de.hsrm.mi.swt.snackman.entities.mob.Thickness;
 import de.hsrm.mi.swt.snackman.services.MapService;
 
 import org.python.core.Py;
+import org.python.core.PyInstance;
 import org.python.core.PyList;
 import org.python.core.PyObject;
 import org.python.core.PyString;
@@ -39,33 +43,65 @@ public class Chicken extends EatingMob {
     private final int MAX_DELAY = 30;
     private int eggIndexX = 0;
     private int eggIndexZ = 0;
-    private PyObject chickenMovementService;
 
     public Chicken() {
         super();
+    }
 
-        // implement python interpreter for movement
-        try (PythonInterpreter pyInterp = new PythonInterpreter()) {
-            List<String> javaList = Arrays.asList("a", "b", "c");
-            PyList pyList = new PyList();
-            Arrays.stream(javaList).forEach(item -> pyList.append(new PyString(item)));
-            PyObject pythonList = Py.java2py(javaList);
-            pyInterp.exec("import sys");
-            pyInterp.exec("sys.path.append('src/main/resources/python')");
-            pyInterp.execfile(
-                    "src\\main\\java\\de\\hsrm\\mi\\swt\\snackman\\entities\\mob\\Chicken\\ChickenMovementSkript.py");
-            pyInterp.exec("choose_walking_path(pythonList)");
+    PythonInterpreter interp = null;
+    StringWriter clout = null;
+    String[] arguments = null;
 
-                    // Java-Array in eine PyList (Python-kompatible Liste) konvertieren
-        } catch (Exception e) {
-            e.printStackTrace();
+    private String start = null, end = null, subject = null;
+    Properties props = new Properties();
+
+    public String SendToCal(String start, String end, String subject) {
+        try {
+            setInputs(start, end, subject);
+            arguments = getInputs(start, end, subject);
+            // ---------------------------------------------
+            // ---------------trying out jython test--------
+            props.setProperty("python.path", "src/main/java/de/hsrm/mi/swt/snackman/entities/mob/Chicken");
+            PythonInterpreter.initialize(System.getProperties(), props, new String[0]);
+
+            this.interp = new PythonInterpreter();
+
+            clout = new StringWriter();
+
+            interp.setOut(clout);
+            interp.exec("from ChickenMovementSkript import pyscript");
+            PyObject func = interp.get("pyscript");
+            PyObject result = func.__call__(new PyString(start), new PyString(end), new PyString(subject));
+            
+            String outputStr = clout.toString();
+
+            System.out.println(outputStr);
+            System.out.println(result.toString());
+            clout.close();
+        } catch (IOException ex) {
+            ex.printStackTrace();
         }
+        return "";
+    }
+
+    public void setInputs(String start, String end, String sub) {
+        this.start = start;
+        this.end = end;
+        this.subject = sub;
+
+    }
+
+    public String[] getInputs(String start, String end, String sub) {
+        String[] arr = { this.start, this.end, this.subject };
+
+        return arr;
+
     }
 
     @Override
     protected String move() {
         /* pyhton script here -> increment timer when scared */
-        return "";
+        return SendToCal("1", "2", "3");
     }
 
     public String chooseWalkingPath() {

@@ -1,3 +1,13 @@
+#!C:\Users\derwo\AppData\Local\Programs\Python\Python311
+# -*- coding: utf-8 -*-
+
+def pyscript(arg1,arg2,arg3):
+      print ("calling python function with parameters:")
+      print (arg1)
+      print (arg2)
+      print (arg3)
+      return arg1
+
 #     W = Wand 
 #     L = Leer 
 #     S = Snack 
@@ -14,7 +24,7 @@
 #testingList = ["W", "W", "G", "G", "W", "G", "G", "W", 1]
 #testingList = ["W", "S", "G", "S", "W", "G", "G", "W", 1]
 #testingList = ["W", "G", "G", "S", "W", "S", "G", "W", 1]
-testingList = ["W", "L", "G", "L", "W", "G", "G", "W", 1]
+#testingList = ["W", "L", "G", "L", "W", "G", "G", "W", 1]
 
 def choose_next_square(squares_list):
       northwest_square, north_square, northeast_square, east_square, southeast_square, south_square, southwest_square, west_square, direction = squares_list
@@ -110,4 +120,4 @@ def choose_square_without_snack_away_from_ghost(north_square, east_square, south
 def choose_random_square(original_list):
      return replace_first_element(original_list, "L")
 
-print(choose_next_square(testingList))
+#print(choose_next_square(testingList))
