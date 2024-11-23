@@ -69,6 +69,11 @@ public class MapService {
         return mazeAsCharArray;
     }
 
+    /**
+     * Converts the char array maze data into MapObjects and populates the maze
+     *
+     * @param mazeData the char array representing the maze
+     */
     protected void switchMazeDataIntoMapObjectsInMaze(char[][] mazeData) {
         for (int i = 0; i < mazeData.length; i++) {
             for (int j = 0; j < mazeData[0].length; j++) {
@@ -94,6 +99,11 @@ public class MapService {
         }
     }
 
+    /**
+     * Prepares the maze data for JSON serialization
+     *
+     * @return a Map containing the maze data in a format suitable for JSON conversion
+     */
     public Map<String, Object> prepareMazeForJson() {
         List<Map<String, Object>> mapList = new ArrayList<>();
 
