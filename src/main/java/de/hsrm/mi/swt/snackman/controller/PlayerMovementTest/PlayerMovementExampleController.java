@@ -19,15 +19,10 @@ public class PlayerMovementExampleController {
   //Erhalte Messages von /topic/cube/update
     @MessageMapping("/topic/player/update")
     public void spreadPlayerUpdate(SnackManDTO player) {
-      //Validation ...
-      // snackman.move(player.moveLeft(), player.moveRight(), player.moveForward(), player.moveBackward());
+      //Validation here
+      
       snackman.move(player.posX(), player.posY(), player.posZ());
-      // snackman.setDirY(player.dirY());
-      messagingTemplate.convertAndSend("/topic/player", SnackManDTO.toSnackManDTO(snackman));
-    }
-
-    @MessageMapping("/topic/player/register")
-    public void register() {
+      snackman.setDirY(player.dirY());
       messagingTemplate.convertAndSend("/topic/player", SnackManDTO.toSnackManDTO(snackman));
     }
 

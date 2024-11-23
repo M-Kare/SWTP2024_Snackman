@@ -32,8 +32,6 @@ stompclient.onConnect = frame => {
     const event: IPlayerDTD = JSON.parse(message.body)
     console.log(`Received: (${event.posX}|${event.posZ})`)
     player.setPosition(event.posX, event.posY, event.posZ);
-    // player.getCamera().rotation.y = event.dirY;
-
   })
 }
 stompclient.activate()
@@ -44,22 +42,7 @@ let player: Player;
 const scene = new THREE.Scene()
 
 // camera setup
-let camera = new THREE.PerspectiveCamera(
-  45,
-  window.innerWidth / window.innerHeight,
-  0.1,
-  100,
-)
-camera.position.set(0, 2, 10)
-scene.add(camera)
-let test = new THREE.Vector3();
-
-
-// light source setup
-const light = new THREE.DirectionalLight()
-light.position.set(0, 10, 10)
-light.castShadow = true
-scene.add(light)
+let camera: THREE.PerspectiveCamera;
 
 // ground setup
 const groundGeometry = new THREE.PlaneGeometry(GROUNDSIZE, GROUNDSIZE)
@@ -89,25 +72,26 @@ box02.receiveShadow = true
 box02.position.set(-10, 5, 10)
 scene.add(box02)
 
+// test wall
 const wallGeo = new THREE.BoxGeometry(0.1, 10, 100)
 const wallMaterial = new THREE.MeshMatcapMaterial({ color: 'blue' })
 const wall = new THREE.Mesh(wallGeo, wallMaterial)
 wall.position.set(-4,0,0)
 scene.add(wall)
 
+// used to calculate fps in animate()
 const clock = new THREE.Clock();
-const clock2 = new THREE.Clock();
 let fps: number;
 let counter = 0;
+
 // is called every frame, changes camera position and velocity
+// only sends updates to backend at 30hz
 function animate() {
   fps = 1 / clock.getDelta()
+  player.updatePlayer();
   if (counter >= fps / 30) {
-    player.updatePlayer();
-
     try {
       //Sende and /topic/player/update
-      console.log(1 / clock2.getDelta())
       const messageObject = {
         posX: player.getCamera().position.x,
         posY: player.getCamera().position.y,
@@ -123,8 +107,8 @@ function animate() {
     }
     counter = 0
   }
-  renderer.render(scene, camera)
   counter++;
+  renderer.render(scene, camera)
 }
 
 onMounted(() => {

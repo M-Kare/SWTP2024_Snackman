@@ -8,5 +8,4 @@ public class GameConfig {
     // SNACKMAN
     public static final int SNACKMAN_GROUND_LEVEL = 2;
     public static final double SNACKMAN_RADIUS = 2;
-    public static final double SNACKMAN_MOVE_DISTANCE = 0.5;
 }

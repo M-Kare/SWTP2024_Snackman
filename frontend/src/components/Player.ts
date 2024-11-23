@@ -106,24 +106,16 @@ export class Player {
         }
       }
 
-      public getInput(){
-        return {moveLeft:this.moveLeft, moveRight:this.moveRight, moveForward:this.moveForward, moveBackward:this.moveBackward, dirY:this.camera.rotation.y}
-      } 
-
+    // lerp is used to interpolate the two positions
     public setPosition(x: number,y: number,z: number) {
-      this.camera.position.lerp(new THREE.Vector3(x,y,z), 0.3);
-      // this.camera.position.set(x,y,z)
+      this.camera.position.lerp(new THREE.Vector3(x,y,z), 1);
     }
 
     public setCameraRotation(x: number,y: number,z: number) {
       this.camera.rotation.set(x,y,z);
     }
 
-    public move(distX:number, distZ:number){
-      this.controls.moveRight(distX)
-      this.controls.moveForward(distZ)
-    }
-
+    // new position is calculated based on which keys are held
     public updatePlayer() {
         const time = performance.now()
         const delta = (time - this.prevTime) / 1000
