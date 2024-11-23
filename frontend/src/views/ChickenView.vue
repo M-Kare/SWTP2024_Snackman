@@ -26,7 +26,7 @@ stompclient.onConnect = frame => {
     // empfangene Nutzdaten in message.body abrufbar,
     // ggf. mit JSON.parse(message.body) zu JS konvertieren
     const event: IChickenDTD = JSON.parse(message.body)
-    console.log('ERHALTENES CHANGE: ')
+    console.log('ERHALTENES CHANGE: ' + message)
     console.log(event)
     updateChicken(event)
   })
@@ -60,7 +60,7 @@ chicken.receiveShadow = true
 scene.add(chicken)
 
 function updateChicken(e: IChickenDTD) {
-    console.log("Scaling");
+  console.log("Scaling");
   switch (e.thickness) {
     case ChickenThickness.THIN:
       chicken.scale.set(1, 1, 1)
@@ -81,7 +81,6 @@ function updateChicken(e: IChickenDTD) {
     case ChickenThickness.VERY_HEAVY:
       chicken.scale.set(3, 3, 3)
       break
-
     default:
       throw Error('ChickenThickness not recognized.')
   }
@@ -110,4 +109,43 @@ function resizeCallback() {
   camera.aspect = window.innerWidth / window.innerHeight
   camera.updateProjectionMatrix()
 }
+
+/*testing ----------------------- */
+onMounted(() => {
+  window.addEventListener('keydown', (event) => {
+    console.log("Pressed key")
+    if (event.key === 'd') {
+      console.log("Pressed d")
+      testing('d')
+    } else if (event.key === 'a') {
+      console.log("Pressed a")
+      testing('a')
+    }
+  })
+});
+
+function testing(key: string) {
+  if ('a' == key) {
+    const message: IChickenDTD = {
+      thickness: ChickenThickness.THIN,
+      square: {
+        indexX: 1,
+        indexZ: 1
+      }
+    }
+    updateChicken(message)
+  } else if ('d' == key) {
+    const message: IChickenDTD = {
+      thickness: ChickenThickness.HEAVY,
+      square: {
+        indexX: 2,
+        indexZ: 2
+      }
+    }
+    updateChicken(message)
+  };
+};
+
+/*testing ----------------------------- */
+
 </script>
