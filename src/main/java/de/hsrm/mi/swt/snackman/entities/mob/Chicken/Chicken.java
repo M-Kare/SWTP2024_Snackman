@@ -1,4 +1,4 @@
-package de.hsrm.mi.swt.snackman.entities.mob;
+package de.hsrm.mi.swt.snackman.entities.mob.Chicken;
 
 import java.util.Random;
 import java.util.Timer;
@@ -8,13 +8,19 @@ import java.util.concurrent.TimeUnit;
 
 import de.hsrm.mi.swt.snackman.entities.MapObject.Egg;
 import de.hsrm.mi.swt.snackman.entities.map.Square;
+import de.hsrm.mi.swt.snackman.entities.mob.EatingMob;
+import de.hsrm.mi.swt.snackman.entities.mob.Thickness;
 import de.hsrm.mi.swt.snackman.services.MapService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
+@Configuration
 public class Chicken extends EatingMob {
 
     private boolean blockingPath = false;
     private Thickness thickness = Thickness.THIN;
-    //private ChickenTimer layEggTimer;
+    // private ChickenTimer layEggTimer;
     private final int ADDITIONAL_TIME_WHEN_SCARED = 30;
     private Square currentPosition;
     private boolean isScared = false;
@@ -25,24 +31,51 @@ public class Chicken extends EatingMob {
     private final int MAX_DELAY = 30;
     private int eggIndexX = 0;
     private int eggIndexZ = 0;
+    private ChickenMovementService chickenMovementService;
+
+    @Bean(name = "ChickenMovementFactory")
+    public ChickenMovementFactory chickenMovementFactory() {
+    	return new ChickenMovementFactory();
+    }
+
+    @Bean(name = "ChickenMovementService")
+    public ChickenMovementService helloServicePython() throws Exception {
+        return chickenMovementFactory().getObject();
+    }
 
     private Chicken(Square currentPosition) {
-        //this.layEggTimer = new ChickenTimer();
+        super();
+        // this.layEggTimer = new ChickenTimer();
         this.currentPosition = currentPosition;
-        //startTimer();
+        // startTimer();
+
+        // implement python interpreter for movement
+        try {
+            chickenMovementService = helloServicePython();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public Chicken() {
+        super();
 
+        // implement python interpreter for movement
+        try {
+            chickenMovementService = helloServicePython();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
-    protected void move() {
-        chooseWalkingPath();
+    protected String move() {
+        /* pyhton script here -> increment timer when scared */
+        return chickenMovementService.getHello();
     }
 
-    private void chooseWalkingPath() {
-        /* pyhton script here -> increment timer when scared */
+    public String chooseWalkingPath() {
+        return move();
     }
 
     private void incrementThickness() {
@@ -69,24 +102,24 @@ public class Chicken extends EatingMob {
 
     /**
      * Lays egg and restarts the timer
-     private void layEgg() {
-        this.layEggTimer.layEgg();
-    }
-    */
+     * private void layEgg() {
+     * this.layEggTimer.layEgg();
+     * }
+     */
 
     /**
      * starts the timer
-     private void startTimer() {
-        this.layEggTimer.start();
-    }
-    */
+     * private void startTimer() {
+     * this.layEggTimer.start();
+     * }
+     */
 
     /**
      * adds a delay to the timer, so that the egg is layed later
-     private void addTimeToTimerWhenScared() {
-        this.layEggTimer.setDelayIncrease(ADDITIONAL_TIME_WHEN_SCARED);
-    }
-    */
+     * private void addTimeToTimerWhenScared() {
+     * this.layEggTimer.setDelayIncrease(ADDITIONAL_TIME_WHEN_SCARED);
+     * }
+     */
 
     public void start() {
         initialDelay = getRandomDelayInSeconds();

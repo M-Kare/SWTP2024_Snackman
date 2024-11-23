@@ -6,6 +6,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import de.hsrm.mi.swt.snackman.entities.mob.Chicken.Chicken;
+
 
 @Controller
 public class ChickenController {
@@ -23,5 +28,11 @@ public class ChickenController {
         // Sende das Event explizit an das Ziel "/topic/chicken"
         messagingTemplate.convertAndSend("/topic/chicken", chicken);
     }
+
+    @GetMapping("/test")
+    public String getMethodName() {
+        return new Chicken().chooseWalkingPath();
+    }
+    
     
 }
