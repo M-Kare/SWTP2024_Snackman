@@ -1,5 +1,7 @@
 package de.hsrm.mi.swt.snackman.entities.mob.Chicken;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Random;
 import java.util.Timer;
 import java.util.concurrent.Executors;
@@ -11,6 +13,12 @@ import de.hsrm.mi.swt.snackman.entities.map.Square;
 import de.hsrm.mi.swt.snackman.entities.mob.EatingMob;
 import de.hsrm.mi.swt.snackman.entities.mob.Thickness;
 import de.hsrm.mi.swt.snackman.services.MapService;
+
+import org.python.core.Py;
+import org.python.core.PyList;
+import org.python.core.PyObject;
+import org.python.core.PyString;
+import org.python.util.PythonInterpreter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -31,38 +39,24 @@ public class Chicken extends EatingMob {
     private final int MAX_DELAY = 30;
     private int eggIndexX = 0;
     private int eggIndexZ = 0;
-    private ChickenMovementService chickenMovementService;
-
-    @Bean(name = "ChickenMovementFactory")
-    public ChickenMovementFactory chickenMovementFactory() {
-    	return new ChickenMovementFactory();
-    }
-
-    @Bean(name = "ChickenMovementService")
-    public ChickenMovementService helloServicePython() throws Exception {
-        return chickenMovementFactory().getObject();
-    }
-
-    private Chicken(Square currentPosition) {
-        super();
-        // this.layEggTimer = new ChickenTimer();
-        this.currentPosition = currentPosition;
-        // startTimer();
-
-        // implement python interpreter for movement
-        try {
-            chickenMovementService = helloServicePython();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+    private PyObject chickenMovementService;
 
     public Chicken() {
         super();
 
         // implement python interpreter for movement
-        try {
-            chickenMovementService = helloServicePython();
+        try (PythonInterpreter pyInterp = new PythonInterpreter()) {
+            List<String> javaList = Arrays.asList("a", "b", "c");
+            PyList pyList = new PyList();
+            Arrays.stream(javaList).forEach(item -> pyList.append(new PyString(item)));
+            PyObject pythonList = Py.java2py(javaList);
+            pyInterp.exec("import sys");
+            pyInterp.exec("sys.path.append('src/main/resources/python')");
+            pyInterp.execfile(
+                    "src\\main\\java\\de\\hsrm\\mi\\swt\\snackman\\entities\\mob\\Chicken\\ChickenMovementSkript.py");
+            pyInterp.exec("choose_walking_path(pythonList)");
+
+                    // Java-Array in eine PyList (Python-kompatible Liste) konvertieren
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -71,7 +65,7 @@ public class Chicken extends EatingMob {
     @Override
     protected String move() {
         /* pyhton script here -> increment timer when scared */
-        return chickenMovementService.getHello();
+        return "";
     }
 
     public String chooseWalkingPath() {

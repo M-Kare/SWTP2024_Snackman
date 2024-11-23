@@ -1,8 +1,5 @@
-from . import ChickenMovementService
+def choose_walking_path(pythonList):
+    print(pythonList)
+    return pythonList
 
-class ChickenMovement(ChickenMovementService):
-    def __init__(self):
-        self.value="Hello from python"
-       
-    def getHello(self):
-        return self.value
+print("Hallo WER IST DAAAAAAAAAAAAAAAAAAAA")
