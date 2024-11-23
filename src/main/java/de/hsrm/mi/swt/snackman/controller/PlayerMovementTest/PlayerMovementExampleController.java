@@ -5,18 +5,30 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 
+import de.hsrm.mi.swt.snackman.entities.Mobile_Objects.Eating_Mobs.SnackMan;
+import de.hsrm.mi.swt.snackman.entities.Mobile_Objects.Eating_Mobs.SnackManDTO;
+
 @Controller
 public class PlayerMovementExampleController {
 
   @Autowired
     private SimpMessagingTemplate messagingTemplate;
+    
+    private final SnackMan snackman = new SnackMan(0, 0);
 
   //Erhalte Messages von /topic/cube/update
-    @MessageMapping("/topic/cube/player")
-    public void spreadCubeUpdate(PlayerDTO player) {
+    @MessageMapping("/topic/player/update")
+    public void spreadPlayerUpdate(SnackManDTO player) {
+      //Validation ...
+      // snackman.move(player.moveLeft(), player.moveRight(), player.moveForward(), player.moveBackward());
+      snackman.move(player.posX(), player.posY(), player.posZ());
+      // snackman.setDirY(player.dirY());
+      messagingTemplate.convertAndSend("/topic/player", SnackManDTO.toSnackManDTO(snackman));
+    }
 
-        // Sende das Event explizit an das Ziel "/topic/cube"
-        messagingTemplate.convertAndSend("/topic/cube", player);
+    @MessageMapping("/topic/player/register")
+    public void register() {
+      messagingTemplate.convertAndSend("/topic/player", SnackManDTO.toSnackManDTO(snackman));
     }
 
 }

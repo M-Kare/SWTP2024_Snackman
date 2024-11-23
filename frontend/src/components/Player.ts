@@ -35,7 +35,7 @@ export class Player {
         this.movementDirection = new THREE.Vector3();
 
         this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100)
-        this.camera.position.set(0, 2, 10)
+        this.camera.position.set(0, 2, 0)
         this.controls = new PointerLockControls(this.camera, renderer.domElement)
         document.addEventListener('keydown', (event)=>{this.onKeyDown(event)})
         document.addEventListener('keyup', (event)=>{this.onKeyUp(event)})
@@ -106,12 +106,22 @@ export class Player {
         }
       }
 
+      public getInput(){
+        return {moveLeft:this.moveLeft, moveRight:this.moveRight, moveForward:this.moveForward, moveBackward:this.moveBackward, dirY:this.camera.rotation.y}
+      } 
+
     public setPosition(x: number,y: number,z: number) {
-      this.camera.position.set(x,y,z);
+      this.camera.position.lerp(new THREE.Vector3(x,y,z), 0.3);
+      // this.camera.position.set(x,y,z)
     }
 
     public setCameraRotation(x: number,y: number,z: number) {
       this.camera.rotation.set(x,y,z);
+    }
+
+    public move(distX:number, distZ:number){
+      this.controls.moveRight(distX)
+      this.controls.moveForward(distZ)
     }
 
     public updatePlayer() {

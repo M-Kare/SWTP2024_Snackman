@@ -1,7 +1,16 @@
 package de.hsrm.mi.swt.snackman.entities.Mobile_Objects;
 
-public interface Mob {
+public abstract class Mob {
+    //private Square square;
 
-    public void move();
+    // public void setSquare(Square square){
+    //     this.square = square;
+    // }
+
+    // public Square getSquare(){
+    //     return this.square;
+    // }
+
+    abstract public void move(double x, double y, double z);
 
 }

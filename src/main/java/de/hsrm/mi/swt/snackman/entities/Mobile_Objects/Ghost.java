@@ -1,12 +1,10 @@
 package de.hsrm.mi.swt.snackman.entities.Mobile_Objects;
 
-public class Ghost implements Mob {
-
-    private int squareIndexX;
-    private int squareIndexZ;
+public class Ghost extends Mob {
 
     public Ghost(){
-
+        super();
+        
     }
 
     public void collectItems(){
@@ -17,19 +15,19 @@ public class Ghost implements Mob {
 
     }
 
-    public void scareChicken(){
+    private void scareChicken(){
 
     }
 
-    public void scareSnackMan(){
+    private void scareSnackMan(){
 
     }
-
 
     @Override
-    public void move() {
+    public void move(double x, double y, double z) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'move'");
     }
+
     
 }
