@@ -21,12 +21,10 @@ import java.util.Map;
 @Service
 public class MapService {
 
-    // map is currently "unnecessary", it will probably be needed as soon as snacks and other items are added
-    //private final Map map;
+    // TODO map is currently "unnecessary", it will probably be needed as soon as snacks and other items are added
+    // private final Map map;
 
     private String filePath;
-
-    private char[][] mazeData;
 
     private Square[][] maze;
 
@@ -38,9 +36,9 @@ public class MapService {
      */
     public MapService() {
         this.filePath = "mini-maze.txt";
-        this.mazeData = readMazeFromFile(this.filePath);
-        this.maze = new Square[this.mazeData.length][this.mazeData[0].length];
-        switchMazeDataIntoMapObjectsInMaze();
+        char[][] mazeData = readMazeFromFile(this.filePath);
+        this.maze = new Square[mazeData.length][mazeData[0].length];
+        switchMazeDataIntoMapObjectsInMaze(mazeData);
     }
 
     /**
@@ -50,7 +48,7 @@ public class MapService {
      * @return a char array representing the maze
      * @throws RuntimeException if there's an error reading the file
      */
-    private char[][] readMazeFromFile(String filePath) {
+    protected char[][] readMazeFromFile(String filePath) {
         List<String> lines = new ArrayList<>();
         try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
             String line;
@@ -63,18 +61,18 @@ public class MapService {
 
         int rows = lines.size();
         int cols = lines.getFirst().length();
-        char[][] maze = new char[rows][cols];
+        char[][] mazeAsCharArray = new char[rows][cols];
 
         for (int i = 0; i < rows; i++) {
-            maze[i] = lines.get(i).toCharArray();
+            mazeAsCharArray[i] = lines.get(i).toCharArray();
         }
-        return maze;
+        return mazeAsCharArray;
     }
 
-    private void switchMazeDataIntoMapObjectsInMaze() {
-        for (int i = 0; i < this.mazeData.length; i++) {
-            for (int j = 0; j < this.mazeData[0].length; j++) {
-                switch (this.mazeData[i][j]) {
+    protected void switchMazeDataIntoMapObjectsInMaze(char[][] mazeData) {
+        for (int i = 0; i < mazeData.length; i++) {
+            for (int j = 0; j < mazeData[0].length; j++) {
+                switch (mazeData[i][j]) {
                     case '#':
                         Wall wall = new Wall();
                         this.mapObjects = new ArrayList<>();
@@ -90,7 +88,7 @@ public class MapService {
                         break;
                     // TODO hier weitere mögliche mapObjects hinzufügen mit ihren Zeichen
                     default:
-                        System.out.println("CAN'T BUILD! " + this.mazeData[i][j] + " doesn't exist");
+                        System.out.println("CAN'T BUILD! " + mazeData[i][j] + " doesn't exist");
                 }
             }
         }
@@ -99,15 +97,15 @@ public class MapService {
     public Map<String, Object> prepareMazeForJson() {
         List<Map<String, Object>> mapList = new ArrayList<>();
 
-        for (int i = 0; i < maze.length; i++) {
-            for (int j = 0; j < maze[i].length; j++) {
+        for (int i = 0; i < this.maze.length; i++) {
+            for (int j = 0; j < this.maze[i].length; j++) {
                 Map<String, Object> squareInfo = new HashMap<>();
                 squareInfo.put("x", j);
                 squareInfo.put("z", i);
 
-                if (maze[i][j].getMapObjects().getFirst() instanceof Wall) {
+                if (this.maze[i][j].getMapObjects().getFirst() instanceof Wall) {
                     squareInfo.put("type", "wall");
-                } else if (maze[i][j].getMapObjects().getFirst() instanceof Floor) {
+                } else if (this.maze[i][j].getMapObjects().getFirst() instanceof Floor) {
                     squareInfo.put("type", "floor");
                 }
                 mapList.add(squareInfo);
@@ -120,9 +118,5 @@ public class MapService {
         responseMap.put("default-side-length", Square.DEFAULT_SIDE_LENGTH);
 
         return responseMap;
-    }
-
-    public char[][] getMazeData() {
-        return mazeData;
     }
 }
