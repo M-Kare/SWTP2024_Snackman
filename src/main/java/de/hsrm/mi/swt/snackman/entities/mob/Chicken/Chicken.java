@@ -3,6 +3,7 @@ package de.hsrm.mi.swt.snackman.entities.mob.Chicken;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
 import java.util.Random;
@@ -55,30 +56,25 @@ public class Chicken extends EatingMob {
     private String start = null, end = null, subject = null;
     Properties props = new Properties();
 
-    public String SendToCal(String start, String end, String subject) {
+    private void initJython() {
+
+    }
+
+    public String executeMovementSkript(List<String>squares) {
         try {
             setInputs(start, end, subject);
             arguments = getInputs(start, end, subject);
-            // ---------------------------------------------
-            // ---------------trying out jython test--------
             props.setProperty("python.path", "src/main/java/de/hsrm/mi/swt/snackman/entities/mob/Chicken");
             PythonInterpreter.initialize(System.getProperties(), props, new String[0]);
 
             this.interp = new PythonInterpreter();
 
-            clout = new StringWriter();
-
-            interp.setOut(clout);
             interp.exec("from ChickenMovementSkript import pyscript");
             PyObject func = interp.get("pyscript");
-            PyObject result = func.__call__(new PyString(start), new PyString(end), new PyString(subject));
+            PyObject result = func.__call__(new PyList(squares));
             
-            String outputStr = clout.toString();
-
-            System.out.println(outputStr);
-            System.out.println(result.toString());
-            clout.close();
-        } catch (IOException ex) {
+            System.out.println("java " + result.toString());
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
         return "";
@@ -101,7 +97,17 @@ public class Chicken extends EatingMob {
     @Override
     protected String move() {
         /* pyhton script here -> increment timer when scared */
-        return SendToCal("1", "2", "3");
+        List<String> squares = new LinkedList<>();
+        squares.add("W");
+        squares.add("W");
+        squares.add("W");
+        squares.add("W");
+        squares.add("W");
+        squares.add("W");
+        squares.add("W");
+        squares.add("W");
+        squares.add("W");
+        return executeMovementSkript(squares);
     }
 
     public String chooseWalkingPath() {
