@@ -1,31 +1,22 @@
 package de.hsrm.mi.swt.snackman.entities.mob.Chicken;
 
-import java.io.IOException;
 import java.io.StringWriter;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
 import java.util.Random;
-import java.util.Timer;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-
 import de.hsrm.mi.swt.snackman.entities.MapObject.Egg;
 import de.hsrm.mi.swt.snackman.entities.map.Square;
 import de.hsrm.mi.swt.snackman.entities.mob.EatingMob;
 import de.hsrm.mi.swt.snackman.entities.mob.Thickness;
 import de.hsrm.mi.swt.snackman.services.MapService;
-
-import org.python.core.Py;
-import org.python.core.PyInstance;
 import org.python.core.PyList;
 import org.python.core.PyObject;
-import org.python.core.PyString;
 import org.python.util.PythonInterpreter;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
@@ -44,70 +35,68 @@ public class Chicken extends EatingMob {
     private final int MAX_DELAY = 30;
     private int eggIndexX = 0;
     private int eggIndexZ = 0;
+    // python
+    private PythonInterpreter pythonInterpreter = null;
+    private Properties pythonProps = new Properties();
 
     public Chicken() {
         super();
     }
 
-    PythonInterpreter interp = null;
-    StringWriter clout = null;
-    String[] arguments = null;
-
-    private String start = null, end = null, subject = null;
-    Properties props = new Properties();
-
     private void initJython() {
-
+        pythonProps.setProperty("python.path", "src/main/java/de/hsrm/mi/swt/snackman/entities/mob/Chicken");
+        PythonInterpreter.initialize(System.getProperties(), pythonProps, new String[0]);
+        this.pythonInterpreter = new PythonInterpreter();
     }
 
-    public String executeMovementSkript(List<String>squares) {
+    public List<String> executeMovementSkript(List<String> squares) {
         try {
-            setInputs(start, end, subject);
-            arguments = getInputs(start, end, subject);
-            props.setProperty("python.path", "src/main/java/de/hsrm/mi/swt/snackman/entities/mob/Chicken");
-            PythonInterpreter.initialize(System.getProperties(), props, new String[0]);
-
-            this.interp = new PythonInterpreter();
-
-            interp.exec("from ChickenMovementSkript import pyscript");
-            PyObject func = interp.get("pyscript");
+            pythonInterpreter.exec("from ChickenMovementSkript import choose_next_square");
+            PyObject func = pythonInterpreter.get("choose_next_square");
             PyObject result = func.__call__(new PyList(squares));
-            
-            System.out.println("java " + result.toString());
+
+            if (result instanceof PyList) {
+                PyList pyList = (PyList) result;
+                return convertPythonList(pyList);
+            }
+
+            throw new Exception("Python chicken script did not load.");
         } catch (Exception ex) {
             ex.printStackTrace();
         }
-        return "";
+        return squares;
     }
 
-    public void setInputs(String start, String end, String sub) {
-        this.start = start;
-        this.end = end;
-        this.subject = sub;
-
+    private List<String> convertPythonList(PyList pyList){
+        List<String> javaList = new ArrayList<>();
+        for (Object item : pyList) {
+            javaList.add(item.toString());
+        }
+        return javaList;
     }
 
-    public String[] getInputs(String start, String end, String sub) {
-        String[] arr = { this.start, this.end, this.subject };
-
-        return arr;
-
-    }
-
+    /**
+     * implement moving logic into each chicken
+     */
     @Override
     protected String move() {
-        /* pyhton script here -> increment timer when scared */
+        if (pythonInterpreter == null)
+            initJython();
+
+        /* pyhton script here */
         List<String> squares = new LinkedList<>();
         squares.add("W");
         squares.add("W");
         squares.add("W");
         squares.add("W");
-        squares.add("W");
-        squares.add("W");
-        squares.add("W");
-        squares.add("W");
-        squares.add("W");
-        return executeMovementSkript(squares);
+        squares.add("S");
+        squares.add("S");
+        squares.add("S");
+        squares.add("S");
+        squares.add("1");
+        List<String> newMove = executeMovementSkript(squares);
+        System.out.println(newMove.toString());
+        return "Moved";
     }
 
     public String chooseWalkingPath() {
