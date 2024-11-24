@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import MainMenuView from '@/views/MainMenuView.vue'
-import GameView from '@/views/GameView.vue'
+import GameView from '@/views/LobbyView.vue'
 
 
 const router = createRouter({

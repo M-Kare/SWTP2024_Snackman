@@ -5,5 +5,5 @@
 </template>
 
 <script setup lang="ts">
-import MainView from './views/MainView.vue'
+import MainView from './views/GameView.vue'
 </script>
