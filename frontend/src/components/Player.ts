@@ -115,6 +115,7 @@ export class Player {
       this.camera.rotation.set(x,y,z);
     }
 
+    // code inspired by from https://github.com/mrdoob/three.js/blob/master/examples/misc_controls_pointerlock.html
     // new position is calculated based on which keys are held
     public updatePlayer() {
         const time = performance.now()
