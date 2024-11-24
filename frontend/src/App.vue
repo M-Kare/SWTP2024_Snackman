@@ -1,9 +1,9 @@
 <template>
   <main>
-    <MapView />
+    <MazeView />
   </main>
 </template>
 
 <script setup lang="ts">
-import MapView from './views/PlayerTestView.vue'
+import MazeView from './views/MazeView.vue'
 </script>
