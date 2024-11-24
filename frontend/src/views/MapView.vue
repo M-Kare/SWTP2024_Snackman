@@ -8,7 +8,8 @@ import * as THREE from 'three'
 import { Client } from '@stomp/stompjs'
 import { PointerLockControls } from 'three/addons/controls/PointerLockControls.js'
 import type { IFrontendNachrichtEvent } from '@/services/IFrontendNachrichtEvent'
-import {addSquareAndSnackToScene} from "@/services/SquareService";
+//NEW (second param)
+import {addSquareAndSnackToScene, removeSnackFromScene} from "@/services/SquareService";
 
 const GROUNDSIZE = 1000
 const DECELERATION = 20.0
@@ -199,8 +200,30 @@ function animate() {
   controls.moveRight(-velocity.x * delta)
   controls.moveForward(-velocity.z * delta)
   prevTime = time
+  //NEW
+  checkCollisionAndRemoveSnack();
+  //NEW
   renderer.render(scene, camera)
 }
+
+//NEW
+function isCollision(camera: THREE.PerspectiveCamera, snack: THREE.Mesh): boolean {
+  const cameraPosition = camera.position;
+  const snackPosition = snack.position;
+  const distance = cameraPosition.distanceTo(snackPosition);
+  return distance < 2;
+}
+
+function checkCollisionAndRemoveSnack() {
+  scene.children.forEach(child => {
+    if (child instanceof THREE.Mesh) {
+      if (isCollision(camera, child)) {
+        removeSnackFromScene(child, scene);
+      }
+    }
+  });
+}
+//NEW
 
 //Examplebox
 const BOX_SIZE = 1

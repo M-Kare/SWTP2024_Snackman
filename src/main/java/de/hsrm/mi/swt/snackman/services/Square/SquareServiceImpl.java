@@ -11,12 +11,19 @@ import java.util.ArrayList;
 @Service
 public class SquareServiceImpl implements SquareService {
 
+    ArrayList<Snack> snackList = new ArrayList<Snack>();
+
     @Override
     public Square getSquare() {
-        ArrayList<Snack> snackList = new ArrayList<Snack>();
+        //ArrayList<Snack> snackList = new ArrayList<Snack>();
         Snack snack = new Snack(SnackType.ORANGE);
         snackList.add(snack);
 
         return new Square(snackList, new Position(0,0));
     }
+
+    public boolean removeSnack(Snack snackToRemove) {
+        return snackList.removeIf(snack -> snack.getPosition().equals(snackToRemove.getPosition()));
+    }
 }
+
