@@ -1,6 +1,6 @@
-package de.hsrm.mi.swt.snackman.entities.Mobile_Objects.Eating_Mobs;
+package de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs;
 
-import de.hsrm.mi.swt.snackman.entities.Mobile_Objects.Mob;
+import de.hsrm.mi.swt.snackman.entities.mobileObjects.Mob;
 
 public abstract class EatingMob extends Mob{
     private int kcal;

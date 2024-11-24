@@ -1,4 +1,4 @@
-package de.hsrm.mi.swt.snackman.entities.Mobile_Objects.Eating_Mobs;
+package de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs;
 
 public record SnackManDTO(double posX, double posY, double posZ, double dirY) {
 

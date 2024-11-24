@@ -1,4 +1,4 @@
-package de.hsrm.mi.swt.snackman.entities.Mobile_Objects;
+package de.hsrm.mi.swt.snackman.entities.mobileObjects;
 
 public class Ghost extends Mob {
 

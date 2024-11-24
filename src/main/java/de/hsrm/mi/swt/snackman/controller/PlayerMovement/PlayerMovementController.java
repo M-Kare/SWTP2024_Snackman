@@ -1,15 +1,15 @@
-package de.hsrm.mi.swt.snackman.controller.PlayerMovementTest;
+package de.hsrm.mi.swt.snackman.controller.PlayerMovement;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 
-import de.hsrm.mi.swt.snackman.entities.Mobile_Objects.Eating_Mobs.SnackMan;
-import de.hsrm.mi.swt.snackman.entities.Mobile_Objects.Eating_Mobs.SnackManDTO;
+import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.SnackMan;
+import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.SnackManDTO;
 
 @Controller
-public class PlayerMovementExampleController {
+public class PlayerMovementController {
 
   @Autowired
     private SimpMessagingTemplate messagingTemplate;
