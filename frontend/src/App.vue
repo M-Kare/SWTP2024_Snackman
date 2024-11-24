@@ -5,5 +5,5 @@
 </template>
 
 <script setup lang="ts">
-import MazeView from './views/MazeView.vue'
+import MazeView from './views/PlayerTestView.vue'
 </script>

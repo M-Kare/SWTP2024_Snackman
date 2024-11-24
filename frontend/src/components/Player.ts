@@ -14,7 +14,7 @@ export class Player {
     private moveRight: boolean;
     private canJump: boolean;
 
-    private camera: THREE.PerspectiveCamera; 
+    private camera: THREE.PerspectiveCamera;
     private controls: PointerLockControls;
 
     private velocity: THREE.Vector3;
@@ -64,17 +64,17 @@ export class Player {
           case 'KeyW':
             this.moveForward = false
             break
-      
+
           case 'ArrowLeft':
           case 'KeyA':
             this.moveLeft = false
             break
-      
+
           case 'ArrowDown':
           case 'KeyS':
             this.moveBackward = false
             break
-      
+
           case 'ArrowRight':
           case 'KeyD':
             this.moveRight = false
@@ -88,17 +88,17 @@ export class Player {
           case 'KeyW':
             this.moveForward = true
             break
-      
+
           case 'ArrowLeft':
           case 'KeyA':
             this.moveLeft = true
             break
-      
+
           case 'ArrowDown':
           case 'KeyS':
             this.moveBackward = true
             break
-      
+
           case 'ArrowRight':
           case 'KeyD':
             this.moveRight = true

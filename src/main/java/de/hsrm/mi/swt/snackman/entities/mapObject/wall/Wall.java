@@ -15,7 +15,7 @@ import lombok.Setter;
 @Setter
 public class Wall extends MapObject {
 
-    public static final int DEFAULT_HEIGHT = 3;
+    public static final int DEFAULT_HEIGHT = 5;
 
     /**
      * Constructs a new Wall
