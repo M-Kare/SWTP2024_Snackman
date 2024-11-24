@@ -6,7 +6,7 @@
       <MainMenuButton class="start-button" @click="startGame">Spiel starten</MainMenuButton>
     </div>
   </template>
-  
+
   <script setup lang="ts">
     import MainMenuButton from '@/components/MainMenuButton.vue';
     import { useRouter } from 'vue-router';
@@ -14,12 +14,11 @@
     const router = useRouter();
 
     const startGame = () => {
-        const playerId = 1;
-        router.push({name: 'GameStart', params: { playerId }});
+        router.push({name: 'GameStart'});
     }
-  
+
   </script>
-  
+
   <style scoped>
   .start-page {
     width: 100vw;
@@ -27,7 +26,7 @@
     position: relative;
     overflow: hidden;
   }
-  
+
   .background {
     position: absolute;
     top: 0;
@@ -39,7 +38,7 @@
     background-position: center;
     z-index: 1;
   }
-  
+
   .overlay {
     position: absolute;
     top: 0;
@@ -49,7 +48,7 @@
     background-color: rgba(0, 0, 0, 0.5);
     z-index: 2;
   }
-  
+
   .title {
     position: absolute;
     top: 50px;
@@ -61,7 +60,7 @@
     text-align: center;
     z-index: 3;
   }
-  
+
   .start-button {
     position: absolute;
     top: 50%;

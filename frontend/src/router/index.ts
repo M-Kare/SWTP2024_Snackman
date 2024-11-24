@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import MainMenuView from '@/views/MainMenuView.vue'
-import GameView from '@/views/LobbyView.vue'
+import GameView from '@/views/GameView.vue'
 
 
 const router = createRouter({
@@ -12,7 +12,7 @@ const router = createRouter({
             component: MainMenuView
         },
         {
-            path: '/player/:playerId',
+            path: '/GameView',
             name: 'GameStart',
             component: GameView,
             props: true
