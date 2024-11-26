@@ -12,6 +12,8 @@
 #
 #     direction: the direction index in which the chickens head is looking
 #     e.g. if the solution liste is [W,G, ,W,2] the chicken is walking in south direction and looking into south direction too
+#
+#    returns: [north_square, east_square, south_square, west_square, indexOfNextPosition]
 
 # todo: nimmt gerade immer die erste Option die es findet, kann man noch random machen
 #testingliste = ["W", "W", "G", "G", "W", "G", "G", "W", 1]
