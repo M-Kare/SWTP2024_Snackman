@@ -1,14 +1,10 @@
 package de.hsrm.mi.swt.snackman.entities.mob.Chicken;
 
-import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
 import java.util.Random;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 import de.hsrm.mi.swt.snackman.entities.MapObject.Egg;
 import de.hsrm.mi.swt.snackman.entities.map.Square;
 import de.hsrm.mi.swt.snackman.entities.mob.EatingMob;
@@ -17,24 +13,21 @@ import de.hsrm.mi.swt.snackman.services.MapService;
 import org.python.core.PyList;
 import org.python.core.PyObject;
 import org.python.util.PythonInterpreter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Configuration;
 
-@Configuration
 public class Chicken extends EatingMob {
 
-    private boolean blockingPath = false;
-    private Thickness thickness = Thickness.THIN;
-    // private ChickenTimer layEggTimer;
-    private final int ADDITIONAL_TIME_WHEN_SCARED = 30;
+    private final Logger logger = LoggerFactory.getLogger(Chicken.class);
+    private boolean blockingPath;
+    private Thickness thickness;
     private Square currentPosition;
-    private boolean isScared = false;
-    private ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
-    private long initialDelay = 0;
-    private long delayIncrease = 0;
+    private Direction lookingDirection;
     private final int MIN_DELAY = 30;
     private final int MAX_DELAY = 30;
-    private int eggIndexX = 0;
-    private int eggIndexZ = 0;
+    private boolean isWalking;
+    private MapService mapService;
     // python
     private PythonInterpreter pythonInterpreter = null;
     private Properties pythonProps = new Properties();
@@ -43,14 +36,88 @@ public class Chicken extends EatingMob {
         super();
     }
 
+    public Chicken(Square initialPosition, MapService mapService) {
+        this.blockingPath = false;
+        this.thickness = Thickness.THIN;
+        this.currentPosition = initialPosition;
+        this.isWalking = true;
+        this.lookingDirection = Direction.NORTH;
+        this.mapService = mapService;
+        initTimer();
+        initWalking();
+        move();
+    }
+
+    // initialises the timer for laying eggs
+    private void initTimer() {
+
+    }
+
+    private void initWalking() {
+        initJython();
+    }
+
+    public List<String> chooseWalkingPath(List<String> currentlyVisibleEnvironment) {
+        List<String> newMove = executeMovementSkript(currentlyVisibleEnvironment);
+        return newMove;
+    }
+
+    private void setNewPosition(List<String> newMove) {
+        Direction walkingDirection = Direction.getDirection(newMove.getLast());
+        this.lookingDirection = walkingDirection;
+        try {
+            logger.info("Wating 1 sec before walking on next square.");
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            logger.info(e.getMessage());
+        }
+        this.currentPosition = this.mapService.getNewPosition(this.currentPosition, walkingDirection);
+    }
+
+    /**
+     * implement moving logic into each chicken
+     */
+    @Override
+    protected void move() {
+        while (isWalking) {
+            // get 9 squares
+            List<String> squares = this.mapService.getSquaresVisibleForChicken(this.currentPosition);
+            List<String> newMove = chooseWalkingPath(squares);
+            // set new square you move to
+            setNewPosition(newMove);
+            // consume snack if present
+            if (this.currentPosition.hasSnack()) {
+                consumeSnack();
+            }
+        }
+    }
+
+    /**
+     * consumes all snacks at the current position
+     */
+    private void consumeSnack() {
+        this.kcal = this.currentPosition.getKcal();
+        this.mapService.deleteConsumedSnacks(this.currentPosition);
+    }
+
+    /**
+     * initialises Jython for running chicken movement script
+     */
     private void initJython() {
         pythonProps.setProperty("python.path", "src/main/java/de/hsrm/mi/swt/snackman/entities/mob/Chicken");
         PythonInterpreter.initialize(System.getProperties(), pythonProps, new String[0]);
         this.pythonInterpreter = new PythonInterpreter();
     }
 
+    /**
+     * runs the jython chicken movement skript and returns its information
+     * 
+     * @param squares the squares the chicken can (in its current position) see
+     * @return information on where the chicken is going
+     */
     public List<String> executeMovementSkript(List<String> squares) {
         try {
+            logger.info("Running python chicken script with: {}", squares.toString());
             pythonInterpreter.exec("from ChickenMovementSkript import choose_next_square");
             PyObject func = pythonInterpreter.get("choose_next_square");
             PyObject result = func.__call__(new PyList(squares));
@@ -67,40 +134,19 @@ public class Chicken extends EatingMob {
         return squares;
     }
 
-    private List<String> convertPythonList(PyList pyList){
+    /**
+     * Converts a python list into a java list
+     * 
+     * @param pyList the python list
+     * @return the java list
+     */
+    private List<String> convertPythonList(PyList pyList) {
         List<String> javaList = new ArrayList<>();
         for (Object item : pyList) {
             javaList.add(item.toString());
         }
+        logger.info("Python script result is {}", javaList.toString());
         return javaList;
-    }
-
-    /**
-     * implement moving logic into each chicken
-     */
-    @Override
-    protected String move() {
-        if (pythonInterpreter == null)
-            initJython();
-
-        /* pyhton script here */
-        List<String> squares = new LinkedList<>();
-        squares.add("W");
-        squares.add("W");
-        squares.add("W");
-        squares.add("W");
-        squares.add("S");
-        squares.add("S");
-        squares.add("S");
-        squares.add("S");
-        squares.add("1");
-        List<String> newMove = executeMovementSkript(squares);
-        System.out.println(newMove.toString());
-        return "Moved";
-    }
-
-    public String chooseWalkingPath() {
-        return move();
     }
 
     private void incrementThickness() {
@@ -125,40 +171,8 @@ public class Chicken extends EatingMob {
         }
     }
 
-    /**
-     * Lays egg and restarts the timer
-     * private void layEgg() {
-     * this.layEggTimer.layEgg();
-     * }
-     */
-
-    /**
-     * starts the timer
-     * private void startTimer() {
-     * this.layEggTimer.start();
-     * }
-     */
-
-    /**
-     * adds a delay to the timer, so that the egg is layed later
-     * private void addTimeToTimerWhenScared() {
-     * this.layEggTimer.setDelayIncrease(ADDITIONAL_TIME_WHEN_SCARED);
-     * }
-     */
-
-    public void start() {
-        initialDelay = getRandomDelayInSeconds();
-        scheduleTask(initialDelay + delayIncrease);
-    }
-
-    private void scheduleTask(long delay) {
-        scheduler.schedule(this::layEgg, delay, TimeUnit.SECONDS);
-    }
-
     public void layEgg() {
-        MapService.layEgg(eggIndexX, eggIndexZ, generateEgg());
-        stop();
-        start();
+        MapService.layEgg(currentPosition.getIndexX(), currentPosition.getIndexZ(), generateEgg());
     }
 
     private Egg generateEgg() {
@@ -168,22 +182,6 @@ public class Chicken extends EatingMob {
 
     private long getRandomDelayInSeconds() {
         return MIN_DELAY + (int) (Math.random() * ((MAX_DELAY - MIN_DELAY) + 1));
-    }
-
-    public void stop() {
-        scheduler.shutdownNow();
-    }
-
-    public void setDelayIncrease(long delayIncrease) {
-        this.delayIncrease = delayIncrease;
-    }
-
-    public void setEggIndexX(int eggIndexX) {
-        this.eggIndexX = eggIndexX;
-    }
-
-    public void setEggIndexZ(int eggIndexZ) {
-        this.eggIndexZ = eggIndexZ;
     }
 
     public boolean getBlockingPath() {
