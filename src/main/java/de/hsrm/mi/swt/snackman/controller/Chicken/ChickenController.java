@@ -21,7 +21,7 @@ public class ChickenController {
     private SimpMessagingTemplate messagingTemplate;
 
     @Bean
-    public Chicken createChicken() {
+    Chicken createChicken() {
         return new Chicken();
     }
 
@@ -35,8 +35,8 @@ public class ChickenController {
     }
 
     @GetMapping("/test")
-    public String getMethodName() {
-        return createChicken().chooseWalkingPath();
+    public ChickenDTO getMethodName() {
+        return ChickenDTO.fromChicken(createChicken());
     }
 
 }
