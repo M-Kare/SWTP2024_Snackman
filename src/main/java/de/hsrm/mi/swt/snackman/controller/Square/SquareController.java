@@ -9,8 +9,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import de.hsrm.mi.swt.snackman.Types.Position;
 import de.hsrm.mi.swt.snackman.controller.Snack.SnackDTO;
-import de.hsrm.mi.swt.snackman.entities.Snack.Snack;
 import de.hsrm.mi.swt.snackman.services.Square.SquareService;
 
 @RestController
@@ -30,11 +30,36 @@ public class SquareController {
     }
 
     //NEW
+    /*
     @DeleteMapping("/snack")
     public boolean removeSnack(@RequestBody SnackDTO snackDTO) {
+        //TODO: Kein neues Snack-Objekt erstellen, stattdessen nur mit Parametern arbeiten.)
         Snack snack = new Snack(snackDTO.snackType());
         snack.setPosition(snackDTO.position());
         boolean removed = squareService.removeSnack(snack);
+        if (removed) {
+            log.info("Snack removed successfully");
+        } else {
+            log.info("Snack not found");
+        }
+        return removed;
+    }
+    */
+    @DeleteMapping("/snack")
+    public boolean removeSnack(@RequestBody SnackDTO snackDTO) {
+        //TODO: Kein neues Snack-Objekt erstellen, stattdessen nur mit Parametern arbeiten.)
+        
+        
+        //Snack snack = new Snack(snackDTO.snackType());
+        //snack.setPosition(snackDTO.position());
+
+
+        Position positionFromDTO = snackDTO.position();
+        Position positionOfSnackToRemove = new Position(0, 0);
+        positionOfSnackToRemove.setX(positionFromDTO.getX());
+        positionOfSnackToRemove.setZ(positionFromDTO.getZ());
+
+        boolean removed = squareService.removeSnack(positionOfSnackToRemove);
         if (removed) {
             log.info("Snack removed successfully");
         } else {

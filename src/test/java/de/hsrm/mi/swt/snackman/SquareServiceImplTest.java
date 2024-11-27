@@ -1,3 +1,4 @@
+
 package de.hsrm.mi.swt.snackman;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -21,11 +22,12 @@ public class SquareServiceImplTest {
 
     @Test
     public void testRemoveSnack_Success() {
-        Snack snack = new Snack(SnackType.ORANGE);
-        snack.setPosition(new Position(0, 0));
+        Snack snack = new Snack(SnackType.CHERRY);
+        snack.setPosition(new Position(10, 10));
         squareService.getSnackList().add(snack);
         
-        boolean result = squareService.removeSnack(snack);
+        Position positionToTest = new Position(10, 10);
+        boolean result = squareService.removeSnack(positionToTest);
         
         assertTrue(result);
         assertTrue(squareService.getSnackList().isEmpty(), "Snack list is supposed to be empty.");
@@ -34,11 +36,15 @@ public class SquareServiceImplTest {
     @Test
     public void testRemoveSnack_Fail_SnackNotFound() {
         Snack snackToRemove = new Snack(SnackType.STRAWBERRY);
-        snackToRemove.setPosition(new Position(1, 1));
+        snackToRemove.setPosition(new Position(10, 10));
         
-        boolean result = squareService.removeSnack(snackToRemove);
+        Position positionToTest = new Position(0, 0);
+        boolean result = squareService.removeSnack(positionToTest);
         
         assertFalse(result);
     }
 }
+
+
+
 
