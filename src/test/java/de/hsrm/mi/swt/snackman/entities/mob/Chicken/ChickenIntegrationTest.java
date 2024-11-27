@@ -36,6 +36,7 @@ public class ChickenIntegrationTest {
         visibleEnvironment.add("L");
         visibleEnvironment.add("W");
         visibleEnvironment.add("L");
+        visibleEnvironment.add("1");
 
         // Call the Python script via the Chicken's executeMovementSkript method
         List<String> result = chicken.executeMovementSkript(visibleEnvironment);
