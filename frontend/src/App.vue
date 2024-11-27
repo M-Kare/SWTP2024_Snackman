@@ -1,10 +1,9 @@
 <template>
   <main>
-    <GuckDing />
+    <ChickenView/>
   </main>
 </template>
 
 <script setup lang="ts">
-
-import GuckDing from './views/ChickenView.vue'
+import ChickenView from './views/ChickenView.vue'
 </script>
