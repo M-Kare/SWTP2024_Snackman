@@ -11,7 +11,11 @@ import java.util.ArrayList;
 @Service
 public class SquareServiceImpl implements SquareService {
 
-    ArrayList<Snack> snackList = new ArrayList<Snack>();
+    private ArrayList<Snack> snackList = new ArrayList<Snack>();
+
+    public ArrayList<Snack> getSnackList() {
+        return snackList;
+    }
 
     @Override
     public Square getSquare() {
