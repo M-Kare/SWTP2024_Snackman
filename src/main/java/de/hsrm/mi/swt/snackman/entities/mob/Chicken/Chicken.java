@@ -1,7 +1,6 @@
 package de.hsrm.mi.swt.snackman.entities.mob.Chicken;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
 import java.util.Random;
@@ -15,7 +14,6 @@ import org.python.core.PyObject;
 import org.python.util.PythonInterpreter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.Configuration;
 
 public class Chicken extends EatingMob {
 
@@ -58,8 +56,7 @@ public class Chicken extends EatingMob {
     }
 
     public List<String> chooseWalkingPath(List<String> currentlyVisibleEnvironment) {
-        List<String> newMove = executeMovementSkript(currentlyVisibleEnvironment);
-        return newMove;
+        return executeMovementSkript(currentlyVisibleEnvironment);
     }
 
     private void setNewPosition(List<String> newMove) {
@@ -103,7 +100,7 @@ public class Chicken extends EatingMob {
     /**
      * initialises Jython for running chicken movement script
      */
-    private void initJython() {
+    protected void initJython() {
         pythonProps.setProperty("python.path", "src/main/java/de/hsrm/mi/swt/snackman/entities/mob/Chicken");
         PythonInterpreter.initialize(System.getProperties(), pythonProps, new String[0]);
         this.pythonInterpreter = new PythonInterpreter();
