@@ -1,11 +1,12 @@
 package de.hsrm.mi.swt.snackman.services;
 
-import de.hsrm.mi.swt.snackman.entities.mapObject.floor.Floor;
-import de.hsrm.mi.swt.snackman.entities.mapObject.MapObject;
-import de.hsrm.mi.swt.snackman.entities.mapObject.wall.Wall;
+import de.hsrm.mi.swt.snackman.entities.MapObject.MapObject;
+import de.hsrm.mi.swt.snackman.entities.MapObject.floor.Floor;
+import de.hsrm.mi.swt.snackman.entities.MapObject.wall.Wall;
 import de.hsrm.mi.swt.snackman.entities.mob.Chicken.Direction;
-import de.hsrm.mi.swt.snackman.entities.MapObject.Egg;
-import de.hsrm.mi.swt.snackman.entities.mob.Chicken.Direction;
+
+import de.hsrm.mi.swt.snackman.entities.square.Square;
+import lombok.Getter;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
@@ -28,6 +29,7 @@ public class MapService {
 
     private String filePath;
 
+    @Getter
     private Square[][] maze;
 
     private List<MapObject> mapObjects;
@@ -60,6 +62,16 @@ public class MapService {
         } catch (IOException e) {
             throw new RuntimeException("Fehler beim Lesen der Labyrinth-Datei", e);
         }
+        int rows = lines.size();
+        int cols = lines.getFirst().length();
+        char[][] mazeAsCharArray = new char[rows][cols];
+
+        for (int i = 0; i < rows; i++) {
+            mazeAsCharArray[i] = lines.get(i).toCharArray();
+        }
+        return mazeAsCharArray;
+    }
+
       /**
        * @todo implement richtiges square zurückgeben
        *
@@ -78,16 +90,6 @@ public class MapService {
             else
                   return maze[0][0];
       }
-
-        int rows = lines.size();
-        int cols = lines.getFirst().length();
-        char[][] mazeAsCharArray = new char[rows][cols];
-
-        for (int i = 0; i < rows; i++) {
-            mazeAsCharArray[i] = lines.get(i).toCharArray();
-        }
-        return mazeAsCharArray;
-    }
 
     /**
      * Converts the char array maze data into MapObjects and populates the maze
@@ -152,12 +154,7 @@ public class MapService {
                 mapList.add(squareInfo);
             }
         }
-      /**
-       * @param currentPosition for which all snacks have been eaten
-       */
-      public void deleteConsumedSnacks(Square currentPosition) {
-            currentPosition.deleteAllSnacks();
-      }
+
 
         Map<String, Object> responseMap = new HashMap<>();
         responseMap.put("map", mapList);
@@ -167,8 +164,11 @@ public class MapService {
         return responseMap;
     }
 
-    public Square[][] getMaze() {
-        return this.maze;
+    /**
+     * @param currentPosition for which all snacks have been eaten
+     */
+    public void deleteConsumedSnacks(Square currentPosition) {
+        currentPosition.deleteAllSnacks();
     }
 
 }

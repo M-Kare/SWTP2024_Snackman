@@ -1,6 +1,6 @@
-package de.hsrm.mi.swt.snackman.entities.mapObject.wall;
+package de.hsrm.mi.swt.snackman.entities.MapObject.wall;
 
-import de.hsrm.mi.swt.snackman.entities.mapObject.MapObject;
+import de.hsrm.mi.swt.snackman.entities.MapObject.MapObject;
 import de.hsrm.mi.swt.snackman.entities.mapObject.TEXTURE;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -22,5 +22,10 @@ public class Wall extends MapObject {
      */
     public Wall() {
         super(TEXTURE.WALL);
+    }
+
+    @Override
+    public String getSymbol() {
+        return "W";
     }
 }

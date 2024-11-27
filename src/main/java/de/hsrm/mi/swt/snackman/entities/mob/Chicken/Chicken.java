@@ -5,9 +5,9 @@ import java.util.List;
 import java.util.Properties;
 import java.util.Random;
 import de.hsrm.mi.swt.snackman.entities.MapObject.Egg;
-import de.hsrm.mi.swt.snackman.entities.map.Square;
 import de.hsrm.mi.swt.snackman.entities.mob.EatingMob;
 import de.hsrm.mi.swt.snackman.entities.mob.Thickness;
+import de.hsrm.mi.swt.snackman.entities.square.Square;
 import de.hsrm.mi.swt.snackman.services.MapService;
 import org.python.core.PyList;
 import org.python.core.PyObject;
@@ -168,14 +168,14 @@ public class Chicken extends EatingMob {
         }
     }
 
-    public void layEgg() {
+    /*public void layEgg() {
         MapService.layEgg(currentPosition.getIndexX(), currentPosition.getIndexZ(), generateEgg());
     }
 
     private Egg generateEgg() {
         Random random = new Random();
-        return new Egg((10 + random.nextInt(51)) * 10); // kcal between 100 and 600
-    }
+        return new Egg((10 + random.nextInt(51)) * 10, ); // kcal between 100 and 600
+    }*/
 
     private long getRandomDelayInSeconds() {
         return MIN_DELAY + (int) (Math.random() * ((MAX_DELAY - MIN_DELAY) + 1));

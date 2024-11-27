@@ -1,11 +1,14 @@
 package de.hsrm.mi.swt.snackman.entities.MapObject;
 
-public class EatableItem {
+import de.hsrm.mi.swt.snackman.entities.mapObject.TEXTURE;
+
+public class EatableItem extends MapObject {
 
       private int kcal;
 
-      public EatableItem(int kcal) {
-            this.kcal = kcal;
+      public EatableItem(int kcal, TEXTURE texture) {
+          super(texture);
+          this.kcal = kcal;
       }
 
       public int getKcal() {
@@ -16,6 +19,9 @@ public class EatableItem {
             this.kcal = kcal;
       }
 
-      
+      @Override
+      public String getSymbol() {
+            return "S";
+      }
       
 }

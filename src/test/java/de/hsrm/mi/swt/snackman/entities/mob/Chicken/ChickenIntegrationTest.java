@@ -3,9 +3,6 @@ package de.hsrm.mi.swt.snackman.entities.mob.Chicken;
 import org.junit.jupiter.api.Test;
 import org.python.util.PythonInterpreter;
 
-import de.hsrm.mi.swt.snackman.entities.map.Square;
-import de.hsrm.mi.swt.snackman.services.MapService;
-
 import java.util.ArrayList;
 import java.util.List;
 

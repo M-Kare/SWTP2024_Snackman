@@ -1,8 +1,8 @@
 package de.hsrm.mi.swt.snackman.controller.Chicken;
 
-import de.hsrm.mi.swt.snackman.entities.map.Square;
 import de.hsrm.mi.swt.snackman.entities.mob.Thickness;
 import de.hsrm.mi.swt.snackman.entities.mob.Chicken.Chicken;
+import de.hsrm.mi.swt.snackman.entities.square.Square;
 
 public record ChickenDTO(Thickness thickness, Square square) {
 
