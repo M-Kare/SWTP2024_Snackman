@@ -3,6 +3,9 @@ package de.hsrm.mi.swt.snackman.entities.mob.Chicken;
 import org.junit.jupiter.api.Test;
 import org.python.util.PythonInterpreter;
 
+import de.hsrm.mi.swt.snackman.entities.map.Square;
+import de.hsrm.mi.swt.snackman.services.MapService;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,6 +25,7 @@ public class ChickenIntegrationTest {
     @Test
     public void testExecuteMovementSkript() {
         Chicken chicken = new Chicken();
+        chicken.initJython();
 
         List<String> visibleEnvironment = new ArrayList<>();
         visibleEnvironment.add("W");

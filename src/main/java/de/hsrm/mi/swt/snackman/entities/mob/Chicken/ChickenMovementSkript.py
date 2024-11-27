@@ -20,6 +20,7 @@
 #testingliste = ["W", "S", "G", "S", "W", "G", "G", "W", 1]
 #testingliste = ["W", "G", "G", "S", "W", "S", "G", "W", 1]
 #testingliste = ["W", "L", "G", "L", "W", "G", "G", "W", 1]
+#testingliste = ["W","S","W","L","W","L","W","L","1"]
 
 def choose_next_square(squares_liste):
       squares_liste = list(squares_liste)
@@ -86,21 +87,29 @@ def at_least_one_square_with_ghost(original_liste):
      return "G" in original_liste
 
 def choose_a_snack_away_from_ghost(original_liste):
-      north_square, east_square, south_square, west_square = original_liste
+     north_square, east_square, south_square, west_square = original_liste
+     # check if there are ghosts, if not -> choose snack
+     if not at_least_one_square_with_ghost(original_liste):
+          if at_least_one_square_with_snack:
+               # choose snack
+               return replace_first_element(original_liste, "S")
+          else:
+               # choose empthy space
+               return replace_first_element(original_liste, "L")
       # alle gegenüber der G anschauen
       # wenn S da: dort hingehen
-      if (north_square == "G" and south_square == "S") or (north_square == "S" and south_square == "G"):
+     if (north_square == "G" and south_square == "S") or (north_square == "S" and south_square == "G"):
             if north_square == "G" and south_square == "S":
                   return [north_square, east_square, " ", west_square]
             if north_square == "S" and south_square == "G":
                   return [" ", east_square, south_square, west_square]
-      elif (west_square == "G" and east_square == "S") or (west_square == "S" and east_square == "G"):
+     elif (west_square == "G" and east_square == "S") or (west_square == "S" and east_square == "G"):
             if west_square == "G" and east_square == "S":
                  return [north_square, " ", south_square, west_square]
             if west_square == "S" and east_square == "G":
                  return [north_square, east_square, south_square, " "]
       # wenn L da: weiter nach S ggü von G suchen
-      return choose_square_without_snack_away_from_ghost(north_square, east_square, south_square, west_square)
+     return choose_square_without_snack_away_from_ghost(north_square, east_square, south_square, west_square)
 
 def choose_square_without_snack_away_from_ghost(north_square, east_square, south_square, west_square):
       if (north_square == "G" and south_square == "L") or (north_square == "L" and south_square == "G"):
