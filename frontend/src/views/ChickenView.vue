@@ -130,7 +130,8 @@ function testing(key: string) {
       thickness: ChickenThickness.THIN,
       square: {
         indexX: 1,
-        indexZ: 1
+        indexZ: 1,
+        DEFAULT_SIDE_LENGTH: 1
       }
     }
     updateChicken(message)
@@ -139,7 +140,8 @@ function testing(key: string) {
       thickness: ChickenThickness.HEAVY,
       square: {
         indexX: 2,
-        indexZ: 2
+        indexZ: 2,
+        DEFAULT_SIDE_LENGTH: 1
       }
     }
     updateChicken(message)
