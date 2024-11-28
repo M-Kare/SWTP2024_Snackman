@@ -1,6 +1,7 @@
 import random
 
-def searchFreeFieldBenath(maze, x, y):
+#returns next free(not a Wall) adjacent field
+def searchFreeFieldAdjacent(maze, x, y):
 
     if maze[x + 1][y + 1] != '#':
         return (x + 1, y + 1)
@@ -23,7 +24,7 @@ def generateSpawnGhost(maze):
         if maze[randome1][randome2] != '#':
             maze[randome1][randome2] = 'G'
         else:
-            randome1, randome2 = searchFreeFieldBenath(maze, randome1, randome2)
+            randome1, randome2 = searchFreeFieldAdjacent(maze, randome1, randome2)
             maze[randome1][randome2] = 'G'
 
     return maze
@@ -35,7 +36,7 @@ def generateSpawnChicken(maze):
         if maze[randome1][randome2] != '#' or maze[randome1][randome2] != 'G' or maze[randome1][randome2] != 'S':
             maze[randome1][randome2] = 'C'
         else:
-            randome1, randome2 = searchFreeFieldBenath(maze, randome1, randome2)
+            randome1, randome2 = searchFreeFieldAdjacent(maze, randome1, randome2)
 
     return maze
 
@@ -55,19 +56,19 @@ def generateSpawnSnackman(maze):
 
 
 def generateLabyrinth(width, height):
-    maze = [["#" for i in range(width)] for i in range(height)] #erstmal alles #
+    maze = [["#" for i in range(width)] for i in range(height)] 
     stack = [(1, 1)]
     maze[1][1] = " "
 
-    while stack: #läuft so lange, wie es Elemente im Stack gibt
+    while stack:
         x, y = stack[-1]
         richtungen = [(0, 2), (2, 0), (0, -2), (-2, 0)]
-        random.shuffle(richtungen)#in jedem Durchlauf neu shuffeln, damit richtungen zufällig festgelegt werden
+        random.shuffle(richtungen)
 
         for rx, ry in richtungen:
             aktx, akty = x + rx, y + ry
             if 1 <= aktx < width - 1 and 1 <= akty < height -1 and maze[akty][aktx] == "#":
-                randomeNumber = random.randint(1, 10) #Snacks werden im verhältnis 1 zu 10 gespawnt
+                randomeNumber = random.randint(1, 10) #snacks spawn in ratio 1:10
                 if(randomeNumber == 1):
                     maze[akty][aktx] == "o"
                     maze[y + ry//2][x + rx//2] = "o"
@@ -76,7 +77,7 @@ def generateLabyrinth(width, height):
                     maze[y + ry//2][x + rx//2] = " "
                 stack.append((aktx, akty))
                 break
-        else:#else einer for schleife wird ausgeführt, wenn Schleife nicht durch break verlassen wurde
+        else:
             stack.pop()
         
     maze = generateSpawnGhost(maze)
