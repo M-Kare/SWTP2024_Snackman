@@ -39,6 +39,27 @@ export const MazeRenderer = () => {
     scene.add(wall)
   }
 
+    /**
+   * create a single chicken with given x-, y-, z-position, height and sidelengthm
+   */
+    const createChicken = (
+      xPosition: number,
+      yPosition: number,
+      zPosition: number,
+      height: number,
+      sideLength: number,
+    ) => {
+      // TODO add correct chicken-material-design!!
+      const chickenMaterial = new THREE.MeshStandardMaterial({ color: 'blue' })
+      const chickenGeometry = new THREE.BoxGeometry(sideLength, height, sideLength)
+      const chicken = new THREE.Mesh(chickenGeometry, chickenMaterial)
+  
+      // Position the wall
+      console.log("Chicken is set into square")
+      chicken.position.set(xPosition, yPosition, zPosition)
+      scene.add(chicken)
+    }
+
   /**
    * initialize renderer
    *
@@ -61,16 +82,25 @@ export const MazeRenderer = () => {
   const createMaze = (mazeData: IMazeDTD) => {
     const DEFAULT_SIDE_LENGTH = mazeData['default-side-length']
     const WALL_HEIGHT = mazeData.height
+    const DEFAULT_SIDE_LENGTH_CHICKEN = 1
+    const CHICKEN_HEIGHT = 1
 
     createGround()
 
+    console.log("Creating the walls and the chickens")
     // Iterate through maze data and create walls
     for (const item of mazeData.map) {
       if (item.type === 'wall') {
         // Create wall at position (x, 0, z) -> y = 0 because of 'building the walls'
         createWall(item.x, 0, item.z, WALL_HEIGHT, DEFAULT_SIDE_LENGTH)
+      } else if(item.type === "chicken") {
+        console.log("Chicken is created")
+        createChicken(item.x, 1, item.z, CHICKEN_HEIGHT, DEFAULT_SIDE_LENGTH_CHICKEN)
       }
     }
+
+    console.log("Maze was added to scene")
+    console.log(scene)
   }
 
   const createGround = () => {

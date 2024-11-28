@@ -1,9 +1,8 @@
 <template>
   <main>
-    <ChickenView/>
+    <router-view></router-view>
   </main>
 </template>
 
 <script setup lang="ts">
-import ChickenView from './views/ChickenView.vue'
 </script>
