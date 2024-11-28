@@ -13,7 +13,7 @@ import org.python.util.PythonInterpreter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public synchronized class Chicken extends EatingMob implements Runnable{
+public class Chicken extends EatingMob implements Runnable{
 
     private final Logger logger = LoggerFactory.getLogger(Chicken.class);
     private boolean blockingPath;
@@ -24,6 +24,7 @@ public synchronized class Chicken extends EatingMob implements Runnable{
     private final int MAX_DELAY = 30;
     private boolean isWalking;
     private MapService mapService;
+    public static final int DEFAULT_HEIGHT = 2;
     // python
     private PythonInterpreter pythonInterpreter = null;
     private Properties pythonProps = new Properties();
@@ -40,17 +41,12 @@ public synchronized class Chicken extends EatingMob implements Runnable{
         this.lookingDirection = Direction.NORTH;
         this.mapService = mapService;
         initTimer();
-        initWalking();
         //move();
     }
 
     // initialises the timer for laying eggs
     private void initTimer() {
 
-    }
-
-    private void initWalking() {
-        initJython();
     }
 
     public List<String> chooseWalkingPath(List<String> currentlyVisibleEnvironment) {
@@ -74,10 +70,11 @@ public synchronized class Chicken extends EatingMob implements Runnable{
      */
     @Override
     protected void move() {
+        initJython();
         while (isWalking) {
             // get 9 squares
             List<String> squares = this.mapService.getSquaresVisibleForChicken(this.currentPosition);
-            squares.add(this.lookingDirection);
+            squares.add(this.lookingDirection.toString());
             List<String> newMove = chooseWalkingPath(squares);
             // set new square you move to
             setNewPosition(newMove);
@@ -103,6 +100,7 @@ public synchronized class Chicken extends EatingMob implements Runnable{
         pythonProps.setProperty("python.path", "src/main/java/de/hsrm/mi/swt/snackman/entities/mob/Chicken");
         PythonInterpreter.initialize(System.getProperties(), pythonProps, new String[0]);
         this.pythonInterpreter = new PythonInterpreter();
+        logger.info("Initialised jython for chicken movement");
     }
 
     /**
@@ -190,7 +188,7 @@ public synchronized class Chicken extends EatingMob implements Runnable{
     }
 
     public Square getCurrentPosition() {
-        return this.getCurrentPosition();
+        return this.currentPosition;
     }
 
     public void setBlockingPath(boolean blockingPath) {
@@ -205,9 +203,12 @@ public synchronized class Chicken extends EatingMob implements Runnable{
         this.currentPosition = currentPosition;
     }
 
+    /**
+     * @todo zurück auskommentieren
+     */
     @Override
     public void run() {
-        move();    
+        //move();    
     }
 
 }

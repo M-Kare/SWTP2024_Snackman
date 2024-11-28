@@ -32,6 +32,8 @@ public class MapService {
 
     private List<MapObject> mapObjects;
 
+    private List<Chicken> allChickens;
+
     /**
      * Constructs a new MapService
      * Initializes the maze data by reading from a file and creates a Map object
@@ -81,8 +83,7 @@ public class MapService {
 
         for (int i = 0; i < mazeData.length; i++) {
             for (int j = 0; j < mazeData[0].length; j++) {
-                this.maze[i][j].setIndexX(i);
-                this.maze[i][j].setIndexZ(j);
+                this.maze[i][j] = new Square(i, j);
             }
         }
     }
@@ -90,6 +91,7 @@ public class MapService {
     /**
      *
      * Gives back the new square-position of the chicken
+     * 
      * @param currentChickenPosition the current position of the chicken
      * @param direction              in which the chicken decided to go
      * @return the square which is laying in the direction of the currentPosition
@@ -115,6 +117,8 @@ public class MapService {
      * @param mazeData the char array representing the maze
      */
     protected void switchMazeDataIntoMapObjectsInMaze(char[][] mazeData) {
+        this.allChickens = new ArrayList<>();
+
         for (int i = 0; i < mazeData.length; i++) {
             for (int j = 0; j < mazeData[0].length; j++) {
                 switch (mazeData[i][j]) {
@@ -133,8 +137,14 @@ public class MapService {
                     // TODO hier weitere mögliche mapObjects hinzufügen mit ihren Zeichen
                     case 'C':
                         Chicken newChicken = new Chicken(this.maze[i][j], this);
+                        this.allChickens.add(newChicken);
                         Thread chickenThread = new Thread(newChicken);
                         chickenThread.start();
+                        //set floor under chicken
+                        Floor floor2 = new Floor();
+                        this.mapObjects = new ArrayList<>();
+                        this.mapObjects.add(floor2);
+                        this.maze[i][j].setMapObjects(mapObjects);
                         break;
                     default:
                         System.out.println("CAN'T BUILD! " + mazeData[i][j] + " doesn't exist");
@@ -150,7 +160,8 @@ public class MapService {
      */
     public synchronized List<String> getSquaresVisibleForChicken(Square currentPosition) {
         List<String> squares = new ArrayList<>();
-        //northwest_square, north_square, northeast_square, east_square, southeast_square, south_square, southwest_square, west_square, direction
+        // northwest_square, north_square, northeast_square, east_square,
+        // southeast_square, south_square, southwest_square, west_square, direction
         squares.add(this.maze[currentPosition.getIndexX() - 1][currentPosition.getIndexZ() - 1].getPrimaryType());
         squares.add(this.maze[currentPosition.getIndexX()][currentPosition.getIndexZ() - 1].getPrimaryType());
         squares.add(this.maze[currentPosition.getIndexX() + 1][currentPosition.getIndexZ() + 1].getPrimaryType());
@@ -171,6 +182,7 @@ public class MapService {
     public Map<String, Object> prepareMazeForJson() {
         List<Map<String, Object>> mapList = new ArrayList<>();
 
+        //add not moving map objects
         for (int i = 0; i < this.maze.length; i++) {
             for (int j = 0; j < this.maze[i].length; j++) {
                 Map<String, Object> squareInfo = new HashMap<>();
@@ -184,6 +196,15 @@ public class MapService {
                 }
                 mapList.add(squareInfo);
             }
+        }
+
+        //add chicken to json
+        for (Chicken chicken : this.allChickens) {
+            Map<String, Object> chickenInfo = new HashMap<>();
+            chickenInfo.put("x", String.valueOf(chicken.getCurrentPosition().getIndexX()));
+            chickenInfo.put("z", String.valueOf(chicken.getCurrentPosition().getIndexZ()));
+            chickenInfo.put("type", "chicken");
+            mapList.add(chickenInfo);
         }
 
         Map<String, Object> responseMap = new HashMap<>();
