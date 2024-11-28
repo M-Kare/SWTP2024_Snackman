@@ -82,8 +82,8 @@ export const MazeRenderer = () => {
   const createMaze = (mazeData: IMazeDTD) => {
     const DEFAULT_SIDE_LENGTH = mazeData['default-side-length']
     const WALL_HEIGHT = mazeData.height
-    const DEFAULT_SIDE_LENGTH_CHICKEN = 1
-    const CHICKEN_HEIGHT = 1
+    const DEFAULT_SIDE_LENGTH_CHICKEN = 0.5
+    const CHICKEN_HEIGHT = 0.5
 
     createGround()
 
@@ -95,7 +95,7 @@ export const MazeRenderer = () => {
         createWall(item.x, 0, item.z, WALL_HEIGHT, DEFAULT_SIDE_LENGTH)
       } else if(item.type === "chicken") {
         console.log("Chicken is created")
-        createChicken(item.x, 1, item.z, CHICKEN_HEIGHT, DEFAULT_SIDE_LENGTH_CHICKEN)
+        createChicken(item.x, 0.5, item.z, CHICKEN_HEIGHT, DEFAULT_SIDE_LENGTH_CHICKEN)
       }
     }
 
