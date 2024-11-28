@@ -1,9 +1,8 @@
 <template>
   <main>
-    <GuckDing />
+    <router-view></router-view>
   </main>
 </template>
 
 <script setup lang="ts">
-import GuckDing from './views/CubeExampleView.vue'
 </script>
