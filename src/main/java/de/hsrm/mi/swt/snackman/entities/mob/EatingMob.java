@@ -1,5 +1,8 @@
 package de.hsrm.mi.swt.snackman.entities.mob;
 
+/**
+ * A mob which can consume snacks
+ */
 public abstract class EatingMob extends Mob{
 
     protected int kcal;

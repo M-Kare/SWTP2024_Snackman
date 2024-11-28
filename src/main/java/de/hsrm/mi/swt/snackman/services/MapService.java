@@ -5,12 +5,9 @@ import de.hsrm.mi.swt.snackman.entities.MapObject.floor.Floor;
 import de.hsrm.mi.swt.snackman.entities.MapObject.wall.Wall;
 import de.hsrm.mi.swt.snackman.entities.mob.Chicken.Chicken;
 import de.hsrm.mi.swt.snackman.entities.mob.Chicken.Direction;
-
 import de.hsrm.mi.swt.snackman.entities.square.Square;
 
-import org.python.modules.synchronize;
 import org.springframework.stereotype.Service;
-
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;

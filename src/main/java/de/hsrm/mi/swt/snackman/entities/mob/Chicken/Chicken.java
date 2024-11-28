@@ -41,7 +41,6 @@ public class Chicken extends EatingMob implements Runnable{
         this.lookingDirection = Direction.NORTH;
         this.mapService = mapService;
         initTimer();
-        //move();
     }
 
     // initialises the timer for laying eggs
@@ -49,10 +48,18 @@ public class Chicken extends EatingMob implements Runnable{
 
     }
 
+    /**
+     * @param currentlyVisibleEnvironment the list of information the chicken can see (8 squares around it)
+     * @return the result of the chicken movement script
+     */
     public List<String> chooseWalkingPath(List<String> currentlyVisibleEnvironment) {
         return executeMovementSkript(currentlyVisibleEnvironment);
     }
 
+    /**
+     * Sets the new Position of the chicken after having chosen a new square to stand on
+     * @param newMove
+     */
     private void setNewPosition(List<String> newMove) {
         Direction walkingDirection = Direction.getDirection(newMove.getLast());
         this.lookingDirection = walkingDirection;
@@ -87,6 +94,7 @@ public class Chicken extends EatingMob implements Runnable{
 
     /**
      * consumes all snacks at the current position
+     * @todo zu fixen sobald mariusz fertig ist mit den snacks
      */
     private void consumeSnack() {
         this.kcal = this.currentPosition.getKcal();
@@ -166,19 +174,6 @@ public class Chicken extends EatingMob implements Runnable{
         }
     }
 
-    /*public void layEgg() {
-        MapService.layEgg(currentPosition.getIndexX(), currentPosition.getIndexZ(), generateEgg());
-    }
-
-    private Egg generateEgg() {
-        Random random = new Random();
-        return new Egg((10 + random.nextInt(51)) * 10, ); // kcal between 100 and 600
-    }*/
-
-    private long getRandomDelayInSeconds() {
-        return MIN_DELAY + (int) (Math.random() * ((MAX_DELAY - MIN_DELAY) + 1));
-    }
-
     public boolean getBlockingPath() {
         return this.blockingPath;
     }
@@ -204,7 +199,7 @@ public class Chicken extends EatingMob implements Runnable{
     }
 
     /**
-     * @todo zurück auskommentieren
+     * @todo zurück auskommentieren, damit chicken sich bewegen kann -> voraussetzung dafür: es muss global der state des gesammten backends an das frontend geschickt werden!!
      */
     @Override
     public void run() {
