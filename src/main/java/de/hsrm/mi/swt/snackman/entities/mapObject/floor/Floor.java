@@ -1,14 +1,8 @@
 package de.hsrm.mi.swt.snackman.entities.MapObject.floor;
 
 import de.hsrm.mi.swt.snackman.entities.MapObject.MapObject;
-import de.hsrm.mi.swt.snackman.entities.mapObject.TEXTURE;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
+import de.hsrm.mi.swt.snackman.entities.MapObject.TEXTURE;
 
-@EqualsAndHashCode(callSuper = true) // note fields of the superclass MapObject (because abstract)
-@Getter
-@Setter
 public class Floor extends MapObject {
 
     public Floor() {
@@ -19,4 +13,6 @@ public class Floor extends MapObject {
     public String getSymbol() {
         return "L";
     }
+
+
 }

@@ -1,7 +1,5 @@
 package de.hsrm.mi.swt.snackman.entities.MapObject;
 
-import de.hsrm.mi.swt.snackman.entities.mapObject.TEXTURE;
-
 public class EatableItem extends MapObject {
 
       private int kcal;

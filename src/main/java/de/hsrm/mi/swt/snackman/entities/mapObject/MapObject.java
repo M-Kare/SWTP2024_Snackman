@@ -1,6 +1,6 @@
 package de.hsrm.mi.swt.snackman.entities.MapObject;
 
-import de.hsrm.mi.swt.snackman.entities.mapObject.TEXTURE;
+import de.hsrm.mi.swt.snackman.entities.MapObject.TEXTURE;
 /**
  * abstract class for general MapObjects – are then divided into eatable and walls
  */

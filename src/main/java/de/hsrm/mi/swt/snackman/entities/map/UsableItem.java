@@ -1,7 +1,7 @@
 package de.hsrm.mi.swt.snackman.entities.map;
 
 import de.hsrm.mi.swt.snackman.entities.MapObject.MapObject;
-import de.hsrm.mi.swt.snackman.entities.mapObject.TEXTURE;
+import de.hsrm.mi.swt.snackman.entities.MapObject.TEXTURE;
 
 public class UsableItem extends MapObject {
 

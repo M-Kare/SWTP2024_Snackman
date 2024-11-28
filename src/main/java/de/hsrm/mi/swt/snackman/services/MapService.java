@@ -6,7 +6,6 @@ import de.hsrm.mi.swt.snackman.entities.MapObject.wall.Wall;
 import de.hsrm.mi.swt.snackman.entities.mob.Chicken.Direction;
 
 import de.hsrm.mi.swt.snackman.entities.square.Square;
-import lombok.Getter;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
@@ -24,12 +23,8 @@ import java.util.Map;
 @Service
 public class MapService {
 
-    // TODO map is currently "unnecessary", it will probably be needed as soon as snacks and other items are added
-    // private final Map map;
-
     private String filePath;
 
-    @Getter
     private Square[][] maze;
 
     private List<MapObject> mapObjects;
