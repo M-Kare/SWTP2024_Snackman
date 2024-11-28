@@ -3,8 +3,6 @@ package de.hsrm.mi.swt.snackman.entities.mob.Chicken;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
-import java.util.Random;
-import de.hsrm.mi.swt.snackman.entities.MapObject.Egg;
 import de.hsrm.mi.swt.snackman.entities.mob.EatingMob;
 import de.hsrm.mi.swt.snackman.entities.mob.Thickness;
 import de.hsrm.mi.swt.snackman.entities.square.Square;
@@ -15,7 +13,7 @@ import org.python.util.PythonInterpreter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class Chicken extends EatingMob {
+public synchronized class Chicken extends EatingMob implements Runnable{
 
     private final Logger logger = LoggerFactory.getLogger(Chicken.class);
     private boolean blockingPath;
@@ -43,7 +41,7 @@ public class Chicken extends EatingMob {
         this.mapService = mapService;
         initTimer();
         initWalking();
-        move();
+        //move();
     }
 
     // initialises the timer for laying eggs
@@ -79,6 +77,7 @@ public class Chicken extends EatingMob {
         while (isWalking) {
             // get 9 squares
             List<String> squares = this.mapService.getSquaresVisibleForChicken(this.currentPosition);
+            squares.add(this.lookingDirection);
             List<String> newMove = chooseWalkingPath(squares);
             // set new square you move to
             setNewPosition(newMove);
@@ -204,6 +203,11 @@ public class Chicken extends EatingMob {
 
     public void setCurrentPosition(Square currentPosition) {
         this.currentPosition = currentPosition;
+    }
+
+    @Override
+    public void run() {
+        move();    
     }
 
 }

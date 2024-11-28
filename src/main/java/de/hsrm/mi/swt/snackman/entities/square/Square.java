@@ -33,7 +33,7 @@ public class Square {
         this.mapObjects.add(mapObject);
     }
 
-    public boolean hasSnack() {
+    public synchronized boolean hasSnack() {
         return this.mapObjects.stream().anyMatch(mapObject -> mapObject.getSymbol().equals("S"));
     }
 
@@ -41,7 +41,7 @@ public class Square {
      *
      * @return the dominant type of MapObject
      */
-    public String getDominantType() {
+    public String getPrimaryType() {
         if (this.mapObjects.stream().anyMatch(mapObject -> mapObject.getSymbol().equals("W")))
             return "W";
         else if (this.mapObjects.stream().anyMatch(mapObject -> mapObject.getSymbol().equals("G")))
@@ -83,11 +83,23 @@ public class Square {
         return indexZ;
     }
 
+    public void setIndexX(int indexX) {
+        this.indexX = indexX;
+    }
+
+    public void setIndexZ(int indexZ) {
+        this.indexZ = indexZ;
+    }
+
     public Square(List<MapObject> mapObjects) {
         this.mapObjects = mapObjects;
     }
 
     public List<MapObject> getMapObjects() {
         return mapObjects;
+    }
+
+    public void setMapObjects(List<MapObject> mapObjects) {
+        this.mapObjects = mapObjects;
     }
 }
