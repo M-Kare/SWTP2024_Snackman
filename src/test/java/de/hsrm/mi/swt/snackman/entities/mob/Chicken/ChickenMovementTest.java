@@ -42,6 +42,7 @@ public class ChickenMovementTest {
     @Test
     public void testChickenWithRandomSelection() {
         Chicken chicken = new Chicken();
+        chicken.initJython();
 
         List<String> visibleEnvironment = new ArrayList<>();
         for (int i = 0; i < 8; i++) {
@@ -61,6 +62,7 @@ public class ChickenMovementTest {
     @Test
     public void testChickenAvoidsGhost() {
         Chicken chicken = new Chicken();
+        chicken.initJython();
 
         List<String> visibleEnvironment = new ArrayList<>();
         visibleEnvironment.add("L");
@@ -85,6 +87,7 @@ public class ChickenMovementTest {
     @Test
     public void testChickenMovesToSnack() {
         Chicken chicken = new Chicken();
+        chicken.initJython();
 
         List<String> visibleEnvironment = new ArrayList<>();
         visibleEnvironment.add("L");
@@ -109,6 +112,7 @@ public class ChickenMovementTest {
     @Test
     public void testChickenChoosesBetweenMultipleSnacks() {
         Chicken chicken = new Chicken();
+        chicken.initJython();
 
         List<String> visibleEnvironment = new ArrayList<>();
         visibleEnvironment.add("S");
@@ -133,6 +137,7 @@ public class ChickenMovementTest {
     @Test
     public void testChickenInComplexEnvironment() {
         Chicken chicken = new Chicken();
+        chicken.initJython();
 
         List<String> visibleEnvironment = new ArrayList<>();
         visibleEnvironment.add("G");

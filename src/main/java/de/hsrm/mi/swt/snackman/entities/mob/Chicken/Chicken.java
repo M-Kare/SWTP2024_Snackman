@@ -126,6 +126,7 @@ public class Chicken extends EatingMob {
 
             throw new Exception("Python chicken script did not load.");
         } catch (Exception ex) {
+            logger.error("Error while executing chicken python script: ", ex);
             ex.printStackTrace();
         }
         return squares;
