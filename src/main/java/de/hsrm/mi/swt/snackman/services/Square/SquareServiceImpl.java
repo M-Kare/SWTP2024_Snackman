@@ -1,9 +1,9 @@
 package de.hsrm.mi.swt.snackman.services.Square;
 
 import de.hsrm.mi.swt.snackman.Types.Position;
-import de.hsrm.mi.swt.snackman.entities.Snack.Snack;
-import de.hsrm.mi.swt.snackman.entities.Snack.SnackType;
-import de.hsrm.mi.swt.snackman.entities.Square.Square;
+import de.hsrm.mi.swt.snackman.entities.mapObject.snack.Snack;
+import de.hsrm.mi.swt.snackman.entities.mapObject.snack.SnackType;
+import de.hsrm.mi.swt.snackman.entities.map.Square;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -11,6 +11,7 @@ import java.util.ArrayList;
 @Service
 public class SquareServiceImpl implements SquareService {
 
+    //TODO is this Service needed?
     private ArrayList<Snack> snackList = new ArrayList<Snack>();
 
     public ArrayList<Snack> getSnackList() {
@@ -21,14 +22,9 @@ public class SquareServiceImpl implements SquareService {
     public Square getSquare() {
         Snack snack = new Snack(SnackType.ORANGE);
 
-
-        
         snackList.add(snack);
-        
 
-
-
-        return new Square(snackList, new Position(0,0));
+        return new Square(0,0);
     }
 
     public boolean removeSnack(Position positionOfSnackToRemove) {

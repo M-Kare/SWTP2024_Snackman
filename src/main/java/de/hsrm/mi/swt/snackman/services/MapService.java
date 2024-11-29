@@ -1,9 +1,9 @@
 package de.hsrm.mi.swt.snackman.services;
 
+import de.hsrm.mi.swt.snackman.entities.map.Square;
 import de.hsrm.mi.swt.snackman.entities.mapObject.floor.Floor;
 import de.hsrm.mi.swt.snackman.entities.mapObject.MapObject;
 import de.hsrm.mi.swt.snackman.entities.mapObject.wall.Wall;
-import de.hsrm.mi.swt.snackman.entities.square.Square;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
@@ -82,14 +82,14 @@ public class MapService {
                         Wall wall = new Wall();
                         this.mapObjects = new ArrayList<>();
                         this.mapObjects.add(wall);
-                        this.maze[i][j] = new Square(mapObjects);
+                        this.maze[i][j] = new Square(mapObjects, i, j);
                         break;
                     case ' ':
                         Floor floor = new Floor();
-                        this.maze[i][j] = new Square(new ArrayList<>());
+                        this.maze[i][j] = new Square(new ArrayList<>(), i, j);
                         this.mapObjects = new ArrayList<>();
                         this.mapObjects.add(floor);
-                        this.maze[i][j] = new Square(mapObjects);
+                        this.maze[i][j] = new Square(mapObjects, i, j);
                         break;
                     // TODO hier weitere mögliche mapObjects hinzufügen mit ihren Zeichen
                     default:
