@@ -1,13 +1,11 @@
+import type {ISquareDTD} from "@/stores/Square/ISquareDTD";
+
 export interface IMazeDTD {
-  'default-side-length': number
-  map: {
-    x: number
-    z: number
-    type: MapObjectType
-  }[]
-  height: number
+  default_WALL_HEIGHT: number,
+  default_SQUARE_SIDE_LENGTH: number,
+  gameMap: Array<ISquareDTD>
 }
 
 export enum MapObjectType{
-  WALL = 'WALL', FLOOR = 'FLOOR', SNACK = 'SNACK'
+  WALL = 'WALL', FLOOR = 'FLOOR'
 }

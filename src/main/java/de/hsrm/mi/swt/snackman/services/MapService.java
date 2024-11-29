@@ -1,19 +1,19 @@
 package de.hsrm.mi.swt.snackman.services;
 
+import de.hsrm.mi.swt.snackman.entities.map.GameMap;
 import de.hsrm.mi.swt.snackman.entities.map.Square;
 import de.hsrm.mi.swt.snackman.entities.mapObject.MapObjectType;
-import de.hsrm.mi.swt.snackman.entities.mapObject.floor.Floor;
-import de.hsrm.mi.swt.snackman.entities.mapObject.MapObject;
-import de.hsrm.mi.swt.snackman.entities.mapObject.wall.Wall;
+import de.hsrm.mi.swt.snackman.entities.mapObject.snack.Snack;
+import de.hsrm.mi.swt.snackman.entities.mapObject.snack.SnackType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Service class for managing the game map
@@ -21,15 +21,9 @@ import java.util.Map;
  */
 @Service
 public class MapService {
-
-    // TODO map is currently "unnecessary", it will probably be needed as soon as snacks and other items are added
-    // private final Map map;
-
     private String filePath;
-
-    private Square[][] maze;
-
-    private List<MapObject> mapObjects;
+    private GameMap gameMap;
+    Logger log = LoggerFactory.getLogger(MapService.class);
 
     /**
      * Constructs a new MapService
@@ -38,8 +32,7 @@ public class MapService {
     public MapService() {
         this.filePath = "mini-maze.txt";
         char[][] mazeData = readMazeFromFile(this.filePath);
-        this.maze = new Square[mazeData.length][mazeData[0].length];
-        switchMazeDataIntoMapObjectsInMaze(mazeData);
+        gameMap = switchMazeDataIntoMapObjectsInMaze(mazeData);
     }
 
     /**
@@ -75,59 +68,47 @@ public class MapService {
      *
      * @param mazeData the char array representing the maze
      */
-    protected void switchMazeDataIntoMapObjectsInMaze(char[][] mazeData) {
+    private GameMap switchMazeDataIntoMapObjectsInMaze(char[][] mazeData) {
+        ArrayList<Square> squaresBuildingMap = new ArrayList<>();
+
         for (int i = 0; i < mazeData.length; i++) {
             for (int j = 0; j < mazeData[0].length; j++) {
-                switch (mazeData[i][j]) {
-                    case '#':
-                        Wall wall = new Wall();
-                        this.mapObjects = new ArrayList<>();
-                        this.mapObjects.add(wall);
-                        this.maze[i][j] = new Square(mapObjects, i, j);
-                        break;
-                    case ' ':
-                        Floor floor = new Floor();
-                        this.maze[i][j] = new Square(new ArrayList<>(), i, j);
-                        this.mapObjects = new ArrayList<>();
-                        this.mapObjects.add(floor);
-                        this.maze[i][j] = new Square(mapObjects, i, j);
-                        break;
-                    // TODO hier weitere mögliche mapObjects hinzufügen mit ihren Zeichen
-                    default:
-                        System.out.println("CAN'T BUILD! " + mazeData[i][j] + " doesn't exist");
+                try {
+                    Square squareToAdd = createSquare(mazeData[i][j], i, j);
+                    squaresBuildingMap.add(squareToAdd);
+                } catch (IllegalArgumentException e) {
+                    log.debug(e.getMessage());
                 }
             }
         }
+
+        for (Square square : squaresBuildingMap) {
+            addRandomSnackToSquare(square);
+        }
+
+        return new GameMap(squaresBuildingMap);
     }
 
-    /**
-     * Prepares the maze data for JSON serialization
-     *
-     * @return a Map containing the maze data in a format suitable for JSON conversion
-     */
-    public Map<String, Object> prepareMazeForJson() {
-        List<Map<String, Object>> mapList = new ArrayList<>();
+    //TODO add Javadoc
+    private Square createSquare(char symbol, int x, int z) {
+        return switch (symbol) {
+            case '#' -> new Square(MapObjectType.WALL, x, z);
+            case ' ' -> new Square(MapObjectType.FLOOR, x, z);
+            // TODO weitere Fälle hinzufügen
+            default -> throw new IllegalArgumentException("CAN'T BUILD! " + symbol + " doesn't exist");
+        };
+    }
 
-        for (int i = 0; i < this.maze.length; i++) {
-            for (int j = 0; j < this.maze[i].length; j++) {
-                Map<String, Object> squareInfo = new HashMap<>();
-                squareInfo.put("x", j);
-                squareInfo.put("z", i);
 
-                if (this.maze[i][j].getMapObjects().getFirst() instanceof Wall) {
-                    squareInfo.put("type", MapObjectType.WALL);
-                } else if (this.maze[i][j].getMapObjects().getFirst() instanceof Floor) {
-                    squareInfo.put("type", MapObjectType.FLOOR);
-                }
-                mapList.add(squareInfo);
-            }
-        }
+    //TODO add Javadoc
+    private void addRandomSnackToSquare(Square square) {
+        SnackType randomSnackType = SnackType.getRandomSnack();
 
-        Map<String, Object> responseMap = new HashMap<>();
-        responseMap.put("map", mapList);
-        responseMap.put("height", Wall.DEFAULT_HEIGHT);
-        responseMap.put("default-side-length", Square.DEFAULT_SIDE_LENGTH);
+        square.addSnack(new Snack(randomSnackType));
+    };
 
-        return responseMap;
+
+    public GameMap getGameMap() {
+        return gameMap;
     }
 }
