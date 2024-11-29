@@ -1,5 +1,6 @@
 import * as THREE from 'three'
 import {type IMazeDTD, MapObjectType} from "@/stores/IMazeDTD";
+import {SnackType} from "@/stores/Snack/ISnackDTD";
 
 /**
  * for rendering the maze
@@ -73,8 +74,42 @@ export const MazeRenderer = () => {
       }
       if (item.type === MapObjectType.FLOOR) {
         createFloorSquare(item.indexX, item.indexZ, DEFAULT_SIDE_LENGTH)
+
+        for (const snack of item.snacks) {
+          createSnackOnFloor(item.indexX, item.indexZ, DEFAULT_SIDE_LENGTH, snack.snackType)
+        }
       }
     }
+  }
+
+  const createSnackOnFloor = (
+    xPosition: number,
+    zPosition: number,
+    sideLength: number,
+    type: SnackType
+  ) => {
+    let color = 'blue';
+
+    if (type == SnackType.STRAWBERRY) {
+      color = 'purple'
+    } else if (type == SnackType.ORANGE) {
+      color = 'orange'
+    } else if (type == SnackType.CHERRY) {
+      color = 'red'
+    } else if (type == SnackType.APPLE) {
+      color = 'green'
+    }
+
+    // TODO add correct snack-material-design
+    const SNACK_WIDTH_AND_DEPTH = sideLength / 3
+    const SNACK_HEIGHT = 1
+    const snackMaterial = new THREE.MeshStandardMaterial({color: color})
+    const snackGeometry = new THREE.BoxGeometry(SNACK_WIDTH_AND_DEPTH, SNACK_HEIGHT, SNACK_WIDTH_AND_DEPTH)
+    const snack = new THREE.Mesh(snackGeometry, snackMaterial)
+
+    snack.position.set(xPosition, 0, zPosition)
+
+    scene.add(snack)
   }
 
   const createFloorSquare = (

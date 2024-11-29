@@ -3,5 +3,5 @@ export interface ISnackDTD {
 }
 
 export enum SnackType{
-  CHERRY = 'CHERRY', STRAWBERRY = 'STRAWBERRY', ORANGE = 'ORANGE'
+  CHERRY = 'CHERRY', STRAWBERRY = 'STRAWBERRY', ORANGE = 'ORANGE', APPLE = 'APPLE'
 }
