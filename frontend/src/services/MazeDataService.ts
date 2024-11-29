@@ -1,3 +1,5 @@
+import type {IMazeDTD} from "@/stores/IMazeDTD";
+
 /**
  * fetches maze data from backend, sends a GET request to '/api/maze'
  * and returns the parsed JSON data as an IMazeDTD object

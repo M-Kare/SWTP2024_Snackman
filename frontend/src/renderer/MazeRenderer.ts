@@ -1,4 +1,5 @@
 import * as THREE from 'three'
+import {type IMazeDTD, MapObjectType} from "@/stores/IMazeDTD";
 
 /**
  * for rendering the maze
@@ -66,11 +67,11 @@ export const MazeRenderer = () => {
 
     // Iterate through maze data and create walls
     for (const item of mazeData.map) {
-      if (item.type === 'WALL') {
+      if (item.type === MapObjectType.WALL) {
         // Create wall at position (x, 0, z) -> y = 0 because of 'building the walls'
         createWall(item.x, 0, item.z, WALL_HEIGHT, DEFAULT_SIDE_LENGTH)
       }
-      if (item.type === 'FLOOR') {
+      if (item.type === MapObjectType.FLOOR) {
         createFloorSquare(item.x, item.z, DEFAULT_SIDE_LENGTH)
       }
     }
@@ -81,7 +82,7 @@ export const MazeRenderer = () => {
     zPosition: number,
     sideLength: number,
   ) => {
-    // TODO add correct Square-material-design!!
+    // TODO squareHeight is set for seeing it actually in game
     const squareHeight = 0.1
     const squareMaterial = new THREE.MeshStandardMaterial({color: 'green'})
     const squareGeometry = new THREE.BoxGeometry(sideLength, squareHeight, sideLength)
