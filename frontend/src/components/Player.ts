@@ -14,7 +14,7 @@ export class Player {
     private moveRight: boolean;
     private canJump: boolean;
 
-    private camera: THREE.PerspectiveCamera; 
+    private camera: THREE.PerspectiveCamera;
     private controls: PointerLockControls;
 
     private velocity: THREE.Vector3;
@@ -35,7 +35,7 @@ export class Player {
         this.movementDirection = new THREE.Vector3();
 
         this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100)
-        this.camera.position.set(0, 2, 10)
+        this.camera.position.set(0, 2, 0)
         this.controls = new PointerLockControls(this.camera, renderer.domElement)
         document.addEventListener('keydown', (event)=>{this.onKeyDown(event)})
         document.addEventListener('keyup', (event)=>{this.onKeyUp(event)})
@@ -64,17 +64,17 @@ export class Player {
           case 'KeyW':
             this.moveForward = false
             break
-      
+
           case 'ArrowLeft':
           case 'KeyA':
             this.moveLeft = false
             break
-      
+
           case 'ArrowDown':
           case 'KeyS':
             this.moveBackward = false
             break
-      
+
           case 'ArrowRight':
           case 'KeyD':
             this.moveRight = false
@@ -88,17 +88,17 @@ export class Player {
           case 'KeyW':
             this.moveForward = true
             break
-      
+
           case 'ArrowLeft':
           case 'KeyA':
             this.moveLeft = true
             break
-      
+
           case 'ArrowDown':
           case 'KeyS':
             this.moveBackward = true
             break
-      
+
           case 'ArrowRight':
           case 'KeyD':
             this.moveRight = true
@@ -106,6 +106,17 @@ export class Player {
         }
       }
 
+    // lerp is used to interpolate the two positions
+    public setPosition(x: number,y: number,z: number) {
+      this.camera.position.lerp(new THREE.Vector3(x,y,z), 1);
+    }
+
+    public setCameraRotation(x: number,y: number,z: number) {
+      this.camera.rotation.set(x,y,z);
+    }
+
+    // code inspired by from https://github.com/mrdoob/three.js/blob/master/examples/misc_controls_pointerlock.html
+    // new position is calculated based on which keys are held
     public updatePlayer() {
         const time = performance.now()
         const delta = (time - this.prevTime) / 1000
