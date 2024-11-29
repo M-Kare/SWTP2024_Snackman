@@ -14,7 +14,7 @@ public class Snack extends MapObject {
     private int calories;
 
     public Snack(SnackType snackType) {
-        super(MapObjectType.SNACk);
+        super(MapObjectType.SNACK);
         this.snackType = snackType;
         this.calories = snackType.getCalories();
     }
