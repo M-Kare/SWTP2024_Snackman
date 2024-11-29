@@ -1,5 +1,7 @@
 package de.hsrm.mi.swt.snackman.entities.mapObject.snack;
 
+import java.util.Random;
+
 public enum SnackType {
     CHERRY(100),
     STRAWBERRY(300),
@@ -13,5 +15,13 @@ public enum SnackType {
 
     public int getCalories() {
         return calories;
+    }
+
+    //TODO add javadoc
+    public static SnackType getRandomSnack() {
+        SnackType[] snacks = values();
+        Random random = new Random();
+        int randomIndex = random.nextInt(snacks.length);
+        return snacks[randomIndex];
     }
 }
