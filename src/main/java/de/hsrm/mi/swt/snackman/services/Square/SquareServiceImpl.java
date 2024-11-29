@@ -11,7 +11,6 @@ import java.util.ArrayList;
 @Service
 public class SquareServiceImpl implements SquareService {
 
-    //TODO is this Service needed?
     private ArrayList<Snack> snackList = new ArrayList<Snack>();
 
     public ArrayList<Snack> getSnackList() {
@@ -27,8 +26,9 @@ public class SquareServiceImpl implements SquareService {
         return new Square(0,0);
     }
 
+    //TODO please implement.
     public boolean removeSnack(Position positionOfSnackToRemove) {
-        return snackList.removeIf(snack -> snack.getPosition().equals(positionOfSnackToRemove));
+        return true;
     }
 }
 
