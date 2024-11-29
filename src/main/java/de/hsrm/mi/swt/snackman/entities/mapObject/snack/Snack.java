@@ -1,23 +1,22 @@
-package de.hsrm.mi.swt.snackman.entities.Snack;
+package de.hsrm.mi.swt.snackman.entities.mapObject.snack;
 
 import de.hsrm.mi.swt.snackman.Types.Position;
+import de.hsrm.mi.swt.snackman.entities.mapObject.MapObject;
+import de.hsrm.mi.swt.snackman.entities.mapObject.MapObjectType;
 
 /**
  * Class that defines Snack, that can be eaten by Snackman
  */
-public class Snack {
-    private final double HEIGHT = 1.0;
+public class Snack extends MapObject {
+    //TODO Is position realy needed?
     private Position position;
     private SnackType snackType;
     private int calories;
 
     public Snack(SnackType snackType) {
+        super(MapObjectType.SNACk);
         this.snackType = snackType;
         this.calories = snackType.getCalories();
-    }
-
-    public double getHEIGHT() {
-        return HEIGHT;
     }
 
     public SnackType getSnackType() {
