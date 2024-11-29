@@ -1,7 +1,7 @@
 package de.hsrm.mi.swt.snackman.entities.mapObject.floor;
 
 import de.hsrm.mi.swt.snackman.entities.mapObject.MapObject;
-import de.hsrm.mi.swt.snackman.entities.mapObject.TEXTURE;
+import de.hsrm.mi.swt.snackman.entities.mapObject.MapObjectType;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -12,6 +12,6 @@ import lombok.Setter;
 public class Floor extends MapObject {
 
     public Floor() {
-        super(TEXTURE.FLOOR);
+        super(MapObjectType.FLOOR);
     }
 }

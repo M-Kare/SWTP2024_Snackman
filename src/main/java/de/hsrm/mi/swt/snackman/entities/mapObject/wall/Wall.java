@@ -1,7 +1,7 @@
 package de.hsrm.mi.swt.snackman.entities.mapObject.wall;
 
 import de.hsrm.mi.swt.snackman.entities.mapObject.MapObject;
-import de.hsrm.mi.swt.snackman.entities.mapObject.TEXTURE;
+import de.hsrm.mi.swt.snackman.entities.mapObject.MapObjectType;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -21,6 +21,6 @@ public class Wall extends MapObject {
      * Constructs a new Wall
      */
     public Wall() {
-        super(TEXTURE.WALL);
+        super(MapObjectType.WALL);
     }
 }

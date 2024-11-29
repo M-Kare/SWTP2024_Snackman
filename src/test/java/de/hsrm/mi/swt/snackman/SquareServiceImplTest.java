@@ -7,8 +7,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import de.hsrm.mi.swt.snackman.Types.Position;
-import de.hsrm.mi.swt.snackman.entities.Snack.Snack;
-import de.hsrm.mi.swt.snackman.entities.Snack.SnackType;
+import de.hsrm.mi.swt.snackman.entities.mapObject.snack.Snack;
+import de.hsrm.mi.swt.snackman.entities.mapObject.snack.SnackType;
 import de.hsrm.mi.swt.snackman.services.Square.SquareServiceImpl;
 
 public class SquareServiceImplTest {

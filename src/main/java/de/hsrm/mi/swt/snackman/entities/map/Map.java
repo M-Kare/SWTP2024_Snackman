@@ -1,7 +1,5 @@
 package de.hsrm.mi.swt.snackman.entities.map;
 
-import de.hsrm.mi.swt.snackman.entities.square.Square;
-
 /**
  * Represents a game map
  */
