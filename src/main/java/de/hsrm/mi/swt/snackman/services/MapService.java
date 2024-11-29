@@ -1,6 +1,7 @@
 package de.hsrm.mi.swt.snackman.services;
 
 import de.hsrm.mi.swt.snackman.entities.map.Square;
+import de.hsrm.mi.swt.snackman.entities.mapObject.MapObjectType;
 import de.hsrm.mi.swt.snackman.entities.mapObject.floor.Floor;
 import de.hsrm.mi.swt.snackman.entities.mapObject.MapObject;
 import de.hsrm.mi.swt.snackman.entities.mapObject.wall.Wall;
@@ -114,9 +115,9 @@ public class MapService {
                 squareInfo.put("z", i);
 
                 if (this.maze[i][j].getMapObjects().getFirst() instanceof Wall) {
-                    squareInfo.put("type", "wall");
+                    squareInfo.put("type", MapObjectType.WALL);
                 } else if (this.maze[i][j].getMapObjects().getFirst() instanceof Floor) {
-                    squareInfo.put("type", "floor");
+                    squareInfo.put("type", MapObjectType.FLOOR);
                 }
                 mapList.add(squareInfo);
             }
