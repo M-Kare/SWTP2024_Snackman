@@ -60,19 +60,19 @@ export const MazeRenderer = () => {
 
 
   const createMaze = (mazeData: IMazeDTD) => {
-    const DEFAULT_SIDE_LENGTH = mazeData['default-side-length']
-    const WALL_HEIGHT = mazeData.height
+    const DEFAULT_SIDE_LENGTH = mazeData.default_SQUARE_SIDE_LENGTH
+    const WALL_HEIGHT = mazeData.default_WALL_HEIGHT
 
     createGround()
 
     // Iterate through maze data and create walls
-    for (const item of mazeData.map) {
+    for (const item of mazeData.gameMap) {
       if (item.type === MapObjectType.WALL) {
         // Create wall at position (x, 0, z) -> y = 0 because of 'building the walls'
-        createWall(item.x, 0, item.z, WALL_HEIGHT, DEFAULT_SIDE_LENGTH)
+        createWall(item.indexX, 0, item.indexZ, WALL_HEIGHT, DEFAULT_SIDE_LENGTH)
       }
       if (item.type === MapObjectType.FLOOR) {
-        createFloorSquare(item.x, item.z, DEFAULT_SIDE_LENGTH)
+        createFloorSquare(item.indexX, item.indexZ, DEFAULT_SIDE_LENGTH)
       }
     }
   }

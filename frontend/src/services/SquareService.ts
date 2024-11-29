@@ -7,7 +7,7 @@ import * as THREE from "three";
 import {createSquare} from "@/components/Square";
 import {createSnack} from "@/components/Snack";
 
-
+//TODO please check if needed.
 export async function addSquareAndSnackToScene(scene: THREE.Scene){
   const squareData : ISquareDTD  = await getSquare()
   console.log(squareData)
@@ -55,7 +55,6 @@ function convertMeshToSnack(mesh: THREE.Mesh): ISnackDTD {
     z: mesh.position.z,
   };
   const snackType = SnackType.CHERRY;
-  const height = 1;
-  return { position, snackType, height };
+  return {snackType };
 }
 //NEW
