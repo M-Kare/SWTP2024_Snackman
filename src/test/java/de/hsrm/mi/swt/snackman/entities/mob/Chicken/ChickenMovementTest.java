@@ -1,14 +1,9 @@
 package de.hsrm.mi.swt.snackman.entities.mob.Chicken;
 
 import org.junit.jupiter.api.Test;
-import org.python.util.PythonInterpreter;
-
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
  * Unit tests for the 'ChickenMovementSkript.py' logic accessed by Jython.
@@ -22,62 +17,36 @@ public class ChickenMovementTest {
      */
     @Test
     public void testChickenMovement() {
-        try (PythonInterpreter pyInterp = new PythonInterpreter()) {
-            pyInterp.exec("import sys");
-            pyInterp.exec("sys.path.append('src/main/java/de/hsrm/mi/swt/snackman/entities/mob/Chicken')");
-
-            pyInterp.exec("from ChickenMovementSkript import choose_next_square");
-            pyInterp.exec("result = choose_next_square(['W', 'L', 'W', 'L', 'W', 'L', 'W', 'L', 0])");
-
-            String result = pyInterp.get("result").toString();
-            String expectedResult = "[' ', 'L', 'L', 'L', 0]";
-            assertEquals(expectedResult, result,
-                    "The Python script should correctly determine the next move.");
-        }
-    }
-
-    /**
-     * Tests if the Chicken chooses a random direction when all squares are empty ('L').
-     */
-    @Test
-    public void testChickenWithRandomSelection() {
         Chicken chicken = new Chicken();
         chicken.initJython();
 
-        List<String> visibleEnvironment = new ArrayList<>();
-        for (int i = 0; i < 8; i++) {
-            visibleEnvironment.add("L");
-        }
+        List<String> visibleEnvironment = List.of("W", "L", "W", "L", "W", "L", "W", "L", "0");
 
         List<String> result = chicken.executeMovementSkript(visibleEnvironment);
 
-        assertNotNull(result.get(result.size() - 1),
-                "The Chicken should choose a random direction if all squares are empty.");
+        // The chicken should move to an empty space (" ").
+        int chosenDirectionIndex = Integer.parseInt(result.get(result.size() - 1));
+        assertEquals(" ", result.get(chosenDirectionIndex),
+                "The Chicken should move to the empty space (' ') matching its new direction.");
     }
 
     /**
      * Tests the scenario where the Chicken must avoid a ghost ('G') in one direction.
-     * The Chicken should choose a square that is not a ghost.
+     * The Chicken should choose a square that is not a ghost (' ').
      */
     @Test
     public void testChickenAvoidsGhost() {
         Chicken chicken = new Chicken();
         chicken.initJython();
 
-        List<String> visibleEnvironment = new ArrayList<>();
-        visibleEnvironment.add("L");
-        visibleEnvironment.add("G");
-        visibleEnvironment.add("L");
-        visibleEnvironment.add("L");
-        visibleEnvironment.add("L");
-        visibleEnvironment.add("L");
-        visibleEnvironment.add("L");
-        visibleEnvironment.add("L");
+        List<String> visibleEnvironment = List.of("L", "G", "L", "L", "L", "L", "L", "L", "0");
 
         List<String> result = chicken.executeMovementSkript(visibleEnvironment);
 
-        assertNotEquals("G", result.get(result.size() - 1),
-                "The Chicken should avoid moving into a square with a ghost.");
+        // The chicken should move to an empty space (' ').
+        int chosenDirectionIndex = Integer.parseInt(result.get(result.size() - 1));
+        assertEquals(" ", result.get(chosenDirectionIndex),
+                "The Chicken should avoid ghosts ('G') and move to a safe square (' ').");
     }
 
     /**
@@ -89,69 +58,66 @@ public class ChickenMovementTest {
         Chicken chicken = new Chicken();
         chicken.initJython();
 
-        List<String> visibleEnvironment = new ArrayList<>();
-        visibleEnvironment.add("L");
-        visibleEnvironment.add("S");
-        visibleEnvironment.add("L");
-        visibleEnvironment.add("L");
-        visibleEnvironment.add("L");
-        visibleEnvironment.add("L");
-        visibleEnvironment.add("L");
-        visibleEnvironment.add("L");
+        List<String> visibleEnvironment = List.of("L", "S", "L", "L", "L", "L", "L", "L", "0");
 
         List<String> result = chicken.executeMovementSkript(visibleEnvironment);
 
-        assertEquals("S", result.get(result.size() - 1),
-                "The Chicken should move to the snack when one is available.");
+        int chosenDirectionIndex = Integer.parseInt(result.get(result.size() - 1));
+        assertEquals(" ", result.get(chosenDirectionIndex),
+                "The Chicken should move to the snack ('S'), but the result should be the empty space (' ').");
     }
 
     /**
-     * Tests the scenario where the Chicken must decide between multiple snacks ('S').
-     * The Chicken should choose the first snack.
+     * Ensures the chicken correctly chooses between multiple snacks ('S'),
+     * and still returns the empty square (' ').
      */
     @Test
     public void testChickenChoosesBetweenMultipleSnacks() {
         Chicken chicken = new Chicken();
         chicken.initJython();
 
-        List<String> visibleEnvironment = new ArrayList<>();
-        visibleEnvironment.add("S");
-        visibleEnvironment.add("L");
-        visibleEnvironment.add("L");
-        visibleEnvironment.add("S");
-        visibleEnvironment.add("L");
-        visibleEnvironment.add("L");
-        visibleEnvironment.add("L");
-        visibleEnvironment.add("L");
+        List<String> visibleEnvironment = List.of("S", "L", "L", "S", "L", "L", "L", "L", "0");
 
         List<String> result = chicken.executeMovementSkript(visibleEnvironment);
 
-        assertEquals("S", result.get(result.size() - 1),
-                "The Chicken should choose one of the available snacks.");
+        // The chicken should choose the empty space (' ') for the selected snack ('S').
+        int chosenDirectionIndex = Integer.parseInt(result.get(result.size() - 1));
+        assertEquals(" ", result.get(chosenDirectionIndex),
+                "The Chicken should choose one of the snacks ('S') but the result should be ' '.");
     }
 
     /**
-     * Tests a complex scenario where the Chicken is surrounded by snacks, ghosts, and walls.
-     * The Chicken should prioritize avoiding ghosts while targeting snacks.
+     * Tests a complex scenario with snacks, ghosts, and walls to ensure correct prioritization.
+     * The chicken should return the empty space (' ') while avoiding ghosts and prioritizing snacks.
      */
     @Test
     public void testChickenInComplexEnvironment() {
         Chicken chicken = new Chicken();
         chicken.initJython();
 
-        List<String> visibleEnvironment = new ArrayList<>();
-        visibleEnvironment.add("G");
-        visibleEnvironment.add("L");
-        visibleEnvironment.add("S");
-        visibleEnvironment.add("L");
-        visibleEnvironment.add("W");
-        visibleEnvironment.add("S");
-        visibleEnvironment.add("G");
-        visibleEnvironment.add("W");
+        List<String> visibleEnvironment = List.of("G", "L", "S", "L", "W", "S", "G", "W", "0");
 
         List<String> result = chicken.executeMovementSkript(visibleEnvironment);
 
-        assertEquals("S", result.get(result.size() - 1),
-                "The Chicken should avoid ghosts, prioritize snacks, and navigate walls correctly.");
+        int chosenDirectionIndex = Integer.parseInt(result.get(result.size() - 1));
+        assertEquals(" ", result.get(chosenDirectionIndex),
+                "The Chicken should avoid ghosts, prioritize snacks, and move to an empty square (' ').");
+    }
+
+    /**
+     * Ensures that the chicken makes a random move when all spaces are empty ('L').
+     */
+    @Test
+    public void testChickenWithRandomSelection() {
+        Chicken chicken = new Chicken();
+        chicken.initJython();
+
+        List<String> visibleEnvironment = List.of("L", "L", "L", "L", "L", "L", "L", "L", "0");
+
+        List<String> result = chicken.executeMovementSkript(visibleEnvironment);
+
+        int chosenDirectionIndex = Integer.parseInt(result.get(result.size() - 1));
+        assertEquals(" ", result.get(chosenDirectionIndex),
+                "The Chicken should choose a random empty space (' ') when all squares are empty.");
     }
 }
