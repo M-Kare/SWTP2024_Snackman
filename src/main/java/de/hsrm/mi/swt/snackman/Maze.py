@@ -20,7 +20,6 @@ def generateSpawnGhost(maze):
     for i in range(5):
         randome1 = random.randint(1, len(maze) - 2)
         randome2 = random.randint(1, len(maze) - 2)
-        print(randome1, " ", randome2)
         if maze[randome1][randome2] != '#':
             maze[randome1][randome2] = 'G'
         else:
@@ -100,4 +99,3 @@ def saveFile(maze, filename="Maze.txt"):
 width, height = 99, 99
 maze = generateLabyrinth(width, height)
 saveFile(maze)
-print("Labyrinth fertig")
