@@ -3,9 +3,7 @@ package de.hsrm.mi.swt.snackman.controller.Square;
 import de.hsrm.mi.swt.snackman.controller.Snack.SnackDTO;
 import de.hsrm.mi.swt.snackman.entities.map.Square;
 import de.hsrm.mi.swt.snackman.entities.mapObject.MapObjectType;
-import de.hsrm.mi.swt.snackman.entities.mapObject.snack.Snack;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
