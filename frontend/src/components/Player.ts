@@ -12,12 +12,15 @@ export class Player {
     private moveRight: boolean;
     private canJump: boolean;
 
+    private radius: number;
+    private speed: number;
+
     private camera: THREE.PerspectiveCamera;
     private controls: PointerLockControls;
 
     private movementDirection: THREE.Vector3;
 
-    constructor(renderer: WebGLRenderer, posX: number, posY: number, posZ: number){
+    constructor(renderer: WebGLRenderer, posX: number, posY: number, posZ: number, radius: number, speed: number){
         this.prevTime = performance.now();
         this.moveBackward = false;
         this.moveForward = false;
@@ -25,6 +28,9 @@ export class Player {
         this.moveRight = false;
         this.canJump = true;
         this.movementDirection = new THREE.Vector3();
+
+        this.radius = radius;
+        this.speed = speed;
 
         this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100)
         this.camera.position.set(posX, posY, posZ)
@@ -117,13 +123,18 @@ export class Player {
       this.movementDirection.x = Number(this.moveRight) - Number(this.moveLeft)
 
       let move = new THREE.Vector3(0,0,0)
-      const speed = 3
       if(this.moveForward || this.moveBackward){
-        move.z -= this.movementDirection.z * delta * speed
+        move.z -= this.movementDirection.z
       }
       if(this.moveLeft || this.moveRight){
-        move.x += this.movementDirection.x * delta * speed
+        move.x += this.movementDirection.x
       }
+
+      if(move.z != 0 && move.x != 0){
+        move.normalize();
+      }
+        move.x = move.x  * delta * this.speed
+        move.z = move.z * delta * this.speed
 
       move.applyQuaternion(this.camera.quaternion)
       this.camera.position.x += move.x

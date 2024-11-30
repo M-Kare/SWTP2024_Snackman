@@ -16,7 +16,6 @@ public class SnackMan extends EatingMob {
     private double posX;
     private double posY;
     private double posZ;
-    private double dirY;
     private double radius;
     private Quaterniond quat;
     private Square currentSquare;
@@ -29,9 +28,8 @@ public class SnackMan extends EatingMob {
 
         this.mapService = mapService;
         posY = GameConfig.SNACKMAN_GROUND_LEVEL;
-        posX = this.mapService.getGameMap().getGameMap().length/2;
-        posZ = this.mapService.getGameMap().getGameMap().length/2;
-        dirY = GameConfig.SNACKMAN_GROUND_LEVEL;
+        posX = (this.mapService.getGameMap().getGameMap().length/2)*GameConfig.SQUARE_SIZE;
+        posZ = (this.mapService.getGameMap().getGameMap()[0].length/2)*GameConfig.SQUARE_SIZE;
         radius = GameConfig.SNACKMAN_RADIUS;
         quat = new Quaterniond();
         setCurrentSquareWithIndex(posX, posY);
@@ -61,10 +59,6 @@ public class SnackMan extends EatingMob {
         this.posZ = posZ;
     }
 
-    public double getDirY() {
-        return dirY;
-    }
-
     public double getRadius() {
         return radius;
     }
@@ -89,11 +83,16 @@ public class SnackMan extends EatingMob {
         Vector3d move = new Vector3d();
 
         if (f || b) {
-            move.z -= moveDirZ * delta * 3;
+            move.z -= moveDirZ;
         }
         if (l || r) {
-            move.x += moveDirX * delta * 3;
+            move.x += moveDirX;
         }
+        if(move.x != 0 && move.z != 0){
+            move.normalize();
+        }
+            move.x = move.x * delta * GameConfig.SNACKMAN_SPEED;
+            move.z = move.z * delta * GameConfig.SNACKMAN_SPEED;
         move.rotate(quat);
         double xNew = posX + move.x;
         double zNew = posZ + move.z;
@@ -110,11 +109,15 @@ public class SnackMan extends EatingMob {
                 posX += move.x;
                 break;
             case 3:
+                // move.normalize();
+                // posX += (-0.1)*move.x;
+                // posZ += (-0.1)*move.z;
                 break;
         }
         setCurrentSquareWithIndex(posX, posZ);
     }
 
+    // TODO: Find out why frontend and backend are not completly synced (labyrinth size not displayed correcty in frontend?)
     public int checkWallCollision(double x, double z) {
         int change = 0;
         double middleX = currentSquare.getIndexX()*GameConfig.SQUARE_SIZE + GameConfig.SQUARE_SIZE/2;
@@ -132,13 +135,13 @@ public class SnackMan extends EatingMob {
             }
         }
         if (squareZ.getType() == MapObjectType.WALL) {
-            Vector3d origin = new Vector3d(middleX - GameConfig.SQUARE_SIZE/2, vertical > 0 ? (currentSquare.getIndexZ()+1)*GameConfig.SQUARE_SIZE : currentSquare.getIndexZ(), 1);
+            Vector3d origin = new Vector3d(middleX - GameConfig.SQUARE_SIZE/2, vertical > 0 ? (currentSquare.getIndexZ()+1)*GameConfig.SQUARE_SIZE : currentSquare.getIndexZ()*GameConfig.SQUARE_SIZE, 1);
             Vector3d line = new Vector3d(1,0,0);
             if (calcIntersectionWithLine(x, z, origin, line)) {
                 change += 2;
             }
         }
-        if (squareDiagonal.getType() == MapObjectType.WALL) {
+        if (squareDiagonal.getType() == MapObjectType.WALL && change == 0) {
             double diagX = horizontal > 0 ? (currentSquare.getIndexX()+1)*GameConfig.SQUARE_SIZE : currentSquare.getIndexX()*GameConfig.SQUARE_SIZE;
             double diagZ =  vertical > 0 ? (currentSquare.getIndexZ()+1)*GameConfig.SQUARE_SIZE : currentSquare.getIndexZ()*GameConfig.SQUARE_SIZE;
             double dist = Math.sqrt((diagX-x)*(diagX-x) + (diagZ-z)*(diagZ-z));
@@ -163,10 +166,6 @@ public class SnackMan extends EatingMob {
 
     private int calcMapIndexOfCoordinate(double a){
         return (int)(a / GameConfig.SQUARE_SIZE);
-    }
-    
-    public void setDirY(double angleY){
-        dirY = angleY;
     }
 
     @Override

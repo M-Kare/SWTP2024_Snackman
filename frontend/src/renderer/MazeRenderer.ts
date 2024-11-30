@@ -60,6 +60,7 @@ export const MazeRenderer = () => {
   }
 
   const createMaze = (mazeData: IGameMapDTD) => {
+    const OFFSET = mazeData.default_SQUARE_SIDE_LENGTH/2 
     const DEFAULT_SIDE_LENGTH = mazeData.default_SQUARE_SIDE_LENGTH
     const WALL_HEIGHT = mazeData.default_WALL_HEIGHT
 
@@ -73,13 +74,13 @@ export const MazeRenderer = () => {
 
         if (square.type === MapObjectType.WALL) {
           // Create wall at position (x, 0, z) -> y = 0 because of 'building the walls'
-          createWall(square.indexX, 0, square.indexZ, WALL_HEIGHT, DEFAULT_SIDE_LENGTH)
+          createWall(square.indexX*DEFAULT_SIDE_LENGTH+OFFSET, 0, square.indexZ*DEFAULT_SIDE_LENGTH+OFFSET, WALL_HEIGHT, DEFAULT_SIDE_LENGTH)
         }
         if (square.type === MapObjectType.FLOOR) {
-          createFloorSquare(square.indexX, square.indexZ, DEFAULT_SIDE_LENGTH)
+          createFloorSquare(square.indexX*DEFAULT_SIDE_LENGTH+OFFSET, square.indexZ*DEFAULT_SIDE_LENGTH+OFFSET, DEFAULT_SIDE_LENGTH)
 
           for (const snack of square.snacks) {
-            createSnackOnFloor(square.indexX, square.indexZ, DEFAULT_SIDE_LENGTH, snack.snackType)
+            createSnackOnFloor(square.indexX*DEFAULT_SIDE_LENGTH+OFFSET, square.indexZ*DEFAULT_SIDE_LENGTH+OFFSET, DEFAULT_SIDE_LENGTH, snack.snackType)
           }
         }
       }
