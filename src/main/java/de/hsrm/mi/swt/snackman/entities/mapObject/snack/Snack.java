@@ -1,8 +1,5 @@
 package de.hsrm.mi.swt.snackman.entities.mapObject.snack;
 
-import de.hsrm.mi.swt.snackman.entities.mapObject.MapObject;
-import de.hsrm.mi.swt.snackman.entities.mapObject.MapObjectType;
-
 /**
  * Class that defines Snack, that can be eaten by Snackman
  */
