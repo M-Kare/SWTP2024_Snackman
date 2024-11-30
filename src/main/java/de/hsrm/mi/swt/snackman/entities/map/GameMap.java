@@ -11,18 +11,17 @@ public class GameMap {
 
     private final int DEFAULT_WALL_HEIGHT = 5;
 
-    private List<Square> gameMap;
-
+    //Schachbrettform //TODO in englsich
+    private Square[][] gameMap;
 
     /**
      * Constructs a new Map with the given map data
      *
      * @param map A square array representing the map
      */
-    public GameMap(List<Square> map) {
+    public GameMap(Square[][] map) {
         this.gameMap = map;
     }
-
 
     public int getDEFAULT_SQUARE_SIDE_LENGTH() {
         return DEFAULT_SQUARE_SIDE_LENGTH;
@@ -32,7 +31,7 @@ public class GameMap {
         return DEFAULT_WALL_HEIGHT;
     }
 
-    public List<Square> getGameMap() {
+    public Square[][] getGameMap() {
         return gameMap;
     }
 }

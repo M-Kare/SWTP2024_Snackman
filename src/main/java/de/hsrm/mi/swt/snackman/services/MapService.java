@@ -50,7 +50,7 @@ public class MapService {
                 lines.add(line);
             }
         } catch (IOException e) {
-            throw new RuntimeException("Fehler beim Lesen der Labyrinth-Datei", e);
+            throw new RuntimeException("Fehler beim Lesen der Maze-Datei", e);
         }
 
         int rows = lines.size();
@@ -69,21 +69,20 @@ public class MapService {
      * @param mazeData the char array representing the maze
      */
     private GameMap switchMazeDataIntoMapObjectsInMaze(char[][] mazeData) {
-        ArrayList<Square> squaresBuildingMap = new ArrayList<>();
+        Square[][] squaresBuildingMap = new Square[mazeData.length][mazeData[0].length];
 
         for (int i = 0; i < mazeData.length; i++) {
             for (int j = 0; j < mazeData[0].length; j++) {
                 try {
                     Square squareToAdd = createSquare(mazeData[i][j], i, j);
-                    squaresBuildingMap.add(squareToAdd);
+                    addRandomSnackToSquare(squareToAdd);
+
+                    squaresBuildingMap[i][j] = squareToAdd;
+
                 } catch (IllegalArgumentException e) {
                     log.debug(e.getMessage());
                 }
             }
-        }
-
-        for (Square square : squaresBuildingMap) {
-            addRandomSnackToSquare(square);
         }
 
         return new GameMap(squaresBuildingMap);
