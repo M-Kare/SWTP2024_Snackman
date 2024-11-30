@@ -13,7 +13,8 @@ public class PlayerMovementController {
   @Autowired
     private SimpMessagingTemplate messagingTemplate;
     
-    private final SnackMan snackman = new SnackMan(0, 0);
+    @Autowired
+    private SnackMan snackman;
 
     // Erhalte Messages von /topic/player/update
     @MessageMapping("/topic/player/update")

@@ -3,17 +3,16 @@ package de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs;
 import org.joml.Quaterniond;
 import org.joml.Vector3d;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import de.hsrm.mi.swt.snackman.configuration.GameConfig;
 import de.hsrm.mi.swt.snackman.entities.map.Square;
 import de.hsrm.mi.swt.snackman.entities.mapObject.MapObjectType;
 import de.hsrm.mi.swt.snackman.services.MapService;
 
+@Component
 public class SnackMan extends EatingMob {
     
-    @Autowired
-    private MapService mapService;
-
     private double posX;
     private double posY;
     private double posZ;
@@ -22,16 +21,20 @@ public class SnackMan extends EatingMob {
     private Quaterniond quat;
     private Square currentSquare;
 
-    public SnackMan(double x, double z){
+    private MapService mapService;
+
+    @Autowired
+    public SnackMan(MapService mapService){
         super();
 
+        this.mapService = mapService;
         posY = GameConfig.SNACKMAN_GROUND_LEVEL;
-        posX = x;
-        posZ = z;
+        posX = 5;
+        posZ = 5;
         dirY = 0;
         radius = GameConfig.SNACKMAN_RADIUS;
         quat = new Quaterniond();
-        setCurrentSquareWithIndex(x,z);
+        setCurrentSquareWithIndex(5, 5);
     }
 
     public double getPosX() {
@@ -79,6 +82,7 @@ public class SnackMan extends EatingMob {
     }
 
     public void move(boolean f, boolean b, boolean l, boolean r, double delta) {
+        System.out.println(currentSquare.getIndexX() + "  |  " + currentSquare.getIndexZ());
         int moveDirZ = (f ? 1 : 0) - (b ? 1 : 0);
         int moveDirX = (r ? 1 : 0) - (l ? 1 : 0);
 

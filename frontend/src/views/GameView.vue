@@ -58,6 +58,7 @@ function animate() {
   fps = 1 / clock.getDelta()
   player.updatePlayer();
   if (counter >= fps / 30) {
+    console.log(`${player.getCamera().position.x}  |  ${player.getCamera().position.z}`)
     const time = performance.now()
     const delta = (time - prevTime) / 1000
     try {

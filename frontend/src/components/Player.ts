@@ -35,7 +35,7 @@ export class Player {
         this.movementDirection = new THREE.Vector3();
 
         this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100)
-        this.camera.position.set(0, 2, 0)
+        this.camera.position.set(5, 2, 5)
         this.controls = new PointerLockControls(this.camera, renderer.domElement)
         document.addEventListener('keydown', (event)=>{this.onKeyDown(event)})
         document.addEventListener('keyup', (event)=>{this.onKeyUp(event)})
@@ -112,7 +112,7 @@ export class Player {
 
     // lerp is used to interpolate the two positions
     public setPosition(x: number,y: number,z: number) {
-      this.camera.position.lerp(new THREE.Vector3(x,y,z), 1);
+      this.camera.position.set(x,y,z);
     }
 
     public setCameraRotation(x: number,y: number,z: number) {
