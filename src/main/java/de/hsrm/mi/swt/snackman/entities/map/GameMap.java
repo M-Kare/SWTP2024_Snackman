@@ -1,8 +1,5 @@
 package de.hsrm.mi.swt.snackman.entities.map;
 
-
-import java.util.List;
-
 /**
  * Represents a game map
  */
@@ -11,7 +8,7 @@ public class GameMap {
 
     private final int DEFAULT_WALL_HEIGHT = 5;
 
-    //Schachbrettform //TODO in englsich
+    //Like a chessboard for better handling of collision
     private Square[][] gameMap;
 
     /**

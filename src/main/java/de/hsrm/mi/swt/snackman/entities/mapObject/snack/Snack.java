@@ -8,8 +8,7 @@ public class Snack {
     private int calories;
 
     public Snack(SnackType snackType) {
-        this.snackType = snackType;
-        this.calories = snackType.getCalories();
+        setSnackType(snackType);
     }
 
     public SnackType getSnackType() {
@@ -18,6 +17,7 @@ public class Snack {
 
     public void setSnackType(SnackType snackType) {
         this.snackType = snackType;
+        this.calories = snackType.getCalories();
     }
 
     public int getCalories() {
