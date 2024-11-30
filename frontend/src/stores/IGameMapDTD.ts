@@ -1,9 +1,9 @@
 import type {ISquareDTD} from "@/stores/Square/ISquareDTD";
 
-export interface IMazeDTD {
+export interface IGameMapDTD {
   default_WALL_HEIGHT: number,
   default_SQUARE_SIDE_LENGTH: number,
-  gameMap: Array<ISquareDTD>
+  gameMap: ISquareDTD[][]
 }
 
 export enum MapObjectType{

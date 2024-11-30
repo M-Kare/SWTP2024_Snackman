@@ -1,5 +1,5 @@
 import * as THREE from 'three'
-import {type IMazeDTD, MapObjectType} from "@/stores/IMazeDTD";
+import {type IGameMapDTD, MapObjectType} from "@/stores/IGameMapDTD";
 import {SnackType} from "@/stores/Snack/ISnackDTD";
 
 /**
@@ -59,24 +59,28 @@ export const MazeRenderer = () => {
     return renderer
   }
 
-
-  const createMaze = (mazeData: IMazeDTD) => {
+  const createMaze = (mazeData: IGameMapDTD) => {
     const DEFAULT_SIDE_LENGTH = mazeData.default_SQUARE_SIDE_LENGTH
     const WALL_HEIGHT = mazeData.default_WALL_HEIGHT
 
     createGround()
 
-    // Iterate through maze data and create walls
-    for (const item of mazeData.gameMap) {
-      if (item.type === MapObjectType.WALL) {
-        // Create wall at position (x, 0, z) -> y = 0 because of 'building the walls'
-        createWall(item.indexX, 0, item.indexZ, WALL_HEIGHT, DEFAULT_SIDE_LENGTH)
-      }
-      if (item.type === MapObjectType.FLOOR) {
-        createFloorSquare(item.indexX, item.indexZ, DEFAULT_SIDE_LENGTH)
+    const gameMap = mazeData.gameMap
 
-        for (const snack of item.snacks) {
-          createSnackOnFloor(item.indexX, item.indexZ, DEFAULT_SIDE_LENGTH, snack.snackType)
+    for (let i = 0; i < gameMap.length; i++) {
+      for (let j = 0; j < gameMap[i].length; j++) {
+        const square = gameMap[i][j]
+
+        if (square.type === MapObjectType.WALL) {
+          // Create wall at position (x, 0, z) -> y = 0 because of 'building the walls'
+          createWall(square.indexX, 0, square.indexZ, WALL_HEIGHT, DEFAULT_SIDE_LENGTH)
+        }
+        if (square.type === MapObjectType.FLOOR) {
+          createFloorSquare(square.indexX, square.indexZ, DEFAULT_SIDE_LENGTH)
+
+          for (const snack of square.snacks) {
+            createSnackOnFloor(square.indexX, square.indexZ, DEFAULT_SIDE_LENGTH, snack.snackType)
+          }
         }
       }
     }
