@@ -2,12 +2,18 @@ package de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs;
 
 import org.joml.Quaterniond;
 import org.joml.Vector3d;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import de.hsrm.mi.swt.snackman.configuration.GameConfig;
-import de.hsrm.mi.swt.snackman.entities.square.Square;
+import de.hsrm.mi.swt.snackman.entities.map.Square;
+import de.hsrm.mi.swt.snackman.entities.mapObject.MapObjectType;
+import de.hsrm.mi.swt.snackman.services.MapService;
 
 public class SnackMan extends EatingMob {
     
+    @Autowired
+    private MapService mapService;
+
     private double posX;
     private double posY;
     private double posZ;
@@ -25,7 +31,7 @@ public class SnackMan extends EatingMob {
         dirY = 0;
         radius = GameConfig.SNACKMAN_RADIUS;
         quat = new Quaterniond();
-        calcMapIndex(x, z);
+        setCurrentSquareWithIndex(x,z);
     }
 
     public double getPosX() {
@@ -68,8 +74,8 @@ public class SnackMan extends EatingMob {
         return currentSquare;
     }
 
-    public void setCurrentSquare(Square square) {
-        currentSquare = square;
+    public void setCurrentSquareWithIndex(double x, double z) {
+        currentSquare = mapService.getSquareAtIndexXZ(calcMapIndexOfCoordinate(x), calcMapIndexOfCoordinate(z));
     }
 
     public void move(boolean f, boolean b, boolean l, boolean r, double delta) {
@@ -85,8 +91,63 @@ public class SnackMan extends EatingMob {
             move.x += moveDirX * delta * 3;
         }
         move.rotate(quat);
-        posX += move.x;
-        posZ += move.z;
+        double xNew = posX + move.x;
+        double zNew = posZ + move.z;
+        int result = checkWallCollision(xNew, zNew);
+        switch (result) {
+            case 0:
+                posX += move.x;
+                posZ += move.z;
+                break;
+            case 1: 
+                posZ += move.z;
+                break;
+            case 2:
+                posX += move.x;
+                break;
+            case 3:
+                break;
+        }
+        setCurrentSquareWithIndex(posX, posZ);
+    }
+
+    public int checkWallCollision(double x, double z) {
+        int change = 0;
+        double middleX = currentSquare.getIndexX()*GameConfig.SQUARE_SIZE + GameConfig.SQUARE_SIZE/2;
+        double middleZ = currentSquare.getIndexZ()*GameConfig.SQUARE_SIZE + GameConfig.SQUARE_SIZE/2;
+        int horizontal = (x - middleX <= 0) ? -1 : 1;
+        int vertical = (z - middleZ <= 0) ? -1 : 1;
+        Square squareX = mapService.getSquareAtIndexXZ(currentSquare.getIndexX()+horizontal, currentSquare.getIndexZ());
+        Square squareZ = mapService.getSquareAtIndexXZ(currentSquare.getIndexX(), currentSquare.getIndexZ()+vertical);
+        Square squareDiagonal = mapService.getSquareAtIndexXZ(currentSquare.getIndexX()+horizontal, currentSquare.getIndexZ()+vertical);
+        if (squareX.getType() == MapObjectType.WALL) {
+            Vector3d origin = new Vector3d(horizontal > 0 ? (currentSquare.getIndexX()+1)*GameConfig.SQUARE_SIZE : currentSquare.getIndexX()*GameConfig.SQUARE_SIZE, middleZ - GameConfig.SQUARE_SIZE/2, 1);
+            Vector3d line = new Vector3d(0,1,0);
+            if (calcIntersectionWithLine(x, z, origin, line)) {
+                change += 1;
+            }
+        }
+        if (squareZ.getType() == MapObjectType.WALL) {
+            Vector3d origin = new Vector3d(middleX - GameConfig.SQUARE_SIZE/2, vertical > 0 ? (currentSquare.getIndexZ()+1)*GameConfig.SQUARE_SIZE : currentSquare.getIndexZ(), 1);
+            Vector3d line = new Vector3d(1,0,0);
+            if (calcIntersectionWithLine(x, z, origin, line)) {
+                change += 2;
+            }
+        }
+        if (squareDiagonal.getType() == MapObjectType.WALL) {
+            double diagX = horizontal > 0 ? (currentSquare.getIndexX()+1)*GameConfig.SQUARE_SIZE : currentSquare.getIndexX()*GameConfig.SQUARE_SIZE;
+            double diagZ =  vertical > 0 ? (currentSquare.getIndexZ()+1)*GameConfig.SQUARE_SIZE : currentSquare.getIndexZ()*GameConfig.SQUARE_SIZE;
+            double dist = Math.sqrt((diagX-x)*(diagX-x) + (diagZ-z)*(diagZ-z));
+            if (dist <= this.radius)
+                change = 3;
+        }
+        return change;
+    }
+
+    public boolean calcIntersectionWithLine(double xNew, double zNew, Vector3d origin, Vector3d direction) {
+        Vector3d line = origin.cross(direction);
+        double dist = Math.abs(line.x*xNew + line.y*zNew + line.z) / Math.sqrt(line.x*line.x + line.y*line.y);
+        return dist <= this.radius;
     }
 
     public void setQuaternion(double qX, double qY, double qZ, double qW) {
@@ -96,10 +157,8 @@ public class SnackMan extends EatingMob {
         quat.w = qW;
     }
 
-    private void calcMapIndex(double x, double z){
-        int squareIndexX = (int)(x / GameConfig.SQUARE_SIZE);
-        int squareIndexZ = (int)(z / GameConfig.SQUARE_SIZE);
-        //setSquare(setMap.getSquare(squareIndexX, squareIndexZ));
+    private int calcMapIndexOfCoordinate(double a){
+        return (int)(a / GameConfig.SQUARE_SIZE);
     }
     
     public void setDirY(double angleY){
