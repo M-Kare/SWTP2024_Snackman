@@ -75,7 +75,10 @@ public class MapService {
             for (int j = 0; j < mazeData[0].length; j++) {
                 try {
                     Square squareToAdd = createSquare(mazeData[i][j], i, j);
-                    addRandomSnackToSquare(squareToAdd);
+                    // addRandomSnackToSquare(squareToAdd);
+
+                    // TODO delete and remove comment from "addRandomSnackToSquare" because this is just for testing
+                    addEggSnackToSquare(squareToAdd);
 
                     squaresBuildingMap[i][j] = squareToAdd;
 
@@ -104,7 +107,16 @@ public class MapService {
         SnackType randomSnackType = SnackType.getRandomSnack();
 
         square.addSnack(new Snack(randomSnackType));
-    };
+    }
+
+    // TODO can be deleted because it's just for testing
+    private void addEggSnackToSquare(Square square) {
+        Snack egg = new Snack(SnackType.EGG);
+        egg.setCalories(17);
+        square.addSnack(egg);
+
+        System.out.println(egg.getCalories());
+    }
 
 
     public GameMap getGameMap() {
