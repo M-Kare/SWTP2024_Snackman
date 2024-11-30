@@ -10,6 +10,7 @@ import { Player } from '@/components/Player';
 import type { IPlayerDTD } from '@/stores/IPlayerDTD';
 import { fetchMazeDataFromBackend } from "@/services/MazeDataService";
 import { MazeRenderer } from "@/renderer/MazeRenderer";
+import { fetchSnackManFromBackend } from '@/services/SnackManInitService';
 
 const DECELERATION = 20.0
 const ACCELERATION = 300.0
@@ -83,7 +84,8 @@ onMounted(async () => {
   scene = getScene()
   renderer = initRenderer(canvasRef.value)
 
-  player = new Player(renderer, DECELERATION, ACCELERATION)
+  const playerData = await fetchSnackManFromBackend();
+  player = new Player(renderer, playerData.posX, playerData.posY, playerData.posZ)
   camera = player.getCamera()
   scene.add(player.getControls().object)
 

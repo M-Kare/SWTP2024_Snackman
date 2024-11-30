@@ -4,8 +4,6 @@ import { PointerLockControls } from 'three/addons/controls/PointerLockControls.j
 
 export class Player {
     private prevTime: DOMHighResTimeStamp
-    private DECELERATION: number;
-    private ACCELERATION: number;
 
     // Booleans for checking movement-input
     private moveForward: boolean;
@@ -17,25 +15,19 @@ export class Player {
     private camera: THREE.PerspectiveCamera;
     private controls: PointerLockControls;
 
-    private velocity: THREE.Vector3;
     private movementDirection: THREE.Vector3;
 
-    constructor(renderer: WebGLRenderer, deceleration: number, acceleration: number){
-        this.DECELERATION = deceleration;
-        this.ACCELERATION = acceleration;
-
+    constructor(renderer: WebGLRenderer, posX: number, posY: number, posZ: number){
         this.prevTime = performance.now();
         this.moveBackward = false;
         this.moveForward = false;
         this.moveLeft = false;
         this.moveRight = false;
         this.canJump = true;
-
-        this.velocity = new THREE.Vector3();
         this.movementDirection = new THREE.Vector3();
 
         this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100)
-        this.camera.position.set(5, 2, 5)
+        this.camera.position.set(posX, posY, posZ)
         this.controls = new PointerLockControls(this.camera, renderer.domElement)
         document.addEventListener('keydown', (event)=>{this.onKeyDown(event)})
         document.addEventListener('keyup', (event)=>{this.onKeyUp(event)})
@@ -48,10 +40,6 @@ export class Player {
 
     public getControls():PointerLockControls{
         return this.controls;
-    }
-
-    public getVelocity(){
-        return this.velocity;
     }
 
     public getMovementDirection(){

@@ -29,12 +29,12 @@ public class SnackMan extends EatingMob {
 
         this.mapService = mapService;
         posY = GameConfig.SNACKMAN_GROUND_LEVEL;
-        posX = 5;
-        posZ = 5;
-        dirY = 0;
+        posX = this.mapService.getGameMap().getGameMap().length/2;
+        posZ = this.mapService.getGameMap().getGameMap().length/2;
+        dirY = GameConfig.SNACKMAN_GROUND_LEVEL;
         radius = GameConfig.SNACKMAN_RADIUS;
         quat = new Quaterniond();
-        setCurrentSquareWithIndex(5, 5);
+        setCurrentSquareWithIndex(posX, posY);
     }
 
     public double getPosX() {
