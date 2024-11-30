@@ -8,8 +8,8 @@ import * as THREE from 'three'
 import { Client } from '@stomp/stompjs'
 import { Player } from '@/components/Player';
 import type { IPlayerDTD } from '@/stores/IPlayerDTD';
-import {fetchMazeDataFromBackend} from "@/services/MazeDataService";
-import {MazeRenderer} from "@/renderer/MazeRenderer";
+import {fetchGameMapDataFromBackend} from "@/services/GameMapDataService";
+import {GameMapRenderer} from "@/renderer/GameMapRenderer";
 
 const DECELERATION = 20.0
 const ACCELERATION = 300.0
@@ -80,8 +80,8 @@ function animate() {
 }
 
 onMounted(async () => {
-// for rendering the scene, create maze in 3d and change window size
-  const {initRenderer, createMaze, getScene} = MazeRenderer()
+// for rendering the scene, create gameMap in 3d and change window size
+  const {initRenderer, createGameMap, getScene} = GameMapRenderer()
   scene = getScene()
   renderer = initRenderer(canvasRef.value)
 
@@ -89,12 +89,12 @@ onMounted(async () => {
   camera = player.getCamera()
   scene.add(player.getControls().object)
 
-  //Add maze
+  //Add gameMap
   try {
-    const mazeData = await fetchMazeDataFromBackend()
-    createMaze(mazeData)
+    const gameMapData = await fetchGameMapDataFromBackend()
+    createGameMap(gameMapData)
   } catch (error) {
-    console.error('Error when retrieving the maze:', error)
+    console.error('Error when retrieving the gameMap:', error)
   }
 
   renderer.render(scene, camera)

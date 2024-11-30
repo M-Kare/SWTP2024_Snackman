@@ -3,9 +3,9 @@ import {type IGameMapDTD, MapObjectType} from "@/stores/IGameMapDTD";
 import {SnackType} from "@/stores/Snack/ISnackDTD";
 
 /**
- * for rendering the maze
+ * for rendering the game map
  */
-export const MazeRenderer = () => {
+export const GameMapRenderer = () => {
   // create new three.js scene
   const GROUNDSIZE = 1000
   let renderer: THREE.WebGLRenderer
@@ -59,14 +59,14 @@ export const MazeRenderer = () => {
     return renderer
   }
 
-  const createMaze = (mazeData: IGameMapDTD) => {
-    const DEFAULT_SIDE_LENGTH = mazeData.DEFAULT_SQUARE_SIDE_LENGTH
-    const WALL_HEIGHT = mazeData.DEFAULT_WALL_HEIGHT
+  const createGameMap = (mapData: IGameMapDTD) => {
+    const DEFAULT_SIDE_LENGTH = mapData.DEFAULT_SQUARE_SIDE_LENGTH
+    const WALL_HEIGHT = mapData.DEFAULT_WALL_HEIGHT
 
     createGround()
 
-  // Iterate through maze data and create walls
-    for (const item of mazeData.gameMap) {
+  // Iterate through map data and create walls
+    for (const item of mapData.gameMap) {
       if (item.type === MapObjectType.WALL) {
         // Create wall at position (x, 0, z) -> y = 0 because of 'building the walls'
         createWall(item.indexX, 0, item.indexZ, WALL_HEIGHT, DEFAULT_SIDE_LENGTH)
@@ -144,5 +144,5 @@ export const MazeRenderer = () => {
     return scene
   }
 
-  return {initRenderer, createMaze, getScene}
+  return {initRenderer, createGameMap, getScene}
 }

@@ -17,7 +17,7 @@ import java.util.List;
 
 /**
  * Service class for managing the game map
- * This class is responsible for loading and providing access to the maze data
+ * This class is responsible for loading and providing access to the game map data
  */
 @Service
 public class MapService {
@@ -32,7 +32,7 @@ public class MapService {
     public MapService() {
         this.filePath = "mini-maze.txt";
         char[][] mazeData = readMazeFromFile(this.filePath);
-        gameMap = switchMazeDataIntoMapObjectsInMaze(mazeData);
+        gameMap = switchMazeDataIntoMapObjectsInGameMap(mazeData);
     }
 
     /**
@@ -64,11 +64,11 @@ public class MapService {
     }
 
     /**
-     * Converts the char array maze data into MapObjects and populates the maze
+     * Converts the char array maze data into MapObjects and populates the game map
      *
      * @param mazeData the char array representing the maze
      */
-    private GameMap switchMazeDataIntoMapObjectsInMaze(char[][] mazeData) {
+    private GameMap switchMazeDataIntoMapObjectsInGameMap(char[][] mazeData) {
         Square[][] squaresBuildingMap = new Square[mazeData.length][mazeData[0].length];
 
         for (int i = 0; i < mazeData.length; i++) {
