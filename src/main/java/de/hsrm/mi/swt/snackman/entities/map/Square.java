@@ -7,7 +7,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-//TODO add Javadoc
+/**
+ * Class that represents a Square. A Square is part of the game map. Multiple squares representing a game map.
+ */
 public class Square {
 
     //It's static because the idCounter is the same for all Squares.

@@ -63,7 +63,14 @@ public class MapService {
         return new GameMap(squaresBuildingMap);
     }
 
-    //TODO add Javadoc
+    /**
+     * Creates a Square by given indexes
+     *
+     * @param symbol from char array
+     * @param x index
+     * @param z index
+     * @return a created Square
+     */
     private Square createSquare(char symbol, int x, int z) {
         return switch (symbol) {
             case '#' -> new Square(MapObjectType.WALL, x, z);
@@ -74,7 +81,10 @@ public class MapService {
     }
 
 
-    //TODO add Javadoc
+    /**
+     * Adds a random generated snack inside a square
+     * @param square to put snack in
+     */
     private void addRandomSnackToSquare(Square square) {
         SnackType randomSnackType = SnackType.getRandomSnack();
 

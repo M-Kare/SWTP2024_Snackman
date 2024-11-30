@@ -17,7 +17,10 @@ public enum SnackType {
         return calories;
     }
 
-    //TODO add javadoc
+    /**
+     * Gets a random snack
+     * @return random snack
+     */
     public static SnackType getRandomSnack() {
         SnackType[] snacks = values();
         Random random = new Random();
