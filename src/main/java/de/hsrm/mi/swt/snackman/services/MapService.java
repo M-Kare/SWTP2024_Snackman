@@ -5,6 +5,7 @@ import de.hsrm.mi.swt.snackman.entities.map.Square;
 import de.hsrm.mi.swt.snackman.entities.mapObject.MapObjectType;
 import de.hsrm.mi.swt.snackman.entities.mapObject.snack.Snack;
 import de.hsrm.mi.swt.snackman.entities.mapObject.snack.SnackType;
+import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -75,10 +76,11 @@ public class MapService {
             for (int j = 0; j < mazeData[0].length; j++) {
                 try {
                     Square squareToAdd = createSquare(mazeData[i][j], i, j);
-                    // addRandomSnackToSquare(squareToAdd);
 
-                    // TODO delete and remove comment from "addRandomSnackToSquare" because this is just for testing
-                    addEggSnackToSquare(squareToAdd);
+                    // TODO just for testing 1 chicken in one Square with mazeData[1][1]
+                    if (i == 1 && j == 1) {
+                        addChickenForEggsToSquare(squareToAdd);
+                    } else addRandomSnackToSquare(squareToAdd);
 
                     squaresBuildingMap[i][j] = squareToAdd;
 
@@ -110,14 +112,9 @@ public class MapService {
     }
 
     // TODO can be deleted because it's just for testing
-    private void addEggSnackToSquare(Square square) {
-        Snack egg = new Snack(SnackType.EGG);
-        egg.setCalories(17);
-        square.addSnack(egg);
-
-        System.out.println(egg.getCalories());
+    private void addChickenForEggsToSquare(Square square) {
+        Chicken chicken = new Chicken(this);
     }
-
 
     public GameMap getGameMap() {
         return gameMap;
