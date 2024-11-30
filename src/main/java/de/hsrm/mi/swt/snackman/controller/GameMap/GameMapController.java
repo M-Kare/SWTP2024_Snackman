@@ -25,8 +25,8 @@ public class GameMapController {
     Logger log = LoggerFactory.getLogger(MapService.class);
 
     @GetMapping("/game-map")
-    public ResponseEntity<GameMap> getGameMap() {
+    public ResponseEntity<GameMapDTO> getGameMap() {
         log.debug("Get GameMap");
-        return ResponseEntity.ok(mapService.getGameMap());
+        return ResponseEntity.ok(GameMapDTO.fromGameMap(mapService.getGameMap()));
     }
 }
