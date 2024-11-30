@@ -4,6 +4,7 @@ import org.joml.Quaterniond;
 import org.joml.Vector3d;
 
 import de.hsrm.mi.swt.snackman.configuration.GameConfig;
+import de.hsrm.mi.swt.snackman.entities.square.Square;
 
 public class SnackMan extends EatingMob {
     
@@ -13,6 +14,7 @@ public class SnackMan extends EatingMob {
     private double dirY;
     private double radius;
     private Quaterniond quat;
+    private Square currentSquare;
 
     public SnackMan(double x, double z){
         super();
@@ -23,6 +25,7 @@ public class SnackMan extends EatingMob {
         dirY = 0;
         radius = GameConfig.SNACKMAN_RADIUS;
         quat = new Quaterniond();
+        calcMapIndex(x, z);
     }
 
     public double getPosX() {
@@ -59,6 +62,14 @@ public class SnackMan extends EatingMob {
 
     public void setRadius(double radius) {
         this.radius = radius;
+    }
+
+    public Square getCurrentSquare() {
+        return currentSquare;
+    }
+
+    public void setCurrentSquare(Square square) {
+        currentSquare = square;
     }
 
     public void move(boolean f, boolean b, boolean l, boolean r, double delta) {
