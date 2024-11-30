@@ -1,8 +1,5 @@
 package de.hsrm.mi.swt.snackman.entities.map;
 
-
-import java.util.List;
-
 /**
  * Represents a game map
  */
@@ -33,5 +30,9 @@ public class GameMap {
 
     public Square[][] getGameMap() {
         return gameMap;
+    }
+
+    public Square getSquareAtIndexXZ(int x, int z) {
+        return gameMap[x][z];
     }
 }
