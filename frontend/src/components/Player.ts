@@ -106,6 +106,10 @@ export class Player {
         }
       }
 
+      public getInput(){
+        return {forward:this.moveForward, backward:this.moveBackward, left:this.moveLeft, right:this.moveRight}
+      }
+
     // lerp is used to interpolate the two positions
     public setPosition(x: number,y: number,z: number) {
       this.camera.position.lerp(new THREE.Vector3(x,y,z), 1);
@@ -118,20 +122,24 @@ export class Player {
     // code inspired by from https://github.com/mrdoob/three.js/blob/master/examples/misc_controls_pointerlock.html
     // new position is calculated based on which keys are held
     public updatePlayer() {
-        const time = performance.now()
-        const delta = (time - this.prevTime) / 1000
+      const time = performance.now()
+      const delta = (time - this.prevTime) / 1000
 
-        this.velocity.x -= this.velocity.x * this.DECELERATION * delta
-        this.velocity.z -= this.velocity.z * this.DECELERATION * delta
-        this.movementDirection.z = Number(this.moveForward) - Number(this.moveBackward)
-        this.movementDirection.x = Number(this.moveRight) - Number(this.moveLeft)
-        this.movementDirection.normalize()
-        if (this.moveForward || this.moveBackward)
-            this.velocity.z -= this.movementDirection.z * this.ACCELERATION * delta
-        if (this.moveLeft || this.moveRight)
-            this.velocity.x -= this.movementDirection.x * this.ACCELERATION * delta
-        this.controls.moveRight(-this.velocity.x * delta)
-        this.controls.moveForward(-this.velocity.z * delta)
-        this.prevTime = time
+      this.movementDirection.z = Number(this.moveForward) - Number(this.moveBackward)
+      this.movementDirection.x = Number(this.moveRight) - Number(this.moveLeft)
+
+      let move = new THREE.Vector3(0,0,0)
+      const speed = 3
+      if(this.moveForward || this.moveBackward){
+        move.z -= this.movementDirection.z * delta * speed
+      }
+      if(this.moveLeft || this.moveRight){
+        move.x += this.movementDirection.x * delta * speed
+      }
+
+      move.applyQuaternion(this.camera.quaternion)
+      this.camera.position.x += move.x
+      this.camera.position.z += move.z
+      this.prevTime = time
     }
 }

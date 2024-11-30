@@ -1,5 +1,8 @@
 package de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs;
 
+import org.joml.Quaterniond;
+import org.joml.Vector3d;
+
 import de.hsrm.mi.swt.snackman.configuration.GameConfig;
 
 public class SnackMan extends EatingMob {
@@ -9,6 +12,7 @@ public class SnackMan extends EatingMob {
     private double posZ;
     private double dirY;
     private double radius;
+    private Quaterniond quat;
 
     public SnackMan(double x, double z){
         super();
@@ -18,6 +22,7 @@ public class SnackMan extends EatingMob {
         posZ = z;
         dirY = 0;
         radius = GameConfig.SNACKMAN_RADIUS;
+        quat = new Quaterniond();
     }
 
     public double getPosX() {
@@ -56,15 +61,29 @@ public class SnackMan extends EatingMob {
         this.radius = radius;
     }
 
-    @Override
-    public void move(double x, double y, double z) {
-        if(x-radius > -4){
-            posX = x;
+    public void move(boolean f, boolean b, boolean l, boolean r, double delta) {
+        int moveDirZ = (f ? 1 : 0) - (b ? 1 : 0);
+        int moveDirX = (r ? 1 : 0) - (l ? 1 : 0);
+
+        Vector3d move = new Vector3d();
+
+        if (f || b) {
+            move.z -= moveDirZ * delta * 3;
         }
-        posZ = z;
-        calcMapIndex(posX, posZ);
+        if (l || r) {
+            move.x += moveDirX * delta * 3;
+        }
+        move.rotate(quat);
+        posX += move.x;
+        posZ += move.z;
     }
 
+    public void setQuaternion(double qX, double qY, double qZ, double qW) {
+        quat.x = qX;
+        quat.y = qY;
+        quat.z = qZ;
+        quat.w = qW;
+    }
 
     private void calcMapIndex(double x, double z){
         int squareIndexX = (int)(x / GameConfig.SQUARE_SIZE);
@@ -106,6 +125,12 @@ public class SnackMan extends EatingMob {
 
     public void collectItems(){
 
+    }
+
+    @Override
+    public void move(double x, double y, double z) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'move'");
     }
 
 }
