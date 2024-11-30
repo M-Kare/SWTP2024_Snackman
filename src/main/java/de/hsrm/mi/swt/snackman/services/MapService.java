@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -30,7 +31,18 @@ public class MapService {
      * Initializes the maze data by reading from a file and creates a Map object
      */
     public MapService() {
-        this.filePath = "mini-maze.txt";
+        //String pathToScript = getClass().getClassLoader().getResource("Maze.py").getPath();
+        //PythonInterpreter interpreter = new PythonInterpreter();
+        //interpreter.execfile("./Maze.py");
+        try {
+            ProcessBuilder pb = new ProcessBuilder("python3", "./Maze.py");
+            pb.directory(new File("./Maze.py"));
+            Process process = pb.start();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        this.filePath = "Maze.txt";
         char[][] mazeData = readMazeFromFile(this.filePath);
         gameMap = switchMazeDataIntoMapObjectsInMaze(mazeData);
     }

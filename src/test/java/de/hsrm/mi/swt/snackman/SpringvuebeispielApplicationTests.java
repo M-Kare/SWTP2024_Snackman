@@ -9,8 +9,9 @@ import java.util.List;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.SpringApplication;
 import org.springframework.boot.test.context.SpringBootTest;
+
+import de.hsrm.mi.swt.snackman.services.MapService;
 
 @SpringBootTest
 class SnackmanApplicationTests {
@@ -20,7 +21,7 @@ class SnackmanApplicationTests {
 		mazeExists();
 		mazeHasContent();
 		mazeHasDefindesCharacters();
-		
+		newMazeGeneratedWhenNewInstanceOfMapService();
 	}
 
 	@Test
@@ -51,10 +52,10 @@ class SnackmanApplicationTests {
 	@Test
 	static void mazeHasDefindesCharacters(){
 		List<String> maze = new LinkedList<String>();
+		
 		try {
 			maze = Files.readAllLines(Paths.get("./Maze.txt"));
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -65,5 +66,33 @@ class SnackmanApplicationTests {
 			}
 		}
 
+	}
+
+	@Test
+	static void newMazeGeneratedWhenNewInstanceOfMapService(){
+		List<String> mazeBeforeMapService = new LinkedList<String>();
+		List<String> mazeAfterMapService = new LinkedList<String>();
+
+		try {
+			mazeBeforeMapService = Files.readAllLines(Paths.get("./Maze.txt"));		
+			//System.out.println("MapService: "+ mazeBeforeMapService);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		System.out.println("Dies ist ein Test");
+
+		MapService mapService = new MapService();
+
+		try {
+			mazeAfterMapService = Files.readAllLines(Paths.get("./Maze.txt"));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		System.out.println("Dies ist ein Test");
+
+		Assertions.assertNotEquals(mazeAfterMapService, mazeBeforeMapService,"No new maze generated");
+		
 	}
 }
