@@ -16,7 +16,7 @@ public class PlayerMovementController {
     
     private final SnackMan snackman = new SnackMan(0, 0);
 
-  //Erhalte Messages von /topic/cube/update
+    // Erhalte Messages von /topic/player/update
     @MessageMapping("/topic/player/update")
     public void spreadPlayerUpdate(SnackManDTO player) {
       //Validation here
