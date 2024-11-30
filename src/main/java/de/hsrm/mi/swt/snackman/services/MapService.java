@@ -28,7 +28,11 @@ public class MapService {
      */
     @Autowired
     public MapService(ReadMazeService readMazeService) {
-        this.filePath = "mini-maze.txt";
+        this(readMazeService, "mini-maze.txt");
+    }
+
+    public MapService(ReadMazeService readMazeService, String filePath) {
+        this.filePath = filePath;
         char[][] mazeData = readMazeService.readMazeFromFile(this.filePath);
         gameMap = convertMazeDataGameMap(mazeData);
     }
