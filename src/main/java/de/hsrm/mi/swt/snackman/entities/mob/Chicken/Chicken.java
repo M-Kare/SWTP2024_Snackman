@@ -13,7 +13,11 @@ import org.python.util.PythonInterpreter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class Chicken extends EatingMob implements Runnable{
+/**
+ * Represents a chicken entity in the game, capable of moving around the map,
+ * consuming snacks, and executing Python-based movement logic
+ */
+public class Chicken extends EatingMob implements Runnable {
 
     private final Logger logger = LoggerFactory.getLogger(Chicken.class);
     private boolean blockingPath;
@@ -49,16 +53,22 @@ public class Chicken extends EatingMob implements Runnable{
     }
 
     /**
-     * @param currentlyVisibleEnvironment the list of information the chicken can see (8 squares around it)
-     * @return the result of the chicken movement script
+     * Chooses the next walking path based on the chicken's visible environment.
+     *
+     * @param currentlyVisibleEnvironment a list of information about the squares
+     *                                    visible around the chicken (8 squares).
+     * @return a list of directions or moves determined by the chicken's movement
+     *         script.
      */
     public List<String> chooseWalkingPath(List<String> currentlyVisibleEnvironment) {
         return executeMovementSkript(currentlyVisibleEnvironment);
     }
 
     /**
-     * Sets the new Position of the chicken after having chosen a new square to stand on
-     * @param newMove
+     * Updates the chicken's position based on the chosen move and sets its new
+     * direction.
+     *
+     * @param newMove a list representing the next move for the chicken.
      */
     private void setNewPosition(List<String> newMove) {
         Direction walkingDirection = Direction.getDirection(newMove.getLast());
@@ -73,7 +83,9 @@ public class Chicken extends EatingMob implements Runnable{
     }
 
     /**
-     * implement moving logic into each chicken
+     * Contains the movement logic for the chicken. The chicken calculates its next
+     * move,
+     * updates its position and consumes any snacks found at its current location.
      */
     @Override
     protected void move() {
@@ -93,8 +105,10 @@ public class Chicken extends EatingMob implements Runnable{
     }
 
     /**
-     * consumes all snacks at the current position
-     * @todo zu fixen sobald mariusz fertig ist mit den snacks
+     * Consumes all snacks at the chicken's current position, updating the chicken's
+     * calorie count and removing consumed snacks from the map.
+     * 
+     * @todo Fix this implementation once the snack handling logic is finalized.
      */
     private void consumeSnack() {
         this.kcal = this.currentPosition.getKcal();
@@ -102,7 +116,8 @@ public class Chicken extends EatingMob implements Runnable{
     }
 
     /**
-     * initialises Jython for running chicken movement script
+     * Initializes Jython for executing the chicken's movement script.
+     * Sets up the required Python environment and interpreter.
      */
     protected void initJython() {
         pythonProps.setProperty("python.path", "src/main/java/de/hsrm/mi/swt/snackman/entities/mob/Chicken");
@@ -112,10 +127,11 @@ public class Chicken extends EatingMob implements Runnable{
     }
 
     /**
-     * runs the jython chicken movement skript and returns its information
-     * 
-     * @param squares the squares the chicken can (in its current position) see
-     * @return information on where the chicken is going
+     * Executes the chicken's movement script written in Python and determines the
+     * next move.
+     *
+     * @param squares a list of squares visible from the chicken's current position.
+     * @return a list of moves resulting from the Python script's execution.
      */
     public List<String> executeMovementSkript(List<String> squares) {
         try {
@@ -138,10 +154,10 @@ public class Chicken extends EatingMob implements Runnable{
     }
 
     /**
-     * Converts a python list into a java list
-     * 
-     * @param pyList the python list
-     * @return the java list
+     * Converts a Python list to a Java list.
+     *
+     * @param pyList the Python list to convert.
+     * @return the corresponding Java list.
      */
     private List<String> convertPythonList(PyList pyList) {
         List<String> javaList = new ArrayList<>();
@@ -152,6 +168,10 @@ public class Chicken extends EatingMob implements Runnable{
         return javaList;
     }
 
+    /**
+     * Adjusts the chicken's thickness state, cycling through predefined values,
+     * and updates its path-blocking status accordingly.
+     */
     private void incrementThickness() {
         switch (this.thickness) {
             case Thickness.THIN:
@@ -169,7 +189,7 @@ public class Chicken extends EatingMob implements Runnable{
                 break;
             case Thickness.VERY_HEAVY:
                 this.thickness = Thickness.THIN;
-                blockingPath = false;
+                blockingPath = true;
                 break;
         }
     }
@@ -199,11 +219,13 @@ public class Chicken extends EatingMob implements Runnable{
     }
 
     /**
-     * @todo zurück auskommentieren, damit chicken sich bewegen kann -> voraussetzung dafür: es muss global der state des gesammten backends an das frontend geschickt werden!!
+     * @todo zurück auskommentieren, damit chicken sich bewegen kann ->
+     *       voraussetzung dafür: es muss global der state des gesammten backends an
+     *       das frontend geschickt werden!!
      */
     @Override
     public void run() {
-        //move();    
+        // move();
     }
 
 }
