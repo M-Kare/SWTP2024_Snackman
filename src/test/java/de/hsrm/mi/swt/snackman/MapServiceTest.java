@@ -61,12 +61,9 @@ public class MapServiceTest {
 
                 // Check if a snack is available when floor
                 if (map[row][col].getType() == MapObjectType.FLOOR) {
-                    List<Snack> snacks = map[row][col].getSnacks();
-                    assertNotNull(snacks,
-                            String.format("Snacks should not be null at row %d, column %d", row, col));
-
-                    assertFalse(snacks.isEmpty(),
-                            String.format("Snacks list should not be empty at row %d, column %d", row, col));
+                    Snack snack = map[row][col].getSnack();
+                    assertNotNull(snack,
+                            String.format("Snack should not be null at row %d, column %d", row, col));
                 }
             }
         }

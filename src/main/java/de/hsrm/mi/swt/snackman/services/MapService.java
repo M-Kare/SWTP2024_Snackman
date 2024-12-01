@@ -88,7 +88,7 @@ public class MapService {
     private void addRandomSnackToSquare(Square square) {
         SnackType randomSnackType = SnackType.getRandomSnack();
 
-        square.addSnack(new Snack(randomSnackType));
+        square.setSnack(new Snack(randomSnackType));
     };
 
 
