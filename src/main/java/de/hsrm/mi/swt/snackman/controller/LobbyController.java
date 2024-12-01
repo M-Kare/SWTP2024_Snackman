@@ -2,7 +2,6 @@ package de.hsrm.mi.swt.snackman.controller;
 
 import java.util.List;
 
-import org.apache.juli.logging.Log;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +21,12 @@ import de.hsrm.mi.swt.snackman.services.GameAlreadyStartedException;
 import de.hsrm.mi.swt.snackman.services.LobbyAlreadyExistsException;
 import de.hsrm.mi.swt.snackman.services.LobbyManagerService;
 
+/**
+ * The LobbyController handles HTTP requests related to managing game lobbies.
+ * It provides endpoints for creating, joining, leaving, and starting lobbies,
+ * as well as retrieving a list of all active lobbies. Additionally, it uses
+ * STOMP messaging to notify clients of lobby updates in real time.
+ */
 @Controller
 @RequestMapping("/api/lobbies")
 public class LobbyController {
@@ -32,6 +37,14 @@ public class LobbyController {
       private SimpMessagingTemplate messagingTemplate;
       private final Logger logger = LoggerFactory.getLogger(LobbyController.class);
 
+      /**
+       * Creates a new lobby with the specified name and creator UUID.
+       * 
+       * @param name        the name of the lobby to create
+       * @param creatorUuid the UUID of the client creating the lobby
+       * @return the newly created {@link Lobby}, or a 409 Conflict status if the
+       *         lobby name already exists
+       */
       @PostMapping("/create")
       public ResponseEntity<Lobby> createLobby(@RequestParam String name, @RequestParam String creatorUuid) {
             Client client = lobbyManagerService.getClient(name, creatorUuid);
@@ -46,11 +59,24 @@ public class LobbyController {
             }
       }
 
+      /**
+       * Retrieves a list of all active lobbies.
+       * 
+       * @return a list of all {@link Lobby} objects
+       */
       @GetMapping
       public ResponseEntity<List<Lobby>> getAllLobbies() {
             return ResponseEntity.ok(lobbyManagerService.getAllLobbies());
       }
 
+      /**
+       * Adds a player to an existing lobby.
+       * 
+       * @param lobbyId  the ID of the lobby to join
+       * @param playerId the UUID of the player joining the lobby
+       * @return the updated {@link Lobby}, or a 409 Conflict status if the game in
+       *         the lobby has already started
+       */
       @PostMapping("/{lobbyId}/join")
       public ResponseEntity<Lobby> joinLobby(@PathVariable String lobbyId, @RequestParam String playerId) {
             try {
@@ -64,6 +90,13 @@ public class LobbyController {
             }
       }
 
+      /**
+       * Removes a player from an existing lobby
+       * 
+       * @param lobbyId  the ID of the lobby to leave
+       * @param playerId the UUID of the player leaving the lobby
+       * @return a {@link ResponseEntity} with an HTTP 200 OK status
+       */
       @PostMapping("/{lobbyId}/leave")
       public ResponseEntity<Void> leaveLobby(@PathVariable String lobbyId, @RequestParam String playerId) {
             lobbyManagerService.leaveLobby(lobbyId, playerId);
@@ -72,6 +105,12 @@ public class LobbyController {
             return ResponseEntity.ok().build();
       }
 
+      /**
+       * Starts the game in the specified lobby.
+       * 
+       * @param lobbyId the ID of the lobby where the game is to be started
+       * @return a {@link ResponseEntity} with an HTTP 200 OK status
+       */
       @PostMapping("/{lobbyId}/start")
       public ResponseEntity<Void> startGame(@PathVariable String lobbyId) {
             lobbyManagerService.startGame(lobbyId);

@@ -11,21 +11,19 @@ import de.hsrm.mi.swt.snackman.entities.lobby.Client;
 import de.hsrm.mi.swt.snackman.entities.lobby.Lobby;
 import de.hsrm.mi.swt.snackman.entities.lobby.ROLE;
 
+/**
+ * Service for managing lobbies and clients in the application.
+ */
 @Service
 public class LobbyManagerService {
-      private final List<Lobby> lobbies;
-      private final List<Client> clients;
-
-      public LobbyManagerService() {
-            this.lobbies = new ArrayList<>();
-            clients = new ArrayList<>();
-      }
+      private final List<Lobby> lobbies = new ArrayList<>();
+      private final List<Client> clients = new ArrayList<>();
 
       /**
-       * Erstelle einen neuen Client
+       * Create a new client
        * 
-       * @param name der Name des Clients
-       * @return den Client
+       * @param name the name of the client
+       * @return the client
        */
       public Client createNewClient(String name) {
             String uuid = UUID.randomUUID().toString();
@@ -36,11 +34,11 @@ public class LobbyManagerService {
       }
 
       /**
-       * Erstellt eine neue Lobby und fügt sie zur Liste hinzu.
+       * Creates a new lobby and adds it to the list.
        * 
-       * @param name    Name der Lobby
-       * @param adminID ID des Lobby-Erstellers
-       * @return Die erstellte Lobby
+       * @param name    Name of the lobby
+       * @param adminID ID of the lobby creator
+       * @return The lobby created
        * @throws LobbyAlreadyExistsException
        */
       public Lobby createLobby(String name, Client admin) throws LobbyAlreadyExistsException {
@@ -48,9 +46,7 @@ public class LobbyManagerService {
                   throw new LobbyAlreadyExistsException("Lobby name already exists");
             }
 
-            // Lobby erstellen
-            Lobby lobby = new Lobby(name, admin.getPlayerId(), false);
-            lobby.getMembers().add(admin);
+            Lobby lobby = new Lobby(name, admin, false);
 
             admin.setRole(ROLE.SNACKMAN);
 
@@ -59,21 +55,21 @@ public class LobbyManagerService {
       }
 
       /**
-       * Gibt die Liste aller Lobbys zurück.
+       * Returns the list of all lobbies.
        * 
-       * @return Liste der Lobbys
+       * @return list of lobbies
        */
       public List<Lobby> getAllLobbies() {
             return this.lobbies;
       }
 
       /**
-       * Fügt einen Spieler einer Lobby hinzu.
+       * Adds a player to a lobby.
        * 
-       * @param lobbyId  ID der Lobby
-       * @param playerId ID des Spielers
-       * @return Die aktualisierte Lobby
-       * @throws GameAlreadyStartedException
+       * @param lobbyId  ID of the lobby
+       * @param playerId ID of the player
+       * @return The updated lobby
+       * @throws GameAlreadyStartedException if the game has already been started
        */
       public Lobby joinLobby(String lobbyId, String playerId) throws GameAlreadyStartedException {
             Lobby lobby = findLobbyByUUID(lobbyId);
@@ -89,27 +85,24 @@ public class LobbyManagerService {
       }
 
       /**
-       * Entfernt einen Spieler aus einer Lobby.
+       * Removes a player from a lobby.
        * 
-       * @param lobbyId  ID der Lobby
-       * @param playerId ID des Spielers
+       * @param lobbyId  ID of the lobby
+       * @param playerId ID of the player
        */
       public void leaveLobby(String lobbyId, String playerId) {
             Lobby lobby = findLobbyByUUID(lobbyId);
-
-            // Entferne den Spieler
             lobby.getMembers().removeIf(client -> client.getPlayerId().equals(playerId));
 
-            // Lobby entfernen, wenn der Ersteller sie verlässt oder sie leer ist
             if (lobby.getAdminClientId().equals(playerId) || lobby.getMembers().isEmpty()) {
                   lobbies.remove(lobby);
             }
       }
 
       /**
-       * Startet das Spiel in der angegebenen Lobby.
+       * Starts the game in the specified lobby.
        * 
-       * @param lobbyId ID der Lobby
+       * @param lobbyId ID of the lobby
        */
       public void startGame(String lobbyId) {
             Lobby lobby = findLobbyByUUID(lobbyId);
@@ -122,9 +115,9 @@ public class LobbyManagerService {
       }
 
       /**
-       * Sucht die Lobby nach deren UUID
+       * Searches the lobby for its UUID
        * 
-       * @param lobbyID UUID der Lobby
+       * @param lobbyID UUID of the lobby
        * @return the lobby
        */
       public Lobby findLobbyByUUID(String lobbyID) {
@@ -135,10 +128,10 @@ public class LobbyManagerService {
       }
 
       /**
-       * Sucht den Client nach deren UUID
+       * Searches the client for their UUID
        * 
-       * @param clientID UUID des Clients
-       * @return the Client
+       * @param clientID UUID of the client
+       * @return the client
        */
       private Client findClientByUUID(String clientID) {
             return clients.stream()
@@ -149,14 +142,15 @@ public class LobbyManagerService {
 
       /**
        * Retrieves the active client or creates a new client
-       * @param name the name of the client
+       * 
+       * @param name     the name of the client
        * @param clientID the uuid of the client
        * @return the client
        */
-      public Client getClient (String name, String clientID) {
+      public Client getClient(String name, String clientID) {
             return clients.stream()
-                  .filter(l -> l.getPlayerId().equals(clientID) && l.getPlayerName().equals(name))
-                  .findFirst()
-                  .orElse(createNewClient(name));
+                        .filter(l -> l.getPlayerId().equals(clientID) && l.getPlayerName().equals(name))
+                        .findFirst()
+                        .orElse(createNewClient(name));
       }
 }

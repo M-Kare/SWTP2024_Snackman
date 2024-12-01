@@ -4,19 +4,23 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Represents a lobby where players can gather to play a game together.
+ */
 public class Lobby {
       private String uuid;
       private String name;
-      private String adminClientId;
+      private Client adminClient;
       private boolean isGameStarted;
       private List<Client> members;
 
-      public Lobby(String name, String adminId, boolean isGameStarted) {
+      public Lobby(String name, Client adminClient, boolean isGameStarted) {
             this.uuid = UUID.randomUUID().toString();
             this.name = name;
-            this.adminClientId = adminId;
+            this.adminClient = adminClient;
             this.isGameStarted = isGameStarted;
             this.members = new ArrayList<>();
+            this.members.add(adminClient);
       }
 
       public String getUuid() {
@@ -28,7 +32,7 @@ public class Lobby {
       }
 
       public String getAdminClientId() {
-            return adminClientId;
+            return adminClient.getPlayerId();
       }
 
       public boolean isGameStarted() {

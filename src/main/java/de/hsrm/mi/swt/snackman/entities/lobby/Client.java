@@ -1,6 +1,9 @@
 package de.hsrm.mi.swt.snackman.entities.lobby;
 
 
+/**
+ * Represents a client or player in the lobby system. 
+ */
 public class Client {
       private String playerId;
       private String playerName;
