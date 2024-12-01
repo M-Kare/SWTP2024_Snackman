@@ -8,7 +8,7 @@ import de.hsrm.mi.swt.snackman.configuration.GameConfig;
 public class GameMap {
     private final int DEFAULT_SQUARE_SIDE_LENGTH = GameConfig.SQUARE_SIZE;
 
-    private final int DEFAULT_WALL_HEIGHT = 5;
+    private final int DEFAULT_WALL_HEIGHT = GameConfig.SQUARE_HEIGHT;
 
     //Schachbrettform //TODO in englsich
     private Square[][] gameMap;
