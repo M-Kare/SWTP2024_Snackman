@@ -1,5 +1,6 @@
 package de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs;
 
+import de.hsrm.mi.swt.snackman.entities.mapObject.snack.Snack;
 import org.joml.Quaterniond;
 import org.joml.Vector3d;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +13,8 @@ import de.hsrm.mi.swt.snackman.services.MapService;
 
 @Component
 public class SnackMan extends EatingMob {
-    
+
+    private int currentCalories;
     private double posX;
     private double posY;
     private double posZ;
@@ -25,6 +27,7 @@ public class SnackMan extends EatingMob {
     @Autowired
     public SnackMan(MapService mapService){
         super();
+        currentCalories = 0;
 
         this.mapService = mapService;
         posY = GameConfig.SNACKMAN_GROUND_LEVEL;
@@ -76,7 +79,7 @@ public class SnackMan extends EatingMob {
     }
 
     public void move(boolean f, boolean b, boolean l, boolean r, double delta) {
-        System.out.println(currentSquare.getIndexX() + "  |  " + currentSquare.getIndexZ());
+        //System.out.println(currentSquare.getIndexX() + "  |  " + currentSquare.getIndexZ());
         int moveDirZ = (f ? 1 : 0) - (b ? 1 : 0);
         int moveDirX = (r ? 1 : 0) - (l ? 1 : 0);
 
@@ -102,7 +105,7 @@ public class SnackMan extends EatingMob {
                 posX += move.x;
                 posZ += move.z;
                 break;
-            case 1: 
+            case 1:
                 posZ += move.z;
                 break;
             case 2:
@@ -115,6 +118,7 @@ public class SnackMan extends EatingMob {
                 break;
         }
         setCurrentSquareWithIndex(posX, posZ);
+        consumeSnackOnSquare(currentSquare);
     }
 
     // TODO: Find out why frontend and backend are not completly synced (labyrinth size not displayed correcty in frontend?)
@@ -179,7 +183,7 @@ public class SnackMan extends EatingMob {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'loseKcal'");
     }
-    
+
     public void jump(){
 
     }
@@ -206,4 +210,23 @@ public class SnackMan extends EatingMob {
         throw new UnsupportedOperationException("Unimplemented method 'move'");
     }
 
+    public int getCurrentCalories() {
+        return currentCalories;
+    }
+
+    /**
+     * Collects the snack on the square if there is one.
+     * If there is one that remove it from the square.
+     * @param square to eat the snack from
+     */
+    public void consumeSnackOnSquare(Square square){
+        Snack snackOnSquare = square.getSnack();
+
+        if(snackOnSquare != null){
+            currentCalories += snackOnSquare.getCalories();
+
+            //set snack to null after consuming it
+            square.setSnack(null);
+        }
+    }
 }
