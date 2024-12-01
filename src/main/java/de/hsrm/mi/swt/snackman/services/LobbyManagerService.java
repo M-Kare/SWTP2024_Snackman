@@ -75,7 +75,7 @@ public class LobbyManagerService {
        * @return Die aktualisierte Lobby
        * @throws GameAlreadyStartedException
        */
-      public Lobby joinLobby(UUID lobbyId, UUID playerId) throws GameAlreadyStartedException {
+      public Lobby joinLobby(String lobbyId, String playerId) throws GameAlreadyStartedException {
             Lobby lobby = findLobbyByUUID(lobbyId);
 
             if (lobby.isGameStarted()) {
@@ -94,7 +94,7 @@ public class LobbyManagerService {
        * @param lobbyId  ID der Lobby
        * @param playerId ID des Spielers
        */
-      public void leaveLobby(UUID lobbyId, UUID playerId) {
+      public void leaveLobby(String lobbyId, String playerId) {
             Lobby lobby = findLobbyByUUID(lobbyId);
 
             // Entferne den Spieler
@@ -111,7 +111,7 @@ public class LobbyManagerService {
        * 
        * @param lobbyId ID der Lobby
        */
-      public void startGame(UUID lobbyId) {
+      public void startGame(String lobbyId) {
             Lobby lobby = findLobbyByUUID(lobbyId);
 
             if (lobby.getMembers().size() < 2) {
@@ -127,7 +127,7 @@ public class LobbyManagerService {
        * @param lobbyID UUID der Lobby
        * @return the lobby
        */
-      private Lobby findLobbyByUUID(UUID lobbyID) {
+      public Lobby findLobbyByUUID(String lobbyID) {
             return lobbies.stream()
                         .filter(l -> l.getUuid().equals(lobbyID))
                         .findFirst()
@@ -140,7 +140,7 @@ public class LobbyManagerService {
        * @param clientID UUID des Clients
        * @return the Client
        */
-      private Client findClientByUUID(UUID clientID) {
+      private Client findClientByUUID(String clientID) {
             return clients.stream()
                         .filter(l -> l.getPlayerId().equals(clientID))
                         .findFirst()
@@ -153,7 +153,7 @@ public class LobbyManagerService {
        * @param clientID the uuid of the client
        * @return the client
        */
-      public Client getClient (String name, UUID clientID) {
+      public Client getClient (String name, String clientID) {
             return clients.stream()
                   .filter(l -> l.getPlayerId().equals(clientID) && l.getPlayerName().equals(name))
                   .findFirst()

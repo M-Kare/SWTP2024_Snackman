@@ -1,13 +1,12 @@
 package de.hsrm.mi.swt.snackman.entities.lobby;
 
-import java.util.UUID;
 
 public class Client {
       private String playerId;
       private String playerName;
       private ROLE role;
       
-      public Client(UUID playerId, String playerName, ROLE role) {
+      public Client(String playerId, String playerName, ROLE role) {
             this.playerId = playerId;
             this.playerName = playerName;
             this.role = role;
