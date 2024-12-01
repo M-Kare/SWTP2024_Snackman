@@ -82,13 +82,15 @@ public class MapService {
 
 
     /**
-     * Adds a random generated snack inside a square
+     * Adds a random generated snack inside a square of type FLOOR
      * @param square to put snack in
      */
     private void addRandomSnackToSquare(Square square) {
-        SnackType randomSnackType = SnackType.getRandomSnack();
+        if(square.getType() == MapObjectType.FLOOR){
+            SnackType randomSnackType = SnackType.getRandomSnack();
 
-        square.setSnack(new Snack(randomSnackType));
+            square.setSnack(new Snack(randomSnackType));
+        }
     };
 
 

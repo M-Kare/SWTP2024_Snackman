@@ -6,7 +6,7 @@ export interface ISquareDTD {
   indexX: number,
   indexZ: number,
   type: MapObjectType,
-  snacks: Array<ISnackDTD>,
+  snack: ISnackDTD,
 }
 
 

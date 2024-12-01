@@ -3,8 +3,6 @@ package de.hsrm.mi.swt.snackman.entities.map;
 import de.hsrm.mi.swt.snackman.entities.mapObject.MapObjectType;
 import de.hsrm.mi.swt.snackman.entities.mapObject.snack.Snack;
 
-import java.util.List;
-
 
 /**
  * Class that represents a Square. A Square is part of the game map. Multiple squares representing a game map.

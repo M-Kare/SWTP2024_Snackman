@@ -73,10 +73,7 @@ export const GameMapRenderer = () => {
       }
       if (item.type === MapObjectType.FLOOR) {
         createFloorSquare(item.indexX, item.indexZ, DEFAULT_SIDE_LENGTH)
-
-        for (const snack of item.snacks) {
-          createSnackOnFloor(item.indexX, item.indexZ, DEFAULT_SIDE_LENGTH, snack.snackType)
-        }
+        createSnackOnFloor(item.indexX, item.indexZ, DEFAULT_SIDE_LENGTH, item.snack.snackType)
       }
     }
   }
