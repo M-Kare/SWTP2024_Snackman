@@ -7,7 +7,7 @@ import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 
-import de.hsrm.mi.swt.snackman.entities.lobby.Client;
+import de.hsrm.mi.swt.snackman.entities.lobby.PlayerClient;
 import de.hsrm.mi.swt.snackman.entities.lobby.Lobby;
 import de.hsrm.mi.swt.snackman.entities.lobby.ROLE;
 
@@ -16,8 +16,9 @@ import de.hsrm.mi.swt.snackman.entities.lobby.ROLE;
  */
 @Service
 public class LobbyManagerService {
+      
       private final List<Lobby> lobbies = new ArrayList<>();
-      private final List<Client> clients = new ArrayList<>();
+      private final List<PlayerClient> clients = new ArrayList<>();
 
       /**
        * Create a new client
@@ -25,9 +26,9 @@ public class LobbyManagerService {
        * @param name the name of the client
        * @return the client
        */
-      public Client createNewClient(String name) {
+      public PlayerClient createNewClient(String name) {
             String uuid = UUID.randomUUID().toString();
-            Client newClient = new Client(uuid, name);
+            PlayerClient newClient = new PlayerClient(uuid, name);
             this.clients.add(newClient);
 
             return newClient;
@@ -41,7 +42,7 @@ public class LobbyManagerService {
        * @return The lobby created
        * @throws LobbyAlreadyExistsException
        */
-      public Lobby createLobby(String name, Client admin) throws LobbyAlreadyExistsException {
+      public Lobby createLobby(String name, PlayerClient admin) throws LobbyAlreadyExistsException {
             if (lobbies.stream().anyMatch(lobby -> lobby.getName().equals(name))) {
                   throw new LobbyAlreadyExistsException("Lobby name already exists");
             }
@@ -78,7 +79,7 @@ public class LobbyManagerService {
                   throw new GameAlreadyStartedException("Game already started");
             }
 
-            Client newJoiningClient = findClientByUUID(playerId);
+            PlayerClient newJoiningClient = findClientByUUID(playerId);
             newJoiningClient.setRole(ROLE.GHOST);
             lobby.getMembers().add(newJoiningClient);
             return lobby;
@@ -133,7 +134,7 @@ public class LobbyManagerService {
        * @param clientID UUID of the client
        * @return the client
        */
-      private Client findClientByUUID(String clientID) {
+      private PlayerClient findClientByUUID(String clientID) {
             return clients.stream()
                         .filter(l -> l.getPlayerId().equals(clientID))
                         .findFirst()
@@ -147,7 +148,7 @@ public class LobbyManagerService {
        * @param clientID the uuid of the client
        * @return the client
        */
-      public Client getClient(String name, String clientID) {
+      public PlayerClient getClient(String name, String clientID) {
             return clients.stream()
                         .filter(l -> l.getPlayerId().equals(clientID) && l.getPlayerName().equals(name))
                         .findFirst()

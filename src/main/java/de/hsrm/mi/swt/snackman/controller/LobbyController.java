@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import de.hsrm.mi.swt.snackman.entities.lobby.Client;
+import de.hsrm.mi.swt.snackman.entities.lobby.PlayerClient;
 import de.hsrm.mi.swt.snackman.entities.lobby.Lobby;
 import de.hsrm.mi.swt.snackman.services.GameAlreadyStartedException;
 import de.hsrm.mi.swt.snackman.services.LobbyAlreadyExistsException;
@@ -47,7 +47,7 @@ public class LobbyController {
        */
       @PostMapping("/create")
       public ResponseEntity<Lobby> createLobby(@RequestParam String name, @RequestParam String creatorUuid) {
-            Client client = lobbyManagerService.getClient(name, creatorUuid);
+            PlayerClient client = lobbyManagerService.getClient(name, creatorUuid);
             try {
                   Lobby newLobby = lobbyManagerService.createLobby(name, client);
                   messagingTemplate.convertAndSend("/topic/lobbies", lobbyManagerService.getAllLobbies());

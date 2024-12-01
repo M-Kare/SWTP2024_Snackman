@@ -4,18 +4,18 @@ package de.hsrm.mi.swt.snackman.entities.lobby;
 /**
  * Represents a client or player in the lobby system. 
  */
-public class Client {
+public class PlayerClient {
       private String playerId;
       private String playerName;
       private ROLE role;
       
-      public Client(String playerId, String playerName, ROLE role) {
+      public PlayerClient(String playerId, String playerName, ROLE role) {
             this.playerId = playerId;
             this.playerName = playerName;
             this.role = role;
       }
 
-      public Client(String playerId, String playerName) {
+      public PlayerClient(String playerId, String playerName) {
             this.playerId = playerId;
             this.playerName = playerName;
       }

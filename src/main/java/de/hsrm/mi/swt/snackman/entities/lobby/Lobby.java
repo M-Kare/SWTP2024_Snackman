@@ -10,11 +10,11 @@ import java.util.UUID;
 public class Lobby {
       private String uuid;
       private String name;
-      private Client adminClient;
+      private PlayerClient adminClient;
       private boolean isGameStarted;
-      private List<Client> members;
+      private List<PlayerClient> members;
 
-      public Lobby(String name, Client adminClient, boolean isGameStarted) {
+      public Lobby(String name, PlayerClient adminClient, boolean isGameStarted) {
             this.uuid = UUID.randomUUID().toString();
             this.name = name;
             this.adminClient = adminClient;
@@ -39,7 +39,7 @@ public class Lobby {
             return isGameStarted;
       }
 
-      public List<Client> getMembers() {
+      public List<PlayerClient> getMembers() {
             return members;
       }
 
