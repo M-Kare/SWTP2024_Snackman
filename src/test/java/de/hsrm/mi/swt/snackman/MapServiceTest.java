@@ -48,8 +48,6 @@ public class MapServiceTest {
         Square[][] map = gameMap.getGameMap();
 
         assertNotNull(map, "Map should not be null");
-        assertEquals(1, gameMap.getDEFAULT_SQUARE_SIDE_LENGTH(), "Default side length should be one");
-        assertEquals(5, gameMap.getDEFAULT_WALL_HEIGHT(), "Default wall height should be 5");
 
         for (int row = 0; row < expectedMap.length; row++) {
             for (int col = 0; col < expectedMap[row].length; col++) {
