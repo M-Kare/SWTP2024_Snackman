@@ -10,7 +10,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -35,6 +34,7 @@ public class MapService {
     public MapService() {
         String path = System.getProperty("user.dir") + "/src/main/java/de/hsrm/mi/swt/snackman/Maze.py";
 
+        //generates a new randome Maze
         try(PythonInterpreter interpreter = new PythonInterpreter()){
             interpreter.execfile(path);
         }
