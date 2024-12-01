@@ -97,4 +97,8 @@ public class MapService {
     public GameMap getGameMap() {
         return gameMap;
     }
+
+    public Square getSquareAtIndexXZ(int x, int z) {
+        return gameMap.getSquareAtIndexXZ(x, z);
+    }
 }

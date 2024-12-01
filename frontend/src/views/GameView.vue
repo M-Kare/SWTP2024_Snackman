@@ -8,6 +8,7 @@ import * as THREE from 'three'
 import { Client } from '@stomp/stompjs'
 import { Player } from '@/components/Player';
 import type { IPlayerDTD } from '@/stores/IPlayerDTD';
+import { fetchSnackManFromBackend } from '@/services/SnackManInitService';
 import {fetchGameMapDataFromBackend} from "@/services/GameMapDataService";
 import {GameMapRenderer} from "@/renderer/GameMapRenderer";
 
@@ -31,7 +32,6 @@ stompclient.onConnect = frame => {
     // empfangene Nutzdaten in message.body abrufbar,
     // ggf. mit JSON.parse(message.body) zu JS konvertieren
     const event: IPlayerDTD = JSON.parse(message.body)
-    //console.log(`Received: (${event.posX}|${event.posZ})`)
     player.setPosition(event.posX, event.posY, event.posZ);
   })
 }
@@ -41,6 +41,7 @@ const canvasRef = ref()
 let renderer: THREE.WebGLRenderer
 let player: Player;
 let scene: THREE.Scene
+let prevTime = performance.now();
 
 // camera setup
 let camera: THREE.PerspectiveCamera;
@@ -58,21 +59,19 @@ function animate() {
   fps = 1 / clock.getDelta()
   player.updatePlayer();
   if (counter >= fps / 30) {
+    console.log(`${player.getCamera().position.x}  |  ${player.getCamera().position.z}`)
+    const time = performance.now()
+    const delta = (time - prevTime) / 1000
     try {
       //Sende and /topic/player/update
-      const messageObject = {
-        posX: player.getCamera().position.x,
-        posY: player.getCamera().position.y,
-        posZ: player.getCamera().position.z,
-        dirY: player.getCamera().rotation.y,
-      };
       stompclient.publish({
         destination: DEST + "/update", headers: {},
-        body: JSON.stringify(messageObject)
+        body: JSON.stringify(Object.assign({}, player.getInput(), { qX: player.getCamera().quaternion.x, qY: player.getCamera().quaternion.y, qZ: player.getCamera().quaternion.z, qW: player.getCamera().quaternion.w }, { delta: delta }))
       });
     } catch (fehler) {
       console.log(fehler)
     }
+    prevTime = time;
     counter = 0
   }
   counter++;
@@ -85,7 +84,8 @@ onMounted(async () => {
   scene = getScene()
   renderer = initRenderer(canvasRef.value)
 
-  player = new Player(renderer, DECELERATION, ACCELERATION)
+  const playerData = await fetchSnackManFromBackend();
+  player = new Player(renderer, playerData.posX, playerData.posY, playerData.posZ, playerData.radius, playerData.speed)
   camera = player.getCamera()
   scene.add(player.getControls().object)
 

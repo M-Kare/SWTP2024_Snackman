@@ -60,8 +60,9 @@ export const GameMapRenderer = () => {
   }
 
   const createGameMap = (mapData: IGameMapDTD) => {
-    const DEFAULT_SIDE_LENGTH = mapData.DEFAULT_SQUARE_SIDE_LENGTH
-    const WALL_HEIGHT = mapData.DEFAULT_WALL_HEIGHT
+    const OFFSET = mapData.default_SQUARE_SIDE_LENGTH/2
+    const DEFAULT_SIDE_LENGTH = mapData.default_SQUARE_SIDE_LENGTH
+    const WALL_HEIGHT = mapData.default_WALL_HEIGHT
 
     createGround()
 
@@ -69,11 +70,11 @@ export const GameMapRenderer = () => {
     for (const item of mapData.gameMap) {
       if (item.type === MapObjectType.WALL) {
         // Create wall at position (x, 0, z) -> y = 0 because of 'building the walls'
-        createWall(item.indexX, 0, item.indexZ, WALL_HEIGHT, DEFAULT_SIDE_LENGTH)
+        createWall(square.indexX*DEFAULT_SIDE_LENGTH+OFFSET, 0, square.indexZ*DEFAULT_SIDE_LENGTH+OFFSET, WALL_HEIGHT, DEFAULT_SIDE_LENGTH)
       }
       if (item.type === MapObjectType.FLOOR) {
-        createFloorSquare(item.indexX, item.indexZ, DEFAULT_SIDE_LENGTH)
-        createSnackOnFloor(item.indexX, item.indexZ, DEFAULT_SIDE_LENGTH, item.snack.snackType)
+        createFloorSquare(square.indexX*DEFAULT_SIDE_LENGTH+OFFSET, square.indexZ*DEFAULT_SIDE_LENGTH+OFFSET, DEFAULT_SIDE_LENGTH)
+        createSnackOnFloor(square.indexX*DEFAULT_SIDE_LENGTH+OFFSET, square.indexZ*DEFAULT_SIDE_LENGTH+OFFSET, DEFAULT_SIDE_LENGTH, snack.snackType)
       }
     }
   }
