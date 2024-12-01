@@ -17,7 +17,6 @@ import de.hsrm.mi.swt.snackman.services.MapService;
 class SnackmanApplicationTests {
 
 	public static void main(String[] args){
-		//SpringApplication.run(SnackmanApplicationTests.class, args);
 		mazeExists();
 		mazeHasContent();
 		mazeHasDefindesCharacters();
@@ -75,22 +74,16 @@ class SnackmanApplicationTests {
 
 		try {
 			mazeBeforeMapService = Files.readAllLines(Paths.get("./Maze.txt"));		
-			//System.out.println("MapService: "+ mazeBeforeMapService);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		System.out.println("Dies ist ein Test");
-
 		MapService mapService = new MapService();
 
 		try {
 			mazeAfterMapService = Files.readAllLines(Paths.get("./Maze.txt"));
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
-		System.out.println("Dies ist ein Test");
 
 		Assertions.assertNotEquals(mazeAfterMapService, mazeBeforeMapService,"No new maze generated");
 		
