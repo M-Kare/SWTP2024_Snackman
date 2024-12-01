@@ -5,21 +5,21 @@ import java.util.List;
 import java.util.UUID;
 
 public class Lobby {
-      private UUID uuid;
+      private String uuid;
       private String name;
-      private UUID adminClientId;
+      private String adminClientId;
       private boolean isGameStarted;
       private List<Client> members;
 
-      public Lobby(String name, UUID adminId, boolean isGameStarted) {
-            this.uuid = UUID.randomUUID();
+      public Lobby(String name, String adminId, boolean isGameStarted) {
+            this.uuid = UUID.randomUUID().toString();
             this.name = name;
             this.adminClientId = adminId;
             this.isGameStarted = isGameStarted;
             this.members = new ArrayList<>();
       }
 
-      public UUID getUuid() {
+      public String getUuid() {
             return uuid;
       }
 
@@ -27,7 +27,7 @@ public class Lobby {
             return name;
       }
 
-      public UUID getAdminClientId() {
+      public String getAdminClientId() {
             return adminClientId;
       }
 

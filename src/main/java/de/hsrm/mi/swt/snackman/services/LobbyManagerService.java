@@ -28,7 +28,7 @@ public class LobbyManagerService {
        * @return den Client
        */
       public Client createNewClient(String name) {
-            UUID uuid = UUID.randomUUID();
+            String uuid = UUID.randomUUID().toString();
             Client newClient = new Client(uuid, name);
             this.clients.add(newClient);
 
@@ -145,5 +145,18 @@ public class LobbyManagerService {
                         .filter(l -> l.getPlayerId().equals(clientID))
                         .findFirst()
                         .orElseThrow(() -> new NoSuchElementException("Client not found"));
+      }
+
+      /**
+       * Retrieves the active client or creates a new client
+       * @param name the name of the client
+       * @param clientID the uuid of the client
+       * @return the client
+       */
+      public Client getClient (String name, UUID clientID) {
+            return clients.stream()
+                  .filter(l -> l.getPlayerId().equals(clientID) && l.getPlayerName().equals(name))
+                  .findFirst()
+                  .orElse(createNewClient(name));
       }
 }
