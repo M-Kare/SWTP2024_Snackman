@@ -24,7 +24,7 @@
     background-image: url('@/assets/main_menu-bg.jpg');
     background-size: cover;
     background-position: center;
-    z-index: 1;
+    z-index: -2;
   }
 
   .overlay {
@@ -34,6 +34,6 @@
     width: 100%;
     height: 100%;
     background-color: rgba(0, 0, 0, 0.5);
-    z-index: 2;
+    z-index: -1;
   }
   </style>
