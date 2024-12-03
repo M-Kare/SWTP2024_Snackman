@@ -1,19 +1,21 @@
 package de.hsrm.mi.swt.snackman.services;
 
-import de.hsrm.mi.swt.snackman.entities.map.GameMap;
-import de.hsrm.mi.swt.snackman.entities.map.Square;
-import de.hsrm.mi.swt.snackman.entities.mapObject.MapObjectType;
-import de.hsrm.mi.swt.snackman.entities.mapObject.snack.Snack;
-import de.hsrm.mi.swt.snackman.entities.mapObject.snack.SnackType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
-
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+
+import de.hsrm.mi.swt.snackman.entities.map.GameMap;
+import de.hsrm.mi.swt.snackman.entities.map.Square;
+import de.hsrm.mi.swt.snackman.entities.mapObject.MapObjectType;
+import de.hsrm.mi.swt.snackman.entities.mapObject.snack.Snack;
+import de.hsrm.mi.swt.snackman.entities.mapObject.snack.SnackType;
+import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.SnackMan;
 
 /**
  * Service class for managing the game map
@@ -23,6 +25,7 @@ import java.util.List;
 public class MapService {
     private String filePath;
     private GameMap gameMap;
+    private SnackMan snackman;
     Logger log = LoggerFactory.getLogger(MapService.class);
 
     /**
@@ -33,6 +36,8 @@ public class MapService {
         this.filePath = "mini-maze.txt";
         char[][] mazeData = readMazeFromFile(this.filePath);
         gameMap = switchMazeDataIntoMapObjectsInMaze(mazeData);
+
+        snackman = new SnackMan(this);
     }
 
     /**
@@ -113,5 +118,9 @@ public class MapService {
 
     public Square getSquareAtIndexXZ(int x, int z) {
         return gameMap.getSquareAtIndexXZ(x, z);
+    }
+
+    public SnackMan getSnackMan(){
+        return snackman;
     }
 }
