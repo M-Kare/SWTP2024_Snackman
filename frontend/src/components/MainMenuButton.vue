@@ -1,3 +1,4 @@
+<!-- Refactor later on to ShowLobbyButton -->
 <template>
     <button class="main-menu-button" @click="handleClick">
       <slot></slot>
@@ -5,15 +6,19 @@
 </template>
   
 <script setup lang="ts">
+  import { useRouter } from 'vue-router';
+
+  const router = useRouter();
+
   const handleClick = () => {
-    // TODO: implement onclick - start Game?
+    router.push({name: 'GameStart'});
   };
+
 </script>
   
 <style scoped>
 .main-menu-button {
   position: relative;
-  z-index: 2;
   padding: 1.75rem 4rem;
   border: none;
   border-radius: 0.3125rem;

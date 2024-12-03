@@ -26,18 +26,7 @@
   font-weight: bold;
 }
 
-.return-button {
-  height: 50px;
-  width: 200px;
-  margin-top: 20px;
-  margin-left: 100px;
-  padding: 10px 20px;
-  font-size: 18px;
-  cursor: pointer;
-  background-color: #007bff;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  text-align: center;
+.back-button {
+  
 }
 </style>
