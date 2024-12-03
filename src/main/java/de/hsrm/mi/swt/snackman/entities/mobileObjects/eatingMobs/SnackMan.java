@@ -2,15 +2,13 @@ package de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs;
 
 import org.joml.Quaterniond;
 import org.joml.Vector3d;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import de.hsrm.mi.swt.snackman.configuration.GameConfig;
+import de.hsrm.mi.swt.snackman.entities.map.GameMap;
 import de.hsrm.mi.swt.snackman.entities.map.Square;
 import de.hsrm.mi.swt.snackman.entities.mapObject.MapObjectType;
 import de.hsrm.mi.swt.snackman.services.MapService;
 
-@Component
 public class SnackMan extends EatingMob {
     
     private double posX;
@@ -21,18 +19,28 @@ public class SnackMan extends EatingMob {
     private Square currentSquare;
 
     private MapService mapService;
+    private GameMap gameMap;
 
-    @Autowired
     public SnackMan(MapService mapService){
         super();
 
         this.mapService = mapService;
+        gameMap = mapService.getGameMap();
         posY = GameConfig.SNACKMAN_GROUND_LEVEL;
-        posX = (this.mapService.getGameMap().getGameMap().length/2)*GameConfig.SQUARE_SIZE;
-        posZ = (this.mapService.getGameMap().getGameMap()[0].length/2)*GameConfig.SQUARE_SIZE;
+        posX = (gameMap.getGameMap().length/2)*GameConfig.SQUARE_SIZE;
+        posZ = (gameMap.getGameMap()[0].length/2)*GameConfig.SQUARE_SIZE;
         radius = GameConfig.SNACKMAN_RADIUS;
         quat = new Quaterniond();
-        setCurrentSquareWithIndex(posX, posY);
+        setCurrentSquareWithIndex(posX, posZ);
+    }
+
+    public SnackMan(MapService mapService, double posX, double posY, double posZ){
+        this(mapService);
+
+        this.posX = posX;
+        this.posY = posY;
+        this.posZ = posZ;
+        setCurrentSquareWithIndex(posX, posZ);
     }
 
     public double getPosX() {
@@ -72,7 +80,20 @@ public class SnackMan extends EatingMob {
     }
 
     public void setCurrentSquareWithIndex(double x, double z) {
-        currentSquare = mapService.getSquareAtIndexXZ(calcMapIndexOfCoordinate(x), calcMapIndexOfCoordinate(z));
+        try {
+            currentSquare = gameMap.getSquareAtIndexXZ(calcMapIndexOfCoordinate(x), calcMapIndexOfCoordinate(z));
+        } catch (IndexOutOfBoundsException e) {
+            respawn();
+        }
+    }
+
+    
+    @Override
+    public void move(double posX, double posY, double posZ) {
+        this.setPosX(posX);
+        this.setPosY(posY);
+        this.setPosZ(posZ);
+        this.setCurrentSquareWithIndex(this.posX, this.posZ);
     }
 
     public void move(boolean f, boolean b, boolean l, boolean r, double delta) {
@@ -117,16 +138,21 @@ public class SnackMan extends EatingMob {
         setCurrentSquareWithIndex(posX, posZ);
     }
 
-    // TODO: Find out why frontend and backend are not completly synced (labyrinth size not displayed correcty in frontend?)
+    //TODO: SnackMan spawn in MapService benötigt
+    public void respawn(){
+        this.posX = (gameMap.getGameMap().length/2)*GameConfig.SQUARE_SIZE;
+        this.posZ = (gameMap.getGameMap()[0].length/2)*GameConfig.SQUARE_SIZE;
+    }
+
     public int checkWallCollision(double x, double z) {
         int change = 0;
         double middleX = currentSquare.getIndexX()*GameConfig.SQUARE_SIZE + GameConfig.SQUARE_SIZE/2;
         double middleZ = currentSquare.getIndexZ()*GameConfig.SQUARE_SIZE + GameConfig.SQUARE_SIZE/2;
         int horizontal = (x - middleX <= 0) ? -1 : 1;
         int vertical = (z - middleZ <= 0) ? -1 : 1;
-        Square squareX = mapService.getSquareAtIndexXZ(currentSquare.getIndexX()+horizontal, currentSquare.getIndexZ());
-        Square squareZ = mapService.getSquareAtIndexXZ(currentSquare.getIndexX(), currentSquare.getIndexZ()+vertical);
-        Square squareDiagonal = mapService.getSquareAtIndexXZ(currentSquare.getIndexX()+horizontal, currentSquare.getIndexZ()+vertical);
+        Square squareX = gameMap.getSquareAtIndexXZ(currentSquare.getIndexX()+horizontal, currentSquare.getIndexZ());
+        Square squareZ = gameMap.getSquareAtIndexXZ(currentSquare.getIndexX(), currentSquare.getIndexZ()+vertical);
+        Square squareDiagonal = gameMap.getSquareAtIndexXZ(currentSquare.getIndexX()+horizontal, currentSquare.getIndexZ()+vertical);
         if (squareX.getType() == MapObjectType.WALL) {
             Vector3d origin = new Vector3d(horizontal > 0 ? (currentSquare.getIndexX()+1)*GameConfig.SQUARE_SIZE : currentSquare.getIndexX()*GameConfig.SQUARE_SIZE, middleZ - GameConfig.SQUARE_SIZE/2, 1);
             Vector3d line = new Vector3d(0,1,0);
@@ -164,7 +190,7 @@ public class SnackMan extends EatingMob {
         quat.w = qW;
     }
 
-    private int calcMapIndexOfCoordinate(double a){
+    public int calcMapIndexOfCoordinate(double a){
         return (int)(a / GameConfig.SQUARE_SIZE);
     }
 
@@ -200,10 +226,5 @@ public class SnackMan extends EatingMob {
 
     }
 
-    @Override
-    public void move(double x, double y, double z) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'move'");
-    }
 
 }
