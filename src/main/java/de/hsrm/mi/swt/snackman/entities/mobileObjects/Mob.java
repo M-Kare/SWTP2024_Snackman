@@ -10,17 +10,16 @@ import de.hsrm.mi.swt.snackman.entities.mapObject.MapObjectType;
 import de.hsrm.mi.swt.snackman.services.MapService;
 
 public abstract class Mob {
-    //private Square square;
+    // private Square square;
 
     // public void setSquare(Square square){
-    //     this.square = square;
+    // this.square = square;
     // }
 
     // public Square getSquare(){
-    //     return this.square;
+    // return this.square;
     // }
 
-        
     private double posX;
     private double posY;
     private double posZ;
@@ -31,20 +30,20 @@ public abstract class Mob {
     private MapService mapService;
     private GameMap gameMap;
 
-    public Mob(MapService mapService){
+    public Mob(MapService mapService) {
         super();
 
         this.mapService = mapService;
         gameMap = this.mapService.getGameMap();
         posY = GameConfig.SNACKMAN_GROUND_LEVEL;
-        posX = (gameMap.getGameMap().length/2)*GameConfig.SQUARE_SIZE;
-        posZ = (gameMap.getGameMap()[0].length/2)*GameConfig.SQUARE_SIZE;
+        posX = (gameMap.getGameMap().length / 2) * GameConfig.SQUARE_SIZE;
+        posZ = (gameMap.getGameMap()[0].length / 2) * GameConfig.SQUARE_SIZE;
         radius = GameConfig.SNACKMAN_RADIUS;
         quat = new Quaterniond();
         setCurrentSquareWithIndex(posX, posZ);
     }
 
-    public Mob(MapService mapService, double posX, double posY, double posZ){
+    public Mob(MapService mapService, double posX, double posY, double posZ) {
         this(mapService);
 
         this.posX = posX;
@@ -97,7 +96,6 @@ public abstract class Mob {
         }
     }
 
-    
     public void move(double posX, double posY, double posZ) {
         this.setPosX(posX);
         this.setPosY(posY);
@@ -118,11 +116,11 @@ public abstract class Mob {
         if (l || r) {
             move.x += moveDirX;
         }
-        if(move.x != 0 && move.z != 0){
+        if (move.x != 0 && move.z != 0) {
             move.normalize();
         }
-            move.x = move.x * delta * GameConfig.SNACKMAN_SPEED;
-            move.z = move.z * delta * GameConfig.SNACKMAN_SPEED;
+        move.x = move.x * delta * GameConfig.SNACKMAN_SPEED;
+        move.z = move.z * delta * GameConfig.SNACKMAN_SPEED;
         move.rotate(quat);
         double xNew = posX + move.x;
         double zNew = posZ + move.z;
@@ -132,61 +130,80 @@ public abstract class Mob {
                 posX += move.x;
                 posZ += move.z;
                 break;
-            case 1: 
+            case 1:
                 posZ += move.z;
                 break;
             case 2:
                 posX += move.x;
                 break;
             case 3:
-                //TODO: Wenn jemand eine einfache Methode hat den Spieler in die richige Richtung zu nudgen, gerne einfügen!
+                break;
+            default:
                 break;
         }
         setCurrentSquareWithIndex(posX, posZ);
     }
 
-    //TODO: SnackMan spawn in MapService benötigt
-    public void respawn(){
-        this.posX = (gameMap.getGameMap().length/2)*GameConfig.SQUARE_SIZE;
-        this.posZ = (gameMap.getGameMap()[0].length/2)*GameConfig.SQUARE_SIZE;
+    // TODO: SnackMan spawn in MapService benötigt
+    public void respawn() {
+        this.posX = (gameMap.getGameMap().length / 2) * GameConfig.SQUARE_SIZE;
+        this.posZ = (gameMap.getGameMap()[0].length / 2) * GameConfig.SQUARE_SIZE;
     }
 
     public int checkWallCollision(double x, double z) {
-        int change = 0;
-        double middleX = currentSquare.getIndexX()*GameConfig.SQUARE_SIZE + GameConfig.SQUARE_SIZE/2;
-        double middleZ = currentSquare.getIndexZ()*GameConfig.SQUARE_SIZE + GameConfig.SQUARE_SIZE/2;
-        int horizontal = (x - middleX <= 0) ? -1 : 1;
-        int vertical = (z - middleZ <= 0) ? -1 : 1;
-        Square squareX = gameMap.getSquareAtIndexXZ(currentSquare.getIndexX()+horizontal, currentSquare.getIndexZ());
-        Square squareZ = gameMap.getSquareAtIndexXZ(currentSquare.getIndexX(), currentSquare.getIndexZ()+vertical);
-        Square squareDiagonal = gameMap.getSquareAtIndexXZ(currentSquare.getIndexX()+horizontal, currentSquare.getIndexZ()+vertical);
-        if (squareX.getType() == MapObjectType.WALL) {
-            Vector3d origin = new Vector3d(horizontal > 0 ? (currentSquare.getIndexX()+1)*GameConfig.SQUARE_SIZE : currentSquare.getIndexX()*GameConfig.SQUARE_SIZE, middleZ - GameConfig.SQUARE_SIZE/2, 1);
-            Vector3d line = new Vector3d(0,1,0);
+        int collisionCase = 0;
+
+        double squareCenterX = currentSquare.getIndexX() * GameConfig.SQUARE_SIZE + GameConfig.SQUARE_SIZE / 2;
+        double squareCenterZ = currentSquare.getIndexZ() * GameConfig.SQUARE_SIZE + GameConfig.SQUARE_SIZE / 2;
+
+        int horizontalRelativeToCenter = (x - squareCenterX <= 0) ? -1 : 1;
+        int verticalRelativeToCenter = (z - squareCenterZ <= 0) ? -1 : 1;
+
+        Square squareLeftRight = gameMap.getSquareAtIndexXZ(currentSquare.getIndexX() + horizontalRelativeToCenter,
+                currentSquare.getIndexZ());
+        Square squareTopBottom = gameMap.getSquareAtIndexXZ(currentSquare.getIndexX(),
+                currentSquare.getIndexZ() + verticalRelativeToCenter);
+        Square squareDiagonal = gameMap.getSquareAtIndexXZ(currentSquare.getIndexX() + horizontalRelativeToCenter,
+                currentSquare.getIndexZ() + verticalRelativeToCenter);
+
+        if (squareLeftRight.getType() == MapObjectType.WALL) {
+            Vector3d origin = new Vector3d(
+                    horizontalRelativeToCenter > 0 ? (currentSquare.getIndexX() + 1) * GameConfig.SQUARE_SIZE
+                            : currentSquare.getIndexX() * GameConfig.SQUARE_SIZE,
+                    0, 1);
+            Vector3d line = new Vector3d(0, 1, 0);
             if (calcIntersectionWithLine(x, z, origin, line)) {
-                change += 1;
+                collisionCase += 1;
             }
         }
-        if (squareZ.getType() == MapObjectType.WALL) {
-            Vector3d origin = new Vector3d(middleX - GameConfig.SQUARE_SIZE/2, vertical > 0 ? (currentSquare.getIndexZ()+1)*GameConfig.SQUARE_SIZE : currentSquare.getIndexZ()*GameConfig.SQUARE_SIZE, 1);
-            Vector3d line = new Vector3d(1,0,0);
+
+        if (squareTopBottom.getType() == MapObjectType.WALL) {
+            Vector3d origin = new Vector3d(0,
+                    verticalRelativeToCenter > 0 ? (currentSquare.getIndexZ() + 1) * GameConfig.SQUARE_SIZE
+                            : currentSquare.getIndexZ() * GameConfig.SQUARE_SIZE,
+                    1);
+            Vector3d line = new Vector3d(1, 0, 0);
             if (calcIntersectionWithLine(x, z, origin, line)) {
-                change += 2;
+                collisionCase += 2;
             }
         }
-        if (squareDiagonal.getType() == MapObjectType.WALL && change == 0) {
-            double diagX = horizontal > 0 ? (currentSquare.getIndexX()+1)*GameConfig.SQUARE_SIZE : currentSquare.getIndexX()*GameConfig.SQUARE_SIZE;
-            double diagZ =  vertical > 0 ? (currentSquare.getIndexZ()+1)*GameConfig.SQUARE_SIZE : currentSquare.getIndexZ()*GameConfig.SQUARE_SIZE;
-            double dist = Math.sqrt((diagX-x)*(diagX-x) + (diagZ-z)*(diagZ-z));
+
+        if (squareDiagonal.getType() == MapObjectType.WALL && collisionCase == 0) {
+            double diagX = horizontalRelativeToCenter > 0 ? (currentSquare.getIndexX() + 1) * GameConfig.SQUARE_SIZE
+                    : currentSquare.getIndexX() * GameConfig.SQUARE_SIZE;
+            double diagZ = verticalRelativeToCenter > 0 ? (currentSquare.getIndexZ() + 1) * GameConfig.SQUARE_SIZE
+                    : currentSquare.getIndexZ() * GameConfig.SQUARE_SIZE;
+            double dist = Math.sqrt((diagX - x) * (diagX - x) + (diagZ - z) * (diagZ - z));
             if (dist <= this.radius)
-                change = 3;
+                collisionCase = 3;
         }
-        return change;
+
+        return collisionCase;
     }
 
     public boolean calcIntersectionWithLine(double xNew, double zNew, Vector3d origin, Vector3d direction) {
         Vector3d line = origin.cross(direction);
-        double dist = Math.abs(line.x*xNew + line.y*zNew + line.z) / Math.sqrt(line.x*line.x + line.y*line.y);
+        double dist = Math.abs(line.x * xNew + line.y * zNew + line.z) / Math.sqrt(line.x * line.x + line.y * line.y);
         return dist <= this.radius;
     }
 
@@ -197,7 +214,7 @@ public abstract class Mob {
         quat.w = qW;
     }
 
-    public int calcMapIndexOfCoordinate(double a){
-        return (int)(a / GameConfig.SQUARE_SIZE);
+    public int calcMapIndexOfCoordinate(double a) {
+        return (int) (a / GameConfig.SQUARE_SIZE);
     }
 }
