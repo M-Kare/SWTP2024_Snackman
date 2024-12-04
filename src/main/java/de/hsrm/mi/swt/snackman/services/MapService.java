@@ -25,9 +25,8 @@ import org.python.util.PythonInterpreter;
 @Service
 public class MapService {
 
-    private FrontendMessageService frontendMessageService;
-
     Logger log = LoggerFactory.getLogger(MapService.class);
+    private FrontendMessageService frontendMessageService;
     private String filePath;
     private GameMap gameMap;
 
@@ -36,11 +35,11 @@ public class MapService {
      * Initializes the maze data by reading from a file and creates a Map object
      */
     @Autowired
-    public MapService( FrontendMessageService frontendMessageService, ReadMazeService readMazeService) {
+    public MapService(FrontendMessageService frontendMessageService, ReadMazeService readMazeService) {
         this(frontendMessageService, readMazeService, "Maze.txt");
     }
 
-    public MapService(FrontendMessageService frontendMessageService,ReadMazeService readMazeService,
+    public MapService(FrontendMessageService frontendMessageService, ReadMazeService readMazeService,
                       String filePath) {
         this.frontendMessageService = frontendMessageService;
         generateNewMaze();
@@ -58,12 +57,12 @@ public class MapService {
     private GameMap convertMazeDataGameMap(char[][] mazeData) {
         Square[][] squaresBuildingMap = new Square[mazeData.length][mazeData[0].length];
 
-        for (int i = 0; i < mazeData.length; i++) {
-            for (int j = 0; j < mazeData[0].length; j++) {
+        for (int x = 0; x < mazeData.length; x++) {
+            for (int z = 0; z < mazeData[0].length; z++) {
                 try {
-                    Square squareToAdd = createSquare(mazeData[i][j], i, j);
+                    Square squareToAdd = createSquare(mazeData[x][z], x, z);
 
-                    squaresBuildingMap[i][j] = squareToAdd;
+                    squaresBuildingMap[x][z] = squareToAdd;
 
                 } catch (IllegalArgumentException e) {
                     log.debug(e.getMessage());
@@ -74,11 +73,14 @@ public class MapService {
         return new GameMap(squaresBuildingMap);
     }
 
-    public void generateNewMaze(){
+    /**
+     * Generates a new Maze and saves it in a Maze.txt file
+     */
+    public void generateNewMaze() {
         String path = System.getProperty("user.dir") + "/src/main/java/de/hsrm/mi/swt/snackman/Maze.py";
 
         //generates a new randome Maze
-        try(PythonInterpreter interpreter = new PythonInterpreter()){
+        try (PythonInterpreter interpreter = new PythonInterpreter()) {
             interpreter.execfile(path);
         }
     }
@@ -104,7 +106,7 @@ public class MapService {
                 break;
             }
             default: {
-                throw new IllegalArgumentException("CAN'T BUILD! " + symbol + " doesn't exist");
+                square = new Square(MapObjectType.FLOOR, x, z);
             }
         }
 
