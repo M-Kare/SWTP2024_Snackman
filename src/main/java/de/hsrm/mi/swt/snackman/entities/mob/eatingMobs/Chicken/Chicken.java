@@ -143,7 +143,7 @@ public class Chicken extends EatingMob implements Runnable {
      * Initializes Jython for executing the chicken's movement script.
      * Sets up the required Python environment and interpreter.
      */
-    protected void initJython() {
+    public void initJython() {
         pythonProps.setProperty("python.path", "src/main/java/de/hsrm/mi/swt/snackman/entities/mob/Chicken");
         PythonInterpreter.initialize(System.getProperties(), pythonProps, new String[0]);
         this.pythonInterpreter = new PythonInterpreter();

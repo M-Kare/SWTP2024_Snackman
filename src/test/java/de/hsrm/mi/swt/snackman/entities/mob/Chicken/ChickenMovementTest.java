@@ -4,7 +4,7 @@ import de.hsrm.mi.swt.snackman.entities.mob.eatingMobs.Chicken.Chicken;
 import org.junit.jupiter.api.Test;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Unit tests for the 'ChickenMovementSkript.py' logic accessed by Jython.

@@ -7,7 +7,8 @@ import org.python.util.PythonInterpreter;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
+
 
 /**
  * Integration tests for Chicken movement logic with Jython and Java integration.
