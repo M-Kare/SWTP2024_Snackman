@@ -12,8 +12,6 @@ import { fetchMazeDataFromBackend } from "@/services/MazeDataService";
 import { MazeRenderer } from "@/renderer/MazeRenderer";
 import { fetchSnackManFromBackend } from '@/services/SnackManInitService';
 
-const DECELERATION = 20.0
-const ACCELERATION = 300.0
 const WSURL = `ws://${window.location.host}/stompbroker`
 const DEST = '/topic/player'
 

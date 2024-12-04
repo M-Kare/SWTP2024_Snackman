@@ -18,7 +18,7 @@ import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.SnackMan;
 import de.hsrm.mi.swt.snackman.services.MapService;
 
 @ExtendWith(MockitoExtension.class)
-class SnackManMovementTests {
+class DefaultMovementTest {
     
     @Mock
     MapService  mockMapService;
