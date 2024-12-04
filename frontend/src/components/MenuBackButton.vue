@@ -15,7 +15,6 @@
 
 <style scoped>
 .back-button {
-    position: absolute;
     text-align: center;
     cursor: pointer;
     border: none;
