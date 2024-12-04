@@ -20,11 +20,11 @@ stompclient.onStompError = frame => {
   console.log(frame)
 }
 stompclient.onConnect = frame => {
-  // Callback: erfolgreicher Verbindugsaufbau zu Broker
+  // Callback: successful connection to broker
   stompclient.subscribe(DEST, message => {
-    // Callback: Nachricht auf DEST empfangen
-    // empfangene Nutzdaten in message.body abrufbar,
-    // ggf. mit JSON.parse(message.body) zu JS konvertieren
+    // Callback: Receive message on DEST
+    // received user data can be called up in message.body,
+    // convert to JS with JSON.parse(message.body) if necessary
     const event: IChickenDTD = JSON.parse(message.body)
     console.log('ERHALTENES CHANGE: ' + message)
     console.log(event)

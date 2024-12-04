@@ -25,12 +25,12 @@ public class ChickenController {
         return new Chicken();
     }
 
-    // Erhalte Messages von /topic/chicken/update
+    // Receive messages from /topic/send/update
     @MessageMapping("/topic/chicken/update")
     public void spreadCubeUpdate(ChickenDTO chicken) {
         logger.info("Message" + chicken.toString() + " send.");
 
-        // Sende das Event explizit an das Ziel "/topic/chicken"
+        // Send the event explicitly to the destination /topic/send
         messagingTemplate.convertAndSend("/topic/chicken", chicken);
     }
 
