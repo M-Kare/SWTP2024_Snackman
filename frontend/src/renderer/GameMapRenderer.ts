@@ -74,7 +74,13 @@ export const GameMapRenderer = () => {
       }
       if (square.type === MapObjectType.FLOOR) {
         createFloorSquare(square.indexX*DEFAULT_SIDE_LENGTH+OFFSET, square.indexZ*DEFAULT_SIDE_LENGTH+OFFSET, DEFAULT_SIDE_LENGTH)
-        createSnackOnFloor(square.indexX*DEFAULT_SIDE_LENGTH+OFFSET, square.indexZ*DEFAULT_SIDE_LENGTH+OFFSET, DEFAULT_SIDE_LENGTH, square.snack.snackType)
+
+        //TODO Remove because it's only for test purpose
+        if(square.snack === null){
+          console.log(square.id)
+
+        }
+        createSnackOnFloor(square.indexX*DEFAULT_SIDE_LENGTH+OFFSET, square.indexZ*DEFAULT_SIDE_LENGTH+OFFSET, DEFAULT_SIDE_LENGTH, square.snack?.snackType)
       }
     }
   }

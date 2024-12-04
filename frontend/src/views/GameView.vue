@@ -3,14 +3,15 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, onUnmounted, ref } from 'vue'
+import {onMounted, onUnmounted, ref} from 'vue'
 import * as THREE from 'three'
-import { Client } from '@stomp/stompjs'
-import { Player } from '@/components/Player';
-import type { IPlayerDTD } from '@/stores/IPlayerDTD';
-import { fetchSnackManFromBackend } from '@/services/SnackManInitService';
-import {fetchGameMapDataFromBackend} from "@/services/GameMapDataService";
+import {Client} from '@stomp/stompjs'
+import {Player} from '@/components/Player';
+import type {IPlayerDTD} from '@/stores/IPlayerDTD';
+import {fetchSnackManFromBackend} from '@/services/SnackManInitService';
 import {GameMapRenderer} from "@/renderer/GameMapRenderer";
+import {useGameMapStore} from '@/stores/gameMapStore'
+import type {IGameMapDTD} from "@/stores/IGameMapDTD";
 
 const DECELERATION = 20.0
 const ACCELERATION = 300.0
@@ -18,7 +19,7 @@ const WSURL = `ws://${window.location.host}/stompbroker`
 const DEST = '/topic/player'
 
 // stomp
-const stompclient = new Client({ brokerURL: WSURL })
+const stompclient = new Client({brokerURL: WSURL})
 stompclient.onWebSocketError = event => {
   //console.log(event)
 }
@@ -47,7 +48,6 @@ let prevTime = performance.now();
 let camera: THREE.PerspectiveCamera;
 
 
-
 // used to calculate fps in animate()
 const clock = new THREE.Clock();
 let fps: number;
@@ -59,14 +59,19 @@ function animate() {
   fps = 1 / clock.getDelta()
   player.updatePlayer();
   if (counter >= fps / 30) {
-    console.log(`${player.getCamera().position.x}  |  ${player.getCamera().position.z}`)
+    //console.log(`${player.getCamera().position.x}  |  ${player.getCamera().position.z}`)
     const time = performance.now()
     const delta = (time - prevTime) / 1000
     try {
       //Sende and /topic/player/update
       stompclient.publish({
         destination: DEST + "/update", headers: {},
-        body: JSON.stringify(Object.assign({}, player.getInput(), { qX: player.getCamera().quaternion.x, qY: player.getCamera().quaternion.y, qZ: player.getCamera().quaternion.z, qW: player.getCamera().quaternion.w }, { delta: delta }))
+        body: JSON.stringify(Object.assign({}, player.getInput(), {
+          qX: player.getCamera().quaternion.x,
+          qY: player.getCamera().quaternion.y,
+          qZ: player.getCamera().quaternion.z,
+          qW: player.getCamera().quaternion.w
+        }, {delta: delta}))
       });
     } catch (fehler) {
       console.log(fehler)
@@ -91,8 +96,12 @@ onMounted(async () => {
 
   //Add gameMap
   try {
-    const gameMapData = await fetchGameMapDataFromBackend()
-    createGameMap(gameMapData)
+    const gameMapStore = useGameMapStore()
+    await gameMapStore.initGameMap()
+
+    const mapContent = gameMapStore.mapContent
+
+    createGameMap(mapContent as IGameMapDTD)
   } catch (error) {
     console.error('Error when retrieving the gameMap:', error)
   }
