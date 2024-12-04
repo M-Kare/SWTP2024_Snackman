@@ -89,11 +89,9 @@ public abstract class Mob {
     }
 
     public void setCurrentSquareWithIndex(double x, double z) {
-        try {
+        
             currentSquare = gameMap.getSquareAtIndexXZ(calcMapIndexOfCoordinate(x), calcMapIndexOfCoordinate(z));
-        } catch (IndexOutOfBoundsException e) {
-            respawn();
-        }
+        
     }
 
     public void move(double posX, double posY, double posZ) {
@@ -105,6 +103,7 @@ public abstract class Mob {
 
     public void move(boolean f, boolean b, boolean l, boolean r, double delta) {
         System.out.println(currentSquare.getIndexX() + "  |  " + currentSquare.getIndexZ());
+        int result = 3;
         int moveDirZ = (f ? 1 : 0) - (b ? 1 : 0);
         int moveDirX = (r ? 1 : 0) - (l ? 1 : 0);
 
@@ -116,15 +115,22 @@ public abstract class Mob {
         if (l || r) {
             move.x += moveDirX;
         }
-        if (move.x != 0 && move.z != 0) {
-            move.normalize();
-        }
+        move.rotate(quat);
+        move.y = 0;
+        move.normalize();
         move.x = move.x * delta * GameConfig.SNACKMAN_SPEED;
         move.z = move.z * delta * GameConfig.SNACKMAN_SPEED;
-        move.rotate(quat);
         double xNew = posX + move.x;
         double zNew = posZ + move.z;
-        int result = checkWallCollision(xNew, zNew);
+        if (gameMap.getSquareAtIndexXZ(calcMapIndexOfCoordinate(xNew), calcMapIndexOfCoordinate(zNew)).getType() == MapObjectType.WALL) {
+            return;
+        }
+        try{
+            result = checkWallCollision(xNew, zNew);
+        } catch (IndexOutOfBoundsException e){
+            respawn();
+            return;
+        }
         switch (result) {
             case 0:
                 posX += move.x;
@@ -137,7 +143,7 @@ public abstract class Mob {
                 posX += move.x;
                 break;
             case 3:
-                break;
+                return;
             default:
                 break;
         }
@@ -148,9 +154,10 @@ public abstract class Mob {
     public void respawn() {
         this.posX = (gameMap.getGameMap().length / 2) * GameConfig.SQUARE_SIZE;
         this.posZ = (gameMap.getGameMap()[0].length / 2) * GameConfig.SQUARE_SIZE;
+        setCurrentSquareWithIndex(posX, posZ);
     }
 
-    public int checkWallCollision(double x, double z) {
+    public int checkWallCollision(double x, double z) throws IndexOutOfBoundsException {
         int collisionCase = 0;
 
         double squareCenterX = currentSquare.getIndexX() * GameConfig.SQUARE_SIZE + GameConfig.SQUARE_SIZE / 2;

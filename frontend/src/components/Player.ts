@@ -129,14 +129,12 @@ export class Player {
       if(this.moveLeft || this.moveRight){
         move.x += this.movementDirection.x
       }
-
-      if(move.z != 0 && move.x != 0){
-        move.normalize();
-      }
-        move.x = move.x  * delta * this.speed
-        move.z = move.z * delta * this.speed
-
+      
       move.applyQuaternion(this.camera.quaternion)
+      move.y = 0
+      move.normalize();
+      move.x = move.x * delta * this.speed
+      move.z = move.z * delta * this.speed
       this.camera.position.x += move.x
       this.camera.position.z += move.z
       this.prevTime = time
