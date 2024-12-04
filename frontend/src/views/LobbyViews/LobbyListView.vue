@@ -42,7 +42,6 @@
 
     <CreateLobbyForm
         v-if="showNewLobbyForm"
-        id="create-lobby-form"
         @cancelLobbyCreation = "cancelLobbyCreation">
     </CreateLobbyForm>
 
