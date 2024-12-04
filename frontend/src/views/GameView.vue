@@ -11,7 +11,7 @@ import type {IPlayerDTD} from '@/stores/IPlayerDTD';
 import {fetchSnackManFromBackend} from '@/services/SnackManInitService';
 import {GameMapRenderer} from "@/renderer/GameMapRenderer";
 import {useGameMapStore} from '@/stores/gameMapStore'
-import type {IGameMapDTD} from "@/stores/IGameMapDTD";
+import type {IGameMap} from "@/stores/IGameMapDTD";
 
 const DECELERATION = 20.0
 const ACCELERATION = 300.0
@@ -100,7 +100,7 @@ onMounted(async () => {
     await gameMapStore.initGameMap()
 
     const mapContent = gameMapStore.mapContent
-    createGameMap(mapContent as IGameMapDTD)
+    createGameMap(mapContent as IGameMap)
 
     await gameMapStore.startGameMapLiveUpdate()
   } catch (error) {

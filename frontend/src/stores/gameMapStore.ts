@@ -53,6 +53,7 @@ export const useGameMapStore = defineStore('gameMap', () => {
         stompclient.subscribe(DEST, async (message) => {
           const change: IFrontendMessageEvent = JSON.parse(message.body)
 
+          mapData.gameMap.set(change.square.id, change.square)
           console.log(change)
         })
       }
