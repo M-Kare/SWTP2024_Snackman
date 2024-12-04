@@ -4,7 +4,7 @@ import type {IGameMap, IGameMapDTD} from './IGameMapDTD';
 import {fetchGameMapDataFromBackend} from "../services/GameMapDataService.js";
 import {Client} from "@stomp/stompjs";
 import type {IFrontendMessageEvent} from "@/services/IFrontendMessageEvent";
-import type {ISquareDTD} from "@/stores/Square/ISquareDTD";
+import type {ISquare} from "@/stores/Square/ISquareDTD";
 
 export const useGameMapStore = defineStore('gameMap', () => {
   let stompclient: Client
@@ -12,7 +12,7 @@ export const useGameMapStore = defineStore('gameMap', () => {
   const mapData = reactive({
     DEFAULT_SQUARE_SIDE_LENGTH: 0,
     DEFAULT_WALL_HEIGHT: 0,
-    gameMap: new Map<number, ISquareDTD>()
+    gameMap: new Map<number, ISquare>()
   } as IGameMap);
 
   async function initGameMap() {
@@ -24,7 +24,7 @@ export const useGameMapStore = defineStore('gameMap', () => {
       mapData.DEFAULT_WALL_HEIGHT = response.DEFAULT_WALL_HEIGHT
 
       for (const square of response.gameMap) {
-        mapData.gameMap.set(square.id, square)
+        mapData.gameMap.set(square.id, square as ISquare)
       }
 
     } catch (reason) {
@@ -53,7 +53,8 @@ export const useGameMapStore = defineStore('gameMap', () => {
         stompclient.subscribe(DEST, async (message) => {
           const change: IFrontendMessageEvent = JSON.parse(message.body)
 
-          mapData.gameMap.set(change.square.id, change.square)
+          //MeshId zuerst holen, dann setzen
+          mapData.gameMap.set(change.square.id, change.square as ISquare)
           console.log(change)
         })
       }
@@ -64,12 +65,17 @@ export const useGameMapStore = defineStore('gameMap', () => {
 
       stompclient.activate()
     }
+  }
 
+  function setSnackMeshId(squareId: number, meshId: number) {
+    const square = mapData.gameMap.get(squareId)
+    square!.snack.meshId = meshId
   }
 
   return {
     mapContent: readonly(mapData as IGameMap),
     initGameMap,
-    startGameMapLiveUpdate
+    startGameMapLiveUpdate,
+    setSnackMeshId
   };
 })
