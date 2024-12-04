@@ -40,7 +40,7 @@ public class MapServiceTest {
 			e.printStackTrace();
 		}
 
-		Assertions.assertEquals(mazeAfterMapService, mazeBeforeMapService,"No new maze generated");
+		Assertions.assertNotEquals(mazeAfterMapService, mazeBeforeMapService,"No new maze generated");
 		
 	}
     
