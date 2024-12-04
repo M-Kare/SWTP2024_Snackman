@@ -16,6 +16,8 @@ import org.springframework.stereotype.Service;
 
 import java.beans.PropertyChangeEvent;
 
+import org.python.util.PythonInterpreter;
+
 /**
  * Service class for managing the game map
  * This class is responsible for loading and providing access to the game map data
@@ -35,12 +37,13 @@ public class MapService {
      */
     @Autowired
     public MapService( FrontendMessageService frontendMessageService, ReadMazeService readMazeService) {
-        this(frontendMessageService, readMazeService, "mini-maze.txt");
+        this(frontendMessageService, readMazeService, "Maze.txt");
     }
 
     public MapService(FrontendMessageService frontendMessageService,ReadMazeService readMazeService,
                       String filePath) {
         this.frontendMessageService = frontendMessageService;
+        generateNewMaze();
         this.filePath = filePath;
         char[][] mazeData = readMazeService.readMazeFromFile(this.filePath);
         gameMap = convertMazeDataGameMap(mazeData);
@@ -69,6 +72,15 @@ public class MapService {
         }
 
         return new GameMap(squaresBuildingMap);
+    }
+
+    public void generateNewMaze(){
+        String path = System.getProperty("user.dir") + "/src/main/java/de/hsrm/mi/swt/snackman/Maze.py";
+
+        //generates a new randome Maze
+        try(PythonInterpreter interpreter = new PythonInterpreter()){
+            interpreter.execfile(path);
+        }
     }
 
     /**
@@ -123,9 +135,6 @@ public class MapService {
             square.setSnack(new Snack(randomSnackType));
         }
     }
-
-    ;
-
 
     public GameMap getGameMap() {
         return gameMap;
