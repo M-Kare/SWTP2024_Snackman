@@ -1,4 +1,4 @@
-package de.hsrm.mi.swt.snackman.entities.mob.Chicken;
+package de.hsrm.mi.swt.snackman.entities.mob.eatingMobs.Chicken;
 
 /**
  * The direction the chicken could move into

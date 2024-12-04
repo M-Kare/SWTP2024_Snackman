@@ -2,9 +2,13 @@ package de.hsrm.mi.swt.snackman.entities.map;
 
 import de.hsrm.mi.swt.snackman.entities.mapObject.MapObjectType;
 import de.hsrm.mi.swt.snackman.entities.mapObject.snack.Snack;
+import de.hsrm.mi.swt.snackman.entities.mob.Mob;
+import de.hsrm.mi.swt.snackman.entities.mob.Ghost;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -21,6 +25,8 @@ public class Square {
     private MapObjectType type;
 
     private Snack snack;
+
+    private List<Mob> mobs = new ArrayList();
 
     public Square(int indexX, int indexY) {
         id = generateId();
@@ -79,5 +85,31 @@ public class Square {
 
     public long getId() {
         return id;
+    }
+
+    /**
+     *
+     * @return the dominant type of MapObject
+     */
+    public String getPrimaryType() {
+        if (type == MapObjectType.WALL) {
+            return  "W";
+        } else if (type == MapObjectType.FLOOR) {
+            if(this.mobs.stream().anyMatch(mob -> mob instanceof Ghost)) return "G";
+            else if(this.snack != null) return "S";
+        }
+        return "L";
+    }
+
+    public List<Mob> getMobs() {
+        return mobs;
+    }
+
+    public void addMob(Mob mob) {
+        this.mobs.add(mob);
+    }
+
+    public void removeMob(Mob mob) {
+        this.mobs.remove(mob);
     }
 }

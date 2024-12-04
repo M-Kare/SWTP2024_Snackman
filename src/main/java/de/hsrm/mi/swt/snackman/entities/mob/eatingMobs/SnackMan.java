@@ -1,4 +1,4 @@
-package de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs;
+package de.hsrm.mi.swt.snackman.entities.mob.eatingMobs;
 
 import de.hsrm.mi.swt.snackman.entities.mapObject.snack.Snack;
 import org.joml.Quaterniond;
@@ -172,18 +172,6 @@ public class SnackMan extends EatingMob {
         return (int)(a / GameConfig.SQUARE_SIZE);
     }
 
-    @Override
-    public void gainKcal() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'gainKcal'");
-    }
-
-    @Override
-    public void loseKcal() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'loseKcal'");
-    }
-
     public void jump(){
 
     }
@@ -204,12 +192,6 @@ public class SnackMan extends EatingMob {
 
     }
 
-    @Override
-    public void move(double x, double y, double z) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'move'");
-    }
-
     public int getCurrentCalories() {
         return currentCalories;
     }
@@ -228,5 +210,11 @@ public class SnackMan extends EatingMob {
             //set snack to null after consuming it
             square.setSnack(null);
         }
+    }
+
+    @Override
+    protected void move() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'move'");
     }
 }

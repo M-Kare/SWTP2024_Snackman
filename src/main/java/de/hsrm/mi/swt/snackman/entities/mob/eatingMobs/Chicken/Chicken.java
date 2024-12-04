@@ -1,11 +1,13 @@
-package de.hsrm.mi.swt.snackman.entities.mob.Chicken;
+package de.hsrm.mi.swt.snackman.entities.mob.eatingMobs.Chicken;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
-import de.hsrm.mi.swt.snackman.entities.mob.EatingMob;
+
+import de.hsrm.mi.swt.snackman.entities.map.Square;
+import de.hsrm.mi.swt.snackman.entities.mapObject.snack.Snack;
+import de.hsrm.mi.swt.snackman.entities.mob.eatingMobs.EatingMob;
 import de.hsrm.mi.swt.snackman.entities.mob.Thickness;
-import de.hsrm.mi.swt.snackman.entities.square.Square;
 import de.hsrm.mi.swt.snackman.services.MapService;
 import org.python.core.PyList;
 import org.python.core.PyObject;
@@ -20,9 +22,10 @@ import org.slf4j.LoggerFactory;
 public class Chicken extends EatingMob implements Runnable {
 
     private final Logger logger = LoggerFactory.getLogger(Chicken.class);
-    private boolean blockingPath;
-    private Thickness thickness;
-    private Square currentPosition;
+    private boolean blockingPath = false;
+    private Thickness thickness = Thickness.THIN;
+    private int posX;
+    private int posZ;
     private Direction lookingDirection;
     private final int MIN_DELAY = 30;
     private final int MAX_DELAY = 30;
@@ -37,10 +40,13 @@ public class Chicken extends EatingMob implements Runnable {
         super();
     }
 
+    //@todo add PropertyChangeSupport -> siehe setSnack() in Square.java
+
     public Chicken(Square initialPosition, MapService mapService) {
-        this.blockingPath = false;
-        this.thickness = Thickness.THIN;
-        this.currentPosition = initialPosition;
+        this.posX = initialPosition.getIndexX();
+        this.posZ = initialPosition.getIndexZ();
+        initialPosition.addMob(this);
+
         this.isWalking = true;
         this.lookingDirection = Direction.NORTH;
         this.mapService = mapService;
@@ -79,7 +85,10 @@ public class Chicken extends EatingMob implements Runnable {
         } catch (InterruptedException e) {
             logger.info(e.getMessage());
         }
-        this.currentPosition = this.mapService.getNewPosition(this.currentPosition, walkingDirection);
+        Square oldPosition = this.mapService.getSquareAtIndexXZ(this.posX, this.posZ);
+        Square newPosition = this.mapService.getNewPosition(this.posX, this.posZ, walkingDirection);
+        oldPosition.removeMob(this);
+        newPosition.addMob(this);
     }
 
     /**
@@ -92,14 +101,15 @@ public class Chicken extends EatingMob implements Runnable {
         initJython();
         while (isWalking) {
             // get 9 squares
-            List<String> squares = this.mapService.getSquaresVisibleForChicken(this.currentPosition);
+            Square currentPosition = this.mapService.getSquareAtIndexXZ(this.posX, this.posZ);
+            List<String> squares = this.mapService.getSquaresVisibleForChicken(currentPosition);
             squares.add(this.lookingDirection.toString());
             List<String> newMove = chooseWalkingPath(squares);
             // set new square you move to
             setNewPosition(newMove);
             // consume snack if present
-            if (this.currentPosition.hasSnack()) {
-                consumeSnack();
+            if (currentPosition.getSnack() != null) {
+                consumeSnackOnSquare();
             }
         }
     }
@@ -107,12 +117,26 @@ public class Chicken extends EatingMob implements Runnable {
     /**
      * Consumes all snacks at the chicken's current position, updating the chicken's
      * calorie count and removing consumed snacks from the map.
-     * 
-     * @todo Fix this implementation once the snack handling logic is finalized.
-     */
     private void consumeSnack() {
-        this.kcal = this.currentPosition.getKcal();
+        Square currentPosition = this.mapService.getSquareAtIndexXZ(this.posX, this.posZ);
+        this.kcal = currentPosition.getKcal();
         this.mapService.deleteConsumedSnacks(this.currentPosition);
+    }*/
+
+    /**
+     * Collects the snack on the square if there is one.
+     * If there is one that remove it from the square.
+     */
+    public void consumeSnackOnSquare(){
+        Square currentSquare = this.mapService.getSquareAtIndexXZ(this.posX, this.posZ);
+        Snack snackOnSquare = currentSquare.getSnack();
+
+        if(snackOnSquare != null){
+            this.kcal += snackOnSquare.getCalories();
+
+            //set snack to null after consuming it
+            currentSquare.setSnack(null);
+        }
     }
 
     /**
@@ -202,20 +226,12 @@ public class Chicken extends EatingMob implements Runnable {
         return this.thickness;
     }
 
-    public Square getCurrentPosition() {
-        return this.currentPosition;
-    }
-
     public void setBlockingPath(boolean blockingPath) {
         this.blockingPath = blockingPath;
     }
 
     public void setThickness(Thickness thickness) {
         this.thickness = thickness;
-    }
-
-    public void setCurrentPosition(Square currentPosition) {
-        this.currentPosition = currentPosition;
     }
 
     /**

@@ -1,4 +1,4 @@
-package de.hsrm.mi.swt.snackman.entities.mobileObjects;
+package de.hsrm.mi.swt.snackman.entities.mob;
 
 public class Ghost extends Mob {
 
@@ -24,7 +24,7 @@ public class Ghost extends Mob {
     }
 
     @Override
-    public void move(double x, double y, double z) {
+    public void move() {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'move'");
     }

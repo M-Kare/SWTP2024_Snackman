@@ -5,8 +5,8 @@ import de.hsrm.mi.swt.snackman.entities.map.Square;
 import de.hsrm.mi.swt.snackman.entities.mapObject.MapObjectType;
 import de.hsrm.mi.swt.snackman.entities.mapObject.snack.Snack;
 import de.hsrm.mi.swt.snackman.entities.mapObject.snack.SnackType;
-import de.hsrm.mi.swt.snackman.entities.mob.Chicken.Chicken;
-import de.hsrm.mi.swt.snackman.entities.mob.Chicken.Direction;
+import de.hsrm.mi.swt.snackman.entities.mob.eatingMobs.Chicken.Chicken;
+import de.hsrm.mi.swt.snackman.entities.mob.eatingMobs.Chicken.Direction;
 import de.hsrm.mi.swt.snackman.messaging.ChangeType;
 import de.hsrm.mi.swt.snackman.messaging.EventType;
 import de.hsrm.mi.swt.snackman.messaging.FrontendMessageEvent;
@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import java.beans.PropertyChangeEvent;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Service class for managing the game map
@@ -53,23 +54,23 @@ public class MapService {
      *
      * Gives back the new square-position of the chicken
      *
-     * @param currentChickenPosition the current position of the chicken
+     * @param x, z the current position of the chicken
      * @param direction              in which the chicken decided to go
      * @return the square which is laying in the direction of the currentPosition
      */
-    public synchronized Square getNewPosition(Square currentChickenPosition, Direction direction) {
-        switch (direction) {
-            case Direction.NORTH:
-                return this.maze[currentChickenPosition.getIndexX()][currentChickenPosition.getIndexZ() - 1];
-            case Direction.EAST:
-                return this.maze[currentChickenPosition.getIndexX() + 1][currentChickenPosition.getIndexZ()];
-            case Direction.SOUTH:
-                return this.maze[currentChickenPosition.getIndexX()][currentChickenPosition.getIndexZ() + 1];
-            case Direction.WEST:
-                return this.maze[currentChickenPosition.getIndexX() - 1][currentChickenPosition.getIndexZ()];
-            default:
-                return null;
-        }
+    public synchronized Square getNewPosition(int x, int z, Direction direction) {
+        Square currentChickenPosition = this.getSquareAtIndexXZ(x, z);
+        return switch (direction) {
+            case Direction.NORTH ->
+                    this.gameMap.getSquareAtIndexXZ(currentChickenPosition.getIndexX(), currentChickenPosition.getIndexZ() - 1);
+            case Direction.EAST ->
+                    this.gameMap.getSquareAtIndexXZ(currentChickenPosition.getIndexX() + 1, currentChickenPosition.getIndexZ());
+            case Direction.SOUTH ->
+                    this.gameMap.getSquareAtIndexXZ(currentChickenPosition.getIndexX(), currentChickenPosition.getIndexZ() + 1);
+            case Direction.WEST ->
+                    this.gameMap.getSquareAtIndexXZ(currentChickenPosition.getIndexX() - 1, currentChickenPosition.getIndexZ());
+            default -> null;
+        };
     }
 
     /**
@@ -114,34 +115,30 @@ public class MapService {
             }
             case ' ': {
                 square = new Square(MapObjectType.FLOOR, x, z);
+                addRandomSnackToSquare(square);
+
+                square.addPropertyChangeListener((PropertyChangeEvent evt) -> {
+                    if (evt.getPropertyName().equals("square")) {
+                        FrontendMessageEvent messageEvent = new FrontendMessageEvent(EventType.SNACK, ChangeType.UPDATE,
+                                (Square) evt.getNewValue());
+
+                        frontendMessageService.sendEvent(messageEvent);
+                    }
+                });
                 break;
             }
             case 'C':
-                Chicken newChicken = new Chicken(this.maze[i][j], this);
-                this.allChickens.add(newChicken);
+                square = new Square(MapObjectType.FLOOR, x, z);
+                Chicken newChicken = new Chicken(square, this);
                 Thread chickenThread = new Thread(newChicken);
                 chickenThread.start();
-                //set floor under chicken
-                Floor floor2 = new Floor();
-                this.mapObjects = new ArrayList<>();
-                this.mapObjects.add(floor2);
-                this.maze[i][j].setMapObjects(mapObjects);
+
+                // @todo add listener for chicken bak bak und add stomp
                 break;
             default: {
                 throw new IllegalArgumentException("CAN'T BUILD! " + symbol + " doesn't exist");
             }
         }
-
-        addRandomSnackToSquare(square);
-
-        square.addPropertyChangeListener((PropertyChangeEvent evt) -> {
-            if (evt.getPropertyName().equals("square")) {
-                FrontendMessageEvent messageEvent = new FrontendMessageEvent(EventType.SNACK, ChangeType.UPDATE,
-                        (Square) evt.getNewValue());
-
-                frontendMessageService.sendEvent(messageEvent);
-            }
-        });
 
         return square;
     }
@@ -155,14 +152,14 @@ public class MapService {
         List<String> squares = new ArrayList<>();
         // northwest_square, north_square, northeast_square, east_square,
         // southeast_square, south_square, southwest_square, west_square, direction
-        squares.add(this.maze[currentPosition.getIndexX() - 1][currentPosition.getIndexZ() - 1].getPrimaryType());
-        squares.add(this.maze[currentPosition.getIndexX()][currentPosition.getIndexZ() - 1].getPrimaryType());
-        squares.add(this.maze[currentPosition.getIndexX() + 1][currentPosition.getIndexZ() + 1].getPrimaryType());
-        squares.add(this.maze[currentPosition.getIndexX() + 1][currentPosition.getIndexZ()].getPrimaryType());
-        squares.add(this.maze[currentPosition.getIndexX() + 1][currentPosition.getIndexZ() + 1].getPrimaryType());
-        squares.add(this.maze[currentPosition.getIndexX()][currentPosition.getIndexZ() + 1].getPrimaryType());
-        squares.add(this.maze[currentPosition.getIndexX() - 1][currentPosition.getIndexZ() + 1].getPrimaryType());
-        squares.add(this.maze[currentPosition.getIndexX() - 1][currentPosition.getIndexZ()].getPrimaryType());
+        squares.add(this.gameMap.getSquareAtIndexXZ(currentPosition.getIndexX() - 1,currentPosition.getIndexZ() - 1).getPrimaryType());
+        squares.add(this.gameMap.getSquareAtIndexXZ(currentPosition.getIndexX(),currentPosition.getIndexZ() - 1).getPrimaryType());
+        squares.add(this.gameMap.getSquareAtIndexXZ(currentPosition.getIndexX() + 1,currentPosition.getIndexZ() + 1).getPrimaryType());
+        squares.add(this.gameMap.getSquareAtIndexXZ(currentPosition.getIndexX() + 1,currentPosition.getIndexZ()).getPrimaryType());
+        squares.add(this.gameMap.getSquareAtIndexXZ(currentPosition.getIndexX() + 1,currentPosition.getIndexZ() + 1).getPrimaryType());
+        squares.add(this.gameMap.getSquareAtIndexXZ(currentPosition.getIndexX(),currentPosition.getIndexZ() + 1).getPrimaryType());
+        squares.add(this.gameMap.getSquareAtIndexXZ(currentPosition.getIndexX() - 1,currentPosition.getIndexZ() + 1).getPrimaryType());
+        squares.add(this.gameMap.getSquareAtIndexXZ(currentPosition.getIndexX() - 1,currentPosition.getIndexZ()).getPrimaryType());
         return squares;
     }
 
@@ -177,10 +174,7 @@ public class MapService {
 
             square.setSnack(new Snack(randomSnackType));
         }
-    }
-
-    ;
-
+    };
 
     public GameMap getGameMap() {
         return gameMap;
@@ -192,9 +186,9 @@ public class MapService {
 
     /**
      * @param currentPosition for which all snacks have been eaten
-     */
+
     public synchronized void deleteConsumedSnacks(Square currentPosition) {
         currentPosition.deleteAllSnacks();
     }
-
+*/
 }

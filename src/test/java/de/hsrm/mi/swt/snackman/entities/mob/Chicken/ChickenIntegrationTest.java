@@ -1,5 +1,6 @@
 package de.hsrm.mi.swt.snackman.entities.mob.Chicken;
 
+import de.hsrm.mi.swt.snackman.entities.mob.eatingMobs.Chicken.Chicken;
 import org.junit.jupiter.api.Test;
 import org.python.util.PythonInterpreter;
 
