@@ -1,4 +1,4 @@
-package de.hsrm.mi.swt.snackman.Services;
+package de.hsrm.mi.swt.snackman.service;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -6,11 +6,11 @@ import java.nio.file.Paths;
 import java.util.LinkedList;
 import java.util.List;
 
+import de.hsrm.mi.swt.snackman.services.MapService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import de.hsrm.mi.swt.snackman.services.MapService;
 
 @SpringBootTest
 public class MapServiceTest {
