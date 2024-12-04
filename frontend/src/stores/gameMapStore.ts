@@ -5,9 +5,12 @@ import {fetchGameMapDataFromBackend} from "../services/GameMapDataService.js";
 import {Client} from "@stomp/stompjs";
 import type {IFrontendMessageEvent} from "@/services/IFrontendMessageEvent";
 import type {ISquare} from "@/stores/Square/ISquareDTD";
+import {Scene} from "three";
+import * as THREE from "three";
 
 export const useGameMapStore = defineStore('gameMap', () => {
   let stompclient: Client
+  const scene = new THREE.Scene()
 
   const mapData = reactive({
     DEFAULT_SQUARE_SIDE_LENGTH: 0,
@@ -33,7 +36,8 @@ export const useGameMapStore = defineStore('gameMap', () => {
   }
 
   async function startGameMapLiveUpdate() {
-    const wsurl = `ws://${window.location.host}/stompbroker`
+    const protocol = window.location.protocol.replace('http', 'ws')
+    const wsurl = `${protocol}//${window.location.host}/stompbroker`
     const DEST = '/topic/square'
 
     if (!stompclient) {
@@ -53,8 +57,12 @@ export const useGameMapStore = defineStore('gameMap', () => {
         stompclient.subscribe(DEST, async (message) => {
           const change: IFrontendMessageEvent = JSON.parse(message.body)
 
-          //MeshId zuerst holen, dann setzen
+          const savedMeshId = mapData.gameMap.get(change.square.id)!.snack.meshId
+
+          removeSnackMeshFromScene(scene, savedMeshId)
+
           mapData.gameMap.set(change.square.id, change.square as ISquare)
+
           console.log(change)
         })
       }
@@ -69,13 +77,26 @@ export const useGameMapStore = defineStore('gameMap', () => {
 
   function setSnackMeshId(squareId: number, meshId: number) {
     const square = mapData.gameMap.get(squareId)
-    square!.snack.meshId = meshId
+    if(square != undefined && square.snack != null)
+      square.snack.meshId = meshId
+  }
+
+  function removeSnackMeshFromScene(scene: Scene, meshId: number) {
+    const snackMesh = scene.getObjectById(meshId)
+    if(snackMesh != undefined){
+      scene.remove(snackMesh!)
+    }
+  }
+
+  function getScene() {
+    return scene
   }
 
   return {
     mapContent: readonly(mapData as IGameMap),
     initGameMap,
     startGameMapLiveUpdate,
-    setSnackMeshId
+    setSnackMeshId,
+    getScene
   };
 })

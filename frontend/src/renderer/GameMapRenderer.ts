@@ -8,11 +8,12 @@ import {useGameMapStore} from "@/stores/gameMapStore";
  */
 export const GameMapRenderer = () => {
   const gameMapStore = useGameMapStore()
+  const scene = gameMapStore.getScene()
 
   // create new three.js scene
   const GROUNDSIZE = 1000
   let renderer: THREE.WebGLRenderer
-  const scene = new THREE.Scene()
+
 
   // set up light
   const light = new THREE.DirectionalLight(0xffffff, 1)
@@ -63,31 +64,33 @@ export const GameMapRenderer = () => {
   }
 
   const createGameMap = (mapData: IGameMap) => {
-    const OFFSET = mapData.DEFAULT_SQUARE_SIDE_LENGTH/2
+    const OFFSET = mapData.DEFAULT_SQUARE_SIDE_LENGTH / 2
     const DEFAULT_SIDE_LENGTH = mapData.DEFAULT_SQUARE_SIDE_LENGTH
     const WALL_HEIGHT = mapData.DEFAULT_WALL_HEIGHT
 
     createGround()
 
-  // Iterate through map data and create walls
+    // Iterate through map data and create walls
     for (const [id, square] of mapData.gameMap) {
       if (square.type === MapObjectType.WALL) {
         // Create wall at position (x, 0, z) -> y = 0 because of 'building the walls'
-        createWall(square.indexX*DEFAULT_SIDE_LENGTH+OFFSET, 0, square.indexZ*DEFAULT_SIDE_LENGTH+OFFSET, WALL_HEIGHT, DEFAULT_SIDE_LENGTH)
+        createWall(square.indexX * DEFAULT_SIDE_LENGTH + OFFSET, 0, square.indexZ * DEFAULT_SIDE_LENGTH + OFFSET, WALL_HEIGHT, DEFAULT_SIDE_LENGTH)
       }
       if (square.type === MapObjectType.FLOOR) {
-        const squareToAdd = createFloorSquare(square.indexX*DEFAULT_SIDE_LENGTH+OFFSET, square.indexZ*DEFAULT_SIDE_LENGTH+OFFSET, DEFAULT_SIDE_LENGTH)
+        const squareToAdd = createFloorSquare(square.indexX * DEFAULT_SIDE_LENGTH + OFFSET, square.indexZ * DEFAULT_SIDE_LENGTH + OFFSET, DEFAULT_SIDE_LENGTH)
         scene.add(squareToAdd)
 
         //TODO Remove because it's only for test purpose
-        if(square.snack === null){
+        if (square.snack === null) {
           console.log(square.id)
 
         }
-        const snackToAdd = createSnackOnFloor(square.indexX*DEFAULT_SIDE_LENGTH+OFFSET, square.indexZ*DEFAULT_SIDE_LENGTH+OFFSET, DEFAULT_SIDE_LENGTH, square.snack?.snackType)
-        scene.add(snackToAdd)
-        gameMapStore.setSnackMeshId(id, snackToAdd.id)
 
+        if (square.snack != null) {
+          const snackToAdd = createSnackOnFloor(square.indexX * DEFAULT_SIDE_LENGTH + OFFSET, square.indexZ * DEFAULT_SIDE_LENGTH + OFFSET, DEFAULT_SIDE_LENGTH, square.snack?.snackType)
+          scene.add(snackToAdd)
+          gameMapStore.setSnackMeshId(id, snackToAdd.id)
+        }
       }
     }
   }
