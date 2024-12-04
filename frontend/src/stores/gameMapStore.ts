@@ -1,27 +1,31 @@
 import {defineStore} from 'pinia';
 import {reactive, readonly} from "vue";
-import type {IGameMapDTD} from './IGameMapDTD';
+import type {IGameMap, IGameMapDTD} from './IGameMapDTD';
 import {fetchGameMapDataFromBackend} from "../services/GameMapDataService.js";
 import {Client} from "@stomp/stompjs";
 import type {IFrontendMessageEvent} from "@/services/IFrontendMessageEvent";
+import type {ISquareDTD} from "@/stores/Square/ISquareDTD";
 
 export const useGameMapStore = defineStore('gameMap', () => {
   let stompclient: Client
 
   const mapData = reactive({
-      DEFAULT_SQUARE_SIDE_LENGTH: 0,
-      DEFAULT_WALL_HEIGHT: 0,
-      gameMap: []
-  } as IGameMapDTD);
+    DEFAULT_SQUARE_SIDE_LENGTH: 0,
+    DEFAULT_WALL_HEIGHT: 0,
+    gameMap: new Map<number, ISquareDTD>()
+  } as IGameMap);
 
   async function initGameMap() {
     try {
 
-      const response = await fetchGameMapDataFromBackend()
+      const response: IGameMapDTD = await fetchGameMapDataFromBackend()
       console.log(response)
       mapData.DEFAULT_SQUARE_SIDE_LENGTH = response.DEFAULT_SQUARE_SIDE_LENGTH
       mapData.DEFAULT_WALL_HEIGHT = response.DEFAULT_WALL_HEIGHT
-      mapData.gameMap = response.gameMap
+
+      for (const square of response.gameMap) {
+        mapData.gameMap.set(square.id, square)
+      }
 
     } catch (reason) {
       throw reason //Throw again to pass to execution function
@@ -63,7 +67,7 @@ export const useGameMapStore = defineStore('gameMap', () => {
   }
 
   return {
-    mapContent: readonly(mapData as IGameMapDTD),
+    mapContent: readonly(mapData as IGameMap),
     initGameMap,
     startGameMapLiveUpdate
   };

@@ -1,5 +1,5 @@
 import * as THREE from 'three'
-import {type IGameMapDTD, MapObjectType} from "@/stores/IGameMapDTD";
+import {type IGameMap, MapObjectType} from "@/stores/IGameMapDTD";
 import {SnackType} from "@/stores/Snack/ISnackDTD";
 
 /**
@@ -59,7 +59,7 @@ export const GameMapRenderer = () => {
     return renderer
   }
 
-  const createGameMap = (mapData: IGameMapDTD) => {
+  const createGameMap = (mapData: IGameMap) => {
     const OFFSET = mapData.DEFAULT_SQUARE_SIDE_LENGTH/2
     const DEFAULT_SIDE_LENGTH = mapData.DEFAULT_SQUARE_SIDE_LENGTH
     const WALL_HEIGHT = mapData.DEFAULT_WALL_HEIGHT
@@ -67,7 +67,7 @@ export const GameMapRenderer = () => {
     createGround()
 
   // Iterate through map data and create walls
-    for (const square of mapData.gameMap) {
+    for (const [id, square] of mapData.gameMap) {
       if (square.type === MapObjectType.WALL) {
         // Create wall at position (x, 0, z) -> y = 0 because of 'building the walls'
         createWall(square.indexX*DEFAULT_SIDE_LENGTH+OFFSET, 0, square.indexZ*DEFAULT_SIDE_LENGTH+OFFSET, WALL_HEIGHT, DEFAULT_SIDE_LENGTH)
