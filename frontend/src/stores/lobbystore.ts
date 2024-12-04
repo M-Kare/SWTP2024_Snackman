@@ -8,4 +8,10 @@ export const useLobbyStore = defineStore("lobbystore", () =>{
         ok: false, 
         lobbylist: [] as Array<ILobbyDTD>
     })
+
+    async function createLobby() {
+        const lobby = {
+            
+        }
+    }
 })

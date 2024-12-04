@@ -1,10 +1,10 @@
-export enum ROLE{
+export enum Role{
     SNACKMAN = "SNACKMAN",
     GHOST =  "GHOST"
 }
 
 export interface IPlayerClientDTD{
-    playerId: String
-    playerName: String
-    role: ROLE
+    playerId: string
+    playerName: string
+    role: Role
 }
