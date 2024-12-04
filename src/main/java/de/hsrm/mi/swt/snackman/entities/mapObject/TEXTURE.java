@@ -1,4 +1,4 @@
-package de.hsrm.mi.swt.snackman.entities.MapObject;
+package de.hsrm.mi.swt.snackman.entities.mapObject;
 
 /**
  * Represents the different textures that can be applied to map objects

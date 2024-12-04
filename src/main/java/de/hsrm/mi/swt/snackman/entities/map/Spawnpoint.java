@@ -1,7 +1,7 @@
 package de.hsrm.mi.swt.snackman.entities.map;
 
-import de.hsrm.mi.swt.snackman.entities.MapObject.MapObject;
-import de.hsrm.mi.swt.snackman.entities.MapObject.TEXTURE;
+import de.hsrm.mi.swt.snackman.entities.mapObject.MapObject;
+import de.hsrm.mi.swt.snackman.entities.mapObject.TEXTURE;
 
 public class Spawnpoint extends MapObject {
 

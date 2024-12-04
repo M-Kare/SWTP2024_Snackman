@@ -1,7 +1,7 @@
 package de.hsrm.mi.swt.snackman.entities.square;
 
-import de.hsrm.mi.swt.snackman.entities.MapObject.EatableItem;
-import de.hsrm.mi.swt.snackman.entities.MapObject.MapObject;
+import de.hsrm.mi.swt.snackman.entities.mapObject.MapObject;
+import de.hsrm.mi.swt.snackman.entities.mapObject.EatableItem;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,4 +1,4 @@
-package de.hsrm.mi.swt.snackman.entities.MapObject;
+package de.hsrm.mi.swt.snackman.entities.mapObject;
 
 public class EatableItem extends MapObject {
 

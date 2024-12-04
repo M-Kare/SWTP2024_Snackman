@@ -1,7 +1,7 @@
-package de.hsrm.mi.swt.snackman.entities.MapObject.wall;
+package de.hsrm.mi.swt.snackman.entities.mapObject.wall;
 
-import de.hsrm.mi.swt.snackman.entities.MapObject.MapObject;
-import de.hsrm.mi.swt.snackman.entities.MapObject.TEXTURE;
+import de.hsrm.mi.swt.snackman.entities.mapObject.MapObject;
+import de.hsrm.mi.swt.snackman.entities.mapObject.TEXTURE;
 
 /**
  * Represents a wall in the game map
