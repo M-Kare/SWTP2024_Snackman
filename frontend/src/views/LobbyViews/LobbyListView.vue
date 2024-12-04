@@ -1,14 +1,32 @@
 <template>
     <MenuBackground></MenuBackground>
 
+    <!-- <Test></Test> -->
+
     <h1 class="title">Lobbies</h1>
     <div class="outer-box">
-        <SmallNavButton id="menu-back-button" class="nav-buttons" @click="backToMainMenu"> Back </SmallNavButton>
-        <SmallNavButton id="create-lobby-button" class="nav-buttons" @click="createLobby"> Create Lobby </SmallNavButton>
+        <SmallNavButton
+            id="menu-back-button"
+            class="nav-buttons"
+            @click="backToMainMenu">
+            
+            Back
+        </SmallNavButton>
+        <SmallNavButton
+            id="show-lobby-creation-button"
+            class="nav-buttons"
+            @click="showCreateLobbyForm">
+
+            Create new Lobby
+        </SmallNavButton>
 
         <div class="inner-box"> <!-- :key for order? -->
             <ul>
-                <li class="lobby-list-items" v-for="lobby in lobbies" @click="showTest">
+                <li
+                    v-for="lobby in lobbies"
+                    class="lobby-list-items"
+                    @click="showTest">
+
                     <div class="lobby-name">
                         {{ lobby.lobbyNumber }}
                     </div>
@@ -19,22 +37,38 @@
             </ul>
         </div>
     </div>
+
+    <div v-if="showNewLobbyForm" id="darken-background"></div>
+
+    <CreateLobbyForm
+        v-if="showNewLobbyForm"
+        id="create-lobby-form"
+        @cancelLobbyCreation = "cancelLobbyCreation">
+    </CreateLobbyForm>
+
 </template>
 
 <script setup lang="ts">
     import MenuBackground from '@/components/MenuBackground.vue';
     import SmallNavButton from '@/components/SmallNavButton.vue';
+    import CreateLobbyForm from '@/components/CreateLobbyForm.vue';
+
     import { useRouter } from 'vue-router';
     import { ref } from 'vue';
 
     const router = useRouter();
+    const showNewLobbyForm = ref(true); // TODO - change to false, true for testing
 
     const backToMainMenu = () => {
         router.push({name: "MainMenu"});
     }
 
-    const createLobby = () => {
-        // show lobby-form
+    const showCreateLobbyForm = () => {
+        showNewLobbyForm.value = true;
+    }
+
+    const cancelLobbyCreation = () => {
+        showNewLobbyForm.value = false;
     }
 
     const showTest = () => {
@@ -121,18 +155,26 @@
     margin: 1rem;
 }
 
+#darken-background {
+    z-index: 1;
+    position: fixed;
+    top: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 50%);
+
+    transition: background 0.3s ease;
+}
+
 #menu-back-button {
     left: 5%;
 }
-#menu-back-button:hover {
-  box-shadow: 0px 0px 35px 5px rgba(255, 255, 255, 0.2);
-}
 
-#create-lobby-button {
+#show-lobby-creation-button {
     right: 5%;
 }
 
-#create-lobby-button:hover {
+#menu-back-button:hover, #show-lobby-creation-button:hover {
   box-shadow: 0px 0px 35px 5px rgba(255, 255, 255, 0.5);
 }
 </style>
