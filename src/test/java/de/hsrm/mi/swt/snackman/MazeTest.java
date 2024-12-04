@@ -9,23 +9,22 @@ import java.util.List;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.python.util.PythonInterpreter;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class SnackmanApplicationTests {
+public class MazeTest {
+    
+    public MazeTest(){
+        String path = System.getProperty("user.dir") + "/src/main/java/de/hsrm/mi/swt/snackman/Maze.py";
 
-	public static void main(String[] args){
-		mazeExists();
-		mazeHasContent();
-		mazeHasDefindesCharacters();
-	}
+        try(PythonInterpreter interpreter = new PythonInterpreter()){
+            interpreter.execfile(path);
+        }
+    }
 
-	@Test
-	void contextLoads() {
-	}
-
-	@Test
-	static void mazeExists(){
+    @Test
+	void mazeExists(){
 		String filename = "./Maze.txt";
         Path filePath = Path.of(filename);
         Assertions.assertTrue(Files.exists(filePath), "Die Datei existiert nicht!");
@@ -33,7 +32,7 @@ class SnackmanApplicationTests {
 	}
 
 	@Test
-	static void mazeHasContent(){
+	void mazeHasContent(){
 		List<String> maze = new LinkedList<String>();
 		try {
 			maze = Files.readAllLines(Paths.get("./Maze.txt"));
@@ -46,7 +45,7 @@ class SnackmanApplicationTests {
 	}
 
 	@Test
-	static void mazeHasDefindesCharacters(){
+	void mazeHasDefindesCharacters(){
 		List<String> maze = new LinkedList<String>();
 		
 		try {
