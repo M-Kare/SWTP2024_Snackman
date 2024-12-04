@@ -5,6 +5,10 @@ import de.hsrm.mi.swt.snackman.entities.map.Square;
 import de.hsrm.mi.swt.snackman.entities.mapObject.MapObjectType;
 import de.hsrm.mi.swt.snackman.entities.mapObject.snack.Snack;
 import de.hsrm.mi.swt.snackman.entities.mapObject.snack.SnackType;
+import de.hsrm.mi.swt.snackman.messaging.ChangeType;
+import de.hsrm.mi.swt.snackman.messaging.EventType;
+import de.hsrm.mi.swt.snackman.messaging.FrontendMessageEvent;
+import de.hsrm.mi.swt.snackman.messaging.FrontendMessageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +22,9 @@ import java.beans.PropertyChangeEvent;
  */
 @Service
 public class MapService {
+
+    @Autowired
+    FrontendMessageService frontendMessageService;
 
     Logger log = LoggerFactory.getLogger(MapService.class);
     private String filePath;
@@ -73,7 +80,7 @@ public class MapService {
      * @return a created Square
      */
     private Square createSquare(char symbol, int x, int z) {
-        Square square = null;
+        Square square;
 
         switch (symbol) {
             case '#': {
@@ -91,8 +98,12 @@ public class MapService {
 
         square.addPropertyChangeListener((PropertyChangeEvent evt) -> {
             if (evt.getPropertyName().equals("square")) {
-                System.out.println("square changed" + evt.getNewValue());
-                //Hier muss die STOMP Nachricht
+                System.out.println("square changed " + evt.getNewValue());
+
+                FrontendMessageEvent messageEvent = new FrontendMessageEvent(EventType.SNACK, ChangeType.UPDATE,
+                        (Square) evt.getNewValue());
+
+                frontendMessageService.sendEvent(messageEvent);
             }
         });
 
