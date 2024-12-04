@@ -23,8 +23,7 @@ import java.beans.PropertyChangeEvent;
 @Service
 public class MapService {
 
-    @Autowired
-    FrontendMessageService frontendMessageService;
+    private FrontendMessageService frontendMessageService;
 
     Logger log = LoggerFactory.getLogger(MapService.class);
     private String filePath;
@@ -35,11 +34,13 @@ public class MapService {
      * Initializes the maze data by reading from a file and creates a Map object
      */
     @Autowired
-    public MapService(ReadMazeService readMazeService) {
-        this(readMazeService, "mini-maze.txt");
+    public MapService( FrontendMessageService frontendMessageService, ReadMazeService readMazeService) {
+        this(frontendMessageService, readMazeService, "mini-maze.txt");
     }
 
-    public MapService(ReadMazeService readMazeService, String filePath) {
+    public MapService(FrontendMessageService frontendMessageService,ReadMazeService readMazeService,
+                      String filePath) {
+        this.frontendMessageService = frontendMessageService;
         this.filePath = filePath;
         char[][] mazeData = readMazeService.readMazeFromFile(this.filePath);
         gameMap = convertMazeDataGameMap(mazeData);
@@ -58,7 +59,6 @@ public class MapService {
             for (int j = 0; j < mazeData[0].length; j++) {
                 try {
                     Square squareToAdd = createSquare(mazeData[i][j], i, j);
-                    addRandomSnackToSquare(squareToAdd);
 
                     squaresBuildingMap[i][j] = squareToAdd;
 
@@ -96,10 +96,10 @@ public class MapService {
             }
         }
 
+        addRandomSnackToSquare(square);
+
         square.addPropertyChangeListener((PropertyChangeEvent evt) -> {
             if (evt.getPropertyName().equals("square")) {
-                System.out.println("square changed " + evt.getNewValue());
-
                 FrontendMessageEvent messageEvent = new FrontendMessageEvent(EventType.SNACK, ChangeType.UPDATE,
                         (Square) evt.getNewValue());
 

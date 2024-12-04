@@ -2,8 +2,12 @@ import {defineStore} from 'pinia';
 import {reactive, readonly} from "vue";
 import type {IGameMapDTD} from './IGameMapDTD';
 import {fetchGameMapDataFromBackend} from "../services/GameMapDataService.js";
+import {Client} from "@stomp/stompjs";
+import type {IFrontendMessageEvent} from "@/services/IFrontendMessageEvent";
 
 export const useGameMapStore = defineStore('gameMap', () => {
+  let stompclient: Client
+
   const mapData = reactive({
       DEFAULT_SQUARE_SIDE_LENGTH: 0,
       DEFAULT_WALL_HEIGHT: 0,
@@ -24,8 +28,43 @@ export const useGameMapStore = defineStore('gameMap', () => {
     }
   }
 
+  async function startGameMapLiveUpdate() {
+    const wsurl = `ws://${window.location.host}/stompbroker`
+    const DEST = '/topic/square'
+
+    if (!stompclient) {
+      stompclient = new Client({brokerURL: wsurl})
+
+      stompclient.onWebSocketError = (event) => {
+        throw new Error('Websocket wit message: ' + event)
+      }
+
+      stompclient.onStompError = (frameElement) => {
+        throw new Error('Stompclient with message: ' + frameElement)
+      }
+
+      stompclient.onConnect = (frameElement) => {
+        console.log('Stompclient connected')
+
+        stompclient.subscribe(DEST, async (message) => {
+          const change: IFrontendMessageEvent = JSON.parse(message.body)
+
+          console.log(change)
+        })
+      }
+
+      stompclient.onDisconnect = () => {
+        console.log('Stompclient disconnected.')
+      }
+
+      stompclient.activate()
+    }
+
+  }
+
   return {
     mapContent: readonly(mapData as IGameMapDTD),
-    initGameMap
+    initGameMap,
+    startGameMapLiveUpdate
   };
 })

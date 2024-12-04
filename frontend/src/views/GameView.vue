@@ -100,8 +100,9 @@ onMounted(async () => {
     await gameMapStore.initGameMap()
 
     const mapContent = gameMapStore.mapContent
-
     createGameMap(mapContent as IGameMapDTD)
+
+    await gameMapStore.startGameMapLiveUpdate()
   } catch (error) {
     console.error('Error when retrieving the gameMap:', error)
   }
