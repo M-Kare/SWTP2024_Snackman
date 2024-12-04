@@ -3,8 +3,8 @@
 
     <h1 class="title">Lobbies</h1>
     <div class="outer-box">
-        <MenuBackButton id="menu-back-button" class="nav-buttons">Back</MenuBackButton>
-        <button id="create-lobbyNumber-button" class="nav-buttons" @click="createLobby">Create Lobby</button>
+        <SmallNavButton id="menu-back-button" class="nav-buttons" @click="backToMainMenu"> Back </SmallNavButton>
+        <SmallNavButton id="create-lobby-button" class="nav-buttons" @click="createLobby"> Create Lobby </SmallNavButton>
 
         <div class="inner-box"> <!-- :key for order? -->
             <ul>
@@ -23,14 +23,18 @@
 
 <script setup lang="ts">
     import MenuBackground from '@/components/MenuBackground.vue';
-    import MenuBackButton from '@/components/MenuBackButton.vue';
+    import SmallNavButton from '@/components/SmallNavButton.vue';
     import { useRouter } from 'vue-router';
     import { ref } from 'vue';
 
     const router = useRouter();
 
+    const backToMainMenu = () => {
+        router.push({name: "MainMenu"});
+    }
+
     const createLobby = () => {
-        router.push({name: 'LobbyView'});
+        // show lobby-form
     }
 
     const showTest = () => {
@@ -117,27 +121,18 @@
     margin: 1rem;
 }
 
-.nav-buttons {
-    position: inherit;
-    bottom: 3%;
-    font-size: 1.2rem;
-    width: auto;
-    padding: 1rem;
-    height: 3.5rem;
-    cursor: pointer;
-    border: none;
-    border-radius: 0.3rem;
-}
-
 #menu-back-button {
     left: 5%;
 }
+#menu-back-button:hover {
+  box-shadow: 0px 0px 35px 5px rgba(255, 255, 255, 0.2);
+}
 
-#create-lobbyNumber-button {
+#create-lobby-button {
     right: 5%;
 }
 
-#create-lobbyNumber-button:hover {
+#create-lobby-button:hover {
   box-shadow: 0px 0px 35px 5px rgba(255, 255, 255, 0.5);
 }
 </style>

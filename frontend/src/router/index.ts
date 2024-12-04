@@ -1,7 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import MainMenuView from '@/views/MainMenuView.vue'
 import GameView from '@/views/GameView.vue'
-import LobbyView from '@/views/LobbyViews/LobbyView.vue'
 import LobbyListView from '@/views/LobbyViews/LobbyListView.vue'
 
 
@@ -23,12 +22,6 @@ const router = createRouter({
             path: '/LobbyListView',
             name: 'LobbyList',
             component: LobbyListView,
-            props: true
-        },
-        {
-            path: '/LobbyView',
-            name: 'Lobby',
-            component: LobbyView,
             props: true
         }
     ]
