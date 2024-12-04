@@ -32,12 +32,8 @@ public class MapService {
      * Initializes the maze data by reading from a file and creates a Map object
      */
     public MapService() {
-        String path = System.getProperty("user.dir") + "/src/main/java/de/hsrm/mi/swt/snackman/Maze.py";
-
-        //generates a new randome Maze
-        try(PythonInterpreter interpreter = new PythonInterpreter()){
-            interpreter.execfile(path);
-        }
+        
+        generateNewMaze();
 
         this.filePath = "Maze.txt";
         char[][] mazeData = readMazeFromFile(this.filePath);
@@ -95,6 +91,15 @@ public class MapService {
         }
 
         return new GameMap(squaresBuildingMap);
+    }
+
+    public void generateNewMaze(){
+        String path = System.getProperty("user.dir") + "/src/main/java/de/hsrm/mi/swt/snackman/Maze.py";
+
+        //generates a new randome Maze
+        try(PythonInterpreter interpreter = new PythonInterpreter()){
+            interpreter.execfile(path);
+        }
     }
 
     //TODO add Javadoc

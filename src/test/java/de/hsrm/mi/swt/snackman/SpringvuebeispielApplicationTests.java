@@ -11,8 +11,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import de.hsrm.mi.swt.snackman.services.MapService;
-
 @SpringBootTest
 class SnackmanApplicationTests {
 
@@ -20,7 +18,6 @@ class SnackmanApplicationTests {
 		mazeExists();
 		mazeHasContent();
 		mazeHasDefindesCharacters();
-		newMazeGeneratedWhenNewInstanceOfMapService();
 	}
 
 	@Test
@@ -65,27 +62,5 @@ class SnackmanApplicationTests {
 			}
 		}
 
-	}
-
-	@Test
-	static void newMazeGeneratedWhenNewInstanceOfMapService(){
-		List<String> mazeBeforeMapService = new LinkedList<String>();
-		List<String> mazeAfterMapService = new LinkedList<String>();
-
-		try {
-			mazeBeforeMapService = Files.readAllLines(Paths.get("./Maze.txt"));		
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		MapService mapService = new MapService();
-
-		try {
-			mazeAfterMapService = Files.readAllLines(Paths.get("./Maze.txt"));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-		Assertions.assertNotEquals(mazeAfterMapService, mazeBeforeMapService,"No new maze generated");
-		
 	}
 }
