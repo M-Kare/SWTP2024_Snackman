@@ -8,7 +8,7 @@
     </div>
     <div class="inner-box" v-for="lobby in lobbies"> <!-- :key for order? -->
         <ul>
-            <li class="lobby-list" v-for="lobby in lobbies">
+            <li class="lobby-list-items" v-for="lobby in lobbies" @click="showTest">
                 <div class="lobby-name">
                     {{ lobby.lobbyNumber }}
                 </div>
@@ -30,6 +30,10 @@
 
     const createLobby = () => {
         router.push({name: 'LobbyView'});
+    }
+
+    const showTest = () => {
+        alert("Test");
     }
 
     // TODO - Connection to Backend
@@ -78,21 +82,20 @@
 }
 .inner-box > ul {
     list-style: none;
+    left: 50%;
+    transform: translateX(-50%);
+    margin: 0;
+    padding: 0;
+    vertical-align: middle;
 }
 
-.lobby-list {
-
-}
-
-/* TODO: flexible position needed */
-.lobby-name {
-    position: inherit;
-}
-
-/* TODO: flexible position needed */
-.playercount {
-    position: inherit;
-    right: 30%;
+.lobby-list-items {
+    display: flex;
+    justify-content: space-between;
+    border: 1px solid black;
+    font-size: 1.2rem;
+    padding: 0.5rem;
+    margin: 1rem;
 }
 
 /* TODO: flexible position needed */
