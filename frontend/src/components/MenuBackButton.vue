@@ -1,5 +1,5 @@
 <template>
-    <button class="menu-button" id="back-button" @click="backToMain">Back</button>
+    <button class="back-button" @click="backToMain">Back</button>
 </template>
 
 <script setup lang="ts">
@@ -14,11 +14,14 @@
 </script>
 
 <style scoped>
-#back-button {
+.back-button {
     position: absolute;
-    top: 70%;
-    left: 20%;
-    transform: translateX(-50%);
     text-align: center;
+    cursor: pointer;
+    border: none;
+    border-radius: 0.3rem;
+}
+.back-button:hover {
+  box-shadow: 0px 0px 35px 5px rgba(255, 255, 255, 0.2);
 }
 </style>

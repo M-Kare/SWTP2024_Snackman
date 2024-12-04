@@ -6,7 +6,7 @@
     Buttons will be merged later on,
     right now we need a fast entry into the game to test things (Singpleplayer-Button)
      -->
-    <MainMenuButton class="menu-button" id="singleplayer-button" @click="startGame">SinglePlayer</MainMenuButton>
+    <MainMenuButton class="menu-button" id="singleplayer-button">SinglePlayer</MainMenuButton>
     <MainMenuButton class="menu-button" id="multiplayer-button" @click="showLobbies">Multiplayer</MainMenuButton>
 </template>
 
@@ -17,17 +17,9 @@
 
   const router = useRouter();
 
-  //TODO: will be removed later, only for testing purposes right now
-  const startGame = () => {
-      router.push({name: 'GameStart'});
-  }
-
-
   const showLobbies = () => {
       router.push({name: 'LobbyList'});
   }
-
-  
 
 </script>
 
@@ -41,14 +33,12 @@
   font-weight: bold;
   color: #fff;
   text-align: center;
-  z-index: 3;
 }
 
 .menu-button {
   position: absolute;
   left: 50%;
   transform: translate(-50%, -50%); /* h & v centered */
-  z-index: 3;
 }
 
 #singleplayer-button {
