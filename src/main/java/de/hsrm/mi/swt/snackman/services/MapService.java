@@ -10,6 +10,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.beans.PropertyChangeEvent;
+
 /**
  * Service class for managing the game map
  * This class is responsible for loading and providing access to the game map data
@@ -17,10 +19,9 @@ import org.springframework.stereotype.Service;
 @Service
 public class MapService {
 
+    Logger log = LoggerFactory.getLogger(MapService.class);
     private String filePath;
     private GameMap gameMap;
-
-    Logger log = LoggerFactory.getLogger(MapService.class);
 
     /**
      * Constructs a new MapService
@@ -67,31 +68,52 @@ public class MapService {
      * Creates a Square by given indexes
      *
      * @param symbol from char array
-     * @param x index
-     * @param z index
+     * @param x      index
+     * @param z      index
      * @return a created Square
      */
     private Square createSquare(char symbol, int x, int z) {
-        return switch (symbol) {
-            case '#' -> new Square(MapObjectType.WALL, x, z);
-            case ' ' -> new Square(MapObjectType.FLOOR, x, z);
-            // TODO weitere Fälle hinzufügen
-            default -> throw new IllegalArgumentException("CAN'T BUILD! " + symbol + " doesn't exist");
-        };
+        Square square = null;
+
+        switch (symbol) {
+            case '#': {
+                square = new Square(MapObjectType.WALL, x, z);
+                break;
+            }
+            case ' ': {
+                square = new Square(MapObjectType.FLOOR, x, z);
+                break;
+            }
+            default: {
+                throw new IllegalArgumentException("CAN'T BUILD! " + symbol + " doesn't exist");
+            }
+        }
+
+        square.addPropertyChangeListener((PropertyChangeEvent evt) -> {
+            if (evt.getPropertyName().equals("square")) {
+                System.out.println("square changed" + evt.getNewValue());
+                //Hier muss die STOMP Nachricht
+            }
+        });
+
+        return square;
     }
 
 
     /**
      * Adds a random generated snack inside a square of type FLOOR
+     *
      * @param square to put snack in
      */
     private void addRandomSnackToSquare(Square square) {
-        if(square.getType() == MapObjectType.FLOOR){
+        if (square.getType() == MapObjectType.FLOOR) {
             SnackType randomSnackType = SnackType.getRandomSnack();
 
             square.setSnack(new Snack(randomSnackType));
         }
-    };
+    }
+
+    ;
 
 
     public GameMap getGameMap() {
