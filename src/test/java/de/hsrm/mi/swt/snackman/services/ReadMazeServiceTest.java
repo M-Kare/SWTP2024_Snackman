@@ -1,6 +1,5 @@
-package de.hsrm.mi.swt.snackman;
+package de.hsrm.mi.swt.snackman.services;
 
-import de.hsrm.mi.swt.snackman.services.ReadMazeService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

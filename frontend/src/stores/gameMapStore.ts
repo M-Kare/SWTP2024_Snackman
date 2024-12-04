@@ -22,7 +22,6 @@ export const useGameMapStore = defineStore('gameMap', () => {
     try {
 
       const response: IGameMapDTD = await fetchGameMapDataFromBackend()
-      console.log(response)
       mapData.DEFAULT_SQUARE_SIDE_LENGTH = response.DEFAULT_SQUARE_SIDE_LENGTH
       mapData.DEFAULT_WALL_HEIGHT = response.DEFAULT_WALL_HEIGHT
 
@@ -63,7 +62,6 @@ export const useGameMapStore = defineStore('gameMap', () => {
 
           mapData.gameMap.set(change.square.id, change.square as ISquare)
 
-          console.log(change)
         })
       }
 

@@ -80,12 +80,6 @@ export const GameMapRenderer = () => {
         const squareToAdd = createFloorSquare(square.indexX * DEFAULT_SIDE_LENGTH + OFFSET, square.indexZ * DEFAULT_SIDE_LENGTH + OFFSET, DEFAULT_SIDE_LENGTH)
         scene.add(squareToAdd)
 
-        //TODO Remove because it's only for test purpose
-        if (square.snack === null) {
-          console.log(square.id)
-
-        }
-
         if (square.snack != null) {
           const snackToAdd = createSnackOnFloor(square.indexX * DEFAULT_SIDE_LENGTH + OFFSET, square.indexZ * DEFAULT_SIDE_LENGTH + OFFSET, DEFAULT_SIDE_LENGTH, square.snack?.snackType)
           scene.add(snackToAdd)
