@@ -8,13 +8,20 @@
 
         <div class="inner-box"> <!-- :key for order? -->
             <ul>
-                <li class="lobby-list-items" v-for="lobby in lobbies" @click="showTest">
+                <li class="lobby-list-items" v-for="lobby in lobbies" :key="lobby.uuid" @click="showTest">
                     <div class="lobby-name">
-                        {{ lobby.lobbyNumber }}
+                        {{ lobby.name }}
                     </div>
+
+                    <div class="lobby-uuid">
+                        {{ lobby.uuid }}
+                    </div>
+
+                    <!--
                     <div class="playercount">
                         {{ lobby.playerCount }} / {{ maxPlayerCount }}
                     </div>
+                    -->
                 </li>
             </ul>
         </div>
@@ -25,16 +32,40 @@
     import MenuBackground from '@/components/MenuBackground.vue';
     import SmallNavButton from '@/components/SmallNavButton.vue';
     import { useRouter } from 'vue-router';
-    import { ref } from 'vue';
+    import { computed, ref } from 'vue';
+    import { useLobbiesStore } from '@/stores/lobbiesstore';
+    import type { ILobbyDTD } from '@/stores/ILobbyDTD';
+    import { Role, type IPlayerClientDTD } from '@/stores/IPlayerClientDTD';
 
     const router = useRouter();
+    const lobbiesStore = useLobbiesStore();
+
+    const lobbies = computed(() => lobbiesStore.lobbydata.lobbies)
 
     const backToMainMenu = () => {
         router.push({name: "MainMenu"});
     }
 
-    const createLobby = () => {
-        // show lobby-form
+    const createLobby = async () => {
+        const lobbyName = prompt("Enter Lobby Name: ")
+        if (lobbyName){
+            try{
+
+                //Player-Data just for Test
+                const sessionNumber = Math.floor(Math.random() * 100000).toString()
+                const adminPlayer: IPlayerClientDTD = {
+                    playerId: sessionNumber,
+                    playerName: "playerTest",
+                    role: Role.SNACKMAN, 
+                }
+                
+                await lobbiesStore.createLobby(lobbyName, adminPlayer)
+                alert("Lobby created successfully!")
+            } catch (error: any){
+                console.error('Error:', error)
+                alert("Error create Lobby!")
+            }
+        }
     }
 
     const showTest = () => {
@@ -43,20 +74,20 @@
 
     // TODO - Connection to Backend
     const maxPlayerCount = "4";
-    const lobbies = ref([
-        {lobbyNumber: "Lobby 1", playerCount: "1"},
-        {lobbyNumber: "Lobby 2", playerCount: "3"},
-        {lobbyNumber: "Lobby 3", playerCount: "4"},
-        {lobbyNumber: "Lobby x", playerCount: "4"},
-        {lobbyNumber: "Lobby x", playerCount: "4"},
-        {lobbyNumber: "Lobby x", playerCount: "4"},
-        {lobbyNumber: "Lobby x", playerCount: "4"},
-        {lobbyNumber: "Lobby x", playerCount: "4"},
-        {lobbyNumber: "Lobby x", playerCount: "4"},
-        {lobbyNumber: "Lobby x", playerCount: "4"},
-        {lobbyNumber: "Lobby x", playerCount: "4"},
-        {lobbyNumber: "Lobby x", playerCount: "4"}
-    ]);
+    // const lobbies = ref([
+    //     {lobbyNumber: "Lobby 1", playerCount: "1"},
+    //     {lobbyNumber: "Lobby 2", playerCount: "3"},
+    //     {lobbyNumber: "Lobby 3", playerCount: "4"},
+    //     {lobbyNumber: "Lobby x", playerCount: "4"},
+    //     {lobbyNumber: "Lobby x", playerCount: "4"},
+    //     {lobbyNumber: "Lobby x", playerCount: "4"},
+    //     {lobbyNumber: "Lobby x", playerCount: "4"},
+    //     {lobbyNumber: "Lobby x", playerCount: "4"},
+    //     {lobbyNumber: "Lobby x", playerCount: "4"},
+    //     {lobbyNumber: "Lobby x", playerCount: "4"},
+    //     {lobbyNumber: "Lobby x", playerCount: "4"},
+    //     {lobbyNumber: "Lobby x", playerCount: "4"}
+    // ]);
 
 
 
