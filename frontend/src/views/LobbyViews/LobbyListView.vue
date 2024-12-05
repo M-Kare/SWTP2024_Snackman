@@ -8,7 +8,7 @@
 
         <div class="inner-box"> <!-- :key for order? -->
             <ul>
-                <li class="lobby-list-items" v-for="lobby in lobbies" :key="lobby.uuid" @click="showTest">
+                <li class="lobby-list-items" v-for="lobby in lobbies" :key="lobby.uuid" @click="showLobbyDetails">
                     <div class="lobby-name">
                         {{ lobby.name }}
                     </div>
@@ -35,7 +35,7 @@
     import { computed, ref } from 'vue';
     import { useLobbiesStore } from '@/stores/lobbiesstore';
     import type { ILobbyDTD } from '@/stores/ILobbyDTD';
-    import { Role, type IPlayerClientDTD } from '@/stores/IPlayerClientDTD';
+    import type { IPlayerClientDTD } from '@/stores/IPlayerClientDTD';
 
     const router = useRouter();
     const lobbiesStore = useLobbiesStore();
@@ -56,7 +56,6 @@
                 const adminPlayer: IPlayerClientDTD = {
                     playerId: sessionNumber,
                     playerName: "playerTest",
-                    role: Role.SNACKMAN, 
                 }
                 
                 await lobbiesStore.createLobby(lobbyName, adminPlayer)
@@ -68,8 +67,8 @@
         }
     }
 
-    const showTest = () => {
-        alert("Test");
+    const showLobbyDetails = (lobby: any) => {
+        alert(`Lobby Details:\nName: ${lobby.name}\nUUID: ${lobby.uuid}`)
     }
 
     // TODO - Connection to Backend

@@ -11,7 +11,7 @@ export const useLobbiesStore = defineStore("lobbiesstore", () =>{
 
     async function fetchLobbies(){
         try{
-            const url = "/api/lobbies"
+            const url = `/api/lobbies`
             const response = await fetch(url)
 
             if(!response.ok){
@@ -39,15 +39,22 @@ export const useLobbiesStore = defineStore("lobbiesstore", () =>{
         }
 
         try{
-            const url = "/api/lobbies/create?name=" + lobbyName + "&createUuid=" + adminClient.playerId
-            const response = await fetch(url, {method: 'POST'})
+            const url = `/api/lobbies/create?name=` + lobbyName + `&creatorUuid=` + adminClient.playerId
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(newLobby)
+            })
 
             if(response.ok){
                 const lobby = await response.json()
                 lobbydata.lobbies.push(lobby)
                 lobbydata.ok = true
             } else {
-                console.log('Can not create new lobby!')
+                const errorText = await response.text()
+                console.error('Failed to create lobby:', errorText)
                 lobbydata.ok = false
             }
 

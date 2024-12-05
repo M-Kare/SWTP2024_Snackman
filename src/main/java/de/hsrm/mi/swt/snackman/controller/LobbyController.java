@@ -47,7 +47,13 @@ public class LobbyController {
        */
       @PostMapping("/create")
       public ResponseEntity<Lobby> createLobby(@RequestParam String name, @RequestParam String creatorUuid) {
+            if (name == null || creatorUuid == null) {
+                  return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+            }
+
+            logger.info("Creating lobby with name: {} and creatorUuid: {}", name, creatorUuid);
             PlayerClient client = lobbyManagerService.getClient(name, creatorUuid);
+            
             try {
                   Lobby newLobby = lobbyManagerService.createLobby(name, client);
                   messagingTemplate.convertAndSend("/topic/lobbies", lobbyManagerService.getAllLobbies());
