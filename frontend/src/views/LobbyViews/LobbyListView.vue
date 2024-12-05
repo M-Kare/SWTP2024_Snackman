@@ -8,7 +8,7 @@
 
         <div class="inner-box"> <!-- :key for order? -->
             <ul>
-                <li class="lobby-list-items" v-for="lobby in lobbies" :key="lobby.uuid" @click="showLobbyDetails">
+                <li class="lobby-list-items" v-for="lobby in lobbies" :key="lobby.uuid" @click="showLobbyDetails(lobby)">
                     <div class="lobby-name">
                         {{ lobby.name }}
                     </div>
@@ -36,7 +36,6 @@
     import { useLobbiesStore } from '@/stores/lobbiesstore';
     import type { ILobbyDTD } from '@/stores/ILobbyDTD';
     import type { IPlayerClientDTD } from '@/stores/IPlayerClientDTD';
-import { Player } from '@/components/Player';
 
     const router = useRouter();
     const lobbiesStore = useLobbiesStore();
@@ -68,7 +67,7 @@ import { Player } from '@/components/Player';
         }
     }
 
-    const showLobbyDetails = (lobby: any) => {
+    const showLobbyDetails = (lobby: ILobbyDTD) => {
         alert(`Lobby Details\nName: ${lobby.name}\nUUID: ${lobby.uuid}`)
     }
 
