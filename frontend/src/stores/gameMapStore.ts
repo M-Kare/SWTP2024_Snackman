@@ -8,6 +8,12 @@ import type {ISquare} from "@/stores/Square/ISquareDTD";
 import {Scene} from "three";
 import * as THREE from "three";
 
+/**
+ * Defines the pinia store used for saving the map from
+ * the backend. Updates of the snacks are saved here and
+ * updated in the store itself. It holds the scene on
+ * which the game is build up on.
+ */
 export const useGameMapStore = defineStore('gameMap', () => {
   let stompclient: Client
   const scene = new THREE.Scene()
