@@ -36,6 +36,7 @@
     import { useLobbiesStore } from '@/stores/lobbiesstore';
     import type { ILobbyDTD } from '@/stores/ILobbyDTD';
     import type { IPlayerClientDTD } from '@/stores/IPlayerClientDTD';
+import { Player } from '@/components/Player';
 
     const router = useRouter();
     const lobbiesStore = useLobbiesStore();
@@ -68,7 +69,7 @@
     }
 
     const showLobbyDetails = (lobby: any) => {
-        alert(`Lobby Details:\nName: ${lobby.name}\nUUID: ${lobby.uuid}`)
+        alert(`Lobby Details\nName: ${lobby.name}\nUUID: ${lobby.uuid}`)
     }
 
     // TODO - Connection to Backend
@@ -130,6 +131,7 @@
     background: rgba(255, 255, 255, 70%);
     border-radius: 0.3rem;
     overflow-y: scroll;
+    color: black;
 }
 
 .inner-box > ul {

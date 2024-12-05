@@ -46,14 +46,14 @@ public class LobbyController {
        *         lobby name already exists
        */
       @PostMapping("/create")
-      public ResponseEntity<Lobby> createLobby(@RequestParam String name, @RequestParam String creatorUuid) {
+      public ResponseEntity<Lobby> createLobby(@RequestParam("name") String name, @RequestParam("creatorUuid") String creatorUuid) {
             if (name == null || creatorUuid == null) {
                   return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
             }
 
             logger.info("Creating lobby with name: {} and creatorUuid: {}", name, creatorUuid);
             PlayerClient client = lobbyManagerService.getClient(name, creatorUuid);
-            
+
             try {
                   Lobby newLobby = lobbyManagerService.createLobby(name, client);
                   messagingTemplate.convertAndSend("/topic/lobbies", lobbyManagerService.getAllLobbies());
@@ -72,7 +72,8 @@ public class LobbyController {
        */
       @GetMapping
       public ResponseEntity<List<Lobby>> getAllLobbies() {
-            return ResponseEntity.ok(lobbyManagerService.getAllLobbies());
+            List<Lobby> lobbies = lobbyManagerService.getAllLobbies();
+            return ResponseEntity.ok(lobbies);
       }
 
       /**
