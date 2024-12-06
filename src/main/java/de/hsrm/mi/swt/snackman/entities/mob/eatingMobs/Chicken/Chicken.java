@@ -1,5 +1,7 @@
 package de.hsrm.mi.swt.snackman.entities.mob.eatingMobs.Chicken;
 
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -21,6 +23,7 @@ import org.slf4j.LoggerFactory;
  */
 public class Chicken extends EatingMob implements Runnable {
 
+    private final PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
     private final Logger logger = LoggerFactory.getLogger(Chicken.class);
     private boolean blockingPath = false;
     private Thickness thickness = Thickness.THIN;
@@ -40,8 +43,6 @@ public class Chicken extends EatingMob implements Runnable {
         super();
     }
 
-    //@todo add PropertyChangeSupport -> siehe setSnack() in Square.java
-
     public Chicken(Square initialPosition, MapService mapService) {
         this.posX = initialPosition.getIndexX();
         this.posZ = initialPosition.getIndexZ();
@@ -51,6 +52,10 @@ public class Chicken extends EatingMob implements Runnable {
         this.lookingDirection = Direction.NORTH;
         this.mapService = mapService;
         initTimer();
+    }
+
+    public void addPropertyChangeListener(PropertyChangeListener listener) {
+        this.propertyChangeSupport.addPropertyChangeListener(listener);
     }
 
     // initialises the timer for laying eggs
@@ -87,8 +92,11 @@ public class Chicken extends EatingMob implements Runnable {
         }
         Square oldPosition = this.mapService.getSquareAtIndexXZ(this.posX, this.posZ);
         Square newPosition = this.mapService.getNewPosition(this.posX, this.posZ, walkingDirection);
+        this.posX = newPosition.getIndexX();
+        this.posZ = newPosition.getIndexZ();
         oldPosition.removeMob(this);
         newPosition.addMob(this);
+        propertyChangeSupport.firePropertyChange("chicken", oldPosition, newPosition);
     }
 
     /**
