@@ -23,6 +23,8 @@ import org.slf4j.LoggerFactory;
  */
 public class Chicken extends EatingMob implements Runnable {
 
+    private static long idCounter = 0;
+    private long id;
     private final PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
     private final Logger logger = LoggerFactory.getLogger(Chicken.class);
     private boolean blockingPath = false;
@@ -44,6 +46,7 @@ public class Chicken extends EatingMob implements Runnable {
     }
 
     public Chicken(Square initialPosition, MapService mapService) {
+        id = generateId();
         this.posX = initialPosition.getIndexX();
         this.posZ = initialPosition.getIndexZ();
         initialPosition.addMob(this);
@@ -56,6 +59,15 @@ public class Chicken extends EatingMob implements Runnable {
 
     public void addPropertyChangeListener(PropertyChangeListener listener) {
         this.propertyChangeSupport.addPropertyChangeListener(listener);
+    }
+
+    /**
+     * Method to generate the next id of a new Square. It is synchronized because of thread-safety.
+     *
+     * @return the next incremented id
+     */
+    private synchronized static long generateId() {
+        return idCounter++;
     }
 
     // initialises the timer for laying eggs
@@ -252,4 +264,7 @@ public class Chicken extends EatingMob implements Runnable {
         // move();
     }
 
+    public long getId() {
+        return id;
+    }
 }
