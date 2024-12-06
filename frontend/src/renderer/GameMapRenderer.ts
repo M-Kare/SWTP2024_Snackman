@@ -2,7 +2,7 @@ import * as THREE from 'three'
 import {type IGameMap, MapObjectType} from "@/stores/IGameMapDTD";
 import {SnackType} from "@/stores/Snack/ISnackDTD";
 import {useGameMapStore} from "@/stores/gameMapStore";
-import type {ChickenThickness, IChickenDTD} from "@/stores/Chicken/IChickenDTD";
+import {ChickenThickness} from "@/stores/Chicken/IChickenDTD";
 
 /**
  * for rendering the game map
@@ -67,11 +67,13 @@ export const GameMapRenderer = () => {
           gameMapStore.setSnackMeshId(id, snackToAdd.id)
         }
         //add chickens to square
-        square.chickens.forEach((currentChicken, chickenIndex) => {
-          const chickenToAdd = createChickenOnFloor(square.indexX * DEFAULT_SIDE_LENGTH + OFFSET, square.indexZ * DEFAULT_SIDE_LENGTH + OFFSET, DEFAULT_SIDE_LENGTH, currentChicken.thickness);
-          scene.add(chickenToAdd);
-          gameMapStore.setChickenMeshId(id, chickenToAdd.id, chickenIndex);
-        });
+        if(square.chickens.length > 0){
+          square.chickens.forEach((currentChicken, chickenIndex) => {
+            const chickenToAdd = createChickenOnFloor(square.indexX * DEFAULT_SIDE_LENGTH + OFFSET, square.indexZ * DEFAULT_SIDE_LENGTH + OFFSET, DEFAULT_SIDE_LENGTH, currentChicken.thickness);
+            scene.add(chickenToAdd);
+            gameMapStore.setChickenMeshId(id, chickenToAdd.id, chickenIndex);
+          });
+        }
       }
     }
   }
@@ -114,12 +116,13 @@ export const GameMapRenderer = () => {
   ) => {
     let color = 'black';
     const CHICKEN_WIDTH_AND_DEPTH = sideLength / 2
-    const CHICKEN_HEIGHT = 1
+    const CHICKEN_HEIGHT = 15
+    const scale = ChickenThickness[thickness as unknown as keyof typeof ChickenThickness]
 
     //@TODO add correct chicken-material-design
-    const boxMaterial = new THREE.MeshStandardMaterial({ color: color })
-    const boxGeometry = new THREE.BoxGeometry(CHICKEN_WIDTH_AND_DEPTH * thickness, CHICKEN_HEIGHT, CHICKEN_WIDTH_AND_DEPTH * thickness)
-    const chicken = new THREE.Mesh(boxGeometry, boxMaterial)
+    const chickenMaterial = new THREE.MeshStandardMaterial({ color: color })
+    const chickenGeometry = new THREE.BoxGeometry(CHICKEN_WIDTH_AND_DEPTH * scale, CHICKEN_HEIGHT, CHICKEN_WIDTH_AND_DEPTH * scale)
+    const chicken = new THREE.Mesh(chickenGeometry, chickenMaterial)
     chicken.castShadow = true
     chicken.receiveShadow = true
 
