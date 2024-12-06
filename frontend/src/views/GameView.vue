@@ -7,7 +7,7 @@ import {onMounted, onUnmounted, ref} from 'vue'
 import * as THREE from 'three'
 import {Client} from '@stomp/stompjs'
 import {Player} from '@/components/Player';
-import type {IPlayerDTD} from '@/stores/IPlayerDTD';
+import type {IPlayerDTD} from '@/stores/Player/IPlayerDTD';
 import {fetchSnackManFromBackend} from '@/services/SnackManInitService';
 import {GameMapRenderer} from "@/renderer/GameMapRenderer";
 import {useGameMapStore} from '@/stores/gameMapStore'

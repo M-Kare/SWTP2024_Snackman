@@ -6,7 +6,7 @@
 import { onMounted, ref } from 'vue'
 import * as THREE from 'three'
 import { Client } from '@stomp/stompjs'
-import { ChickenThickness, type IChickenDTD } from '@/stores/IChickenDTD'
+import { ChickenThickness, type IChickenDTD } from '@/stores/Chicken/IChickenDTD'
 
 const wsurl = `ws://${window.location.host}/stompbroker`
 const DEST = '/topic/chicken'
