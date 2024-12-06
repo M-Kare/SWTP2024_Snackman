@@ -3,7 +3,7 @@ import {reactive, readonly} from "vue";
 import type {IGameMap, IGameMapDTD} from './IGameMapDTD';
 import {fetchGameMapDataFromBackend} from "../services/GameMapDataService.js";
 import {Client} from "@stomp/stompjs";
-import type {IFrontendMessageEvent} from "@/services/IFrontendMessageEvent";
+import type {IFrontendChickenMessageEvent, IFrontendMessageEvent} from "@/services/IFrontendMessageEvent";
 import type {ISquare} from "@/stores/Square/ISquareDTD";
 import {Scene} from "three";
 import * as THREE from "three";
@@ -37,7 +37,8 @@ export const useGameMapStore = defineStore('gameMap', () => {
   async function startGameMapLiveUpdate() {
     const protocol = window.location.protocol.replace('http', 'ws')
     const wsurl = `${protocol}//${window.location.host}/stompbroker`
-    const DEST = '/topic/square'
+    const DEST_SQUARE = '/topic/square'
+    const DEST_CHICKEN = '/topic/chicken'
 
     if (!stompclient) {
       stompclient = new Client({brokerURL: wsurl})
@@ -53,7 +54,7 @@ export const useGameMapStore = defineStore('gameMap', () => {
       stompclient.onConnect = (frameElement) => {
         console.log('Stompclient connected')
 
-        stompclient.subscribe(DEST, async (message) => {
+        stompclient.subscribe(DEST_SQUARE, async (message) => {
           const change: IFrontendMessageEvent = JSON.parse(message.body)
 
           const savedMeshId = mapData.gameMap.get(change.square.id)!.snack.meshId
@@ -61,7 +62,23 @@ export const useGameMapStore = defineStore('gameMap', () => {
           removeSnackMeshFromScene(scene, savedMeshId)
 
           mapData.gameMap.set(change.square.id, change.square as ISquare)
+        })
+      }
 
+      stompclient.onConnect = (frameElement) => {
+        console.log('Stompclient for chicken connected')
+
+        stompclient.subscribe(DEST_CHICKEN, async (message) => {
+          const change: IFrontendChickenMessageEvent = JSON.parse(message.body)
+
+          // @todo get mesh ids of chicken which exist in both squares (old and new)
+          //const savedMeshId = mapData.gameMap.get(change.square.id)!.snack.meshId
+
+          // @todo remove these chicken in the old and add in the new square
+          //removeSnackMeshFromScene(scene, savedMeshId)
+
+          // @todo set shit here
+          //mapData.gameMap.set(change.square.id, change.square as ISquare)
         })
       }
 
@@ -86,9 +103,9 @@ export const useGameMapStore = defineStore('gameMap', () => {
   }
 
   function removeSnackMeshFromScene(scene: Scene, meshId: number) {
-    const snackMesh = scene.getObjectById(meshId)
-    if(snackMesh != undefined){
-      scene.remove(snackMesh!)
+    const mesh = scene.getObjectById(meshId)
+    if(mesh != undefined){
+      scene.remove(mesh!)
     }
   }
 

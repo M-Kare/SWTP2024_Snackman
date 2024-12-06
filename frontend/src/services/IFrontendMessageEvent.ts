@@ -8,3 +8,10 @@ export interface IFrontendMessageEvent{
   changeType: ChangeType,
   square: ISquareDTD
 }
+
+export interface IFrontendChickenMessageEvent{
+  eventType: EventType,
+  changeType: ChangeType,
+  oldSquare: ISquareDTD,
+  newSquare: ISquareDTD
+}
