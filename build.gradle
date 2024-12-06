@@ -31,15 +31,18 @@ dependencies {
 	// implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 	implementation 'org.springframework.boot:spring-boot-starter-websocket'
-	// JUnit 5 (falls nicht bereits enthalten)
+	implementation 'org.python:jython-standalone:2.7.1'
+    implementation 'org.joml:joml:1.10.8'
+    // JUnit 5 (falls nicht bereits enthalten)
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.0'
     testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.9.0'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
     // Mockito für das Mocken von Objekten
     testImplementation 'org.mockito:mockito-core:4.8.0'
+
+	implementation 'org.python:jython-standalone:2.7.2'
 }
 
 
@@ -82,4 +85,5 @@ task clean_frontend {
 }
 clean.dependsOn clean_frontend
 */
+
 

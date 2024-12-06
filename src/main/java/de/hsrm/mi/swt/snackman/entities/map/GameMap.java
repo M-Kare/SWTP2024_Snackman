@@ -1,10 +1,12 @@
 package de.hsrm.mi.swt.snackman.entities.map;
 
+import de.hsrm.mi.swt.snackman.configuration.GameConfig;
+
 /**
  * Represents a game map
  */
 public class GameMap {
-    private final int DEFAULT_SQUARE_SIDE_LENGTH = 1;
+    private final int DEFAULT_SQUARE_SIDE_LENGTH = GameConfig.SQUARE_SIZE;
 
     private final int DEFAULT_WALL_HEIGHT = 5;
 
@@ -30,5 +32,9 @@ public class GameMap {
 
     public Square[][] getGameMap() {
         return gameMap;
+    }
+
+    public Square getSquareAtIndexXZ(int x, int z) {
+        return gameMap[x][z];
     }
 }
