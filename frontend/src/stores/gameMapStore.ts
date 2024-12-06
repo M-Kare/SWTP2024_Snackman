@@ -65,6 +65,7 @@ export const useGameMapStore = defineStore('gameMap', () => {
         })
       }
 
+      /*
       stompclient.onConnect = (frameElement) => {
         console.log('Stompclient for chicken connected')
 
@@ -81,6 +82,7 @@ export const useGameMapStore = defineStore('gameMap', () => {
           //mapData.gameMap.set(change.square.id, change.square as ISquare)
         })
       }
+      */
 
       stompclient.onDisconnect = () => {
         console.log('Stompclient disconnected.')
