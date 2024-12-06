@@ -1,5 +1,6 @@
 import type {ISnack, ISnackDTD} from "@/stores/Snack/ISnackDTD";
 import {MapObjectType} from "@/stores/IGameMapDTD";
+import type {IChicken, IChickenDTD} from "@/stores/Chicken/IChickenDTD";
 
 export interface ISquareDTD {
   id: number,
@@ -7,6 +8,7 @@ export interface ISquareDTD {
   indexZ: number,
   type: MapObjectType,
   snack: ISnackDTD,
+  chickens: IChickenDTD[]
 }
 
 export interface ISquare {
@@ -15,6 +17,7 @@ export interface ISquare {
   indexZ: number,
   type: MapObjectType,
   snack: ISnack,
+  chickens: IChicken[]
 }
 
 

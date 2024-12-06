@@ -1,8 +1,10 @@
-import type { ISquareDTD } from "./ISquareDTD";
-
 export interface IChickenDTD {
     thickness: ChickenThickness;
-    square: ISquareDTD;
+}
+
+export interface IChicken {
+  thickness: ChickenThickness;
+  meshId: number
 }
 
 export enum ChickenThickness {
