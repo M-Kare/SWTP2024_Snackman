@@ -15,13 +15,6 @@
 #
 #    returns: [north_square, east_square, south_square, west_square, indexOfNextPosition]
 
-# todo: nimmt gerade immer die erste Option die es findet, kann man noch random machen
-#testingliste = ["W", "W", "G", "G", "W", "G", "G", "W", 1]
-#testingliste = ["W", "S", "G", "S", "W", "G", "G", "W", 1]
-#testingliste = ["W", "G", "G", "S", "W", "S", "G", "W", 1]
-#testingliste = ["W", "L", "G", "L", "W", "G", "G", "W", 1]
-#testingliste = ["W","S","W","L","W","L","W","L","1"]
-
 def choose_next_square(squares_liste):
       squares_liste = list(squares_liste)
       print("Python chicken skript working with list of:")
