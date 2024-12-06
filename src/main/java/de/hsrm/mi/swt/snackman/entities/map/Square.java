@@ -26,7 +26,7 @@ public class Square {
 
     private Snack snack;
 
-    private List<Mob> mobs = new ArrayList();
+    private final List<Mob> mobs = new ArrayList<>();
 
     public Square(int indexX, int indexY) {
         id = generateId();
