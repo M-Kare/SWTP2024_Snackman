@@ -24,4 +24,11 @@ public class FrontendMessageService {
 
         messagingTemplate.convertAndSend("/topic/square", ev);
     }
+
+    public void sendChickenEvent(FrontendChickenMessageEvent ev) {
+        log.info("Send Event: eventType {}, changeTyp {}, old square {}, new square {}", ev.eventType(), ev.changeType(),
+                ev.oldSquare().toString(), ev.newSquare().toString());
+
+        messagingTemplate.convertAndSend("/topic/chicken", ev);
+    }
 }

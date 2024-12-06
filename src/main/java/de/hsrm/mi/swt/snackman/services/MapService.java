@@ -7,10 +7,7 @@ import de.hsrm.mi.swt.snackman.entities.mapObject.snack.Snack;
 import de.hsrm.mi.swt.snackman.entities.mapObject.snack.SnackType;
 import de.hsrm.mi.swt.snackman.entities.mob.eatingMobs.Chicken.Chicken;
 import de.hsrm.mi.swt.snackman.entities.mob.eatingMobs.Chicken.Direction;
-import de.hsrm.mi.swt.snackman.messaging.ChangeType;
-import de.hsrm.mi.swt.snackman.messaging.EventType;
-import de.hsrm.mi.swt.snackman.messaging.FrontendMessageEvent;
-import de.hsrm.mi.swt.snackman.messaging.FrontendMessageService;
+import de.hsrm.mi.swt.snackman.messaging.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -147,7 +144,14 @@ public class MapService {
                 Thread chickenThread = new Thread(newChicken);
                 chickenThread.start();
 
-                // @todo add listener for chicken bak bak und add stomp
+                newChicken.addPropertyChangeListener((PropertyChangeEvent evt) -> {
+                    if (evt.getPropertyName().equals("chicken")) {
+                        FrontendChickenMessageEvent messageEvent = new FrontendChickenMessageEvent(EventType.CHICKEN, ChangeType.UPDATE,
+                                (Square) evt.getOldValue(), (Square) evt.getNewValue());
+
+                        frontendMessageService.sendChickenEvent(messageEvent);
+                    }
+                });
                 break;
             default: {
                 square = new Square(MapObjectType.FLOOR, x, z);
