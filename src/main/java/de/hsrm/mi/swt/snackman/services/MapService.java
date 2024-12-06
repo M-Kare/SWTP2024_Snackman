@@ -7,7 +7,6 @@ import de.hsrm.mi.swt.snackman.entities.mapObject.snack.Snack;
 import de.hsrm.mi.swt.snackman.entities.mapObject.snack.SnackType;
 import de.hsrm.mi.swt.snackman.entities.mob.eatingMobs.Chicken.Chicken;
 import de.hsrm.mi.swt.snackman.entities.mob.eatingMobs.Chicken.Direction;
-import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken;
 import de.hsrm.mi.swt.snackman.messaging.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -2,6 +2,7 @@ package de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs;
 
 import de.hsrm.mi.swt.snackman.entities.mapObject.snack.Snack;
 import de.hsrm.mi.swt.snackman.entities.mapObject.snack.SnackType;
+import de.hsrm.mi.swt.snackman.entities.mob.eatingMobs.EatingMob;
 import de.hsrm.mi.swt.snackman.services.MapService;
 
 import java.util.Random;
@@ -32,21 +33,6 @@ public class Chicken extends EatingMob {
     private void initTimer() {
         this.eggLayingTimer = new Timer();
         startNewTimer();
-    }
-
-    @Override
-    public void gainKcal() {
-
-    }
-
-    @Override
-    public void loseKcal() {
-
-    }
-
-    @Override
-    public void move(double x, double y, double z) {
-
     }
 
     /**
@@ -96,5 +82,10 @@ public class Chicken extends EatingMob {
     public void getScared() {
         this.isScared = true;
         startNewTimer();
+    }
+
+    @Override
+    protected void move() {
+
     }
 }
