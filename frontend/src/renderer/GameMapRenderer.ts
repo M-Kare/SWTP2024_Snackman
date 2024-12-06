@@ -2,6 +2,7 @@ import * as THREE from 'three'
 import {type IGameMap, MapObjectType} from "@/stores/IGameMapDTD";
 import {SnackType} from "@/stores/Snack/ISnackDTD";
 import {useGameMapStore} from "@/stores/gameMapStore";
+import type {ChickenThickness, IChickenDTD} from "@/stores/Chicken/IChickenDTD";
 
 /**
  * for rendering the game map
@@ -24,26 +25,6 @@ export const GameMapRenderer = () => {
   // add more natural outdoor lighting
   const hemiLight = new THREE.HemisphereLight(0xffffbb, 0x080820, 1)
   scene.add(hemiLight)
-
-  /**
-   * create a single wall with given x-, y-, z-position, height and sidelengthm
-   */
-  const createWall = (
-    xPosition: number,
-    yPosition: number,
-    zPosition: number,
-    height: number,
-    sideLength: number,
-  ) => {
-    // TODO add correct wall-material-design!!
-    const wallMaterial = new THREE.MeshStandardMaterial({color: 'orange'})
-    const wallGeometry = new THREE.BoxGeometry(sideLength, height, sideLength)
-    const wall = new THREE.Mesh(wallGeometry, wallMaterial)
-
-    // Position the wall
-    wall.position.set(xPosition, yPosition, zPosition)
-    scene.add(wall)
-  }
 
   /**
    * initialize renderer
@@ -85,6 +66,12 @@ export const GameMapRenderer = () => {
           scene.add(snackToAdd)
           gameMapStore.setSnackMeshId(id, snackToAdd.id)
         }
+        //add chickens to square
+        square.chickens.forEach((currentChicken, chickenIndex) => {
+          const chickenToAdd = createChickenOnFloor(square.indexX * DEFAULT_SIDE_LENGTH + OFFSET, square.indexZ * DEFAULT_SIDE_LENGTH + OFFSET, DEFAULT_SIDE_LENGTH, currentChicken.thickness);
+          scene.add(chickenToAdd);
+          gameMapStore.setChickenMeshId(id, chickenToAdd.id, chickenIndex);
+        });
       }
     }
   }
@@ -119,6 +106,28 @@ export const GameMapRenderer = () => {
     return snack
   }
 
+  const createChickenOnFloor = (
+    xPosition: number,
+    zPosition: number,
+    sideLength: number,
+    thickness: ChickenThickness
+  ) => {
+    let color = 'black';
+    const CHICKEN_WIDTH_AND_DEPTH = sideLength / 2
+    const CHICKEN_HEIGHT = 1
+
+    //@TODO add correct chicken-material-design
+    const boxMaterial = new THREE.MeshStandardMaterial({ color: color })
+    const boxGeometry = new THREE.BoxGeometry(CHICKEN_WIDTH_AND_DEPTH * thickness, CHICKEN_HEIGHT, CHICKEN_WIDTH_AND_DEPTH * thickness)
+    const chicken = new THREE.Mesh(boxGeometry, boxMaterial)
+    chicken.castShadow = true
+    chicken.receiveShadow = true
+
+    chicken.position.set(xPosition, 0, zPosition)
+
+    return chicken
+  }
+
   const createFloorSquare = (
     xPosition: number,
     zPosition: number,
@@ -148,6 +157,27 @@ export const GameMapRenderer = () => {
 
     scene.add(ground)
   }
+
+  /**
+   * create a single wall with given x-, y-, z-position, height and sidelengthm
+   */
+  const createWall = (
+    xPosition: number,
+    yPosition: number,
+    zPosition: number,
+    height: number,
+    sideLength: number,
+  ) => {
+    // TODO add correct wall-material-design!!
+    const wallMaterial = new THREE.MeshStandardMaterial({color: 'orange'})
+    const wallGeometry = new THREE.BoxGeometry(sideLength, height, sideLength)
+    const wall = new THREE.Mesh(wallGeometry, wallMaterial)
+
+    // Position the wall
+    wall.position.set(xPosition, yPosition, zPosition)
+    scene.add(wall)
+  }
+
 
   const getScene = () => {
     return scene

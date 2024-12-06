@@ -79,6 +79,12 @@ export const useGameMapStore = defineStore('gameMap', () => {
       square.snack.meshId = meshId
   }
 
+  function setChickenMeshId(squareId: number, meshId: number, chickenIndex: number) {
+    const square = mapData.gameMap.get(squareId)
+    if(square != undefined && square.snack != null)
+      square.chickens[chickenIndex].meshId = meshId
+  }
+
   function removeSnackMeshFromScene(scene: Scene, meshId: number) {
     const snackMesh = scene.getObjectById(meshId)
     if(snackMesh != undefined){
@@ -95,6 +101,7 @@ export const useGameMapStore = defineStore('gameMap', () => {
     initGameMap,
     startGameMapLiveUpdate,
     setSnackMeshId,
+    setChickenMeshId,
     getScene
   };
 })
