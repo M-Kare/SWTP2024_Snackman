@@ -125,9 +125,13 @@ public abstract class Mob {
         if (l || r) {
             move.x += moveDirX;
         }
+
+        System.out.println("Before: " + move.x + "  |  " + move.z);
         move.rotate(quat);
         move.y = 0;
-        move.normalize();
+        System.out.println("After: " + move.x + "  |  " + move.z);
+        if(!(move.x == 0 && move.z == 0))
+            move.normalize();
         move.x = move.x * delta * GameConfig.SNACKMAN_SPEED;
         move.z = move.z * delta * GameConfig.SNACKMAN_SPEED;
         double xNew = posX + move.x;
@@ -154,8 +158,6 @@ public abstract class Mob {
             default:
                 break;
         }
-        posX = move.x;
-        posZ = move.z;  
         setCurrentSquareWithIndex(posX, posZ);
     }
 

@@ -133,7 +133,7 @@ export class Player {
 
     // lerp is used to interpolate the two positions
     public setPosition(x: number,y: number,z: number) {
-      this.camera.position.set(x,y,z);
+      this.camera.position.lerp(new THREE.Vector3(x,y,z), 0.7);
     }
 
     public setCameraRotation(x: number,y: number,z: number) {
@@ -159,30 +159,37 @@ export class Player {
 
       move.applyQuaternion(this.camera.quaternion)
       move.y = 0;
-      move.normalize();
+      if(!(move.x == 0 && move.z == 0))
+        	move.normalize();
       move.x = move.x  * delta * this.speed
       move.z = move.z * delta * this.speed
       const xNew = this.camera.position.x + move.x;
       const zNew = this.camera.position.z + move.z;
-    //   const result = this.checkWallCollision(xNew, zNew);
-    //   switch (result) {
-    //     case 0:
-    //         this.camera.position.x += move.x;
-    //         this.camera.position.z += move.z;
-    //         break;
-    //     case 1:
-    //       this.camera.position.z += move.z;
-    //         break;
-    //     case 2:
-    //       this.camera.position.x += move.x;
-    //         break;
-    //     case 3:
-    //         break;
-    //     default:
-    //         break;
-    // }
+      const result = this.checkWallCollision(xNew, zNew);
+      switch (result) {
+        case 0:
+            this.camera.position.x += move.x;
+            this.camera.position.z += move.z;
+            break;
+        case 1:
+          this.camera.position.z += move.z;
+            break;
+        case 2:
+          this.camera.position.x += move.x;
+            break;
+        case 3:
+            break;
+        default:
+            break;
+    }
+    console.log(result)
+    this.setCurrentSquareWithIndex(this.camera.position.x, this.camera.position.z);
       this.prevTime = time
     }
+
+    public setCurrentSquareWithIndex(x: number, z: number) {
+      this.currentSquare = {x:this.calcMapIndexOfCoordinate(x), z:this.calcMapIndexOfCoordinate(z)};
+}
 
     public checkWallCollision(x: number, z: number): number {
       const wall = '#'
@@ -201,8 +208,8 @@ export class Player {
       squareLeftRight = {indexX:this.currentSquare.x + horizontalRelativeToCenter, indexZ:this.currentSquare.z, type:this.geilesHardgecodetesMaze[this.currentSquare.x + horizontalRelativeToCenter][this.currentSquare.z]};
       squareTopBottom = {indexX:this.currentSquare.x, indexZ:this.currentSquare.z + verticalRelativeToCenter, type:this.geilesHardgecodetesMaze[this.currentSquare.x][this.currentSquare.z + verticalRelativeToCenter]};
       squareDiagonal = {indexX:this.currentSquare.x + horizontalRelativeToCenter, indexZ:this.currentSquare.z + verticalRelativeToCenter, type:this.geilesHardgecodetesMaze[this.currentSquare.x + horizontalRelativeToCenter][this.currentSquare.z + verticalRelativeToCenter]};
-
-      if (squareLeftRight.type === wall) {
+      console.log(squareLeftRight)
+      if (squareLeftRight.type == wall) {
           const origin = new THREE.Vector3(
                   horizontalRelativeToCenter > 0 ? (this.currentSquare.x + 1) * this.HARDCODED_SQUARE_SIZE
                           : this.currentSquare.x * this.HARDCODED_SQUARE_SIZE,
