@@ -20,6 +20,27 @@ export class Player {
 
     private movementDirection: THREE.Vector3;
 
+    private HARDCODED_SQUARE_SIZE = 4;
+
+    private geilesHardgecodetesMaze: string[][] = [
+      ['#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#'],
+      ['#', ' ', ' ', ' ', '#', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '#'],
+      ['#', '#', '#', ' ', '#', ' ', '#', '#', '#', '#', '#', '#', '#', ' ', '#'],
+      ['#', ' ', ' ', ' ', '#', ' ', ' ', ' ', '#', ' ', ' ', ' ', ' ', ' ', '#'],
+      ['#', ' ', '#', '#', '#', '#', '#', ' ', '#', '#', '#', '#', '#', ' ', '#'],
+      ['#', ' ', '#', ' ', ' ', ' ', ' ', ' ', '#', ' ', ' ', ' ', '#', ' ', '#'],
+      ['#', ' ', '#', '#', '#', ' ', ' ', ' ', ' ', ' ', '#', ' ', '#', '#', '#'],
+      ['#', ' ', ' ', ' ', '#', ' ', ' ', ' ', ' ', ' ', '#', ' ', ' ', ' ', '#'],
+      ['#', '#', '#', ' ', '#', '#', ' ', ' ', ' ', ' ', '#', '#', '#', ' ', '#'],
+      ['#', ' ', ' ', ' ', '#', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '#'],
+      ['#', ' ', '#', '#', '#', ' ', '#', '#', '#', '#', '#', '#', '#', ' ', '#'],
+      ['#', ' ', '#', ' ', ' ', ' ', '#', ' ', ' ', ' ', '#', ' ', ' ', ' ', '#'],
+      ['#', ' ', '#', ' ', '#', '#', '#', ' ', '#', ' ', '#', ' ', '#', '#', '#'],
+      ['#', ' ', ' ', ' ', '#', ' ', ' ', ' ', '#', ' ', ' ', ' ', ' ', ' ', '#'],
+      ['#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#']
+    ];
+    private currentSquare: {x:number,z:number};
+
     constructor(renderer: WebGLRenderer, posX: number, posY: number, posZ: number, radius: number, speed: number){
         this.prevTime = performance.now();
         this.moveBackward = false;
@@ -28,6 +49,8 @@ export class Player {
         this.moveRight = false;
         this.canJump = true;
         this.movementDirection = new THREE.Vector3();
+
+        this.currentSquare = {x:this.calcMapIndexOfCoordinate(posX), z:this.calcMapIndexOfCoordinate(posY)}
 
         this.radius = radius;
         this.speed = speed;
@@ -39,6 +62,10 @@ export class Player {
         document.addEventListener('keyup', (event)=>{this.onKeyUp(event)})
         document.addEventListener('click', ()=>{this.controls.lock()})
     }
+
+    public calcMapIndexOfCoordinate(a: number): number {
+      return Math.floor(a / this.HARDCODED_SQUARE_SIZE);
+  }
 
     public getCamera():THREE.PerspectiveCamera{
         return this.camera;
@@ -130,15 +157,89 @@ export class Player {
         move.x += this.movementDirection.x
       }
 
-      if(move.z != 0 && move.x != 0){
-        move.normalize();
-      }
-        move.x = move.x  * delta * this.speed
-        move.z = move.z * delta * this.speed
-
       move.applyQuaternion(this.camera.quaternion)
-      this.camera.position.x += move.x
-      this.camera.position.z += move.z
+      move.y = 0;
+      move.normalize();
+      move.x = move.x  * delta * this.speed
+      move.z = move.z * delta * this.speed
+      const xNew = this.camera.position.x + move.x;
+      const zNew = this.camera.position.z + move.z;
+    //   const result = this.checkWallCollision(xNew, zNew);
+    //   switch (result) {
+    //     case 0:
+    //         this.camera.position.x += move.x;
+    //         this.camera.position.z += move.z;
+    //         break;
+    //     case 1:
+    //       this.camera.position.z += move.z;
+    //         break;
+    //     case 2:
+    //       this.camera.position.x += move.x;
+    //         break;
+    //     case 3:
+    //         break;
+    //     default:
+    //         break;
+    // }
       this.prevTime = time
     }
+
+    public checkWallCollision(x: number, z: number): number {
+      const wall = '#'
+      const floor = ' '
+      let squareLeftRight: {indexX: number, indexZ:number, type:string}
+      let squareTopBottom: {indexX: number, indexZ:number, type:string}
+      let squareDiagonal: {indexX: number, indexZ:number, type:string}
+      let collisionCase = 0;
+
+      const squareCenterX = this.currentSquare.x * this.HARDCODED_SQUARE_SIZE + this.HARDCODED_SQUARE_SIZE / 2;
+      const  squareCenterZ = this.currentSquare.z * this.HARDCODED_SQUARE_SIZE + this.HARDCODED_SQUARE_SIZE / 2;
+
+      const horizontalRelativeToCenter = (x - squareCenterX <= 0) ? -1 : 1;
+      const verticalRelativeToCenter = (z - squareCenterZ <= 0) ? -1 : 1;
+      console.log(this.currentSquare.x + horizontalRelativeToCenter)
+      squareLeftRight = {indexX:this.currentSquare.x + horizontalRelativeToCenter, indexZ:this.currentSquare.z, type:this.geilesHardgecodetesMaze[this.currentSquare.x + horizontalRelativeToCenter][this.currentSquare.z]};
+      squareTopBottom = {indexX:this.currentSquare.x, indexZ:this.currentSquare.z + verticalRelativeToCenter, type:this.geilesHardgecodetesMaze[this.currentSquare.x][this.currentSquare.z + verticalRelativeToCenter]};
+      squareDiagonal = {indexX:this.currentSquare.x + horizontalRelativeToCenter, indexZ:this.currentSquare.z + verticalRelativeToCenter, type:this.geilesHardgecodetesMaze[this.currentSquare.x + horizontalRelativeToCenter][this.currentSquare.z + verticalRelativeToCenter]};
+
+      if (squareLeftRight.type === wall) {
+          const origin = new THREE.Vector3(
+                  horizontalRelativeToCenter > 0 ? (this.currentSquare.x + 1) * this.HARDCODED_SQUARE_SIZE
+                          : this.currentSquare.x * this.HARDCODED_SQUARE_SIZE,
+                  0, 1);
+          const line = new THREE.Vector3(0, 1, 0);
+          if (this.calcIntersectionWithLine(x, z, origin, line)) {
+              collisionCase += 1;
+          }
+      }
+
+      if (squareTopBottom.type == wall) {
+          const origin = new THREE.Vector3(0,
+                  verticalRelativeToCenter > 0 ? (this.currentSquare.z + 1) * this.HARDCODED_SQUARE_SIZE
+                          : this.currentSquare.z * this.HARDCODED_SQUARE_SIZE,
+                  1);
+          const line = new THREE.Vector3(1, 0, 0);
+          if (this.calcIntersectionWithLine(x, z, origin, line)) {
+              collisionCase += 2;
+          }
+      }
+
+      if (squareDiagonal.type == wall && collisionCase == 0) {
+          const diagX = horizontalRelativeToCenter > 0 ? (this.currentSquare.x + 1) * this.HARDCODED_SQUARE_SIZE
+                  : this.currentSquare.x * this.HARDCODED_SQUARE_SIZE;
+          const diagZ = verticalRelativeToCenter > 0 ? (this.currentSquare.z + 1) * this.HARDCODED_SQUARE_SIZE
+                  : this.currentSquare.z * this.HARDCODED_SQUARE_SIZE;
+          const dist = Math.sqrt((diagX - x) * (diagX - x) + (diagZ - z) * (diagZ - z));
+          if (dist <= this.radius)
+              collisionCase = 3;
+      }
+
+      return collisionCase;
+  }
+
+  public calcIntersectionWithLine(xNew: number, zNew: number, origin: THREE.Vector3, direction:THREE.Vector3): boolean {
+      const line = origin.cross(direction);
+      const dist = Math.abs(line.x * xNew + line.y * zNew + line.z) / Math.sqrt(line.x * line.x + line.y * line.y);
+      return dist <= this.radius;
+  }
 }
