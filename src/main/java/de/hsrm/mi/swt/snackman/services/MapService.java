@@ -37,7 +37,7 @@ public class MapService {
      */
     @Autowired
     public MapService(FrontendMessageService frontendMessageService, ReadMazeService readMazeService) {
-        this(frontendMessageService, readMazeService, "Maze.txt");
+        this(frontendMessageService, readMazeService, "mini-maze.txt");
     }
 
     public MapService(FrontendMessageService frontendMessageService, ReadMazeService readMazeService,
