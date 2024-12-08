@@ -88,7 +88,7 @@ public class Chicken extends EatingMob implements Runnable {
         this.lookingDirection = walkingDirection;
         Square oldPosition = this.mapService.getSquareAtIndexXZ(this.posX, this.posZ);
         Square newPosition = walkingDirection.getNewPosition(this.mapService, this.posX, this.posZ, walkingDirection);
-        propertyChangeSupport.firePropertyChange("chicken", oldPosition, newPosition);
+        propertyChangeSupport.firePropertyChange("chicken", null, this);
 
         try {
             log.debug("Waiting " + WAITING_TIME + " sec before walking on next square.");
@@ -102,7 +102,7 @@ public class Chicken extends EatingMob implements Runnable {
         this.posZ = newPosition.getIndexZ();
         oldPosition.removeMob(this);
         newPosition.addMob(this);
-        propertyChangeSupport.firePropertyChange("chicken", oldPosition, newPosition);
+        propertyChangeSupport.firePropertyChange("chicken", null, this);
     }
 
     /**
@@ -120,7 +120,7 @@ public class Chicken extends EatingMob implements Runnable {
             log.debug("Squares chicken is seeing: {}", squares);
 
             log.debug("Current position is x {} z {}", this.posX, this.posZ);
-            this.mapService.printGameMap();
+            //this.mapService.printGameMap();
 
             List<String> newMove = executeMovementSkript(squares);
 
@@ -131,7 +131,7 @@ public class Chicken extends EatingMob implements Runnable {
             // consume snack if present
             currentPosition = this.mapService.getSquareAtIndexXZ(this.posX, this.posZ);
             if (currentPosition.getSnack() != null) {
-                log.info("Snack being eaten at x {} z {}", this.posX, this.posZ);
+                log.debug("Snack being eaten at x {} z {}", this.posX, this.posZ);
                 consumeSnackOnSquare();
             }
         }
@@ -265,5 +265,17 @@ public class Chicken extends EatingMob implements Runnable {
 
     public long getId() {
         return id;
+    }
+
+    public int getPosX() {
+        return posX;
+    }
+
+    public int getPosZ() {
+        return posZ;
+    }
+
+    public Direction getLookingDirection() {
+        return lookingDirection;
     }
 }

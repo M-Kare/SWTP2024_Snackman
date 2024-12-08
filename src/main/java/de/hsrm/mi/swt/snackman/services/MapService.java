@@ -47,7 +47,7 @@ public class MapService {
         this.filePath = filePath;
         char[][] mazeData = readMazeService.readMazeFromFile(this.filePath);
         gameMap = convertMazeDataGameMap(mazeData);
-        printGameMap();
+        //printGameMap();
     }
 
     /**
@@ -125,8 +125,7 @@ public class MapService {
 
                 newChicken.addPropertyChangeListener((PropertyChangeEvent evt) -> {
                     if (evt.getPropertyName().equals("chicken")) {
-                        FrontendChickenMessageEvent messageEvent = new FrontendChickenMessageEvent(EventType.CHICKEN, ChangeType.UPDATE,
-                                (Square) evt.getOldValue(), (Square) evt.getNewValue());
+                        FrontendChickenMessageEvent messageEvent = new FrontendChickenMessageEvent(EventType.CHICKEN, ChangeType.UPDATE, (Chicken) evt.getNewValue());
 
                         frontendMessageService.sendChickenEvent(messageEvent);
                     }
