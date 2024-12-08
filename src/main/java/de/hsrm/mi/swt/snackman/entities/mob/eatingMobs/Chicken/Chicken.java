@@ -26,17 +26,16 @@ public class Chicken extends EatingMob implements Runnable {
     private static long idCounter = 0;
     private long id;
     private final PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
-    private final Logger logger = LoggerFactory.getLogger(Chicken.class);
+    private final Logger log = LoggerFactory.getLogger(Chicken.class);
     private boolean blockingPath = false;
     private Thickness thickness = Thickness.THIN;
     private int posX;
     private int posZ;
     private Direction lookingDirection;
-    private final int MIN_DELAY = 30;
-    private final int MAX_DELAY = 30;
     private boolean isWalking;
     private MapService mapService;
     public static final int DEFAULT_HEIGHT = 2;
+    private final int WAITING_TIME = 2000;  // in ms
     // python
     private PythonInterpreter pythonInterpreter = null;
     private Properties pythonProps = new Properties();
@@ -76,34 +75,29 @@ public class Chicken extends EatingMob implements Runnable {
     }
 
     /**
-     * Chooses the next walking path based on the chicken's visible environment.
-     *
-     * @param currentlyVisibleEnvironment a list of information about the squares
-     *                                    visible around the chicken (8 squares).
-     * @return a list of directions or moves determined by the chicken's movement
-     *         script.
-     */
-    public List<String> chooseWalkingPath(List<String> currentlyVisibleEnvironment) {
-        return executeMovementSkript(currentlyVisibleEnvironment);
-    }
-
-    /**
      * Updates the chicken's position based on the chosen move and sets its new
      * direction.
      *
      * @param newMove a list representing the next move for the chicken.
      */
     private void setNewPosition(List<String> newMove) {
+        //get positions
         Direction walkingDirection = Direction.getDirection(newMove.getLast());
+        log.debug("Walking direction is: {}", walkingDirection);
+
         this.lookingDirection = walkingDirection;
-        try {
-            logger.info("Wating 1 sec before walking on next square.");
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            logger.info(e.getMessage());
-        }
         Square oldPosition = this.mapService.getSquareAtIndexXZ(this.posX, this.posZ);
-        Square newPosition = this.mapService.getNewPosition(this.posX, this.posZ, walkingDirection);
+        Square newPosition = walkingDirection.getNewPosition(this.mapService, this.posX, this.posZ, walkingDirection);
+        propertyChangeSupport.firePropertyChange("chicken", oldPosition, newPosition);
+
+        try {
+            log.debug("Waiting " + WAITING_TIME + " sec before walking on next square.");
+            Thread.sleep(WAITING_TIME);
+        } catch (InterruptedException e) {
+            log.error(e.getMessage());
+        }
+
+        // set new position
         this.posX = newPosition.getIndexX();
         this.posZ = newPosition.getIndexZ();
         oldPosition.removeMob(this);
@@ -122,36 +116,36 @@ public class Chicken extends EatingMob implements Runnable {
         while (isWalking) {
             // get 9 squares
             Square currentPosition = this.mapService.getSquareAtIndexXZ(this.posX, this.posZ);
-            List<String> squares = this.mapService.getSquaresVisibleForChicken(currentPosition);
-            squares.add(this.lookingDirection.toString());
-            List<String> newMove = chooseWalkingPath(squares);
+            List<String> squares = this.mapService.getSquaresVisibleForChicken(currentPosition, lookingDirection);
+            log.debug("Squares chicken is seeing: {}", squares);
+
+            log.debug("Current position is x {} z {}", this.posX, this.posZ);
+            this.mapService.printGameMap();
+
+            List<String> newMove = executeMovementSkript(squares);
+
             // set new square you move to
             setNewPosition(newMove);
+            log.debug("New position is x {} z {}", this.posX, this.posZ);
+
             // consume snack if present
+            currentPosition = this.mapService.getSquareAtIndexXZ(this.posX, this.posZ);
             if (currentPosition.getSnack() != null) {
+                log.info("Snack being eaten at x {} z {}", this.posX, this.posZ);
                 consumeSnackOnSquare();
             }
         }
     }
 
     /**
-     * Consumes all snacks at the chicken's current position, updating the chicken's
-     * calorie count and removing consumed snacks from the map.
-    private void consumeSnack() {
-        Square currentPosition = this.mapService.getSquareAtIndexXZ(this.posX, this.posZ);
-        this.kcal = currentPosition.getKcal();
-        this.mapService.deleteConsumedSnacks(this.currentPosition);
-    }*/
-
-    /**
      * Collects the snack on the square if there is one.
      * If there is one that remove it from the square.
      */
-    public void consumeSnackOnSquare(){
+    public void consumeSnackOnSquare() {
         Square currentSquare = this.mapService.getSquareAtIndexXZ(this.posX, this.posZ);
         Snack snackOnSquare = currentSquare.getSnack();
 
-        if(snackOnSquare != null){
+        if (snackOnSquare != null) {
             this.kcal += snackOnSquare.getCalories();
 
             //set snack to null after consuming it
@@ -164,10 +158,11 @@ public class Chicken extends EatingMob implements Runnable {
      * Sets up the required Python environment and interpreter.
      */
     public void initJython() {
-        pythonProps.setProperty("python.path", "src/main/java/de/hsrm/mi/swt/snackman/entities/mob/Chicken");
+        //pythonProps.setProperty("python.path", "src/main/java/de/hsrm/mi/swt/snackman/entities/mob/eatingMobs/Chicken/ChickenMovementSkript.py");
+        pythonProps.setProperty("python.path", "src/main/java/de/hsrm/mi/swt/snackman/entities/mob/eatingMobs/Chicken");
         PythonInterpreter.initialize(System.getProperties(), pythonProps, new String[0]);
+        log.debug("Initialised jython for chicken movement");
         this.pythonInterpreter = new PythonInterpreter();
-        logger.info("Initialised jython for chicken movement");
     }
 
     /**
@@ -179,19 +174,20 @@ public class Chicken extends EatingMob implements Runnable {
      */
     public List<String> executeMovementSkript(List<String> squares) {
         try {
-            logger.info("Running python chicken script with: {}", squares.toString());
+            log.debug("Running python chicken script with: {}", squares.toString());
             pythonInterpreter.exec("from ChickenMovementSkript import choose_next_square");
             PyObject func = pythonInterpreter.get("choose_next_square");
             PyObject result = func.__call__(new PyList(squares));
 
             if (result instanceof PyList) {
                 PyList pyList = (PyList) result;
+                log.debug("Python chicken script return: {}", pyList);
                 return convertPythonList(pyList);
             }
 
             throw new Exception("Python chicken script did not load.");
         } catch (Exception ex) {
-            logger.error("Error while executing chicken python script: ", ex);
+            log.error("Error while executing chicken python script: ", ex);
             ex.printStackTrace();
         }
         return squares;
@@ -208,7 +204,7 @@ public class Chicken extends EatingMob implements Runnable {
         for (Object item : pyList) {
             javaList.add(item.toString());
         }
-        logger.info("Python script result is {}", javaList.toString());
+        log.debug("Python script result is {}", javaList);
         return javaList;
     }
 
@@ -255,13 +251,16 @@ public class Chicken extends EatingMob implements Runnable {
     }
 
     /**
-     * @todo zurück auskommentieren, damit chicken sich bewegen kann ->
-     *       voraussetzung dafür: es muss global der state des gesammten backends an
-     *       das frontend geschickt werden!!
+     * starts a thread for moving the chicken
      */
     @Override
     public void run() {
-        // move();
+        try {
+            Thread.sleep(WAITING_TIME);
+            move();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public long getId() {
