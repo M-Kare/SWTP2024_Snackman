@@ -3,7 +3,7 @@
         <h1 id="title"> New Lobby </h1>
 
         <form id="form">
-            <p>Lobby Name: </p>
+            <p>Enter Name: </p>
             <input v-model.trim="lobbyName" type="text">
         </form>
 
@@ -70,7 +70,7 @@
     width: 60%;
     max-width: 600px;
     height: 25%;
-    background: rgb(202, 83, 83);
+    background: #172D54;
     border-radius: 0.3rem;
 }
 

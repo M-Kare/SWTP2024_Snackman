@@ -54,7 +54,7 @@
     import { ref } from 'vue';
 
     const router = useRouter();
-    const showNewLobbyForm = ref(true); // TODO - change to false, true for testing
+    const showNewLobbyForm = ref(false);
 
     const backToMainMenu = () => {
         router.push({name: "MainMenu"});
@@ -111,7 +111,7 @@
 
 .outer-box {
     position: absolute;
-    top: 12%;
+    top: 20%;
     left: 50%;
     transform: translateX(-50%);
     width: 70%;
@@ -127,10 +127,13 @@
     left: 50%;
     transform: translateX(-50%);
     width: 90%;
-    height: 80%;
+    height: auto;
+    max-height: 80%;
     background: rgba(255, 255, 255, 70%);
     border-radius: 0.3rem;
-    overflow-y: scroll;
+    color: #000000;
+    overflow-y: auto;
+    scrollbar-width: thin;
 }
 
 .inner-box > ul {
@@ -152,8 +155,13 @@
     margin: 1rem;
 }
 
+.lobby-list-items:hover {
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
 .small-nav-buttons {
     bottom: 3%;
+    font-weight: bold;
 }
 
 #darken-background {
