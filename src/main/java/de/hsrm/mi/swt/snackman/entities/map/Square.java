@@ -4,6 +4,7 @@ import de.hsrm.mi.swt.snackman.entities.mapObject.MapObjectType;
 import de.hsrm.mi.swt.snackman.entities.mapObject.snack.Snack;
 import de.hsrm.mi.swt.snackman.entities.mob.Mob;
 import de.hsrm.mi.swt.snackman.entities.mob.Ghost;
+import de.hsrm.mi.swt.snackman.entities.mob.eatingMobs.Chicken.Chicken;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
@@ -96,6 +97,7 @@ public class Square {
             return  "W";
         } else if (type == MapObjectType.FLOOR) {
             if(this.mobs.stream().anyMatch(mob -> mob instanceof Ghost)) return "G";
+            //if(this.mobs.stream().anyMatch(mob -> mob instanceof Chicken)) return "C";
             else if(this.snack != null) return "S";
         }
         return "L";
@@ -111,5 +113,16 @@ public class Square {
 
     public void removeMob(Mob mob) {
         this.mobs.remove(mob);
+    }
+
+    @Override
+    public String toString() {
+        return "Square{" +
+                "indexX=" + indexX +
+                ", indexZ=" + indexZ +
+                ", type=" + type +
+                ", snack=" + snack +
+                ", mobs=" + mobs +
+                '}';
     }
 }
