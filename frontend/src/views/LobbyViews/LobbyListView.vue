@@ -23,10 +23,10 @@
                 <li
                     v-for="lobby in lobbies"
                     class="lobby-list-items"
-                    @click="showTest">
+                    @click="enterLobby(lobby)">
 
                     <div class="lobby-name">
-                        {{ lobby.lobbyNumber }}
+                        {{ lobby.lobbyName }}
                     </div>
                     <div class="playercount">
                         {{ lobby.playerCount }} / {{ maxPlayerCount }}
@@ -68,25 +68,30 @@
         showNewLobbyForm.value = false;
     }
 
-    const showTest = () => {
-        alert("Test");
+    const enterLobby = (lobby: Lobby) => {
+        router.push({name: "LobbyView", params: {lobbyName: lobby.lobbyName}});
     }
 
     // TODO - Connection to Backend
-    const maxPlayerCount = "4";
-    const lobbies = ref([
-        {lobbyNumber: "Lobby 1", playerCount: "1"},
-        {lobbyNumber: "Lobby 2", playerCount: "3"},
-        {lobbyNumber: "Lobby 3", playerCount: "4"},
-        {lobbyNumber: "Lobby x", playerCount: "4"},
-        {lobbyNumber: "Lobby x", playerCount: "4"},
-        {lobbyNumber: "Lobby x", playerCount: "4"},
-        {lobbyNumber: "Lobby x", playerCount: "4"},
-        {lobbyNumber: "Lobby x", playerCount: "4"},
-        {lobbyNumber: "Lobby x", playerCount: "4"},
-        {lobbyNumber: "Lobby x", playerCount: "4"},
-        {lobbyNumber: "Lobby x", playerCount: "4"},
-        {lobbyNumber: "Lobby x", playerCount: "4"}
+    // TODO - refacgor for BackEnd
+    interface Lobby {
+        lobbyName: string,
+        playerCount: number
+    }
+    const maxPlayerCount = 4;
+    const lobbies = ref<Lobby[]>([
+        {lobbyName: "Lobby 1", playerCount: 1},
+        {lobbyName: "Lobby 2", playerCount: 3},
+        {lobbyName: "Lobby 3", playerCount: 4},
+        {lobbyName: "Lobby x", playerCount: 4},
+        {lobbyName: "Lobby x", playerCount: 4},
+        {lobbyName: "Lobby x", playerCount: 4},
+        {lobbyName: "Lobby x", playerCount: 4},
+        {lobbyName: "Lobby x", playerCount: 4},
+        {lobbyName: "Lobby x", playerCount: 4},
+        {lobbyName: "Lobby x", playerCount: 4},
+        {lobbyName: "Lobby x", playerCount: 4},
+        {lobbyName: "Lobby x", playerCount: 4}
     ]);
 
 

@@ -54,9 +54,9 @@
     const router = useRouter();
 
     // Backend-Connection
-    const lobbyName = ref('LobbyName'); // replace with emitted value from CreateLobbyForm.vue
-    const playerCount = ref('3');
-    const maxPlayerCount = ref('4');
+    const lobbyName = ref('LobbyName'); // TODO - Placeholder
+    const playerCount = ref(3);
+    const maxPlayerCount = ref(4);
     const players = ref([
         {name: "Player 1", character: "Snackman"},
         {name: "Player 2", character: "Ghost"},
