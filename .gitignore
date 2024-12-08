@@ -38,3 +38,4 @@ out/
 
 .DS_Store
 
+src/main/java/de/hsrm/mi/swt/snackman/entities/mob/eatingMobs/Chicken/ChickenMovementSkript$py.class
