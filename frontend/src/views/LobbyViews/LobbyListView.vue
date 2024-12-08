@@ -1,20 +1,18 @@
 <template>
     <MenuBackground></MenuBackground>
 
-    <!-- <Test></Test> -->
-
     <h1 class="title">Lobbies</h1>
     <div class="outer-box">
         <SmallNavButton
             id="menu-back-button"
-            class="nav-buttons"
+            class="small-nav-buttons"
             @click="backToMainMenu">
             
             Back
         </SmallNavButton>
         <SmallNavButton
             id="show-lobby-creation-button"
-            class="nav-buttons"
+            class="small-nav-buttons"
             @click="showCreateLobbyForm">
 
             Create new Lobby
@@ -152,6 +150,10 @@
     font-size: 1.2rem;
     padding: 0.5rem;
     margin: 1rem;
+}
+
+.small-nav-buttons {
+    bottom: 3%;
 }
 
 #darken-background {

@@ -2,9 +2,8 @@
     <div id="form-box">
         <h1 id="title"> New Lobby </h1>
 
-        <!-- Input-Form -->
         <form id="form">
-            <p>Name: </p>
+            <p>Lobby Name: </p>
             <input v-model.trim="lobbyName" type="text">
         </form>
 
@@ -28,14 +27,15 @@
 <script setup lang="ts">
     import SmallNavButton from '@/components/SmallNavButton.vue';
     import { useRouter } from 'vue-router';
+    import { ref } from 'vue';
 
     const router = useRouter();
 
-    // const lobbyName = ref('');
+    const lobbyName = ref('');
 
     const emit = defineEmits<{
-        (event: 'cancelLobbyCreation', value: boolean)
-        (event: 'createLobby', value: string)
+        (event: 'cancelLobbyCreation', value: boolean): void;
+        (event: 'createLobby', value: string): void;
     }>()
 
     const cancelLobbyCreation = () => {
@@ -84,13 +84,16 @@
 }
 
 #form > input {
-    width: 50vw;
+    font-size: 1.2rem;
+    width: 90%;
     height: 2rem;
-    padding: 1rem;
+    margin-top: 0.2rem;
+    padding: 1.2rem;
 }
 
 .small-nav-buttons {
-    font-size: 0.8rem;
+    bottom: 7%;
+    font-size: 0.9rem;
     font-weight: bold;
     padding: 0.5rem;
     height: 2rem;

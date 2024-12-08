@@ -14,7 +14,6 @@
 <style scoped>
 .small-nav-button {
     position: inherit;
-    bottom: 3%;
     font-size: 1.2rem;
     width: auto;
     padding: 1rem;
