@@ -18,4 +18,13 @@ public record FrontendChickenMessageEvent(EventType eventType, ChangeType change
     public Chicken chicken() {
         return chicken;
     }
+
+    @Override
+    public String toString() {
+        return "FrontendChickenMessageEvent{" +
+                "eventType=" + eventType +
+                ", changeType=" + changeType +
+                ", chicken=" + chicken +
+                '}';
+    }
 }

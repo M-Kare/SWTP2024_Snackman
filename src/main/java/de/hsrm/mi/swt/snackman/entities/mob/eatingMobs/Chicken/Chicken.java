@@ -278,4 +278,15 @@ public class Chicken extends EatingMob implements Runnable {
     public Direction getLookingDirection() {
         return lookingDirection;
     }
+
+    @Override
+    public String toString() {
+        return "Chicken{" +
+                "thickness=" + thickness +
+                ", posX=" + posX +
+                ", posZ=" + posZ +
+                ", lookingDirection=" + lookingDirection +
+                ", kcal=" + kcal +
+                '}';
+    }
 }
