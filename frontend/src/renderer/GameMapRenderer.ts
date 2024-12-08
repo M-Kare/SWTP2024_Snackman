@@ -67,15 +67,14 @@ export const GameMapRenderer = () => {
           scene.add(snackToAdd)
           gameMapStore.setSnackMeshId(id, snackToAdd.id)
         }
-        //add chickens to square
-        if (square.chickens.length > 0) {
-          square.chickens.forEach((currentChicken, chickenIndex) => {
-            const chickenToAdd = gameObjectRenderer.createChickenOnFloor(square.indexX * DEFAULT_SIDE_LENGTH + OFFSET, square.indexZ * DEFAULT_SIDE_LENGTH + OFFSET, DEFAULT_SIDE_LENGTH, currentChicken.thickness);
-            scene.add(chickenToAdd);
-            gameMapStore.setChickenMeshId(id, chickenToAdd.id, chickenIndex);
-          });
-        }
       }
+    }
+    // add chickens
+    for(let currentChicken of mapData.chickens){
+      console.log("Added chicken at position: {} {}", currentChicken.posX, currentChicken.posZ)
+      const chickenToAdd = gameObjectRenderer.createChickenOnFloor(currentChicken.posX * DEFAULT_SIDE_LENGTH + OFFSET, currentChicken.posZ * DEFAULT_SIDE_LENGTH + OFFSET, DEFAULT_SIDE_LENGTH, currentChicken.thickness);
+      scene.add(chickenToAdd);
+      gameMapStore.setChickenMeshId(chickenToAdd.id, currentChicken.id);
     }
   }
 
