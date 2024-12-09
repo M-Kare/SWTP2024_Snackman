@@ -58,7 +58,7 @@ function animate() {
   fps = 1 / clock.getDelta()
   player.updatePlayer();
   if (counter >= fps / targetHz) {
-    console.log(`${player.getCamera().position.x}  |  ${player.getCamera().position.z}`)
+    // console.log(`${player.getCamera().position.x}  |  ${player.getCamera().position.z}`)
     const time = performance.now()
     const delta = (time - prevTime) / 1000
     try {
@@ -82,16 +82,11 @@ function animate() {
   renderer.render(scene, camera)
 }
 
-onMounted(async () => {
+onMounted(async () =>{
 // for rendering the scene, create gameMap in 3d and change window size
   const {initRenderer, createGameMap, getScene} = GameMapRenderer()
   scene = getScene()
   renderer = initRenderer(canvasRef.value)
-
-  const playerData = await fetchSnackManFromBackend();
-  player = new Player(renderer, playerData.posX, playerData.posY, playerData.posZ, playerData.radius, playerData.speed)
-  camera = player.getCamera()
-  scene.add(player.getControls().object)
 
   //Add gameMap
   try {
@@ -105,6 +100,11 @@ onMounted(async () => {
   } catch (error) {
     console.error('Error when retrieving the gameMap:', error)
   }
+
+  const playerData = await fetchSnackManFromBackend();
+  player = new Player(renderer, playerData.posX, playerData.posY, playerData.posZ, playerData.radius, playerData.speed)
+  camera = player.getCamera()
+  scene.add(player.getControls().object)
 
   renderer.render(scene, camera)
   renderer.setAnimationLoop(animate)

@@ -1,3 +1,6 @@
+import { useGameMapStore } from '@/stores/gameMapStore';
+import { MapObjectType, type IGameMap } from '@/stores/IGameMapDTD';
+import type { ISquare } from '@/stores/Square/ISquareDTD';
 import type { WebGLRenderer } from 'three'
 import * as THREE from 'three'
 import { PointerLockControls } from 'three/addons/controls/PointerLockControls.js'
@@ -21,25 +24,9 @@ export class Player {
   private movementDirection: THREE.Vector3;
 
   //TODO: ersetzten durch das maze im pinia store
-  private HARDCODED_SQUARE_SIZE = 4;
-  private geilesHardgecodetesMaze: string[][] = [
-    ['#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#'],
-    ['#', ' ', ' ', ' ', '#', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '#'],
-    ['#', '#', '#', ' ', '#', ' ', '#', '#', '#', '#', '#', '#', '#', ' ', '#'],
-    ['#', ' ', ' ', ' ', '#', ' ', ' ', ' ', '#', ' ', ' ', ' ', ' ', ' ', '#'],
-    ['#', ' ', '#', '#', '#', '#', '#', ' ', '#', '#', '#', '#', '#', ' ', '#'],
-    ['#', ' ', '#', ' ', ' ', ' ', ' ', ' ', '#', ' ', ' ', ' ', '#', ' ', '#'],
-    ['#', ' ', '#', '#', '#', ' ', ' ', ' ', ' ', ' ', '#', ' ', '#', '#', '#'],
-    ['#', ' ', ' ', ' ', '#', ' ', ' ', ' ', ' ', ' ', '#', ' ', ' ', ' ', '#'],
-    ['#', '#', '#', ' ', '#', '#', ' ', ' ', ' ', ' ', '#', '#', '#', ' ', '#'],
-    ['#', ' ', ' ', ' ', '#', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '#'],
-    ['#', ' ', '#', '#', '#', ' ', '#', '#', '#', '#', '#', '#', '#', ' ', '#'],
-    ['#', ' ', '#', ' ', ' ', ' ', '#', ' ', ' ', ' ', '#', ' ', ' ', ' ', '#'],
-    ['#', ' ', '#', ' ', '#', '#', '#', ' ', '#', ' ', '#', ' ', '#', '#', '#'],
-    ['#', ' ', ' ', ' ', '#', ' ', ' ', ' ', '#', ' ', ' ', ' ', ' ', ' ', '#'],
-    ['#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#']
-  ];
-  private currentSquare: { x: number, z: number };
+  private squareSize: Readonly<number>;
+  private gameMap: ISquare[][];
+  private currentSquare: ISquare;
 
   /**
    * Initialises the Player as a camera
@@ -59,12 +46,20 @@ export class Player {
     this.canJump = true;
     this.movementDirection = new THREE.Vector3();
 
-    this.currentSquare = { x: this.calcMapIndexOfCoordinate(posX), z: this.calcMapIndexOfCoordinate(posY) }
+    const { mapContent } = useGameMapStore();
+    this.squareSize = mapContent.DEFAULT_SQUARE_SIDE_LENGTH;
+
+    const mapArray = Array.from(mapContent.gameMap.values())
+    let lastSquare = mapArray[mapArray.length-1]
+    console.log(lastSquare?.indexX!+1, lastSquare?.indexZ!+1)
+    this.gameMap = this.reshapeArray(mapArray, lastSquare?.indexX!+1, lastSquare?.indexZ!+1) // lastSquare is of type ISquare|undefined because promise
+
+    this.currentSquare = this.gameMap[this.calcMapIndexOfCoordinate(posX)][this.calcMapIndexOfCoordinate(posY)];
 
     this.radius = radius;
     this.speed = speed;
 
-    this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100)
+    this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 60)
     this.camera.position.set(posX, posY, posZ)
     this.controls = new PointerLockControls(this.camera, renderer.domElement)
     document.addEventListener('keydown', (event) => { this.onKeyDown(event) })
@@ -72,8 +67,19 @@ export class Player {
     document.addEventListener('click', () => { this.controls.lock() })
   }
 
+  private reshapeArray(arr: Array<any>, rows: number, cols: number) {
+    const result = new Array(rows);
+    for (let x = 0; x < rows; x++) {
+      result[x] = new Array(cols);
+      for (let z = 0; z < cols; z++) {
+        result[x][z] = arr[x * cols + z];
+      }
+    }
+    return result;
+  }
+
   public calcMapIndexOfCoordinate(a: number): number {
-    return Math.floor(a / this.HARDCODED_SQUARE_SIZE);
+    return Math.floor(a / this.squareSize);
   }
 
   public getCamera(): THREE.PerspectiveCamera {
@@ -174,6 +180,7 @@ export class Player {
   public updatePlayer() {
     const time = performance.now()
     const delta = (time - this.prevTime) / 1000
+    let result = 3;
 
     this.movementDirection.z = Number(this.moveForward) - Number(this.moveBackward)
     this.movementDirection.x = Number(this.moveRight) - Number(this.moveLeft)
@@ -194,7 +201,7 @@ export class Player {
     move.z = move.z * delta * this.speed
     const xNew = this.camera.position.x + move.x;
     const zNew = this.camera.position.z + move.z;
-    const result = this.checkWallCollision(xNew, zNew);
+    result = this.checkWallCollision(xNew, zNew);
     switch (result) {
       case 0:
         this.camera.position.x += move.x;
@@ -211,7 +218,6 @@ export class Player {
       default:
         break;
     }
-    console.log(result)
     this.setCurrentSquareWithIndex(this.camera.position.x, this.camera.position.z);
     this.prevTime = time
   }
@@ -223,7 +229,7 @@ export class Player {
    * @param z z-position
    */
   public setCurrentSquareWithIndex(x: number, z: number) {
-    this.currentSquare = { x: this.calcMapIndexOfCoordinate(x), z: this.calcMapIndexOfCoordinate(z) };
+    this.currentSquare = this.gameMap[this.calcMapIndexOfCoordinate(x)][this.calcMapIndexOfCoordinate(z)];
   }
 
   /**
@@ -238,27 +244,23 @@ export class Player {
    * 3 = both / diagonal collision / corner
    */
   public checkWallCollision(x: number, z: number): number {
-    const wall = '#'
-    const floor = ' '
-    let squareLeftRight: { indexX: number, indexZ: number, type: string }
-    let squareTopBottom: { indexX: number, indexZ: number, type: string }
-    let squareDiagonal: { indexX: number, indexZ: number, type: string }
+    let squareLeftRight: ISquare;
+    let squareTopBottom: ISquare;
+    let squareDiagonal: ISquare;
     let collisionCase = 0;
 
-    const squareCenterX = this.currentSquare.x * this.HARDCODED_SQUARE_SIZE + this.HARDCODED_SQUARE_SIZE / 2;
-    const squareCenterZ = this.currentSquare.z * this.HARDCODED_SQUARE_SIZE + this.HARDCODED_SQUARE_SIZE / 2;
+    const squareCenterX = this.currentSquare.indexX * this.squareSize + this.squareSize / 2;
+    const squareCenterZ = this.currentSquare.indexZ * this.squareSize + this.squareSize / 2;
 
     const horizontalRelativeToCenter = (x - squareCenterX <= 0) ? -1 : 1;
     const verticalRelativeToCenter = (z - squareCenterZ <= 0) ? -1 : 1;
-    console.log(this.currentSquare.x + horizontalRelativeToCenter)
-    squareLeftRight = { indexX: this.currentSquare.x + horizontalRelativeToCenter, indexZ: this.currentSquare.z, type: this.geilesHardgecodetesMaze[this.currentSquare.x + horizontalRelativeToCenter][this.currentSquare.z] };
-    squareTopBottom = { indexX: this.currentSquare.x, indexZ: this.currentSquare.z + verticalRelativeToCenter, type: this.geilesHardgecodetesMaze[this.currentSquare.x][this.currentSquare.z + verticalRelativeToCenter] };
-    squareDiagonal = { indexX: this.currentSquare.x + horizontalRelativeToCenter, indexZ: this.currentSquare.z + verticalRelativeToCenter, type: this.geilesHardgecodetesMaze[this.currentSquare.x + horizontalRelativeToCenter][this.currentSquare.z + verticalRelativeToCenter] };
-    console.log(squareLeftRight)
-    if (squareLeftRight.type == wall) {
+    squareLeftRight = this.gameMap[this.currentSquare.indexX + horizontalRelativeToCenter][this.currentSquare.indexZ];
+    squareTopBottom = this.gameMap[this.currentSquare.indexX][this.currentSquare.indexZ + verticalRelativeToCenter];
+    squareDiagonal = this.gameMap[this.currentSquare.indexX + horizontalRelativeToCenter][this.currentSquare.indexZ + verticalRelativeToCenter];
+    if (squareLeftRight.type === MapObjectType.WALL) {
       const origin = new THREE.Vector3(
-        horizontalRelativeToCenter > 0 ? (this.currentSquare.x + 1) * this.HARDCODED_SQUARE_SIZE
-          : this.currentSquare.x * this.HARDCODED_SQUARE_SIZE,
+        horizontalRelativeToCenter > 0 ? (this.currentSquare.indexX + 1) * this.squareSize
+          : this.currentSquare.indexX * this.squareSize,
         0, 1);
       const line = new THREE.Vector3(0, 1, 0);
       if (this.calcIntersectionWithLine(x, z, origin, line)) {
@@ -266,10 +268,10 @@ export class Player {
       }
     }
 
-    if (squareTopBottom.type == wall) {
+    if (squareTopBottom.type === MapObjectType.WALL) {
       const origin = new THREE.Vector3(0,
-        verticalRelativeToCenter > 0 ? (this.currentSquare.z + 1) * this.HARDCODED_SQUARE_SIZE
-          : this.currentSquare.z * this.HARDCODED_SQUARE_SIZE,
+        verticalRelativeToCenter > 0 ? (this.currentSquare.indexZ + 1) * this.squareSize
+          : this.currentSquare.indexZ * this.squareSize,
         1);
       const line = new THREE.Vector3(1, 0, 0);
       if (this.calcIntersectionWithLine(x, z, origin, line)) {
@@ -277,11 +279,11 @@ export class Player {
       }
     }
 
-    if (squareDiagonal.type == wall && collisionCase == 0) {
-      const diagX = horizontalRelativeToCenter > 0 ? (this.currentSquare.x + 1) * this.HARDCODED_SQUARE_SIZE
-        : this.currentSquare.x * this.HARDCODED_SQUARE_SIZE;
-      const diagZ = verticalRelativeToCenter > 0 ? (this.currentSquare.z + 1) * this.HARDCODED_SQUARE_SIZE
-        : this.currentSquare.z * this.HARDCODED_SQUARE_SIZE;
+    if (squareDiagonal.type === MapObjectType.WALL && collisionCase == 0) {
+      const diagX = horizontalRelativeToCenter > 0 ? (this.currentSquare.indexX + 1) * this.squareSize
+        : this.currentSquare.indexX * this.squareSize;
+      const diagZ = verticalRelativeToCenter > 0 ? (this.currentSquare.indexZ + 1) * this.squareSize
+        : this.currentSquare.indexZ * this.squareSize;
       const dist = Math.sqrt((diagX - x) * (diagX - x) + (diagZ - z) * (diagZ - z));
       if (dist <= this.radius)
         collisionCase = 3;
