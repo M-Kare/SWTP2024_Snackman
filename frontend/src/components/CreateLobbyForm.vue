@@ -3,7 +3,7 @@
         <h1 id="title"> New Lobby </h1>
 
         <form id="form">
-            <p>Enter Name: </p>
+            <label>Enter Name: </label>
             <input v-model.trim="lobbyName" type="text">
         </form>
 
@@ -42,7 +42,6 @@
         emit('cancelLobbyCreation', false);
     }
 
-    // TODO: How to emit name entered in form?
     const createLobby = () => { 
         router.push({name: 'Lobby'});
     }
@@ -69,7 +68,7 @@
     transform: translateX(-50%);
     width: 60%;
     max-width: 600px;
-    height: 30%;
+    height: 20rem;
     max-height: 400px;
     background: #172D54;
     border-radius: 0.3rem;
