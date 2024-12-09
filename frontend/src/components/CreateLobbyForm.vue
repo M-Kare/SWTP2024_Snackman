@@ -29,10 +29,11 @@
     import { useRouter } from 'vue-router';
     import { computed, onMounted, ref } from 'vue';
     import { useLobbiesStore } from '@/stores/lobbiesstore';
+    import type { IPlayerClientDTD } from '@/stores/IPlayerClientDTD';
 
     const router = useRouter();
     const lobbiesStore = useLobbiesStore();
-    const currentPlayer = lobbiesStore.lobbydata.currentPlayer;
+    const currentPlayer = lobbiesStore.lobbydata.currentPlayer as IPlayerClientDTD;
     
     const lobbyName = ref('');
 
@@ -60,23 +61,30 @@
             return;
         }
 
-        if (lobbyName.value.trim() && adminClient.playerId !== '' && adminClient.playerName !== ''){
-            try{
-                await lobbiesStore.createLobby(lobbyName.value.trim(), adminClient);
+        const isDuplicateName = lobbiesStore.lobbydata.lobbies.some(
+            (lobby) => lobby.name === lobbyName.value.trim()
+        );
+
+        if (isDuplicateName) {
+            alert("Lobby name already exists! Please choose another name.");
+            return;
+        }
+
+        try{
+            const newLobby = await lobbiesStore.createLobby(lobbyName.value.trim(), adminClient);
+            if (newLobby && newLobby.uuid) {
                 alert("Lobby created successfully!");
-                lobbiesStore.updateLobbies();
+                await lobbiesStore.updateLobbies();
                 cancelLobbyCreation();
-                router.push({name: "LobbyList"});
-            } catch (error: any){
-                console.error('Error:', error);
-                alert("Error create Lobby!");
+                router.push({ name: "Lobby", params: { lobbyId: newLobby.uuid } });
+            } else {
+                throw new Error("Lobby creation returned invalid response.");
             }
+        } catch (error: any){
+            console.error('Error:', error);
+            alert("Error create Lobby!");
         }
     }
-
-    onMounted(() => {
-        lobbiesStore.updateLobbies();
-    })
 
 </script>
 

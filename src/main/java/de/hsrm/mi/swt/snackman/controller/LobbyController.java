@@ -80,6 +80,17 @@ public class LobbyController {
       }
 
       /**
+       * Find a Lobby with lobby UUID
+       * @param lobbyId Lobby UUID
+       * @return {@link lobby} object
+       */
+      @GetMapping("/{lobbyId}")
+      public ResponseEntity<Lobby> findLobbyById(@PathVariable("lobbyId") String lobbyId){
+            Lobby lobby = lobbyManagerService.findLobbyByUUID(lobbyId);
+            return ResponseEntity.ok(lobby);
+      }
+
+      /**
        * Adds a player to an existing lobby.
        * 
        * @param lobbyId  the ID of the lobby to join
@@ -88,7 +99,7 @@ public class LobbyController {
        *         the lobby has already started
        */
       @PostMapping("/{lobbyId}/join")
-      public ResponseEntity<Lobby> joinLobby(@PathVariable String lobbyId, @RequestParam String playerId) {
+      public ResponseEntity<Lobby> joinLobby(@PathVariable("lobbyId") String lobbyId, @RequestParam("playerId") String playerId) {
             try {
                   Lobby joiningLobby = lobbyManagerService.joinLobby(lobbyId, playerId);
                   messagingTemplate.convertAndSend("/topic/lobbies/" + lobbyId, joiningLobby);
@@ -108,7 +119,7 @@ public class LobbyController {
        * @return a {@link ResponseEntity} with an HTTP 200 OK status
        */
       @PostMapping("/{lobbyId}/leave")
-      public ResponseEntity<Void> leaveLobby(@PathVariable String lobbyId, @RequestParam String playerId) {
+      public ResponseEntity<Void> leaveLobby(@PathVariable("lobbyId") String lobbyId, @RequestParam("playerId") String playerId) {
             lobbyManagerService.leaveLobby(lobbyId, playerId);
             messagingTemplate.convertAndSend("/topic/lobbies/" + lobbyId, lobbyManagerService.findLobbyByUUID(lobbyId));
 
@@ -122,7 +133,7 @@ public class LobbyController {
        * @return a {@link ResponseEntity} with an HTTP 200 OK status
        */
       @PostMapping("/{lobbyId}/start")
-      public ResponseEntity<Void> startGame(@PathVariable String lobbyId) {
+      public ResponseEntity<Void> startGame(@PathVariable("lobbyId") String lobbyId) {
             lobbyManagerService.startGame(lobbyId);
             messagingTemplate.convertAndSend("/topic/lobbies/" + lobbyId, lobbyManagerService.findLobbyByUUID(lobbyId));
 

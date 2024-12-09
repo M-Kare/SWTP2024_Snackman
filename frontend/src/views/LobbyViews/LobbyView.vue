@@ -1,7 +1,7 @@
 <template>
     <MenuBackground></MenuBackground>
 
-    <h1 class="title"> {{ lobbyName }} </h1>
+    <h1 class="title"> {{ lobby?.name || 'Lobby Name' }} </h1>
     <div class="outer-box">
         <SmallNavButton
             id="menu-back-button"
@@ -25,15 +25,15 @@
         <div class="inner-box">
             <ul>
                 <li
-                    v-for="player in players"
+                    v-for="member in members"
                     class="player-list-items">
 
                     <div class="player-name">
-                        {{ player.name }}
+                        {{ member.playerName }}
                     </div>
 
                     <div class="player-character">
-                        {{ player.character }}
+                        {{ member.role }}
                     </div>
 
                 </li>
@@ -48,21 +48,48 @@
     import MenuBackground from '@/components/MenuBackground.vue';
     import SmallNavButton from '@/components/SmallNavButton.vue';
 
-    import { useRouter } from 'vue-router';
-    import { ref } from 'vue';
+    import { useRoute, useRouter } from 'vue-router';
+    import { computed, onMounted, ref } from 'vue';
+    import type { ILobbyDTD } from '@/stores/ILobbyDTD';
+    import { useLobbiesStore } from '@/stores/lobbiesstore';
+    import type { IPlayerClientDTD } from '@/stores/IPlayerClientDTD';
 
     const router = useRouter();
+    const route = useRoute();
+    const lobbiesStore = useLobbiesStore();
+
+    const lobby = ref<ILobbyDTD | null>(null);
+    const members = computed(() => lobby.value?.members || [] as Array<IPlayerClientDTD>);
+    const playerCount = computed(() => members.value.length);
+    const maxPlayerCount = ref(4);
+    
+    onMounted(async () => {
+        const lobbyId = route.params.lobbyId as string;
+        if (!lobbyId) {
+            console.error('Lobby ID is missing!');
+            return;
+        }
+
+        lobby.value = await lobbiesStore.fetchLobbyById(lobbyId);
+
+        if(!lobby.value){
+            alert('Lobby not found or failed to load.');
+            router.push({name: "LobbyList"});
+        }
+
+        await lobbiesStore.updateLobbies();
+    })
 
     // Backend-Connection
-    const lobbyName = ref('LobbyName'); // TODO - Placeholder
-    const playerCount = ref(3);
-    const maxPlayerCount = ref(4);
-    const players = ref([
-        {name: "Player 1", character: "Snackman"},
-        {name: "Player 2", character: "Ghost"},
-        {name: "Player 3", character: "Ghost"},
-        {name: "Player 4", character: "Ghost"}
-    ]);
+    // const lobbyName = ref('LobbyName'); // TODO - Placeholder
+    // const playerCount = ref(3);
+    // const maxPlayerCount = ref(4);
+    // const players = ref([
+    //     {name: "Player 1", character: "Snackman"},
+    //     {name: "Player 2", character: "Ghost"},
+    //     {name: "Player 3", character: "Ghost"},
+    //     {name: "Player 4", character: "Ghost"}
+    // ]);
 
     const backToLobbyList = () => {
         router.push({name: "LobbyList"});

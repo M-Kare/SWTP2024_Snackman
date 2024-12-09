@@ -31,7 +31,7 @@
                 <li
                     v-for="lobby in lobbies" :key="lobby.uuid"
                     class="lobby-list-items"
-                    @click="enterLobby(lobby.uuid)">
+                    @click="joinLobby(lobby)">
 
                     <div class="lobby-name">
                         {{ lobby.name }}
@@ -40,7 +40,6 @@
                     <div class="playercount">
                         {{ lobby.members.length }} / {{ maxPlayerCount }}
                     </div>
-                    
                 </li>
             </ul>
         </div>
@@ -63,12 +62,14 @@
     import { useRouter } from 'vue-router';
     import { computed, onMounted, ref } from 'vue';
     import { useLobbiesStore } from '@/stores/lobbiesstore';
+    import type { ILobbyDTD } from '@/stores/ILobbyDTD';
+    import type { IPlayerClientDTD } from '@/stores/IPlayerClientDTD';
 
     const router = useRouter();
     const lobbiesStore = useLobbiesStore();
 
-    const lobbies = computed(() => lobbiesStore.lobbydata.lobbies);
-    const currentPlayer = lobbiesStore.lobbydata.currentPlayer;
+    const lobbies = computed(() => lobbiesStore.lobbydata.lobbies as Array<ILobbyDTD>);
+    const currentPlayer = lobbiesStore.lobbydata.currentPlayer as IPlayerClientDTD;
     const showNewLobbyForm = ref(false);
 
     const backToMainMenu = () => {
@@ -84,14 +85,28 @@
     }
 
     //join in lobby
-    const enterLobby = (lobby: any) => {
-        router.push({name: "Lobby", params: {lobbyName: lobby.name}});
+    const joinLobby = async (lobby: ILobbyDTD) => {
+        //router.push({name: "Lobby", params: {lobbyName: lobby.name}});
+
+        if(lobby.members.length >= maxPlayerCount){
+            alert(`Lobby "${lobby.name}" is full! Please select another one.`);
+            return;
+        }
+
+        try{
+            const joinedLobby = await lobbiesStore.joinLobby(lobby.uuid, currentPlayer.playerId);
+
+            if(joinedLobby) {
+                console.log('Successfully joined lobby', joinedLobby.name);
+                await lobbiesStore.updateLobbies();
+                router.push({ name: "Lobby", params: { lobbyId: lobby.uuid } });
+            }
+        } catch (error: any){
+            console.error('Error:', error);
+            alert("Error join Lobby!");
+        }
     }
 
-    interface Lobby {
-        lobbyName: string,
-        playerCount: number
-    }
     const maxPlayerCount = 4;
     // const lobbies = ref<Lobby[]>([
     //     {lobbyName: "Lobby 1", playerCount: 1},
@@ -108,14 +123,14 @@
     //     {lobbyName: "Lobby x", playerCount: 4}
     // ]);
 
-    onMounted(() => {
+    onMounted(async () => {
         if (!lobbiesStore.lobbydata.currentPlayer || lobbiesStore.lobbydata.currentPlayer.playerId === '' || lobbiesStore.lobbydata.currentPlayer.playerName === '') {
             lobbiesStore.createPlayer('Player Test');
         }
 
         console.log("Current Player:", lobbiesStore.lobbydata.currentPlayer);
 
-        //lobbiesStore.updateLobbies()
+        await lobbiesStore.updateLobbies();
     })
 
 </script>

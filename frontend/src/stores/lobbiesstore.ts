@@ -12,18 +12,21 @@ export const useLobbiesStore = defineStore("lobbiesstore", () =>{
         lobbies: [] as Array<ILobbyDTD>,
         currentPlayer: {
             playerId: '',
-            playerName: ''
+            playerName: '',
+            role: '',
         } as IPlayerClientDTD //PlayerClient for each window, for check the sync
     })
 
     let stompclient: Client | null = null
 
-    // Each Window have only one Admin Client, for create new lobby, then join in another lobby, they become the normal player
+    // Each Window have only one Admin Client, for create new lobby
+    // then join in another lobby, they become the normal player
     // For Test all Players have the same name 'Player Test'
     async function createPlayer(name: string){
         const newPlayerClient: IPlayerClientDTD = {
             playerId: '',
             playerName: name,
+            role: '',
         }
 
         try{
@@ -38,8 +41,7 @@ export const useLobbiesStore = defineStore("lobbiesstore", () =>{
 
             if(response.ok){
                 const newPlayer = await response.json()
-                lobbydata.currentPlayer.playerId = newPlayer.playerId
-                lobbydata.currentPlayer.playerName = newPlayer.playerName
+                lobbydata.currentPlayer = newPlayer
             } else {
                 const errorText = await response.text()
                 console.error('Failed to create a new player client:', errorText)
@@ -80,12 +82,12 @@ export const useLobbiesStore = defineStore("lobbiesstore", () =>{
         stompclient = new Client({ brokerURL: wsurl })
 
         stompclient.onConnect = (frame) => {
-            stompclient!.subscribe(DEST, (message) => {
+            stompclient!.subscribe(DEST, async (message) => {
                 const eventobject = JSON.parse(message.body)
 
                 if(eventobject.eventType == 'LOBBY'){
-                    updateLobbies()
-                    console.log('Received lobby update:', eventobject);
+                    console.log('Received lobby update:', eventobject)
+                    await updateLobbies()
                 }
             })
         }
@@ -97,7 +99,7 @@ export const useLobbiesStore = defineStore("lobbiesstore", () =>{
         stompclient.activate()
     }
 
-    async function createLobby(lobbyName: string, adminClient: IPlayerClientDTD) {
+    async function createLobby(lobbyName: string, adminClient: IPlayerClientDTD): Promise<ILobbyDTD | null> {
         const newLobby: ILobbyDTD = {
             uuid: '',
             name: lobbyName,
@@ -117,25 +119,89 @@ export const useLobbiesStore = defineStore("lobbiesstore", () =>{
             })
 
             if(response.ok){
-                const lobby = await response.json()
+                const lobby: ILobbyDTD = await response.json()
                 lobbydata.lobbies.push(lobby)
+                await updateLobbies()
+                return lobby
             } else {
-                const errorText = await response.text()
-                console.error('Failed to create lobby:', errorText)
+                console.error('Failed to create lobby. Status:', response.status)
+                return null
             }
 
         } catch (error: any){
             console.error('Error:', error)
+            return null
         }
     }
 
+    async function joinLobby(lobbyId: string, playerId: string): Promise<ILobbyDTD | null> {
+        try{
+            const currentLobby = await fetchLobbyById(lobbyId);
+            if (currentLobby && currentLobby.members.length >= 4) {
+                console.error('Lobby is full. Cannot join.');
+                alert(`Lobby "${currentLobby.name}" is full!`);
+                return null;
+            }
 
+            const url = `/api/lobbies/` + lobbyId + `/join?playerId=` + playerId
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+            })
+
+            if(response.status == 409){
+                console.error("Game has already started. Cannot joint the lobby.")
+                return null
+            }
+
+            if(response.ok){
+                const lobby: ILobbyDTD = await response.json()
+                console.log('lobbiesStore joinLobby successful')
+                await updateLobbies()
+                return lobby
+            } else {
+                console.error('Failed to join lobby. Status:', response.status)
+                return null
+            }
+
+        } catch (error: any){
+            console.error('Error:', error)
+            return null
+        }
+    }
+
+    async function fetchLobbyById(lobbyId: String): Promise<ILobbyDTD | null> {
+        try{
+            const url = `/api/lobbies/` + lobbyId
+            const response = await fetch(url, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+            })
+
+            if(!response.ok){
+                throw new Error(`HTTP error! status: ${response.status}`)
+            }
+
+            const lobby: ILobbyDTD = await response.json()
+            console.log('Fetched Lobby: ', lobby)
+            return lobby
+        } catch (error: any){
+            console.error('Error:', error)
+            return null
+        } 
+    }
 
     return{
         lobbydata,
+        createPlayer,
         updateLobbies,
         startLobbyLiveUpdate,
         createLobby,
-        createPlayer,
+        joinLobby,
+        fetchLobbyById,
     }
 })

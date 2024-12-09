@@ -26,7 +26,7 @@ const router = createRouter({
             props: true
         },
         {
-            path: '/LobbyView',
+            path: '/LobbyView/:lobbyId',
             name: 'Lobby',
             component: LobbyView,
             props: true
