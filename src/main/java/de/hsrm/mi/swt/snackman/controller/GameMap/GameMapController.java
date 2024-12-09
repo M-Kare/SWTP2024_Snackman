@@ -15,7 +15,7 @@ import de.hsrm.mi.swt.snackman.services.MapService;
 
 /**
  * REST Controller for handling map-related API requests
- * This controller provides endpoints for retrieving maze data
+ * This controller provides endpoints for retrieving game map data
  */
 @RestController
 // enable Cross-Origin Resource Sharing (CORS) for requests coming from the specified origin
@@ -28,9 +28,9 @@ public class GameMapController {
     Logger log = LoggerFactory.getLogger(MapService.class);
 
     @GetMapping("/game-map")
-    public ResponseEntity<GameMap> getGameMap() {
+    public ResponseEntity<GameMapDTO> getGameMap() {
         log.debug("Get GameMap");
-        return ResponseEntity.ok(mapService.getGameMap());
+        return ResponseEntity.ok(GameMapDTO.fromGameMap(mapService.getGameMap()));
     }
 
     @GetMapping("/snackman")

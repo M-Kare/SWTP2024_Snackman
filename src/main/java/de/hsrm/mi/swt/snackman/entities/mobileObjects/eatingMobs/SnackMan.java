@@ -22,7 +22,7 @@ public class SnackMan extends EatingMob {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'loseKcal'");
     }
-    
+
     public void jump(){
 
     }
@@ -43,5 +43,29 @@ public class SnackMan extends EatingMob {
 
     }
 
+    @Override
+    public void move(double x, double y, double z) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'move'");
+    }
 
+    public int getCurrentCalories() {
+        return currentCalories;
+    }
+
+    /**
+     * Collects the snack on the square if there is one.
+     * If there is one that remove it from the square.
+     * @param square to eat the snack from
+     */
+    public void consumeSnackOnSquare(Square square){
+        Snack snackOnSquare = square.getSnack();
+
+        if(snackOnSquare != null){
+            currentCalories += snackOnSquare.getCalories();
+
+            //set snack to null after consuming it
+            square.setSnack(null);
+        }
+    }
 }

@@ -1,15 +1,19 @@
 import * as THREE from 'three'
-import {type IGameMapDTD, MapObjectType} from "@/stores/IGameMapDTD";
+import {type IGameMap, MapObjectType} from "@/stores/IGameMapDTD";
 import {SnackType} from "@/stores/Snack/ISnackDTD";
+import {useGameMapStore} from "@/stores/gameMapStore";
 
 /**
- * for rendering the maze
+ * for rendering the game map
  */
-export const MazeRenderer = () => {
+export const GameMapRenderer = () => {
+  const gameMapStore = useGameMapStore()
+  const scene = gameMapStore.getScene()
+
   // create new three.js scene
   const GROUNDSIZE = 1000
   let renderer: THREE.WebGLRenderer
-  const scene = new THREE.Scene()
+
 
   // set up light
   const light = new THREE.DirectionalLight(0xffffff, 1)
@@ -59,29 +63,27 @@ export const MazeRenderer = () => {
     return renderer
   }
 
-  const createMaze = (mazeData: IGameMapDTD) => {
-    const OFFSET = mazeData.default_SQUARE_SIDE_LENGTH/2 
-    const DEFAULT_SIDE_LENGTH = mazeData.default_SQUARE_SIDE_LENGTH
-    const WALL_HEIGHT = mazeData.default_WALL_HEIGHT
+  const createGameMap = (mapData: IGameMap) => {
+    const OFFSET = mapData.DEFAULT_SQUARE_SIDE_LENGTH / 2
+    const DEFAULT_SIDE_LENGTH = mapData.DEFAULT_SQUARE_SIDE_LENGTH
+    const WALL_HEIGHT = mapData.DEFAULT_WALL_HEIGHT
 
     createGround()
 
-    const gameMap = mazeData.gameMap
+    // Iterate through map data and create walls
+    for (const [id, square] of mapData.gameMap) {
+      if (square.type === MapObjectType.WALL) {
+        // Create wall at position (x, 0, z) -> y = 0 because of 'building the walls'
+        createWall(square.indexX * DEFAULT_SIDE_LENGTH + OFFSET, 0, square.indexZ * DEFAULT_SIDE_LENGTH + OFFSET, WALL_HEIGHT, DEFAULT_SIDE_LENGTH)
+      }
+      if (square.type === MapObjectType.FLOOR) {
+        const squareToAdd = createFloorSquare(square.indexX * DEFAULT_SIDE_LENGTH + OFFSET, square.indexZ * DEFAULT_SIDE_LENGTH + OFFSET, DEFAULT_SIDE_LENGTH)
+        scene.add(squareToAdd)
 
-    for (let i = 0; i < gameMap.length; i++) {
-      for (let j = 0; j < gameMap[i].length; j++) {
-        const square = gameMap[i][j]
-
-        if (square.type === MapObjectType.WALL) {
-          // Create wall at position (x, 0, z) -> y = 0 because of 'building the walls'
-          createWall(square.indexX*DEFAULT_SIDE_LENGTH+OFFSET, 0, square.indexZ*DEFAULT_SIDE_LENGTH+OFFSET, WALL_HEIGHT, DEFAULT_SIDE_LENGTH)
-        }
-        if (square.type === MapObjectType.FLOOR) {
-          createFloorSquare(square.indexX*DEFAULT_SIDE_LENGTH+OFFSET, square.indexZ*DEFAULT_SIDE_LENGTH+OFFSET, DEFAULT_SIDE_LENGTH)
-
-          for (const snack of square.snacks) {
-            createSnackOnFloor(square.indexX*DEFAULT_SIDE_LENGTH+OFFSET, square.indexZ*DEFAULT_SIDE_LENGTH+OFFSET, DEFAULT_SIDE_LENGTH, snack.snackType)
-          }
+        if (square.snack != null) {
+          const snackToAdd = createSnackOnFloor(square.indexX * DEFAULT_SIDE_LENGTH + OFFSET, square.indexZ * DEFAULT_SIDE_LENGTH + OFFSET, DEFAULT_SIDE_LENGTH, square.snack?.snackType)
+          scene.add(snackToAdd)
+          gameMapStore.setSnackMeshId(id, snackToAdd.id)
         }
       }
     }
@@ -114,7 +116,7 @@ export const MazeRenderer = () => {
 
     snack.position.set(xPosition, 0, zPosition)
 
-    scene.add(snack)
+    return snack
   }
 
   const createFloorSquare = (
@@ -128,9 +130,10 @@ export const MazeRenderer = () => {
     const squareGeometry = new THREE.BoxGeometry(sideLength, squareHeight, sideLength)
     const square = new THREE.Mesh(squareGeometry, squareMaterial)
 
-    // Position the wall
+    // Position the square
     square.position.set(xPosition, 0, zPosition)
-    scene.add(square)
+
+    return square
   }
 
   const createGround = () => {
@@ -150,5 +153,5 @@ export const MazeRenderer = () => {
     return scene
   }
 
-  return {initRenderer, createMaze, getScene}
+  return {initRenderer, createGameMap, getScene}
 }

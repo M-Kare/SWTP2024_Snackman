@@ -3,7 +3,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, onUnmounted, ref } from 'vue'
+import {onMounted, onUnmounted, ref} from 'vue'
 import * as THREE from 'three'
 import { Client } from '@stomp/stompjs'
 import { Player } from '@/components/Player';
@@ -17,7 +17,7 @@ const DEST = '/topic/player'
 const targetHz = 30
 
 // stomp
-const stompclient = new Client({ brokerURL: WSURL })
+const stompclient = new Client({brokerURL: WSURL})
 stompclient.onWebSocketError = event => {
   //console.log(event)
 }
@@ -46,7 +46,6 @@ let prevTime = performance.now();
 let camera: THREE.PerspectiveCamera;
 
 
-
 // used to calculate fps in animate()
 const clock = new THREE.Clock();
 let fps: number;
@@ -65,7 +64,12 @@ function animate() {
       //Sende and /topic/player/update
       stompclient.publish({
         destination: DEST + "/update", headers: {},
-        body: JSON.stringify(Object.assign({}, player.getInput(), { qX: player.getCamera().quaternion.x, qY: player.getCamera().quaternion.y, qZ: player.getCamera().quaternion.z, qW: player.getCamera().quaternion.w }, { delta: delta }))
+        body: JSON.stringify(Object.assign({}, player.getInput(), {
+          qX: player.getCamera().quaternion.x,
+          qY: player.getCamera().quaternion.y,
+          qZ: player.getCamera().quaternion.z,
+          qW: player.getCamera().quaternion.w
+        }, {delta: delta}))
       });
     } catch (fehler) {
       console.log(fehler)
@@ -78,8 +82,8 @@ function animate() {
 }
 
 onMounted(async () => {
-  // for rendering the scene, create maze in 3d and change window size
-  const { initRenderer, createMaze, getScene } = MazeRenderer()
+// for rendering the scene, create gameMap in 3d and change window size
+  const {initRenderer, createGameMap, getScene} = GameMapRenderer()
   scene = getScene()
   renderer = initRenderer(canvasRef.value)
 
@@ -88,12 +92,17 @@ onMounted(async () => {
   camera = player.getCamera()
   scene.add(player.getControls().object)
 
-  //Add maze
+  //Add gameMap
   try {
-    const mazeData = await fetchMazeDataFromBackend()
-    createMaze(mazeData)
+    const gameMapStore = useGameMapStore()
+    await gameMapStore.initGameMap()
+
+    const mapContent = gameMapStore.mapContent
+    createGameMap(mapContent as IGameMap)
+
+    await gameMapStore.startGameMapLiveUpdate()
   } catch (error) {
-    console.error('Error when retrieving the maze:', error)
+    console.error('Error when retrieving the gameMap:', error)
   }
 
   renderer.render(scene, camera)

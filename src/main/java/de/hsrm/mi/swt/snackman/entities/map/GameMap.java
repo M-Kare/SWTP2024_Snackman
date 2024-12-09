@@ -10,7 +10,7 @@ public class GameMap {
 
     private final int DEFAULT_WALL_HEIGHT = GameConfig.SQUARE_HEIGHT;
 
-    //Schachbrettform //TODO in englsich
+    //Like a chessboard for better handling of collision
     private Square[][] gameMap;
 
     /**
