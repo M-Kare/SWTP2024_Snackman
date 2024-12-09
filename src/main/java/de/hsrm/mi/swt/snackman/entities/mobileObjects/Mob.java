@@ -26,25 +26,26 @@ public abstract class Mob {
     private double radius;
     private Quaterniond quat;
     private Square currentSquare;
+    private int speed;
 
     private MapService mapService;
     private GameMap gameMap;
 
-    public Mob(MapService mapService) {
-        super();
-
+    public Mob(MapService mapService, int speed, double radius) {
+        this.speed = speed;
+        this.radius = radius;
         this.mapService = mapService;
         gameMap = this.mapService.getGameMap();
         posY = GameConfig.SNACKMAN_GROUND_LEVEL;
-        posX = (gameMap.getGameMap().length / 2) * GameConfig.SQUARE_SIZE;
-        posZ = (gameMap.getGameMap()[0].length / 2) * GameConfig.SQUARE_SIZE;
+        posX = (gameMap.getGameMap().length / 2.0) * GameConfig.SQUARE_SIZE;
+        posZ = (gameMap.getGameMap()[0].length / 2.0) * GameConfig.SQUARE_SIZE;
         radius = GameConfig.SNACKMAN_RADIUS;
         quat = new Quaterniond();
         setCurrentSquareWithIndex(posX, posZ);
     }
 
-    public Mob(MapService mapService, double posX, double posY, double posZ) {
-        this(mapService);
+    public Mob(MapService mapService, int speed, double radius, double posX, double posY, double posZ) {
+        this(mapService, speed, radius);
 
         this.posX = posX;
         this.posY = posY;
@@ -126,14 +127,12 @@ public abstract class Mob {
             move.x += moveDirX;
         }
 
-        System.out.println("Before: " + move.x + "  |  " + move.z);
         move.rotate(quat);
         move.y = 0;
-        System.out.println("After: " + move.x + "  |  " + move.z);
         if(!(move.x == 0 && move.z == 0))
             move.normalize();
-        move.x = move.x * delta * GameConfig.SNACKMAN_SPEED;
-        move.z = move.z * delta * GameConfig.SNACKMAN_SPEED;
+        move.x = move.x * delta * speed;
+        move.z = move.z * delta * speed;
         double xNew = posX + move.x;
         double zNew = posZ + move.z;
         try{
@@ -154,7 +153,7 @@ public abstract class Mob {
                 posX += move.x;
                 break;
             case 3:
-                break;
+                return;
             default:
                 break;
         }
@@ -165,9 +164,14 @@ public abstract class Mob {
     public void respawn() {
         this.posX = (gameMap.getGameMap().length / 2) * GameConfig.SQUARE_SIZE;
         this.posZ = (gameMap.getGameMap()[0].length / 2) * GameConfig.SQUARE_SIZE;
+        setCurrentSquareWithIndex(posX, posZ);
     }
 
     public int checkWallCollision(double x, double z) throws IndexOutOfBoundsException {
+        if (gameMap.getSquareAtIndexXZ(calcMapIndexOfCoordinate(x), calcMapIndexOfCoordinate(z)).getType() == MapObjectType.WALL) {
+            return 3;
+        }
+
         int collisionCase = 0;
 
         double squareCenterX = currentSquare.getIndexX() * GameConfig.SQUARE_SIZE + GameConfig.SQUARE_SIZE / 2;

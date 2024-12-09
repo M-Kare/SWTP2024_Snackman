@@ -21,12 +21,12 @@ public class Square {
 
     private List<Snack> snacks;
 
-    public Square(int indexX, int indexY) {
+    public Square(int indexX, int indexZ) {
         id = generateId();
         type = MapObjectType.FLOOR;
         snacks = new ArrayList<>();
         this.indexX = indexX;
-        this.indexZ = indexY;
+        this.indexZ = indexZ;
     }
 
     public Square(MapObjectType type, int indexX, int indexZ) {

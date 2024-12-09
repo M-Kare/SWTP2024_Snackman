@@ -4,12 +4,11 @@ import de.hsrm.mi.swt.snackman.services.MapService;
 
 public class SnackMan extends EatingMob {
 
-    public SnackMan(MapService mapService){
-        super(mapService);
-    }
+    public SnackMan(MapService mapService, int speed, double radius){
+        super(mapService, speed, radius);    }
 
-    public SnackMan(MapService mapService, double posX, double posY, double posZ){
-        super(mapService, posX, posY, posZ);
+    public SnackMan(MapService mapService, int speed, double radius, double posX, double posY, double posZ){
+        super(mapService, speed, radius, posX, posY, posZ);
     }
 
     @Override
