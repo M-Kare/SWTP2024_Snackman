@@ -52,13 +52,15 @@ public class LobbyController {
                   return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
             }
 
-            logger.info("Creating lobby with name: {} and creatorUuid: {}", name, creatorUuid);
-            PlayerClient client = lobbyManagerService.getClient(name, creatorUuid);
+            
+            //PlayerClient client = lobbyManagerService.getClient(name, creatorUuid);
+            PlayerClient client = lobbyManagerService.getClient("Player Test", creatorUuid);
 
             try {
                   Lobby newLobby = lobbyManagerService.createLobby(name, client);
                   messagingTemplate.convertAndSend("/topic/lobbies", lobbyManagerService.getAllLobbies());
-
+                  logger.info("Creating lobby with name: {} and creatorUuid: {}", name, creatorUuid);
+                  
                   return ResponseEntity.ok(newLobby);
             } catch (LobbyAlreadyExistsException e) {
                   logger.error("Error occurred: ", e);

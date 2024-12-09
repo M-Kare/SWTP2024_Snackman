@@ -22,11 +22,11 @@
                     </div>
 
                     <div class="lobby-members">
-                        {{ lobby.members.length }}
+                        {{ lobby.members.length }} / {{ maxPlayerCount }}
                     </div>
 
                     <div class="admin-info">
-                        {{ lobby.adminClient?.playerId }}
+                        {{ lobby.adminClient?.playerName }}
                     </div>
                     <!--
                     <div class="playercount">
@@ -47,22 +47,26 @@
     import { useLobbiesStore } from '@/stores/lobbiesstore';
     import type { ILobbyDTD } from '@/stores/ILobbyDTD';
 
-    const router = useRouter();
-    const lobbiesStore = useLobbiesStore();
+    const router = useRouter()
+    const lobbiesStore = useLobbiesStore()
+
+    const maxPlayerCount = "4"
 
     const lobbies = computed(() => lobbiesStore.lobbydata.lobbies)
     const currentPlayer = lobbiesStore.lobbydata.currentPlayer
 
     const backToMainMenu = () => {
-        router.push({name: "MainMenu"});
+        router.push({name: "MainMenu"})
     }
 
     const createLobby = async () => {
         const lobbyName = prompt("Enter Lobby Name: ")
         const adminClient = currentPlayer
+        adminClient.playerId = currentPlayer.playerId
+        adminClient.playerName = currentPlayer.playerName
 
         if (!adminClient || adminClient.playerId === '' || adminClient.playerName === '') {
-            alert("Admin client is not valid!");
+            alert("Admin client is not valid!")
             return;
         }
 
@@ -81,13 +85,10 @@
     const showLobbyDetails = (lobby: ILobbyDTD) => {
         alert(`Lobby Details\nName: ${lobby.name}\nUUID: ${lobby.uuid}`)
     }
-
-    // TODO - Connection to Backend
-    const maxPlayerCount = "4";
     
     onMounted(() => {
         if (!lobbiesStore.lobbydata.currentPlayer || lobbiesStore.lobbydata.currentPlayer.playerId === '' || lobbiesStore.lobbydata.currentPlayer.playerName === '') {
-            lobbiesStore.createAdminPlayer()
+            lobbiesStore.createPlayer('Player Test')
         }
 
         console.log("Current Player:", lobbiesStore.lobbydata.currentPlayer)

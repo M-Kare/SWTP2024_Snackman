@@ -4,13 +4,11 @@ import { Client } from '@stomp/stompjs';
 import type { IPlayerClientDTD } from './IPlayerClientDTD';
 import type { ILobbyDTD } from './ILobbyDTD';
 
-
 const wsurl = `ws://${window.location.host}/stompbroker`
 const DEST = 'topic/lobbies'
 
 export const useLobbiesStore = defineStore("lobbiesstore", () =>{
     const lobbydata = reactive({
-        ok: false, 
         lobbies: [] as Array<ILobbyDTD>,
         currentPlayer: {
             playerId: '',
@@ -21,18 +19,52 @@ export const useLobbiesStore = defineStore("lobbiesstore", () =>{
     let stompclient: Client | null = null
 
     // Each Window have only one Admin Client, for create new lobby, then join in another lobby, they become the normal player
-    async function createAdminPlayer(){
-        const sessionNumber = Math.floor(Math.random() * 100000).toString()
-        const playerClient: IPlayerClientDTD = {
-            playerId: sessionNumber,
-            playerName: 'Player Test',
+    // For Test all Players have the same name 'Player Test'
+    async function createPlayer(name: string){
+        const newPlayerClient: IPlayerClientDTD = {
+            playerId: '',
+            playerName: name,
         }
 
-        lobbydata.currentPlayer.playerId = playerClient.playerId;
-        lobbydata.currentPlayer.playerName = playerClient.playerName;
+        try{
+            const url = `/api/playerclients/create?name=${name}`
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(newPlayerClient)
+            })
 
-        console.log()
-        return playerClient
+            if(response.ok){
+                const newPlayer = await response.json()
+                lobbydata.currentPlayer.playerId = newPlayer.playerId
+                lobbydata.currentPlayer.playerName = newPlayer.playerName
+            } else {
+                const errorText = await response.text()
+                console.error('Failed to create a new player client:', errorText)
+            }
+
+            return newPlayerClient
+
+        } catch (error: any){
+            console.error('Error: ', error)
+            
+        }
+        
+        
+
+        // const sessionNumber = Math.floor(Math.random() * 100000).toString()
+        // const playerClient: IPlayerClientDTD = {
+        //     playerId: sessionNumber,
+        //     playerName: 'Player Test',
+        // }
+
+        // lobbydata.currentPlayer.playerId = playerClient.playerId;
+        // lobbydata.currentPlayer.playerName = playerClient.playerName;
+
+        // console.log()
+        // return playerClient
     }
 
     async function updateLobbies(): Promise<void>{
@@ -44,13 +76,11 @@ export const useLobbiesStore = defineStore("lobbiesstore", () =>{
 
             const data = await response.json()
             lobbydata.lobbies = data
-            lobbydata.ok = true
 
             startLobbyLiveUpdate()
 
         } catch (error: any){
             console.error('Error:', error)
-            lobbydata.ok = false
         }
     }
 
@@ -109,17 +139,13 @@ export const useLobbiesStore = defineStore("lobbiesstore", () =>{
             if(response.ok){
                 const lobby = await response.json()
                 lobbydata.lobbies.push(lobby)
-                lobbydata.ok = true
-                
             } else {
                 const errorText = await response.text()
                 console.error('Failed to create lobby:', errorText)
-                lobbydata.ok = false
             }
 
         } catch (error: any){
             console.error('Error:', error)
-            lobbydata.ok = false
         }
     }
 
@@ -130,6 +156,6 @@ export const useLobbiesStore = defineStore("lobbiesstore", () =>{
         updateLobbies,
         startLobbyLiveUpdate,
         createLobby,
-        createAdminPlayer,
+        createPlayer,
     }
 })
