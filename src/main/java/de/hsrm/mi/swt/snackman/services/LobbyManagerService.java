@@ -20,6 +20,7 @@ public class LobbyManagerService {
       private final List<Lobby> lobbies = new ArrayList<>();
       private final List<PlayerClient> clients = new ArrayList<>();
 
+      
       /**
        * Create a new client
        * 

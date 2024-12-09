@@ -33,6 +33,7 @@ public class LobbyController {
 
       @Autowired
       private LobbyManagerService lobbyManagerService;
+      
       @Autowired
       private SimpMessagingTemplate messagingTemplate;
       private final Logger logger = LoggerFactory.getLogger(LobbyController.class);

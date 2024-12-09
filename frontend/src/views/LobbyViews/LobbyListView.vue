@@ -3,6 +3,10 @@
 
     <h1 class="title">Lobbies</h1>
     <div class="outer-box">
+        <div class="player-info" v-if="currentPlayer">
+            <p>Player ID:   {{ currentPlayer.playerId }}</p>
+            <p>Player Name: {{ currentPlayer.playerName }}</p>
+        </div>
         <SmallNavButton id="menu-back-button" class="nav-buttons" @click="backToMainMenu"> Back </SmallNavButton>
         <SmallNavButton id="create-lobby-button" class="nav-buttons" @click="createLobby"> Create Lobby </SmallNavButton>
 
@@ -17,6 +21,13 @@
                         {{ lobby.uuid }}
                     </div>
 
+                    <div class="lobby-members">
+                        {{ lobby.members.length }}
+                    </div>
+
+                    <div class="admin-info">
+                        {{ lobby.adminClient?.playerId }}
+                    </div>
                     <!--
                     <div class="playercount">
                         {{ lobby.playerCount }} / {{ maxPlayerCount }}
@@ -32,15 +43,15 @@
     import MenuBackground from '@/components/MenuBackground.vue';
     import SmallNavButton from '@/components/SmallNavButton.vue';
     import { useRouter } from 'vue-router';
-    import { computed, ref } from 'vue';
+    import { computed, onMounted, ref } from 'vue';
     import { useLobbiesStore } from '@/stores/lobbiesstore';
     import type { ILobbyDTD } from '@/stores/ILobbyDTD';
-    import type { IPlayerClientDTD } from '@/stores/IPlayerClientDTD';
 
     const router = useRouter();
     const lobbiesStore = useLobbiesStore();
 
     const lobbies = computed(() => lobbiesStore.lobbydata.lobbies)
+    const currentPlayer = lobbiesStore.lobbydata.currentPlayer
 
     const backToMainMenu = () => {
         router.push({name: "MainMenu"});
@@ -48,18 +59,18 @@
 
     const createLobby = async () => {
         const lobbyName = prompt("Enter Lobby Name: ")
-        if (lobbyName){
-            try{
+        const adminClient = currentPlayer
 
-                //Player-Data just for Test
-                const sessionNumber = Math.floor(Math.random() * 100000).toString()
-                const adminPlayer: IPlayerClientDTD = {
-                    playerId: sessionNumber,
-                    playerName: "playerTest",
-                }
-                
-                await lobbiesStore.createLobby(lobbyName, adminPlayer)
+        if (!adminClient || adminClient.playerId === '' || adminClient.playerName === '') {
+            alert("Admin client is not valid!");
+            return;
+        }
+
+        if (lobbyName && adminClient.playerId !== '' && adminClient.playerName !== ''){
+            try{
+                await lobbiesStore.createLobby(lobbyName, adminClient)
                 alert("Lobby created successfully!")
+                lobbiesStore.updateLobbies()
             } catch (error: any){
                 console.error('Error:', error)
                 alert("Error create Lobby!")
@@ -73,22 +84,16 @@
 
     // TODO - Connection to Backend
     const maxPlayerCount = "4";
-    // const lobbies = ref([
-    //     {lobbyNumber: "Lobby 1", playerCount: "1"},
-    //     {lobbyNumber: "Lobby 2", playerCount: "3"},
-    //     {lobbyNumber: "Lobby 3", playerCount: "4"},
-    //     {lobbyNumber: "Lobby x", playerCount: "4"},
-    //     {lobbyNumber: "Lobby x", playerCount: "4"},
-    //     {lobbyNumber: "Lobby x", playerCount: "4"},
-    //     {lobbyNumber: "Lobby x", playerCount: "4"},
-    //     {lobbyNumber: "Lobby x", playerCount: "4"},
-    //     {lobbyNumber: "Lobby x", playerCount: "4"},
-    //     {lobbyNumber: "Lobby x", playerCount: "4"},
-    //     {lobbyNumber: "Lobby x", playerCount: "4"},
-    //     {lobbyNumber: "Lobby x", playerCount: "4"}
-    // ]);
+    
+    onMounted(() => {
+        if (!lobbiesStore.lobbydata.currentPlayer || lobbiesStore.lobbydata.currentPlayer.playerId === '' || lobbiesStore.lobbydata.currentPlayer.playerName === '') {
+            lobbiesStore.createAdminPlayer()
+        }
 
+        console.log("Current Player:", lobbiesStore.lobbydata.currentPlayer)
 
+        lobbiesStore.updateLobbies()
+    })
 
 </script>
 
