@@ -10,19 +10,7 @@ import de.hsrm.mi.swt.snackman.entities.mapObject.MapObjectType;
 import de.hsrm.mi.swt.snackman.services.MapService;
 
 public abstract class Mob {
-    // private Square square;
-
-    // public void setSquare(Square square){
-    // this.square = square;
-    // }
-
-    // public Square getSquare(){
-    // return this.square;
-    // }
-
-    private double posX;
-    private double posY;
-    private double posZ;
+    private Vector3d position;
     private double radius;
     private Quaterniond quat;
     private Square currentSquare;
@@ -31,50 +19,65 @@ public abstract class Mob {
     private MapService mapService;
     private GameMap gameMap;
 
+    private Vector3d spawn;
+
+    /**
+     * Base constructor for Map with spawn-location at center of Map
+     * @param mapService MapService of the map the mob is located on
+     * @param speed speed of the mob
+     * @param radius size of the mob
+     */
     public Mob(MapService mapService, int speed, double radius) {
         this.speed = speed;
         this.radius = radius;
         this.mapService = mapService;
         gameMap = this.mapService.getGameMap();
-        posY = GameConfig.SNACKMAN_GROUND_LEVEL;
-        posX = (gameMap.getGameMap().length / 2.0) * GameConfig.SQUARE_SIZE;
-        posZ = (gameMap.getGameMap()[0].length / 2.0) * GameConfig.SQUARE_SIZE;
+        spawn = new Vector3d((gameMap.getGameMap()[0].length / 2.0) * GameConfig.SQUARE_SIZE, GameConfig.SNACKMAN_GROUND_LEVEL, (gameMap.getGameMap()[0].length / 2.0) * GameConfig.SQUARE_SIZE);
+        position = new Vector3d(spawn);
         radius = GameConfig.SNACKMAN_RADIUS;
         quat = new Quaterniond();
-        setCurrentSquareWithIndex(posX, posZ);
+        setCurrentSquareWithIndex(position.x, position.z);
     }
 
+    /**
+     * Constructor for Mob with custom spawn point
+     * @param mapService MapService of the map the mob is located on
+     * @param speed speed of the mob
+     * @param radius size of the mob
+     * @param posX x-spawn-position
+     * @param posY y-spawn-positon
+     * @param posZ z-spawn-position
+     */
     public Mob(MapService mapService, int speed, double radius, double posX, double posY, double posZ) {
         this(mapService, speed, radius);
 
-        this.posX = posX;
-        this.posY = posY;
-        this.posZ = posZ;
-        setCurrentSquareWithIndex(posX, posZ);
+        spawn = new Vector3d(posX, posY, posZ);
+        position = new Vector3d(spawn);
+        setCurrentSquareWithIndex(position.x, position.z);
     }
 
     public double getPosX() {
-        return posX;
+        return position.x;
     }
 
     public void setPosX(double posX) {
-        this.posX = posX;
+        position.x = posX;
     }
 
     public double getPosY() {
-        return posY;
+        return position.y;
     }
 
     public void setPosY(double posY) {
-        this.posY = posY;
+        this.position.y = posY;
     }
 
     public double getPosZ() {
-        return posZ;
+        return position.z;
     }
 
     public void setPosZ(double posZ) {
-        this.posZ = posZ;
+        this.position.z = posZ;
     }
 
     public double getRadius() {
@@ -89,18 +92,30 @@ public abstract class Mob {
         return currentSquare;
     }
 
+    /**
+     * Calculates the square-indices to set the currentSquare
+     * @param x x-position
+     * @param z z-position
+     */
     public void setCurrentSquareWithIndex(double x, double z) {
             currentSquare = gameMap.getSquareAtIndexXZ(calcMapIndexOfCoordinate(x), calcMapIndexOfCoordinate(z));
     }
 
+    /**
+     * Teleports player to given coordinates
+     * @param posX x-position
+     * @param posY y-position
+     * @param posZ z-position
+     */
     public void move(double posX, double posY, double posZ) {
         this.setPosX(posX);
         this.setPosY(posY);
         this.setPosZ(posZ);
-        this.setCurrentSquareWithIndex(this.posX, this.posZ);
+        this.setCurrentSquareWithIndex(this.position.x, this.position.z);
     }
 
     /**
+     * Moves the player based on inputs and passed time since last update (delta). Forward is relative to the rotation of the player and handled by a quaternion.
      * Result:
      * 0 = no blocked movement direction
      * 1 = blocked x movement direction
@@ -110,7 +125,7 @@ public abstract class Mob {
      * @param b input backward pressed?
      * @param l input left pressed?
      * @param r input right pressed?
-     * @param delta 
+     * @param delta time since last update 
      */
     public void move(boolean f, boolean b, boolean l, boolean r, double delta) {
         System.out.println(currentSquare.getIndexX() + "  |  " + currentSquare.getIndexZ());
@@ -133,8 +148,8 @@ public abstract class Mob {
             move.normalize();
         move.x = move.x * delta * speed;
         move.z = move.z * delta * speed;
-        double xNew = posX + move.x;
-        double zNew = posZ + move.z;
+        double xNew = position.x + move.x;
+        double zNew = position.z + move.z;
         try{
             result = checkWallCollision(xNew, zNew);
         } catch (IndexOutOfBoundsException e){
@@ -143,30 +158,44 @@ public abstract class Mob {
         }
         switch (result) {
             case 0:
-                posX += move.x;
-                posZ += move.z;
+                position.x += move.x;
+                position.z += move.z;
                 break;
             case 1:
-                posZ += move.z;
+                position.z += move.z;
                 break;
             case 2:
-                posX += move.x;
+                position.x += move.x;
                 break;
             case 3:
                 return;
             default:
                 break;
         }
-        setCurrentSquareWithIndex(posX, posZ);
+        setCurrentSquareWithIndex(position.x, position.z);
     }
 
     // TODO: SnackMan spawn in MapService benötigt
+    /**
+     * respawns the mob at his spawn-location
+     */
     public void respawn() {
-        this.posX = (gameMap.getGameMap().length / 2) * GameConfig.SQUARE_SIZE;
-        this.posZ = (gameMap.getGameMap()[0].length / 2) * GameConfig.SQUARE_SIZE;
-        setCurrentSquareWithIndex(posX, posZ);
+        this.position.x = (gameMap.getGameMap().length / 2) * GameConfig.SQUARE_SIZE;
+        this.position.z = (gameMap.getGameMap()[0].length / 2) * GameConfig.SQUARE_SIZE;
+        setCurrentSquareWithIndex(position.x, position.z);
     }
 
+    /**
+   * firstly determines which walls are close and need to be checked for collision
+   * secondly checks for collision with the walls (checks if target location is a wall and if player circle overlaps any walls)
+   * @param x target x-position
+   * @param z target z-position
+   * @returns the type of collision represented as an int
+   * 0 = no collision
+   * 1 = horizontal collision
+   * 2 = vertical collision
+   * 3 = both / diagonal collision / corner
+   */
     public int checkWallCollision(double x, double z) throws IndexOutOfBoundsException {
         if (gameMap.getSquareAtIndexXZ(calcMapIndexOfCoordinate(x), calcMapIndexOfCoordinate(z)).getType() == MapObjectType.WALL) {
             return 3;
@@ -222,6 +251,14 @@ public abstract class Mob {
         return collisionCase;
     }
 
+    /**
+   * calculates whether the player-cirlce intersects with a line
+   * @param xNew target x-position
+   * @param zNew target z-position
+   * @param origin 
+   * @param direction 
+   * @returns 
+   */
     public boolean calcIntersectionWithLine(double xNew, double zNew, Vector3d origin, Vector3d direction) {
         Vector3d line = origin.cross(direction);
         double dist = Math.abs(line.x * xNew + line.y * zNew + line.z) / Math.sqrt(line.x * line.x + line.y * line.y);

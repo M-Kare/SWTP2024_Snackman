@@ -14,6 +14,7 @@ import { fetchSnackManFromBackend } from '@/services/SnackManInitService';
 
 const WSURL = `ws://${window.location.host}/stompbroker`
 const DEST = '/topic/player'
+const targetHz = 30
 
 // stomp
 const stompclient = new Client({ brokerURL: WSURL })
@@ -56,7 +57,7 @@ let counter = 0;
 function animate() {
   fps = 1 / clock.getDelta()
   player.updatePlayer();
-  if (counter >= fps / 30) {
+  if (counter >= fps / targetHz) {
     console.log(`${player.getCamera().position.x}  |  ${player.getCamera().position.z}`)
     const time = performance.now()
     const delta = (time - prevTime) / 1000
