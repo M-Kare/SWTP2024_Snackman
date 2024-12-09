@@ -1,8 +1,12 @@
 package de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs;
 
+import de.hsrm.mi.swt.snackman.entities.map.Square;
+import de.hsrm.mi.swt.snackman.entities.mapObject.snack.Snack;
 import de.hsrm.mi.swt.snackman.services.MapService;
 
 public class SnackMan extends EatingMob {
+
+    private int currentCalories;
 
     public SnackMan(MapService mapService, int speed, double radius){
         super(mapService, speed, radius);    }

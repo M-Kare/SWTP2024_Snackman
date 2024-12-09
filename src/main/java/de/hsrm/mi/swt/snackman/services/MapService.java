@@ -1,10 +1,12 @@
 package de.hsrm.mi.swt.snackman.services;
 
+import de.hsrm.mi.swt.snackman.configuration.GameConfig;
 import de.hsrm.mi.swt.snackman.entities.map.GameMap;
 import de.hsrm.mi.swt.snackman.entities.map.Square;
 import de.hsrm.mi.swt.snackman.entities.mapObject.MapObjectType;
 import de.hsrm.mi.swt.snackman.entities.mapObject.snack.Snack;
 import de.hsrm.mi.swt.snackman.entities.mapObject.snack.SnackType;
+import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.SnackMan;
 import de.hsrm.mi.swt.snackman.messaging.ChangeType;
 import de.hsrm.mi.swt.snackman.messaging.EventType;
 import de.hsrm.mi.swt.snackman.messaging.FrontendMessageEvent;
@@ -30,7 +32,6 @@ public class MapService {
     private String filePath;
     private GameMap gameMap;
     private SnackMan snackman;
-    Logger log = LoggerFactory.getLogger(MapService.class);
 
     /**
      * Constructs a new MapService
@@ -48,6 +49,8 @@ public class MapService {
         this.filePath = filePath;
         char[][] mazeData = readMazeService.readMazeFromFile(this.filePath);
         gameMap = convertMazeDataGameMap(mazeData);
+        snackman = new SnackMan(this, GameConfig.SNACKMAN_SPEED, GameConfig.SNACKMAN_RADIUS);
+
     }
 
 

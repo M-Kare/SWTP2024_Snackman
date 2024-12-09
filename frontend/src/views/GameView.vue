@@ -8,9 +8,10 @@ import * as THREE from 'three'
 import { Client } from '@stomp/stompjs'
 import { Player } from '@/components/Player';
 import type { IPlayerDTD } from '@/stores/IPlayerDTD';
-import { fetchMazeDataFromBackend } from "@/services/MazeDataService";
-import { MazeRenderer } from "@/renderer/MazeRenderer";
 import { fetchSnackManFromBackend } from '@/services/SnackManInitService';
+import { GameMapRenderer } from '@/renderer/GameMapRenderer';
+import { useGameMapStore } from '@/stores/gameMapStore';
+import type { IGameMap } from '@/stores/IGameMapDTD';
 
 const WSURL = `ws://${window.location.host}/stompbroker`
 const DEST = '/topic/player'
