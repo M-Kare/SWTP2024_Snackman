@@ -63,18 +63,20 @@
 
 #form-box {
     z-index: 2;
-    position: fixed;
+    position: absolute;
     left: 50%;
     top: 25%;
     transform: translateX(-50%);
     width: 60%;
     max-width: 600px;
-    height: 25%;
+    height: 30%;
+    max-height: 400px;
     background: #172D54;
     border-radius: 0.3rem;
 }
 
 #form {
+    position: inherit;
     top: 35%;
     left: 5%;
     width: 100%;
@@ -88,6 +90,7 @@
     width: 90%;
     height: 2rem;
     margin-top: 0.2rem;
+    margin-bottom: 2rem;
     padding: 1.2rem;
 }
 
