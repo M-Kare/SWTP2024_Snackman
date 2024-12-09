@@ -8,7 +8,7 @@
             class="small-nav-buttons"
             @click="backToLobbyList">
             
-            Back to Lobbies
+            Leave Lobby
         </SmallNavButton>
         <SmallNavButton
             id="start-game-button"
@@ -93,8 +93,8 @@
     transform: translateX(-50%);
     width: 70vw;
     max-width: 1000px;
-    height: 500px;
-    max-height: 45vh;
+    height: 30rem;
+    max-height: 45rem;
     background: rgba(255, 255, 255, 60%);
     border-radius: 0.5rem;
 }

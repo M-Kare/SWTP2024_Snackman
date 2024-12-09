@@ -69,7 +69,6 @@
     width: 60%;
     max-width: 600px;
     height: 20rem;
-    max-height: 400px;
     background: #172D54;
     border-radius: 0.3rem;
 }
