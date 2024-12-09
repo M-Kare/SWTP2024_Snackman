@@ -132,7 +132,6 @@
     left: 50%;
     transform: translateX(-50%);
     width: 90%;
-    height: auto;
     max-height: 80%;
     background: rgba(255, 255, 255, 70%);
     border-radius: 0.3rem;
