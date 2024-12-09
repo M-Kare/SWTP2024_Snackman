@@ -52,19 +52,6 @@ export const useLobbiesStore = defineStore("lobbiesstore", () =>{
             
         }
         
-        
-
-        // const sessionNumber = Math.floor(Math.random() * 100000).toString()
-        // const playerClient: IPlayerClientDTD = {
-        //     playerId: sessionNumber,
-        //     playerName: 'Player Test',
-        // }
-
-        // lobbydata.currentPlayer.playerId = playerClient.playerId;
-        // lobbydata.currentPlayer.playerName = playerClient.playerName;
-
-        // console.log()
-        // return playerClient
     }
 
     async function updateLobbies(): Promise<void>{
@@ -111,13 +98,6 @@ export const useLobbiesStore = defineStore("lobbiesstore", () =>{
     }
 
     async function createLobby(lobbyName: string, adminClient: IPlayerClientDTD) {
-        // if (!lobbydata.currentPlayer){
-        //     console.error('Current player is not set. Cannot create lobby.')
-        //     return
-        // }
-
-        // const adminClient = lobbydata.currentPlayer
-
         const newLobby: ILobbyDTD = {
             uuid: '',
             name: lobbyName,

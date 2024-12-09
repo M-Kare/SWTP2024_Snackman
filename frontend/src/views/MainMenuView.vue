@@ -6,7 +6,7 @@
     Buttons will be merged later on,
     right now we need a fast entry into the game to test things (Singpleplayer-Button)
      -->
-    <MainMenuButton class="menu-button" id="singleplayer-button">SinglePlayer</MainMenuButton>
+    <MainMenuButton class="menu-button" id="singleplayer-button">Singleplayer</MainMenuButton>
     <MainMenuButton class="menu-button" id="multiplayer-button" @click="showLobbies">Multiplayer</MainMenuButton>
 </template>
 

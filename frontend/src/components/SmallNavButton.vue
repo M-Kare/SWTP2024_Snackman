@@ -5,16 +5,12 @@
 </template>
 
 <script setup lang="ts">
-    import { useRouter } from 'vue-router';
-
-    const router = useRouter();
 
 </script>
 
 <style scoped>
 .small-nav-button {
     position: inherit;
-    bottom: 3%;
     font-size: 1.2rem;
     width: auto;
     padding: 1rem;

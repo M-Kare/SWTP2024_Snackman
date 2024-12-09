@@ -3,97 +3,119 @@
 
     <h1 class="title">Lobbies</h1>
     <div class="outer-box">
+
+        <!--This is used just for test, can delete later-->
         <div class="player-info" v-if="currentPlayer">
             <p>Player ID:   {{ currentPlayer.playerId }}</p>
             <p>Player Name: {{ currentPlayer.playerName }}</p>
         </div>
-        <SmallNavButton id="menu-back-button" class="nav-buttons" @click="backToMainMenu"> Back </SmallNavButton>
-        <SmallNavButton id="create-lobby-button" class="nav-buttons" @click="createLobby"> Create Lobby </SmallNavButton>
+        <!---->
+
+        <SmallNavButton
+            id="menu-back-button"
+            class="small-nav-buttons"
+            @click="backToMainMenu">
+            
+            Back
+        </SmallNavButton>
+        <SmallNavButton
+            id="show-lobby-creation-button"
+            class="small-nav-buttons"
+            @click="showCreateLobbyForm">
+
+            Create new Lobby
+        </SmallNavButton>
 
         <div class="inner-box"> <!-- :key for order? -->
             <ul>
-                <li class="lobby-list-items" v-for="lobby in lobbies" :key="lobby.uuid" @click="showLobbyDetails(lobby)">
+                <li
+                    v-for="lobby in lobbies" :key="lobby.uuid"
+                    class="lobby-list-items"
+                    @click="enterLobby(lobby.uuid)">
+
                     <div class="lobby-name">
                         {{ lobby.name }}
                     </div>
-
-                    <div class="lobby-uuid">
-                        {{ lobby.uuid }}
-                    </div>
-
-                    <div class="lobby-members">
+                    
+                    <div class="playercount">
                         {{ lobby.members.length }} / {{ maxPlayerCount }}
                     </div>
-
-                    <div class="admin-info">
-                        {{ lobby.adminClient?.playerName }}
-                    </div>
-                    <!--
-                    <div class="playercount">
-                        {{ lobby.playerCount }} / {{ maxPlayerCount }}
-                    </div>
-                    -->
+                    
                 </li>
             </ul>
         </div>
     </div>
+
+    <div v-if="showNewLobbyForm" id="darken-background"></div>
+
+    <CreateLobbyForm
+        v-if="showNewLobbyForm"
+        @cancelLobbyCreation = "cancelLobbyCreation">
+    </CreateLobbyForm>
+
 </template>
 
 <script setup lang="ts">
     import MenuBackground from '@/components/MenuBackground.vue';
     import SmallNavButton from '@/components/SmallNavButton.vue';
+    import CreateLobbyForm from '@/components/CreateLobbyForm.vue';
+
     import { useRouter } from 'vue-router';
     import { computed, onMounted, ref } from 'vue';
     import { useLobbiesStore } from '@/stores/lobbiesstore';
-    import type { ILobbyDTD } from '@/stores/ILobbyDTD';
 
-    const router = useRouter()
-    const lobbiesStore = useLobbiesStore()
+    const router = useRouter();
+    const lobbiesStore = useLobbiesStore();
 
-    const maxPlayerCount = "4"
-
-    const lobbies = computed(() => lobbiesStore.lobbydata.lobbies)
-    const currentPlayer = lobbiesStore.lobbydata.currentPlayer
+    const lobbies = computed(() => lobbiesStore.lobbydata.lobbies);
+    const currentPlayer = lobbiesStore.lobbydata.currentPlayer;
+    const showNewLobbyForm = ref(false);
 
     const backToMainMenu = () => {
-        router.push({name: "MainMenu"})
+        router.push({name: "MainMenu"});
     }
 
-    const createLobby = async () => {
-        const lobbyName = prompt("Enter Lobby Name: ")
-        const adminClient = currentPlayer
-        adminClient.playerId = currentPlayer.playerId
-        adminClient.playerName = currentPlayer.playerName
-
-        if (!adminClient || adminClient.playerId === '' || adminClient.playerName === '') {
-            alert("Admin client is not valid!")
-            return;
-        }
-
-        if (lobbyName && adminClient.playerId !== '' && adminClient.playerName !== ''){
-            try{
-                await lobbiesStore.createLobby(lobbyName, adminClient)
-                alert("Lobby created successfully!")
-                lobbiesStore.updateLobbies()
-            } catch (error: any){
-                console.error('Error:', error)
-                alert("Error create Lobby!")
-            }
-        }
+    const showCreateLobbyForm = () => {
+        showNewLobbyForm.value = true;
     }
 
-    const showLobbyDetails = (lobby: ILobbyDTD) => {
-        alert(`Lobby Details\nName: ${lobby.name}\nUUID: ${lobby.uuid}`)
+    const cancelLobbyCreation = () => {
+        showNewLobbyForm.value = false;
     }
-    
+
+    //join in lobby
+    const enterLobby = (lobby: any) => {
+        router.push({name: "Lobby", params: {lobbyName: lobby.name}});
+    }
+
+    interface Lobby {
+        lobbyName: string,
+        playerCount: number
+    }
+    const maxPlayerCount = 4;
+    // const lobbies = ref<Lobby[]>([
+    //     {lobbyName: "Lobby 1", playerCount: 1},
+    //     {lobbyName: "Lobby 2", playerCount: 3},
+    //     {lobbyName: "Lobby 3", playerCount: 4},
+    //     {lobbyName: "Lobby x", playerCount: 4},
+    //     {lobbyName: "Lobby x", playerCount: 4},
+    //     {lobbyName: "Lobby x", playerCount: 4},
+    //     {lobbyName: "Lobby x", playerCount: 4},
+    //     {lobbyName: "Lobby x", playerCount: 4},
+    //     {lobbyName: "Lobby x", playerCount: 4},
+    //     {lobbyName: "Lobby x", playerCount: 4},
+    //     {lobbyName: "Lobby x", playerCount: 4},
+    //     {lobbyName: "Lobby x", playerCount: 4}
+    // ]);
+
     onMounted(() => {
         if (!lobbiesStore.lobbydata.currentPlayer || lobbiesStore.lobbydata.currentPlayer.playerId === '' || lobbiesStore.lobbydata.currentPlayer.playerName === '') {
-            lobbiesStore.createPlayer('Player Test')
+            lobbiesStore.createPlayer('Player Test');
         }
 
-        console.log("Current Player:", lobbiesStore.lobbydata.currentPlayer)
+        console.log("Current Player:", lobbiesStore.lobbydata.currentPlayer);
 
-        lobbiesStore.updateLobbies()
+        //lobbiesStore.updateLobbies()
     })
 
 </script>
@@ -116,7 +138,7 @@
 
 .outer-box {
     position: absolute;
-    top: 12%;
+    top: 20%;
     left: 50%;
     transform: translateX(-50%);
     width: 70%;
@@ -132,11 +154,10 @@
     left: 50%;
     transform: translateX(-50%);
     width: 90%;
-    height: 80%;
+    max-height: 80%;
     background: rgba(255, 255, 255, 70%);
     border-radius: 0.3rem;
     overflow-y: scroll;
-    color: black;
 }
 
 .inner-box > ul {
@@ -158,18 +179,35 @@
     margin: 1rem;
 }
 
+.lobby-list-items:hover {
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.small-nav-buttons {
+    bottom: 3%;
+    font-weight: bold;
+}
+
+#darken-background {
+    z-index: 1;
+    position: fixed;
+    top: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 50%);
+
+    transition: background 0.3s ease;
+}
+
 #menu-back-button {
     left: 5%;
 }
-#menu-back-button:hover {
-  box-shadow: 0px 0px 35px 5px rgba(255, 255, 255, 0.2);
-}
 
-#create-lobby-button {
+#show-lobby-creation-button {
     right: 5%;
 }
 
-#create-lobby-button:hover {
+#menu-back-button:hover, #show-lobby-creation-button:hover {
   box-shadow: 0px 0px 35px 5px rgba(255, 255, 255, 0.5);
 }
 </style>
