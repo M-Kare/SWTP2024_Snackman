@@ -21,6 +21,7 @@ public class PlayerMovementController {
     public void spreadPlayerUpdate(SnackManFrontendDTO player) {
       //Validation here
       snackman.setQuaternion(player.qX(), player.qY(), player.qZ(), player.qW());
+      snackman.setSpeed(player.sprinting());
       snackman.move(player.forward(), player.backward(), player.left(), player.right(), player.delta());
       messagingTemplate.convertAndSend("/topic/player", new SnackManPositionDTO(snackman.getPosX(), snackman.getPosY(), snackman.getPosZ()));
     }

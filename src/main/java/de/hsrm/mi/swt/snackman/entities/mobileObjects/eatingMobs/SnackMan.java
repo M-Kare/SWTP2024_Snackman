@@ -21,10 +21,12 @@ public class SnackMan extends EatingMob {
     private double radius;
     private Quaterniond quat;
     private Square currentSquare;
-
-    private MapService mapService;
+    private double speed;
+    private static final double SPRINT_MULTIPLIER = 1.5;
 
     @Autowired
+    private MapService mapService;
+
     public SnackMan(MapService mapService){
         super();
         currentCalories = 0;
@@ -35,6 +37,7 @@ public class SnackMan extends EatingMob {
         posZ = (this.mapService.getGameMap().getGameMap()[0].length/2)*GameConfig.SQUARE_SIZE;
         radius = GameConfig.SNACKMAN_RADIUS;
         quat = new Quaterniond();
+        speed = GameConfig.SNACKMAN_SPEED;
         setCurrentSquareWithIndex(posX, posY);
     }
 
@@ -78,6 +81,18 @@ public class SnackMan extends EatingMob {
         currentSquare = mapService.getSquareAtIndexXZ(calcMapIndexOfCoordinate(x), calcMapIndexOfCoordinate(z));
     }
 
+    public void setSpeed(boolean sprinting) {
+        if (sprinting) {
+            this.speed = GameConfig.SNACKMAN_SPEED * SPRINT_MULTIPLIER;
+        } else {
+            this.speed = GameConfig.SNACKMAN_SPEED;
+        }
+    }
+
+    public double getSpeed() {
+        return speed;
+    }
+
     public void move(boolean f, boolean b, boolean l, boolean r, double delta) {
         //System.out.println(currentSquare.getIndexX() + "  |  " + currentSquare.getIndexZ());
         int moveDirZ = (f ? 1 : 0) - (b ? 1 : 0);
@@ -94,8 +109,8 @@ public class SnackMan extends EatingMob {
         if(move.x != 0 && move.z != 0){
             move.normalize();
         }
-            move.x = move.x * delta * GameConfig.SNACKMAN_SPEED;
-            move.z = move.z * delta * GameConfig.SNACKMAN_SPEED;
+        move.x = move.x * delta * speed;
+        move.z = move.z * delta * speed;    
         move.rotate(quat);
         double xNew = posX + move.x;
         double zNew = posZ + move.z;

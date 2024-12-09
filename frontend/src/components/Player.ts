@@ -4,6 +4,7 @@ import { PointerLockControls } from 'three/addons/controls/PointerLockControls.j
 
 export class Player {
     private prevTime: DOMHighResTimeStamp
+    private readonly SPRINT_MULTIPLIER = 1.5;
 
     // Booleans for checking movement-input
     private moveForward: boolean;
@@ -11,8 +12,10 @@ export class Player {
     private moveLeft: boolean;
     private moveRight: boolean;
     private canJump: boolean;
+    private sprinting: boolean;
 
     private radius: number;
+    private baseSpeed: number;
     private speed: number;
 
     private camera: THREE.PerspectiveCamera;
@@ -20,7 +23,7 @@ export class Player {
 
     private movementDirection: THREE.Vector3;
 
-    constructor(renderer: WebGLRenderer, posX: number, posY: number, posZ: number, radius: number, speed: number){
+    constructor(renderer: WebGLRenderer, posX: number, posY: number, posZ: number, radius: number, speed: number, baseSpeed: number){
         this.prevTime = performance.now();
         this.moveBackward = false;
         this.moveForward = false;
@@ -28,9 +31,12 @@ export class Player {
         this.moveRight = false;
         this.canJump = true;
         this.movementDirection = new THREE.Vector3();
-
+        
         this.radius = radius;
+
+        this.baseSpeed = baseSpeed || 5;
         this.speed = speed;
+        this.sprinting = false;
 
         this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100)
         this.camera.position.set(posX, posY, posZ)
@@ -73,6 +79,11 @@ export class Player {
           case 'KeyD':
             this.moveRight = false
             break
+
+          case "ShiftLeft":
+            this.sprinting = false;
+            this.speed = this.baseSpeed;
+            break;
         }
       }
 
@@ -97,11 +108,18 @@ export class Player {
           case 'KeyD':
             this.moveRight = true
             break
+
+          case 'ShiftLeft':
+            this.sprinting = true;
+            if (this.moveForward) {
+                this.speed = this.baseSpeed * this.SPRINT_MULTIPLIER;
+            }
+            break;
         }
       }
 
       public getInput(){
-        return {forward:this.moveForward, backward:this.moveBackward, left:this.moveLeft, right:this.moveRight}
+        return {forward:this.moveForward, backward:this.moveBackward, left:this.moveLeft, right:this.moveRight, sprinting: this.sprinting}
       }
 
     // lerp is used to interpolate the two positions
