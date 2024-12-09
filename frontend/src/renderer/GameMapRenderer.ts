@@ -14,12 +14,12 @@ export const GameMapRenderer = () => {
   const GROUNDSIZE = 1000
   let renderer: THREE.WebGLRenderer
 
-
+  //TODO: Licht noch nicht nötig, da keine belichteten Texturen + licht muss mit lookAt in eine Richtung gesetzt werden 
   // set up light
-  const light = new THREE.DirectionalLight(0xffffff, 1)
-  light.position.set(5, 10, 10)
-  light.castShadow = true
-  scene.add(light)
+  // const light = new THREE.DirectionalLight(0xffffff, 1)
+  // light.position.set(5, 10, 10)
+  // // light.castShadow = true
+  // scene.add(light)
 
   // add more natural outdoor lighting
   const hemiLight = new THREE.HemisphereLight(0xffffbb, 0x080820, 1)
@@ -77,8 +77,8 @@ export const GameMapRenderer = () => {
         createWall(square.indexX * DEFAULT_SIDE_LENGTH + OFFSET, 0, square.indexZ * DEFAULT_SIDE_LENGTH + OFFSET, WALL_HEIGHT, DEFAULT_SIDE_LENGTH)
       }
       if (square.type === MapObjectType.FLOOR) {
-        const squareToAdd = createFloorSquare(square.indexX * DEFAULT_SIDE_LENGTH + OFFSET, square.indexZ * DEFAULT_SIDE_LENGTH + OFFSET, DEFAULT_SIDE_LENGTH)
-        scene.add(squareToAdd)
+        // const squareToAdd = createFloorSquare(square.indexX * DEFAULT_SIDE_LENGTH + OFFSET, square.indexZ * DEFAULT_SIDE_LENGTH + OFFSET, DEFAULT_SIDE_LENGTH)
+        // scene.add(squareToAdd)
 
         if (square.snack != null) {
           const snackToAdd = createSnackOnFloor(square.indexX * DEFAULT_SIDE_LENGTH + OFFSET, square.indexZ * DEFAULT_SIDE_LENGTH + OFFSET, DEFAULT_SIDE_LENGTH, square.snack?.snackType)

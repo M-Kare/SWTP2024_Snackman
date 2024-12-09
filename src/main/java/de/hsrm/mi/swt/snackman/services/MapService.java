@@ -1,5 +1,13 @@
 package de.hsrm.mi.swt.snackman.services;
 
+import java.beans.PropertyChangeEvent;
+
+import org.python.util.PythonInterpreter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import de.hsrm.mi.swt.snackman.configuration.GameConfig;
 import de.hsrm.mi.swt.snackman.entities.map.GameMap;
 import de.hsrm.mi.swt.snackman.entities.map.Square;
@@ -11,14 +19,6 @@ import de.hsrm.mi.swt.snackman.messaging.ChangeType;
 import de.hsrm.mi.swt.snackman.messaging.EventType;
 import de.hsrm.mi.swt.snackman.messaging.FrontendMessageEvent;
 import de.hsrm.mi.swt.snackman.messaging.FrontendMessageService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import java.beans.PropertyChangeEvent;
-
-import org.python.util.PythonInterpreter;
 
 /**
  * Service class for managing the game map
@@ -78,6 +78,7 @@ public class MapService {
         return new GameMap(squaresBuildingMap);
     }
 
+    //TODO Maze.py map größe als Argumente herein reichen statt in der python-file selbst zu hinterlegen
     /**
      * Generates a new Maze and saves it in a Maze.txt file
      */
