@@ -25,9 +25,6 @@ public class GameMapController {
     @Autowired
     private MapService mapService;
 
-    @Autowired
-    private SnackMan snackman;
-
     Logger log = LoggerFactory.getLogger(MapService.class);
 
     @GetMapping("/game-map")
@@ -38,6 +35,7 @@ public class GameMapController {
 
     @GetMapping("/snackman")
     public ResponseEntity<SnackManInitDTO> getSnackManPos(){
+        SnackMan snackman = mapService.getSnackMan();
         return ResponseEntity.ok(new SnackManInitDTO(snackman.getPosX(), snackman.getPosY(), snackman.getPosZ(), snackman.getRadius(), GameConfig.SNACKMAN_SPEED));
     }
 }

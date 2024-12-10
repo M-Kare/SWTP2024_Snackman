@@ -1,5 +1,6 @@
 package de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs;
 
+import de.hsrm.mi.swt.snackman.configuration.GameConfig;
 import de.hsrm.mi.swt.snackman.entities.map.Square;
 import de.hsrm.mi.swt.snackman.entities.mapObject.snack.Snack;
 import de.hsrm.mi.swt.snackman.entities.mapObject.snack.SnackType;
@@ -26,7 +27,7 @@ public class SnackManTest {
     
     @BeforeEach
     public void setUp() {
-        snackMan = new SnackMan(new MapService(frontendMessageService, readMazeService));
+        snackMan = new SnackMan(new MapService(frontendMessageService, readMazeService), GameConfig.SNACKMAN_SPEED, GameConfig.SNACKMAN_RADIUS);
     }
 
     @Test

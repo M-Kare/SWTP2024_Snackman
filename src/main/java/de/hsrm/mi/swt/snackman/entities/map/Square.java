@@ -22,11 +22,11 @@ public class Square {
 
     private Snack snack;
 
-    public Square(int indexX, int indexY) {
+    public Square(int indexX, int indexZ) {
         id = generateId();
         type = MapObjectType.FLOOR;
         this.indexX = indexX;
-        this.indexZ = indexY;
+        this.indexZ = indexZ;
     }
 
     public Square(MapObjectType type, int indexX, int indexZ) {
