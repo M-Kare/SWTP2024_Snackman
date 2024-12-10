@@ -1,6 +1,11 @@
 package de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs;
 
 import de.hsrm.mi.swt.snackman.entities.mapObject.snack.Snack;
+
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
 import org.joml.Quaterniond;
 import org.joml.Vector3d;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +27,17 @@ public class SnackMan extends EatingMob {
     private Quaterniond quat;
     private Square currentSquare;
     private double speed;
+
     private static final double SPRINT_MULTIPLIER = 1.5;
+    private static final double MAX_SPRINT_TIME = 5.0;
+    private static final double MAX_COOLDOWN_TIME = 10.0;
+    private static final double RECHARGE_RATE = 0.5; // 1 second of recharge = 2 seconds Cooldown
+
+    private double remainingSprintTime = MAX_SPRINT_TIME;
+    private double cooldownTime = 0;
+    private boolean isSprinting = false;
+
+    private ScheduledExecutorService timerService;
 
     @Autowired
     private MapService mapService;
@@ -81,14 +96,6 @@ public class SnackMan extends EatingMob {
         currentSquare = mapService.getSquareAtIndexXZ(calcMapIndexOfCoordinate(x), calcMapIndexOfCoordinate(z));
     }
 
-    public void setSpeed(boolean sprinting) {
-        if (sprinting) {
-            this.speed = GameConfig.SNACKMAN_SPEED * SPRINT_MULTIPLIER;
-        } else {
-            this.speed = GameConfig.SNACKMAN_SPEED;
-        }
-    }
-
     public double getSpeed() {
         return speed;
     }
@@ -99,6 +106,13 @@ public class SnackMan extends EatingMob {
         int moveDirX = (r ? 1 : 0) - (l ? 1 : 0);
 
         Vector3d move = new Vector3d();
+
+        if (isSprinting && canSprint()) {
+            this.speed = GameConfig.SNACKMAN_SPEED * SPRINT_MULTIPLIER;
+        } else {
+            this.speed = GameConfig.SNACKMAN_SPEED;
+            stopSprint();
+        }
 
         if (f || b) {
             move.z -= moveDirZ;
@@ -134,6 +148,152 @@ public class SnackMan extends EatingMob {
         }
         setCurrentSquareWithIndex(posX, posZ);
         consumeSnackOnSquare(currentSquare);
+    }
+
+    /* Sprint timer logic */
+
+    /* Adjusts the speed based on whether sprinting is allowed and manages sprint state. */
+    public void setSpeed(boolean sprinting) {
+        if (sprinting && canSprint()) {
+            if (!isSprinting) {
+                this.isSprinting = true;
+                this.speed = GameConfig.SNACKMAN_SPEED * SPRINT_MULTIPLIER;
+                System.out.println("[DEBUG] Sprint gestartet. Verbleibende Sprintzeit: " + remainingSprintTime + " Sekunden.");
+                startTimer();
+            }
+        } else {
+            if (isSprinting) {
+                endSprint();
+            }
+            this.speed = GameConfig.SNACKMAN_SPEED;
+        }
+    }
+
+    /* Checks if sprinting is allowed based on cooldown and remaining sprint time. */
+    private boolean canSprint() {
+        if (cooldownTime > 0) {
+            System.out.println("[DEBUG] Remaining Cooldown: " + cooldownTime);
+            return false;
+        }
+        if (remainingSprintTime <= 0) {
+            System.out.println("[DEBUG] No sprint time left");
+            return false;
+        }
+        return true;
+    }
+
+    /* Ends the sprint, calculates the cooldown duration, and resets speed. */
+    private void endSprint() {
+        this.isSprinting = false;
+        double usedTime = MAX_SPRINT_TIME - remainingSprintTime;
+        this.cooldownTime = Math.min(MAX_COOLDOWN_TIME, usedTime * 2);
+        System.out.println("[DEBUG] Sprint beendet. Cooldown gestartet: " + cooldownTime + " Sekunden.");
+        startTimer();
+    }
+
+    /* Starts a timer for managing sprint and cooldown logic if not already running. */
+    private void startTimer() {
+        if (timerService == null || timerService.isShutdown()) {
+            // Create and schedule a recurring task to handle timers
+            timerService = Executors.newSingleThreadScheduledExecutor();
+            timerService.scheduleAtFixedRate(this::updateTimersTask, 0, 100, TimeUnit.MILLISECONDS);
+        }
+    }
+
+    /* Stops the timer when it is no longer needed. */
+    private void stopTimer() {
+        if (timerService != null && !timerService.isShutdown()) {
+            timerService.shutdown();
+        }
+    }
+
+    /* Handles updates to sprint time, cooldown, and recharging in the timer task. */
+    private void updateTimersTask() {
+        double delta = 0.1; // Time increment in seconds (100ms)
+    
+        if (isSprinting) {
+            // Decrease remaining sprint time during active sprint
+            remainingSprintTime -= delta;
+            if (remainingSprintTime <= 0) {
+                remainingSprintTime = 0;
+                endSprint();
+            }
+        } else if (cooldownTime > 0) {
+            // Decrease cooldown time if active
+            cooldownTime -= delta;
+            if (cooldownTime <= 0) {
+                cooldownTime = 0;
+                remainingSprintTime = MAX_SPRINT_TIME;
+                System.out.println("[DEBUG] Cooldown expired. Sprint time resets in " + MAX_SPRINT_TIME);
+                stopTimer();
+            }
+        } else if (remainingSprintTime < MAX_SPRINT_TIME) {
+            // Recharge sprint time if not sprinting and cooldown is complete
+            remainingSprintTime += delta * RECHARGE_RATE;
+            if (remainingSprintTime >= MAX_SPRINT_TIME) {
+                remainingSprintTime = MAX_SPRINT_TIME;
+                System.out.println("[DEBUG] Sprint time fully charged");
+                stopTimer();
+            } else {
+                System.out.println("[DEBUG] Sprint time up in: " + remainingSprintTime);
+            }
+        }
+    
+        System.out.println("[DEBUG] Sprint time: " + remainingSprintTime + " Cooldown: " + cooldownTime);
+    }
+
+    /* Starts the sprint if allowed and initializes the timer. */
+    public void startSprint() {
+        if (canSprint()) {
+            if (!isSprinting) {
+                this.isSprinting = true;
+                this.speed = GameConfig.SNACKMAN_SPEED * SPRINT_MULTIPLIER;
+                System.out.println("[DEBUG] Sprint started. Remaining sprint time: " + remainingSprintTime);
+                startTimer();
+            }
+        } else {
+            System.out.println("[DEBUG] Sprint could not be started. Cooldown active or sprint time exhausted.");
+        }
+    }
+    
+    /* Stops the sprint and resets the speed to normal. */
+    public void stopSprint() {
+        if (isSprinting) {
+            this.isSprinting = false;
+            this.speed = GameConfig.SNACKMAN_SPEED;
+            System.out.println("[DEBUG] Sprint beendet.");
+        }
+    }
+
+    /* Handles updates to sprint time, cooldown, and recharging. */
+    public void updateTimers(double delta) {
+        // Update sprint time if currently sprinting
+        if (isSprinting) {
+            remainingSprintTime -= delta;
+            if (remainingSprintTime <= 0) {
+                // End sprint when time runs out
+                remainingSprintTime = 0;
+                endSprint();
+            }
+        } else if (cooldownTime > 0) {
+            // Update cooldown time if active
+            cooldownTime -= delta;
+            if (cooldownTime <= 0) {
+                // Reset sprint time when cooldown finishes
+                cooldownTime = 0;
+                remainingSprintTime = MAX_SPRINT_TIME;
+                System.out.println("[DEBUG] Cooldown expired. Sprint time fully recharged.");
+            }
+        } else if (remainingSprintTime < MAX_SPRINT_TIME) {
+            // Recharge sprint time if not sprinting and no cooldown
+            remainingSprintTime += delta * RECHARGE_RATE;
+            if (remainingSprintTime >= MAX_SPRINT_TIME) {
+                remainingSprintTime = MAX_SPRINT_TIME;
+                System.out.println("[DEBUG] Sprint time fully recharged.");
+            }
+        }
+
+        System.out.println("[DEBUG] Sprint time: " + remainingSprintTime + ", Cooldown: " + cooldownTime);
     }
 
     // TODO: Find out why frontend and backend are not completly synced (labyrinth size not displayed correcty in frontend?)
