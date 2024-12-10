@@ -146,6 +146,7 @@ public class Chicken extends EatingMob implements Runnable {
         Snack snackOnSquare = currentSquare.getSnack();
 
         if (snackOnSquare != null) {
+
             this.kcal += snackOnSquare.getCalories();
 
             //set snack to null after consuming it
