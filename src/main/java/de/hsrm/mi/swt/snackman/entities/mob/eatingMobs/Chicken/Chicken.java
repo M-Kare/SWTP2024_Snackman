@@ -151,7 +151,7 @@ public class Chicken extends EatingMob implements Runnable {
         Snack snackOnSquare = currentSquare.getSnack();
 
         if (snackOnSquare != null) {
-            super.gainKcal(snackOnSquare.getCalories());
+            super.kcal += snackOnSquare.getCalories();
 
             //set snack to null after consuming it
             currentSquare.setSnack(null);
@@ -317,11 +317,11 @@ public class Chicken extends EatingMob implements Runnable {
      * After laying the egg, the chicken's calories are reset to 0 and its thickness is set to thin
      */
     private void layEgg() {
-        if (super.getKcal() > 0) {
+        if (super.kcal > 0) {
             Square currentSquare = this.mapService.getSquareAtIndexXZ(this.posX, this.posZ);
 
             // new egg with current chicken-calories * 1.5
-            int eggCalories = (int) (super.getKcal() * 1.5);
+            int eggCalories = (int) (super.kcal * 1.5);
             Snack egg = new Snack(SnackType.EGG);
             egg.setCalories(eggCalories);
 
@@ -329,7 +329,7 @@ public class Chicken extends EatingMob implements Runnable {
             this.mapService.addEggToSquare(currentSquare, egg);
 
             // Chicken becomes thin again and has no calories after it has laid an egg
-            super.setKcal(0);
+            super.kcal = 0;
             this.setThickness(Thickness.THIN);
 
             startNewTimer();
@@ -351,7 +351,7 @@ public class Chicken extends EatingMob implements Runnable {
                 ", posX=" + posX +
                 ", posZ=" + posZ +
                 ", lookingDirection=" + lookingDirection +
-                ", kcal=" + super.getKcal() +
+                ", kcal=" + kcal +
                 '}';
     }
 }
