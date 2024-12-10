@@ -163,6 +163,7 @@ public class Chicken extends EatingMob implements Runnable {
         PythonInterpreter.initialize(System.getProperties(), pythonProps, new String[0]);
         log.debug("Initialised jython for chicken movement");
         this.pythonInterpreter = new PythonInterpreter();
+        pythonInterpreter.exec("from ChickenMovementSkript import choose_next_square");
     }
 
     /**
@@ -175,7 +176,6 @@ public class Chicken extends EatingMob implements Runnable {
     public List<String> executeMovementSkript(List<String> squares) {
         try {
             log.debug("Running python chicken script with: {}", squares.toString());
-            pythonInterpreter.exec("from ChickenMovementSkript import choose_next_square");
             PyObject func = pythonInterpreter.get("choose_next_square");
             PyObject result = func.__call__(new PyList(squares));
 
