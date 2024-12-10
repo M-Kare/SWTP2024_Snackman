@@ -14,12 +14,11 @@ export const GameMapRenderer = () => {
   const GROUNDSIZE = 1000
   let renderer: THREE.WebGLRenderer
 
-  //TODO: Licht noch nicht nötig, da keine belichteten Texturen + licht muss mit lookAt in eine Richtung gesetzt werden 
   // set up light
-  // const light = new THREE.DirectionalLight(0xffffff, 1)
-  // light.position.set(5, 10, 10)
-  // // light.castShadow = true
-  // scene.add(light)
+  const light = new THREE.DirectionalLight(0xffffff, 1)
+  light.position.set(5, 10, 10)
+  // light.castShadow = true
+  scene.add(light)
 
   // add more natural outdoor lighting
   const hemiLight = new THREE.HemisphereLight(0xffffbb, 0x080820, 1)
