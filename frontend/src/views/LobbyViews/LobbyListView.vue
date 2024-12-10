@@ -86,8 +86,7 @@
 
     //join in lobby
     const joinLobby = async (lobby: ILobbyDTD) => {
-        //router.push({name: "Lobby", params: {lobbyName: lobby.name}});
-
+        
         if(lobby.members.length >= maxPlayerCount){
             alert(`Lobby "${lobby.name}" is full! Please select another one.`);
             return;

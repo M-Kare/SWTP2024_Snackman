@@ -84,7 +84,7 @@ public class LobbyController {
        * @param lobbyId Lobby UUID
        * @return {@link lobby} object
        */
-      @GetMapping("/{lobbyId}")
+      @GetMapping("/lobby/{lobbyId}")
       public ResponseEntity<Lobby> findLobbyById(@PathVariable("lobbyId") String lobbyId){
             Lobby lobby = lobbyManagerService.findLobbyByUUID(lobbyId);
             return ResponseEntity.ok(lobby);

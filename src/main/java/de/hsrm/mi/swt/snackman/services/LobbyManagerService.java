@@ -135,7 +135,7 @@ public class LobbyManagerService {
        * @param clientID UUID of the client
        * @return the client
        */
-      private PlayerClient findClientByUUID(String clientID) {
+      public PlayerClient findClientByUUID(String clientID) {
             return clients.stream()
                         .filter(l -> l.getPlayerId().equals(clientID))
                         .findFirst()

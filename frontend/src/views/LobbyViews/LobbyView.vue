@@ -6,7 +6,7 @@
         <SmallNavButton
             id="menu-back-button"
             class="small-nav-buttons"
-            @click="backToLobbyList">
+            @click="leaveLobby">
             
             Leave Lobby
         </SmallNavButton>
@@ -80,19 +80,15 @@
         await lobbiesStore.updateLobbies();
     })
 
-    // Backend-Connection
-    // const lobbyName = ref('LobbyName'); // TODO - Placeholder
-    // const playerCount = ref(3);
-    // const maxPlayerCount = ref(4);
-    // const players = ref([
-    //     {name: "Player 1", character: "Snackman"},
-    //     {name: "Player 2", character: "Ghost"},
-    //     {name: "Player 3", character: "Ghost"},
-    //     {name: "Player 4", character: "Ghost"}
-    // ]);
+    const leaveLobby = async () => {
+        const playerId = lobbiesStore.lobbydata.currentPlayer.playerId;
+        if (!playerId || !lobby.value) {
+            console.error('Player or Lobby not found');
+            return;
+        }
 
-    const backToLobbyList = () => {
-        router.push({name: "LobbyList"});
+        await lobbiesStore.leaveLobby(lobby.value.uuid, playerId);
+        router.push({ name: 'LobbyList' });
     }
 
     const startGame = () => {

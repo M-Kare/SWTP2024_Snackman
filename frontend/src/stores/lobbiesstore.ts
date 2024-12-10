@@ -41,10 +41,12 @@ export const useLobbiesStore = defineStore("lobbiesstore", () =>{
 
             if(response.ok){
                 const newPlayer = await response.json()
-                lobbydata.currentPlayer = newPlayer
+                lobbydata.currentPlayer.playerId = newPlayer.playerId
+                lobbydata.currentPlayer.playerName = newPlayer.playerName
+                lobbydata.currentPlayer.role = newPlayer.role
             } else {
                 const errorText = await response.text()
-                console.error('Failed to create a new player client:', errorText)
+                console.error(`Failed to create a new player client: ${response.statusText}`)
             }
 
             return newPlayerClient
@@ -84,11 +86,8 @@ export const useLobbiesStore = defineStore("lobbiesstore", () =>{
         stompclient.onConnect = (frame) => {
             stompclient!.subscribe(DEST, async (message) => {
                 const eventobject = JSON.parse(message.body)
-
-                if(eventobject.eventType == 'LOBBY'){
-                    console.log('Received lobby update:', eventobject)
-                    await updateLobbies()
-                }
+                console.log('Received lobby update:', eventobject)
+                await updateLobbies()
             })
         }
 
@@ -109,7 +108,7 @@ export const useLobbiesStore = defineStore("lobbiesstore", () =>{
         }
 
         try{
-            const url = `/api/lobbies/create?name=` + lobbyName + `&creatorUuid=` + adminClient.playerId
+            const url = `/api/lobbies/create?name=${lobbyName}&creatorUuid=${adminClient.playerId}`
             const response = await fetch(url, {
                 method: 'POST',
                 headers: {
@@ -124,7 +123,7 @@ export const useLobbiesStore = defineStore("lobbiesstore", () =>{
                 await updateLobbies()
                 return lobby
             } else {
-                console.error('Failed to create lobby. Status:', response.status)
+                console.error(`Failed to create lobby: ${response.statusText}`)
                 return null
             }
 
@@ -143,7 +142,7 @@ export const useLobbiesStore = defineStore("lobbiesstore", () =>{
                 return null;
             }
 
-            const url = `/api/lobbies/` + lobbyId + `/join?playerId=` + playerId
+            const url = `/api/lobbies/${lobbyId}/join?playerId=${playerId}`
             const response = await fetch(url, {
                 method: 'POST',
                 headers: {
@@ -162,7 +161,7 @@ export const useLobbiesStore = defineStore("lobbiesstore", () =>{
                 await updateLobbies()
                 return lobby
             } else {
-                console.error('Failed to join lobby. Status:', response.status)
+                console.error(`Failed to join lobby: ${response.statusText}`)
                 return null
             }
 
@@ -172,9 +171,29 @@ export const useLobbiesStore = defineStore("lobbiesstore", () =>{
         }
     }
 
+    async function leaveLobby(lobbyId: String, playerId: string): Promise<void> {
+        try{
+            const url = `/api/lobbies/${lobbyId}/leave?playerId=${playerId}`
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            })
+    
+            if (!response.ok) {
+                throw new Error(`Failed to leave lobby: ${response.statusText}`)
+            }
+
+            await updateLobbies()
+        } catch (error: any){
+            console.error('Error leaving lobby:', error)
+        }
+    }
+
     async function fetchLobbyById(lobbyId: String): Promise<ILobbyDTD | null> {
         try{
-            const url = `/api/lobbies/` + lobbyId
+            const url = `/api/lobbies/lobby/${lobbyId}`
             const response = await fetch(url, {
                 method: 'GET',
                 headers: {
@@ -195,6 +214,29 @@ export const useLobbiesStore = defineStore("lobbiesstore", () =>{
         } 
     }
 
+    async function fetchClientById(playerId: String): Promise<IPlayerClientDTD | null> {
+        try{
+            const url = `/api/playerclients/player/${playerId}`
+            const response = await fetch(url, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+            })
+
+            if(!response.ok){
+                throw new Error(`HTTP error! status: ${response.status}`)
+            }
+
+            const client: IPlayerClientDTD = await response.json()
+            console.log('Fetched Lobby: ', client)
+            return client
+        } catch (error: any){
+            console.error('Error:', error)
+            return null
+        } 
+    }
+
     return{
         lobbydata,
         createPlayer,
@@ -202,6 +244,8 @@ export const useLobbiesStore = defineStore("lobbiesstore", () =>{
         startLobbyLiveUpdate,
         createLobby,
         joinLobby,
+        leaveLobby,
         fetchLobbyById,
+        fetchClientById,
     }
 })

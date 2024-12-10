@@ -7,10 +7,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import de.hsrm.mi.swt.snackman.entities.lobby.Lobby;
 import de.hsrm.mi.swt.snackman.entities.lobby.PlayerClient;
 import de.hsrm.mi.swt.snackman.services.LobbyManagerService;
 
@@ -34,7 +37,7 @@ public class PlayerClientController {
      * Create a new player client with a name
      * 
      * @param name  the player's name
-     * @return  the newly created player client
+     * @return  the newly created {@link PlayerClient} object
      */
     @PostMapping("/create")
     public ResponseEntity<PlayerClient> createPlayerClient(@RequestParam("name") String name){
@@ -47,4 +50,15 @@ public class PlayerClientController {
         
         return ResponseEntity.ok(newPlayerClient);
     }
+
+    /**
+     * Find Client by Player UUID
+     * @param playerId player client UUID
+     * @return {@link PlayerClient} object
+     */
+    @GetMapping("/player/{playerId}")
+    public ResponseEntity<PlayerClient> findClientById(@PathVariable("playerId") String playerId){
+        PlayerClient playerClient = lobbyManagerService.findClientByUUID(playerId);
+        return ResponseEntity.ok(playerClient);
+    }      
 }
