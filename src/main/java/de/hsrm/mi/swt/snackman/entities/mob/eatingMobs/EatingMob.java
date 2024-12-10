@@ -7,21 +7,21 @@ import de.hsrm.mi.swt.snackman.entities.mob.Mob;
  */
 public abstract class EatingMob extends Mob {
 
-    protected int kcal;
+    private int kcal;
 
-    private void gainKcal(int eatenKcal) {
+    protected void gainKcal(int eatenKcal) {
         this.kcal += eatenKcal;
     }
 
-    private void loseKcal(int consumedKcal) {
+    protected void loseKcal(int consumedKcal) {
         this.kcal -= consumedKcal;
     }
 
-    public int getKcal() {
+    protected int getKcal() {
         return this.kcal; 
     }
 
-    public void setKcal(int kcal) {
+    protected void setKcal(int kcal) {
         this.kcal = kcal;
     }
     

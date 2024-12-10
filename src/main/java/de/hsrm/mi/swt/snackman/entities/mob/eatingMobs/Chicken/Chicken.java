@@ -151,7 +151,7 @@ public class Chicken extends EatingMob implements Runnable {
         Snack snackOnSquare = currentSquare.getSnack();
 
         if (snackOnSquare != null) {
-            this.kcal += snackOnSquare.getCalories();
+            super.gainKcal(snackOnSquare.getCalories());
 
             //set snack to null after consuming it
             currentSquare.setSnack(null);
@@ -349,7 +349,7 @@ public class Chicken extends EatingMob implements Runnable {
                 ", posX=" + posX +
                 ", posZ=" + posZ +
                 ", lookingDirection=" + lookingDirection +
-                ", kcal=" + kcal +
+                ", kcal=" + super.getKcal() +
                 '}';
     }
 }
