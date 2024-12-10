@@ -22,6 +22,11 @@ export const useLobbiesStore = defineStore("lobbiesstore", () =>{
     // Each Window have only one Admin Client, for create new lobby
     // then join in another lobby, they become the normal player
     // For Test all Players have the same name 'Player Test'
+    /**
+     * Creates a new player client.
+     * @param name The name of the player.
+     * @returns The newly created player client object.
+     */
     async function createPlayer(name: string){
         const newPlayerClient: IPlayerClientDTD = {
             playerId: '',
@@ -58,6 +63,10 @@ export const useLobbiesStore = defineStore("lobbiesstore", () =>{
         
     }
 
+    /**
+     * Updates the list of lobbies.
+     * Fetches data from the server and triggers live updates.
+     */
     async function updateLobbies(): Promise<void>{
         try{
             const url = `/api/lobbies`
@@ -74,7 +83,10 @@ export const useLobbiesStore = defineStore("lobbiesstore", () =>{
             console.error('Error:', error)
         }
     }
-
+    
+    /**
+     * Starts the STOMP client for real-time lobby updates.
+     */
     async function startLobbyLiveUpdate(){
         if(stompclient && stompclient.active){
             console.log('STOMP-Client activated.')
@@ -98,6 +110,12 @@ export const useLobbiesStore = defineStore("lobbiesstore", () =>{
         stompclient.activate()
     }
 
+    /**
+     * Creates a new lobby with the given name and admin player.
+     * @param lobbyName The name of the new lobby.
+     * @param adminClient The player who will be the admin of the lobby.
+     * @returns The created lobby object or null if failed.
+     */
     async function createLobby(lobbyName: string, adminClient: IPlayerClientDTD): Promise<ILobbyDTD | null> {
         const newLobby: ILobbyDTD = {
             uuid: '',
@@ -133,6 +151,12 @@ export const useLobbiesStore = defineStore("lobbiesstore", () =>{
         }
     }
 
+    /**
+     * Joins an existing lobby.
+     * @param lobbyId The ID of the lobby to join.
+     * @param playerId The ID of the player joining the lobby.
+     * @returns The updated lobby object or null if failed.
+     */
     async function joinLobby(lobbyId: string, playerId: string): Promise<ILobbyDTD | null> {
         try{
             const currentLobby = await fetchLobbyById(lobbyId);
@@ -171,6 +195,11 @@ export const useLobbiesStore = defineStore("lobbiesstore", () =>{
         }
     }
 
+    /**
+     * Removes a player from an existing lobby.
+     * @param lobbyId The ID of the lobby.
+     * @param playerId The ID of the player leaving the lobby.
+     */
     async function leaveLobby(lobbyId: String, playerId: string): Promise<void> {
         try{
             const url = `/api/lobbies/${lobbyId}/leave?playerId=${playerId}`
@@ -191,6 +220,11 @@ export const useLobbiesStore = defineStore("lobbiesstore", () =>{
         }
     }
 
+    /**
+     * Fetches a specific lobby by its ID.
+     * @param lobbyId The ID of the lobby to fetch.
+     * @returns The lobby object or null if not found.
+     */
     async function fetchLobbyById(lobbyId: String): Promise<ILobbyDTD | null> {
         try{
             const url = `/api/lobbies/lobby/${lobbyId}`
@@ -214,6 +248,11 @@ export const useLobbiesStore = defineStore("lobbiesstore", () =>{
         } 
     }
 
+    /**
+     * Fetches a specific player by their ID.
+     * @param playerId The ID of the player to fetch.
+     * @returns The player object or null if not found.
+     */
     async function fetchClientById(playerId: String): Promise<IPlayerClientDTD | null> {
         try{
             const url = `/api/playerclients/player/${playerId}`
