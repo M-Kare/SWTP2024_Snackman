@@ -51,7 +51,6 @@ export class Player {
 
     const mapArray = Array.from(mapContent.gameMap.values())
     let lastSquare = mapArray[mapArray.length-1]
-    console.log(lastSquare?.indexX!+1, lastSquare?.indexZ!+1)
     this.gameMap = this.reshapeArray(mapArray, lastSquare?.indexX!+1, lastSquare?.indexZ!+1) // lastSquare is of type ISquare|undefined because promise
 
     this.currentSquare = this.gameMap[this.calcMapIndexOfCoordinate(posX)][this.calcMapIndexOfCoordinate(posY)];
@@ -201,7 +200,11 @@ export class Player {
     move.z = move.z * delta * this.speed
     const xNew = this.camera.position.x + move.x;
     const zNew = this.camera.position.z + move.z;
-    result = this.checkWallCollision(xNew, zNew);
+    try{
+      result = this.checkWallCollision(xNew, zNew);
+    } catch(e){
+      console.log(e)
+    }
     switch (result) {
       case 0:
         this.camera.position.x += move.x;

@@ -128,7 +128,6 @@ public abstract class Mob {
      * @param delta time since last update 
      */
     public void move(boolean f, boolean b, boolean l, boolean r, double delta) {
-        System.out.println(currentSquare.getIndexX() + "  |  " + currentSquare.getIndexZ());
         int result = 3;
         int moveDirZ = (f ? 1 : 0) - (b ? 1 : 0);
         int moveDirX = (r ? 1 : 0) - (l ? 1 : 0);
