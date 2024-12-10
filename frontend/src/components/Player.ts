@@ -20,6 +20,13 @@ export class Player {
 
     private movementDirection: THREE.Vector3;
 
+    //JUMPING
+    private isJumping: boolean;
+    private lastJumpTime: number;
+    private doubleJump: boolean;
+    private hasDoubleJumped: boolean;
+    //JUMPING
+
     constructor(renderer: WebGLRenderer, posX: number, posY: number, posZ: number, radius: number, speed: number){
         this.prevTime = performance.now();
         this.moveBackward = false;
@@ -28,6 +35,13 @@ export class Player {
         this.moveRight = false;
         this.canJump = true;
         this.movementDirection = new THREE.Vector3();
+
+        //JUMPING
+        this.isJumping = false;
+        this.lastJumpTime = 0;
+        this.doubleJump = false;
+        this.hasDoubleJumped = false;
+        //JUMPING
 
         this.radius = radius;
         this.speed = speed;
@@ -97,6 +111,22 @@ export class Player {
           case 'KeyD':
             this.moveRight = true
             break
+          //JUMPING//
+          case 'Space':
+            const currentTime = performance.now();
+            if (!this.isJumping) {
+              //Single Jump
+              this.isJumping = true;
+              this.lastJumpTime = currentTime;
+              this.hasDoubleJumped = false;
+            } else if (!this.hasDoubleJumped && (currentTime - this.lastJumpTime <= 300)) {
+              //Double Jump
+              this.doubleJump = true;
+              this.hasDoubleJumped = true;
+              this.lastJumpTime = currentTime;
+            }
+            break
+          //JUMPING//
         }
       }
 
@@ -107,6 +137,11 @@ export class Player {
     // lerp is used to interpolate the two positions
     public setPosition(x: number,y: number,z: number) {
       this.camera.position.set(x,y,z);
+      if (y <= 2) {
+        this.isJumping = false
+        this.doubleJump = false
+        this.hasDoubleJumped = false
+      }
     }
 
     public setCameraRotation(x: number,y: number,z: number) {
@@ -140,5 +175,13 @@ export class Player {
       this.camera.position.x += move.x
       this.camera.position.z += move.z
       this.prevTime = time
+    }
+
+    public getIsJumping() {
+      return this.isJumping;
+    }
+
+    public getIsDoubleJumping() {
+      return this.doubleJump;
     }
 }

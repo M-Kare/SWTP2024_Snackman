@@ -14,6 +14,14 @@ import de.hsrm.mi.swt.snackman.services.MapService;
 @Component
 public class SnackMan extends EatingMob {
 
+    //JUMPING
+    private static final double JUMP_STRENGTH = 6;
+    private static final double GRAVITY = -20;
+    private boolean isJumping = false;
+    private double velocityY = 0.0;
+    private boolean hasDoubleJumped = false;
+    //JUMPING
+
     private int currentCalories;
     private double posX;
     private double posY;
@@ -184,9 +192,38 @@ public class SnackMan extends EatingMob {
         throw new UnsupportedOperationException("Unimplemented method 'loseKcal'");
     }
 
-    public void jump(){
-
+    //JUMPING
+    public void jump() {
+        if (!isJumping) {
+            this.velocityY = JUMP_STRENGTH;
+            this.isJumping = true;
+            this.hasDoubleJumped = false;
+            currentCalories = currentCalories - 100;
+        }
     }
+
+    public void doubleJump() {
+        if (isJumping) {
+            this.velocityY += JUMP_STRENGTH * 0.1;
+            this.hasDoubleJumped = true;
+            currentCalories = currentCalories - 200;
+        }
+    }
+
+    public void updateJumpPosition(double deltaTime) {
+        if (isJumping) {
+            this.velocityY += GRAVITY * deltaTime;
+            this.posY += this.velocityY * deltaTime;
+
+            if (this.posY <= GameConfig.SNACKMAN_GROUND_LEVEL) {
+                this.posY = GameConfig.SNACKMAN_GROUND_LEVEL;
+                this.isJumping = false;
+                this.velocityY = 0;
+                this.hasDoubleJumped = false; 
+            }
+        }
+    }
+    //JUMPING
 
     private void jumpOverChicken(){
 
@@ -230,3 +267,4 @@ public class SnackMan extends EatingMob {
         }
     }
 }
+

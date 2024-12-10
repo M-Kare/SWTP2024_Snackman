@@ -22,7 +22,20 @@ public class PlayerMovementController {
       //Validation here
       snackman.setQuaternion(player.qX(), player.qY(), player.qZ(), player.qW());
       snackman.move(player.forward(), player.backward(), player.left(), player.right(), player.delta());
+
+      //JUMPING
+      if (player.jump()) {
+        if (player.doubleJump()) {
+          snackman.doubleJump();
+          System.out.println("doublejump");
+        } else {
+          snackman.jump();
+          System.out.println("singlejump" + "   " + player.doubleJump());
+        }
+      } 
+      snackman.updateJumpPosition(player.delta());
+      //JUMPING
+
       messagingTemplate.convertAndSend("/topic/player", new SnackManPositionDTO(snackman.getPosX(), snackman.getPosY(), snackman.getPosZ()));
     }
-
 }
