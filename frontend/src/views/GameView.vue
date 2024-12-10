@@ -10,11 +10,15 @@ import { Player } from '@/components/Player';
 import type { IPlayerDTD } from '@/stores/IPlayerDTD';
 import {fetchMazeDataFromBackend} from "@/services/MazeDataService";
 import {MazeRenderer} from "@/renderer/MazeRenderer";
+import { GLTFLoader } from 'three/examples/jsm/Addons.js';
 
 const DECELERATION = 20.0
 const ACCELERATION = 300.0
 const WSURL = `ws://${window.location.host}/stompbroker`
 const DEST = '/topic/player'
+
+const SNACKMAN_TEXTURE = 'src/assets/kirby.glb';
+const GHOST_TEXTURE = '';
 
 // stomp
 const stompclient = new Client({ brokerURL: WSURL })
@@ -88,6 +92,27 @@ onMounted(async () => {
   player = new Player(renderer, DECELERATION, ACCELERATION)
   camera = player.getCamera()
   scene.add(player.getControls().object)
+
+  const loader = new GLTFLoader();
+  loader.load(
+    SNACKMAN_TEXTURE,
+    (gltf) => {
+        const playerModel = gltf.scene;
+        playerModel.position.set(10, 0, 10);
+        playerModel.scale.set(10, 10, 10);
+
+        scene.add(playerModel);
+    },
+
+    // shows progess of loading the playerModel
+    xhr => {
+      console.log('PlayerModel - ' + ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+    },
+    // error while loading playerModel
+    error => {
+      console.log( 'An error happened' );
+    }
+  )
 
   //Add maze
   try {

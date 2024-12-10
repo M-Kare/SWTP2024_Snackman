@@ -20,7 +20,7 @@ export const MazeRenderer = () => {
   scene.add(hemiLight)
 
   /**
-   * create a single wall with given x-, y-, z-position, height and sidelengthm
+   * create a single wall with given x-, y-, z-position, height and sidelength
    */
   const createWall = (
     xPosition: number,
