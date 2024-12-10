@@ -1,7 +1,7 @@
 import * as THREE from 'three'
-import {type IGameMap, MapObjectType} from "@/stores/IGameMapDTD";
-import {useGameMapStore} from "@/stores/gameMapStore";
-import {GameObjectRenderer} from "@/renderer/GameObjectRenderer";
+import { type IGameMap, MapObjectType } from '@/stores/IGameMapDTD'
+import { useGameMapStore } from '@/stores/gameMapStore'
+import { GameObjectRenderer } from '@/renderer/GameObjectRenderer'
 
 /**
  * for rendering the game map
@@ -55,26 +55,46 @@ export const GameMapRenderer = () => {
     for (const [id, square] of mapData.gameMap) {
       if (square.type === MapObjectType.WALL) {
         // Create wall at position (x, 0, z) -> y = 0 because of 'building the walls'
-        const wall = gameObjectRenderer.createWall(square.indexX * DEFAULT_SIDE_LENGTH + OFFSET, 0, square.indexZ * DEFAULT_SIDE_LENGTH + OFFSET, WALL_HEIGHT, DEFAULT_SIDE_LENGTH)
+        const wall = gameObjectRenderer.createWall(
+          square.indexX * DEFAULT_SIDE_LENGTH + OFFSET,
+          0,
+          square.indexZ * DEFAULT_SIDE_LENGTH + OFFSET,
+          WALL_HEIGHT,
+          DEFAULT_SIDE_LENGTH,
+        )
         scene.add(wall)
       }
       if (square.type === MapObjectType.FLOOR) {
-        const squareToAdd = gameObjectRenderer.createFloorSquare(square.indexX * DEFAULT_SIDE_LENGTH + OFFSET, square.indexZ * DEFAULT_SIDE_LENGTH + OFFSET, DEFAULT_SIDE_LENGTH)
+        const squareToAdd = gameObjectRenderer.createFloorSquare(
+          square.indexX * DEFAULT_SIDE_LENGTH + OFFSET,
+          square.indexZ * DEFAULT_SIDE_LENGTH + OFFSET,
+          DEFAULT_SIDE_LENGTH,
+        )
         scene.add(squareToAdd)
 
         if (square.snack != null) {
-          const snackToAdd = gameObjectRenderer.createSnackOnFloor(square.indexX * DEFAULT_SIDE_LENGTH + OFFSET, square.indexZ * DEFAULT_SIDE_LENGTH + OFFSET, DEFAULT_SIDE_LENGTH, square.snack?.snackType)
+          const snackToAdd = gameObjectRenderer.createSnackOnFloor(
+            square.indexX * DEFAULT_SIDE_LENGTH + OFFSET,
+            square.indexZ * DEFAULT_SIDE_LENGTH + OFFSET,
+            DEFAULT_SIDE_LENGTH,
+            square.snack?.snackType,
+          )
           scene.add(snackToAdd)
           gameMapStore.setSnackMeshId(id, snackToAdd.id)
         }
       }
     }
     // add chickens
-    for(let currentChicken of mapData.chickens){
-      console.log("Added chicken at position: {} {}", currentChicken.posX, currentChicken.posZ)
-      const chickenToAdd = gameObjectRenderer.createChickenOnFloor(currentChicken.posX * DEFAULT_SIDE_LENGTH + OFFSET, currentChicken.posZ * DEFAULT_SIDE_LENGTH + OFFSET, DEFAULT_SIDE_LENGTH, currentChicken.thickness);
-      scene.add(chickenToAdd);
-      gameMapStore.setChickenMeshId(chickenToAdd.id, currentChicken.id);
+    for (let currentChicken of mapData.chickens) {
+      const chickenToAdd = gameObjectRenderer.createChickenOnFloor(
+        currentChicken.posX * DEFAULT_SIDE_LENGTH + OFFSET,
+        currentChicken.posZ * DEFAULT_SIDE_LENGTH + OFFSET,
+        DEFAULT_SIDE_LENGTH,
+        currentChicken.thickness,
+      )
+      scene.add(chickenToAdd)
+
+      gameMapStore.setChickenMeshId(chickenToAdd.id, currentChicken.id)
     }
   }
 
@@ -82,5 +102,5 @@ export const GameMapRenderer = () => {
     return scene
   }
 
-  return {initRenderer, createGameMap, getScene}
+  return { initRenderer, createGameMap, getScene }
 }
