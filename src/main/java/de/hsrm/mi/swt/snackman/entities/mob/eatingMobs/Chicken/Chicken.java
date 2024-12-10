@@ -2,12 +2,11 @@ package de.hsrm.mi.swt.snackman.entities.mob.eatingMobs.Chicken;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 
 import de.hsrm.mi.swt.snackman.entities.map.Square;
 import de.hsrm.mi.swt.snackman.entities.mapObject.snack.Snack;
+import de.hsrm.mi.swt.snackman.entities.mapObject.snack.SnackType;
 import de.hsrm.mi.swt.snackman.entities.mob.eatingMobs.EatingMob;
 import de.hsrm.mi.swt.snackman.entities.mob.Thickness;
 import de.hsrm.mi.swt.snackman.services.MapService;
@@ -19,23 +18,26 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Represents a chicken entity in the game, capable of moving around the map,
- * consuming snacks, and executing Python-based movement logic
+ * consuming snacks, laying eggs and executing Python-based movement logic
  */
 public class Chicken extends EatingMob implements Runnable {
 
     private static long idCounter = 0;
     private long id;
-    private final PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
-    private final Logger log = LoggerFactory.getLogger(Chicken.class);
+    private int posX, posZ;
     private boolean blockingPath = false;
-    private Thickness thickness = Thickness.THIN;
-    private int posX;
-    private int posZ;
-    private Direction lookingDirection;
     private boolean isWalking;
-    private MapService mapService;
-    public static final int DEFAULT_HEIGHT = 2;
     private final int WAITING_TIME = 2000;  // in ms
+    private boolean isScared = false;
+
+    private Timer eggLayingTimer;
+    private final PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
+    private Thickness thickness = Thickness.THIN;
+    private Direction lookingDirection;
+    private MapService mapService;
+
+    private final Logger log = LoggerFactory.getLogger(Chicken.class);
+
     // python
     private PythonInterpreter pythonInterpreter = null;
     private Properties pythonProps = new Properties();
@@ -69,9 +71,12 @@ public class Chicken extends EatingMob implements Runnable {
         return idCounter++;
     }
 
-    // initialises the timer for laying eggs
-    private void initTimer() {
-
+    /**
+     * initialises the timer for laying eggs
+     */
+        private void initTimer() {
+        this.eggLayingTimer = new Timer();
+        startNewTimer();
     }
 
     /**
@@ -276,6 +281,55 @@ public class Chicken extends EatingMob implements Runnable {
 
     public Direction getLookingDirection() {
         return lookingDirection;
+    }
+
+    /**
+     * Starts a new timer for laying eggs. If the chicken is scared, it adds a delay before starting the timer
+     */
+    private void startNewTimer() {
+        if (eggLayingTimer != null) {
+            eggLayingTimer.cancel();
+        }
+        eggLayingTimer = new Timer();
+
+        TimerTask task = new TimerTask() {
+            public void run() {
+                layEgg();
+            }
+        };
+
+        // Random interval between 30 and 60 seconds
+        long randomIntervalForLayingANewEgg = new Random().nextInt(30000, 60000);
+        long delayBecauseIsScared = 10000;
+
+        if (this.isScared) {
+            System.out.println("Scared Chicken-Timer " + delayBecauseIsScared/1000 + " seconds"); // TODO delete
+            eggLayingTimer.scheduleAtFixedRate(task, (randomIntervalForLayingANewEgg) + delayBecauseIsScared, randomIntervalForLayingANewEgg);
+            this.isScared = false;
+        } else {
+            this.eggLayingTimer.scheduleAtFixedRate(task, randomIntervalForLayingANewEgg, randomIntervalForLayingANewEgg);
+        }
+    }
+
+    /**
+     * Lays an egg and restarts the timer
+     */
+    private void layEgg() {
+        int defaultCalories = 17; // TODO delete
+
+        Snack egg = new Snack(SnackType.EGG);
+        egg.setCalories(defaultCalories);
+
+        System.out.println("Laying Egg with calories: " + defaultCalories); // TODO delete
+        startNewTimer();
+    }
+
+    /**
+     * Sets the chicken to be scared and restarts the timer with a delay
+     */
+    public void getScared() {
+        this.isScared = true;
+        startNewTimer();
     }
 
     @Override
