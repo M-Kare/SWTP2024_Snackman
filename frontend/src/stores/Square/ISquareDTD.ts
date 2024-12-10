@@ -8,7 +8,6 @@ export interface ISquareDTD {
   indexZ: number,
   type: MapObjectType,
   snack: ISnackDTD,
-  chickens: IChickenDTD[]
 }
 
 export interface ISquare {
@@ -17,7 +16,6 @@ export interface ISquare {
   indexZ: number,
   type: MapObjectType,
   snack: ISnack,
-  chickens: IChicken[]
 }
 
 

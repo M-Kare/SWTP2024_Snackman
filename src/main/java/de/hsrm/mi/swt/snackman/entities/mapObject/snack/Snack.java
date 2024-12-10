@@ -27,4 +27,11 @@ public class Snack {
     public void setCalories(int newCalories) {
         this.calories = newCalories;
     }
+
+    @Override
+    public String toString() {
+        return "Snack{" +
+                "snackType=" + snackType +
+                '}';
+    }
 }

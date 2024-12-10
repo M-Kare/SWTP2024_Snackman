@@ -53,7 +53,7 @@ public class ChickenIntegrationTest {
     public void testChickenMovement() {
         try (PythonInterpreter pyInterp = new PythonInterpreter()) {
             pyInterp.exec("import sys");
-            pyInterp.exec("sys.path.append('src/main/java/de/hsrm/mi/swt/snackman/entities/mob/Chicken')");
+            pyInterp.exec("sys.path.append('src/main/java/de/hsrm/mi/swt/snackman/entities/mob/eatingMobs/Chicken')");
 
             pyInterp.exec("from ChickenMovementSkript import choose_next_square");
             pyInterp.exec("result = choose_next_square(['W', 'L', 'W', 'L', 'W', 'L', 'W', 'L', 0])");

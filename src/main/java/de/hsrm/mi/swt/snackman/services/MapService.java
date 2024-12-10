@@ -50,28 +50,6 @@ public class MapService {
     }
 
     /**
-     * Gives back the new square-position of the chicken
-     *
-     * @param x,        z the current position of the chicken
-     * @param direction in which the chicken decided to go
-     * @return the square which is laying in the direction of the currentPosition
-     */
-    public synchronized Square getNewPosition(int x, int z, Direction direction) {
-        Square currentChickenPosition = this.getSquareAtIndexXZ(x, z);
-        return switch (direction) {
-            case Direction.NORTH ->
-                    this.gameMap.getSquareAtIndexXZ(currentChickenPosition.getIndexX(), currentChickenPosition.getIndexZ() - 1);
-            case Direction.EAST ->
-                    this.gameMap.getSquareAtIndexXZ(currentChickenPosition.getIndexX() + 1, currentChickenPosition.getIndexZ());
-            case Direction.SOUTH ->
-                    this.gameMap.getSquareAtIndexXZ(currentChickenPosition.getIndexX(), currentChickenPosition.getIndexZ() + 1);
-            case Direction.WEST ->
-                    this.gameMap.getSquareAtIndexXZ(currentChickenPosition.getIndexX() - 1, currentChickenPosition.getIndexZ());
-            default -> null;
-        };
-    }
-
-    /**
      * Converts the char array maze data into MapObjects and populates the game map
      *
      * @param mazeData the char array representing the maze
@@ -143,8 +121,7 @@ public class MapService {
 
                 newChicken.addPropertyChangeListener((PropertyChangeEvent evt) -> {
                     if (evt.getPropertyName().equals("chicken")) {
-                        FrontendChickenMessageEvent messageEvent = new FrontendChickenMessageEvent(EventType.CHICKEN, ChangeType.UPDATE,
-                                (Square) evt.getOldValue(), (Square) evt.getNewValue());
+                        FrontendChickenMessageEvent messageEvent = new FrontendChickenMessageEvent(EventType.CHICKEN, ChangeType.UPDATE, (Chicken) evt.getNewValue());
 
                         frontendMessageService.sendChickenEvent(messageEvent);
                     }
@@ -158,21 +135,22 @@ public class MapService {
     }
 
     /**
-     * @param currentPosition the square the chicken is standing on top of
-     * @return a list of 8 square which are around the current square
+     * @param currentPosition  the square the chicken is standing on top of
+     * @param lookingDirection
+     * @return a list of 8 square which are around the current square + the direction the chicken is looking in the order:
+     * northwest_square, north_square, northeast_square, east_square, southeast_square, south_square, southwest_square, west_square, direction
      */
-    public synchronized List<String> getSquaresVisibleForChicken(Square currentPosition) {
+    public synchronized List<String> getSquaresVisibleForChicken(Square currentPosition, Direction lookingDirection) {
         List<String> squares = new ArrayList<>();
-        // northwest_square, north_square, northeast_square, east_square,
-        // southeast_square, south_square, southwest_square, west_square, direction
-        squares.add(this.gameMap.getSquareAtIndexXZ(currentPosition.getIndexX() - 1, currentPosition.getIndexZ() - 1).getPrimaryType());
-        squares.add(this.gameMap.getSquareAtIndexXZ(currentPosition.getIndexX(), currentPosition.getIndexZ() - 1).getPrimaryType());
-        squares.add(this.gameMap.getSquareAtIndexXZ(currentPosition.getIndexX() + 1, currentPosition.getIndexZ() + 1).getPrimaryType());
-        squares.add(this.gameMap.getSquareAtIndexXZ(currentPosition.getIndexX() + 1, currentPosition.getIndexZ()).getPrimaryType());
-        squares.add(this.gameMap.getSquareAtIndexXZ(currentPosition.getIndexX() + 1, currentPosition.getIndexZ() + 1).getPrimaryType());
-        squares.add(this.gameMap.getSquareAtIndexXZ(currentPosition.getIndexX(), currentPosition.getIndexZ() + 1).getPrimaryType());
-        squares.add(this.gameMap.getSquareAtIndexXZ(currentPosition.getIndexX() - 1, currentPosition.getIndexZ() + 1).getPrimaryType());
-        squares.add(this.gameMap.getSquareAtIndexXZ(currentPosition.getIndexX() - 1, currentPosition.getIndexZ()).getPrimaryType());
+        squares.add(Direction.NORTH_WEST.getNorthWestSquare(this, currentPosition).getPrimaryType());
+        squares.add(Direction.NORTH.getNorthSquare(this, currentPosition).getPrimaryType());
+        squares.add(Direction.NORTH_EAST.getNorthEastSquare(this, currentPosition).getPrimaryType());
+        squares.add(Direction.EAST.getEastSquare(this, currentPosition).getPrimaryType());
+        squares.add(Direction.SOUTH_EAST.getSouthEastSquare(this, currentPosition).getPrimaryType());
+        squares.add(Direction.SOUTH.getSouthSquare(this, currentPosition).getPrimaryType());
+        squares.add(Direction.SOUTH_WEST.getSouthWestSquare(this, currentPosition).getPrimaryType());
+        squares.add(Direction.WEST.getWestSquare(this, currentPosition).getPrimaryType());
+        squares.add(lookingDirection.toString());
         return squares;
     }
 
@@ -196,4 +174,5 @@ public class MapService {
     public Square getSquareAtIndexXZ(int x, int z) {
         return gameMap.getSquareAtIndexXZ(x, z);
     }
+
 }

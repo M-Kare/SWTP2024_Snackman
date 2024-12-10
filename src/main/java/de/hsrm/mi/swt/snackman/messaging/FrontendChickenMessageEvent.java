@@ -1,9 +1,8 @@
 package de.hsrm.mi.swt.snackman.messaging;
 
-import de.hsrm.mi.swt.snackman.entities.map.Square;
+import de.hsrm.mi.swt.snackman.entities.mob.eatingMobs.Chicken.Chicken;
 
-public record FrontendChickenMessageEvent(EventType eventType, ChangeType changeType, Square oldSquare, Square newSquare) {
-
+public record FrontendChickenMessageEvent(EventType eventType, ChangeType changeType, Chicken chicken) {
 
     @Override
     public EventType eventType() {
@@ -16,12 +15,16 @@ public record FrontendChickenMessageEvent(EventType eventType, ChangeType change
     }
 
     @Override
-    public Square newSquare() {
-        return newSquare;
+    public Chicken chicken() {
+        return chicken;
     }
 
     @Override
-    public Square oldSquare() {
-        return oldSquare;
+    public String toString() {
+        return "FrontendChickenMessageEvent{" +
+                "eventType=" + eventType +
+                ", changeType=" + changeType +
+                ", chicken=" + chicken +
+                '}';
     }
 }

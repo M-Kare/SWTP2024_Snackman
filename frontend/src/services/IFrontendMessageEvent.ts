@@ -1,4 +1,5 @@
 import type {ISquareDTD} from "@/stores/Square/ISquareDTD";
+import type {IChickenDTD} from "@/stores/Chicken/IChickenDTD";
 
 type EventType = 'SNACK' | 'CHICKEN'
 type ChangeType = 'CREATE' | 'UPDATE' | 'DELETE'
@@ -12,6 +13,5 @@ export interface IFrontendMessageEvent{
 export interface IFrontendChickenMessageEvent{
   eventType: EventType,
   changeType: ChangeType,
-  oldSquare: ISquareDTD,
-  newSquare: ISquareDTD
+  chicken: IChickenDTD,
 }
