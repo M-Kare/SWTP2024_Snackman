@@ -18,14 +18,24 @@ export const GameObjectRenderer = () => {
   ) => {
     let color = 'blue';
 
-    if (type == SnackType.STRAWBERRY) {
-      color = 'purple'
-    } else if (type == SnackType.ORANGE) {
-      color = 'orange'
-    } else if (type == SnackType.CHERRY) {
-      color = 'red'
-    } else if (type == SnackType.APPLE) {
-      color = 'green'
+    switch (type) {
+      case SnackType.STRAWBERRY:
+        color = 'purple'
+        break
+      case SnackType.ORANGE:
+        color = 'orange'
+        break
+      case SnackType.CHERRY:
+        color = 'red'
+        break
+      case SnackType.APPLE:
+        color = 'green'
+        break
+      case SnackType.EGG:
+        color = 'white'
+        break
+      default:
+        console.error("SnackType {} doesn't exist", type)
     }
 
     // TODO add correct snack-material-design
