@@ -312,26 +312,28 @@ public class Chicken extends EatingMob implements Runnable {
     }
 
     /**
-     * Lays an egg on the current square the chicken is standing on
+     * Lays an egg on the current square the chicken is standing on (just if the chicken itself has more than 0 kcal)
      * The calories of the egg are calculated as 1.5 times the current calories of the chicken
      * After laying the egg, the chicken's calories are reset to 0 and its thickness is set to thin
      */
     private void layEgg() {
-        Square currentSquare = this.mapService.getSquareAtIndexXZ(this.posX, this.posZ);
+        if (super.getKcal() > 0) {
+            Square currentSquare = this.mapService.getSquareAtIndexXZ(this.posX, this.posZ);
 
-        // new egg with current chicken-calories * 1.5
-        int eggCalories = (int) (super.getKcal() * 1.5);
-        Snack egg = new Snack(SnackType.EGG);
-        egg.setCalories(eggCalories);
+            // new egg with current chicken-calories * 1.5
+            int eggCalories = (int) (super.getKcal() * 1.5);
+            Snack egg = new Snack(SnackType.EGG);
+            egg.setCalories(eggCalories);
 
-        // add egg to current square
-        this.mapService.addEggToSquare(currentSquare, egg);
+            // add egg to current square
+            this.mapService.addEggToSquare(currentSquare, egg);
 
-        // Chicken becomes thin again and has no calories after it has laid an egg
-        super.setKcal(0);
-        this.setThickness(Thickness.THIN);
+            // Chicken becomes thin again and has no calories after it has laid an egg
+            super.setKcal(0);
+            this.setThickness(Thickness.THIN);
 
-        startNewTimer();
+            startNewTimer();
+        }
     }
 
     /**
