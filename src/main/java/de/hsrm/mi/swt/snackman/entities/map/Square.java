@@ -4,8 +4,6 @@ import de.hsrm.mi.swt.snackman.entities.mapObject.MapObjectType;
 import de.hsrm.mi.swt.snackman.entities.mapObject.snack.Snack;
 import de.hsrm.mi.swt.snackman.entities.mob.Mob;
 import de.hsrm.mi.swt.snackman.entities.mob.Ghost;
-import de.hsrm.mi.swt.snackman.entities.mob.eatingMobs.Chicken.Chicken;
-
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;

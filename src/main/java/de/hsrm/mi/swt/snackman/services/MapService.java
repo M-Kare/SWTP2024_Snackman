@@ -175,4 +175,14 @@ public class MapService {
         return gameMap.getSquareAtIndexXZ(x, z);
     }
 
+    /**
+     * Adds a laid egg to a specified square on the map
+     *
+     * @param square  The square where the egg is to be added
+     * @param laidEgg The snack representing the egg that has been laid
+     */
+    public void addEggToSquare(Square square, Snack laidEgg) {
+        log.info("{} cal egg has just been laid on floor and add to square {}", laidEgg.getCalories(), square.getId()); // TODO delete
+        square.setSnack(laidEgg);
+    }
 }
