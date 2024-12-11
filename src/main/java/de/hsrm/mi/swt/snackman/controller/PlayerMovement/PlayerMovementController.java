@@ -6,6 +6,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.SnackMan;
+import de.hsrm.mi.swt.snackman.services.MapService;
 
 @Controller
 public class PlayerMovementController {
@@ -14,12 +15,12 @@ public class PlayerMovementController {
     private SimpMessagingTemplate messagingTemplate;
     
     @Autowired
-    private SnackMan snackman;
+    private MapService mapService;
 
     // Erhalte Messages von /topic/player/update
     @MessageMapping("/topic/player/update")
     public void spreadPlayerUpdate(SnackManFrontendDTO player) {
-      //Validation here
+      SnackMan snackman = mapService.getSnackMan();
       snackman.setQuaternion(player.qX(), player.qY(), player.qZ(), player.qW());
       snackman.move(player.forward(), player.backward(), player.left(), player.right(), player.delta());
 
