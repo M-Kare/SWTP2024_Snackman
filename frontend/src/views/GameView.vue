@@ -70,7 +70,7 @@ function animate() {
           qY: player.getCamera().quaternion.y,
           qZ: player.getCamera().quaternion.z,
           qW: player.getCamera().quaternion.w
-        }, {delta: delta}, { jump: player.getIsJumping()}, { doubleJump: player.getIsDoubleJumping()}))
+        }, {delta: delta}))
       });
     } catch (fehler) {
       console.log(fehler)

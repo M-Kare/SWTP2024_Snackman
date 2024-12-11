@@ -23,11 +23,6 @@ export class Player {
 
   private movementDirection: THREE.Vector3;
 
-  private isJumping: boolean;
-  private lastJumpTime: number;
-  private doubleJump: boolean;
-  private spacePressed: boolean;
-
   //TODO: ersetzten durch das maze im pinia store
   private squareSize: Readonly<number>;
   private gameMap: ISquare[][];
@@ -50,11 +45,6 @@ export class Player {
     this.moveRight = false;
     this.canJump = true;
     this.movementDirection = new THREE.Vector3();
-
-    this.isJumping = false;
-    this.lastJumpTime = 0;
-    this.doubleJump = false;
-    this.spacePressed = false;
 
     const { mapContent } = useGameMapStore();
     this.squareSize = mapContent.DEFAULT_SQUARE_SIDE_LENGTH;
@@ -128,10 +118,6 @@ export class Player {
       case 'KeyD':
         this.moveRight = false
         break
-
-      case 'Space':
-        this.spacePressed = false;
-        break;
     }
   }
   /**
@@ -159,22 +145,6 @@ export class Player {
       case 'KeyD':
         this.moveRight = true
         break
-
-      case 'Space':
-        if (!this.spacePressed) {
-          this.spacePressed = true;
-          const currentTime = performance.now();
-          if (!this.isJumping) {
-            //Single Jump
-            this.isJumping = true;
-            this.lastJumpTime = currentTime;
-          } else if (!this.doubleJump && (currentTime - this.lastJumpTime <= 600)) {
-            //Double Jump
-            this.doubleJump = true;
-            this.lastJumpTime = currentTime;
-          }
-        }
-        break;
     }
   }
   /**
@@ -190,10 +160,6 @@ export class Player {
    */
   public setPosition(x: number, y: number, z: number) {
     this.camera.position.lerp(new THREE.Vector3(x, y, z), 0.5);
-    if (y <= 2) {
-      this.isJumping = false
-      this.doubleJump = false
-    }
   }
 
   /**
@@ -341,13 +307,5 @@ export class Player {
     const line = origin.cross(direction);
     const dist = Math.abs(line.x * xNew + line.y * zNew + line.z) / Math.sqrt(line.x * line.x + line.y * line.y);
     return dist <= this.radius;
-  }
-
-  public getIsJumping() {
-    return this.isJumping;
-  }
-
-  public getIsDoubleJumping() {
-    return this.doubleJump;
   }
 }
