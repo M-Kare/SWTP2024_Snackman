@@ -36,6 +36,7 @@ public class Chicken extends EatingMob implements Runnable {
     private MapService mapService;
     public static final int DEFAULT_HEIGHT = 2;
     private final int WAITING_TIME = 2000;  // in ms
+    private final int MAX_KALORIEN = 3000;
     // python
     private PythonInterpreter pythonInterpreter = null;
     private Properties pythonProps = new Properties();
@@ -130,7 +131,7 @@ public class Chicken extends EatingMob implements Runnable {
 
             // consume snack if present
             currentPosition = this.mapService.getSquareAtIndexXZ(this.posX, this.posZ);
-            if (currentPosition.getSnack() != null) {
+            if (currentPosition.getSnack() != null && getKcal() < MAX_KALORIEN) {
                 log.debug("Snack being eaten at x {} z {}", this.posX, this.posZ);
                 consumeSnackOnSquare();
             }
@@ -147,7 +148,11 @@ public class Chicken extends EatingMob implements Runnable {
 
         if (snackOnSquare != null) {
 
-            this.kcal += snackOnSquare.getCalories();
+            try {
+                gainKcal(snackOnSquare.getCalories());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
 
             //set snack to null after consuming it
             currentSquare.setSnack(null);
@@ -286,7 +291,7 @@ public class Chicken extends EatingMob implements Runnable {
                 ", posX=" + posX +
                 ", posZ=" + posZ +
                 ", lookingDirection=" + lookingDirection +
-                ", kcal=" + kcal +
+                ", kcal=" + getKcal() +
                 '}';
     }
 }
