@@ -11,6 +11,12 @@ import type {IChicken, IChickenDTD} from "@/stores/Chicken/IChickenDTD";
 import {Direction} from "@/stores/Chicken/IChickenDTD";
 import {GameObjectRenderer} from "@/renderer/GameObjectRenderer";
 
+/**
+ * Defines the pinia store used for saving the map from
+ * the backend. Updates of the snacks are saved here and
+ * updated in the store itself. It holds the scene on
+ * which the game is build up on.
+ */
 export const useGameMapStore = defineStore('gameMap', () => {
   let snackStompclient: Client
   let chickenStompclient: Client

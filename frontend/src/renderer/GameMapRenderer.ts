@@ -18,7 +18,7 @@ export const GameMapRenderer = () => {
   // set up light
   const light = new THREE.DirectionalLight(0xffffff, 1)
   light.position.set(5, 10, 10)
-  light.castShadow = true
+  // light.castShadow = true
   scene.add(light)
 
   // add more natural outdoor lighting
@@ -65,12 +65,12 @@ export const GameMapRenderer = () => {
         scene.add(wall)
       }
       if (square.type === MapObjectType.FLOOR) {
-        const squareToAdd = gameObjectRenderer.createFloorSquare(
+        /*const squareToAdd = gameObjectRenderer.createFloorSquare(
           square.indexX * DEFAULT_SIDE_LENGTH + OFFSET,
           square.indexZ * DEFAULT_SIDE_LENGTH + OFFSET,
           DEFAULT_SIDE_LENGTH,
         )
-        scene.add(squareToAdd)
+        scene.add(squareToAdd)*/
 
         if (square.snack != null) {
           const snackToAdd = gameObjectRenderer.createSnackOnFloor(
@@ -102,5 +102,5 @@ export const GameMapRenderer = () => {
     return scene
   }
 
-  return { initRenderer, createGameMap, getScene }
+  return {initRenderer, createGameMap, getScene}
 }

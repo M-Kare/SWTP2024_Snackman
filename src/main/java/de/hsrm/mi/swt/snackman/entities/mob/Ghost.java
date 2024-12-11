@@ -1,10 +1,15 @@
-package de.hsrm.mi.swt.snackman.entities.mob;
+package de.hsrm.mi.swt.snackman.entities.mobileObjects;
+
+import de.hsrm.mi.swt.snackman.services.MapService;
 
 public class Ghost extends Mob {
 
-    public Ghost(){
-        super();
-        
+    public Ghost(MapService mapService, int speed, double radius){
+        super(mapService, speed, radius);
+    }
+
+    public Ghost(MapService mapService, int speed, double radius, double posX, double posY, double posZ){
+        super(mapService, speed, radius, posX, posY, posZ);
     }
 
     public void collectItems(){
