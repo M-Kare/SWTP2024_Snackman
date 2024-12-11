@@ -1,6 +1,5 @@
 package de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs;
 
-import de.hsrm.mi.swt.snackman.entities.mapObject.snack.Snack;
 import org.joml.Quaterniond;
 import org.joml.Vector3d;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +8,7 @@ import org.springframework.stereotype.Component;
 import de.hsrm.mi.swt.snackman.configuration.GameConfig;
 import de.hsrm.mi.swt.snackman.entities.map.Square;
 import de.hsrm.mi.swt.snackman.entities.mapObject.MapObjectType;
+import de.hsrm.mi.swt.snackman.entities.mapObject.snack.Snack;
 import de.hsrm.mi.swt.snackman.services.MapService;
 
 @Component
@@ -206,7 +206,7 @@ public class SnackMan extends EatingMob {
         if (isJumping) {
             this.velocityY += JUMP_STRENGTH * 0.1;
             this.hasDoubleJumped = true;
-            currentCalories = currentCalories - 200;
+            currentCalories = currentCalories - 100;
         }
     }
 
