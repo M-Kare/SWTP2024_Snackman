@@ -8,37 +8,81 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class SnackMan extends EatingMob {
+    private boolean isJumping = false;
+    private double velocityY = 0.0;
 
     private final Logger log = LoggerFactory.getLogger(SnackMan.class);
 
-    public SnackMan(MapService mapService){
+    public SnackMan(MapService mapService) {
         this(mapService, GameConfig.SNACKMAN_SPEED, GameConfig.SNACKMAN_RADIUS);
     }
 
-    public SnackMan(MapService mapService, int speed, double radius){
-        super(mapService, speed, radius);    }
+    public SnackMan(MapService mapService, int speed, double radius) {
+        super(mapService, speed, radius);
+    }
 
-    public SnackMan(MapService mapService, int speed, double radius, double posX, double posY, double posZ){
+    public SnackMan(MapService mapService, int speed, double radius, double posX, double posY, double posZ) {
         super(mapService, speed, radius, posX, posY, posZ);
     }
 
-    public void jump(){
+    @Override
+    public void gainKcal() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'gainKcal'");
+    }
+
+    @Override
+    public void loseKcal() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'loseKcal'");
+    }
+
+    //JUMPING
+    public void jump() {
+        if (!isJumping) {
+            if (getKcal() >= 100) {
+                this.velocityY = GameConfig.JUMP_STRENGTH;
+                this.isJumping = true;
+                setKcal(getKcal() - 100);
+            }
+        }
+    }
+
+    public void doubleJump() {
+        if (isJumping) {
+            if (getKcal() >= 100) {
+                this.velocityY += GameConfig.DOUBLEJUMP_STRENGTH;
+                setKcal(getKcal() - 100);
+            }
+        }
+    }
+
+    public void updateJumpPosition(double deltaTime) {
+        if (isJumping) {
+            this.velocityY += GameConfig.GRAVITY * deltaTime;
+            setPosY(getPosY() + velocityY * deltaTime);
+
+            if (getPosY() <= GameConfig.SNACKMAN_GROUND_LEVEL) {
+                setPosY(GameConfig.SNACKMAN_GROUND_LEVEL);
+                this.isJumping = false;
+                this.velocityY = 0;
+            }
+        }
+    }
+
+    private void jumpOverChicken() {
 
     }
 
-    private void jumpOverChicken(){
+    private void jumpToSeeMap() {
 
     }
 
-    private void jumpToSeeMap(){
+    private void jumpOverWall() {
 
     }
 
-    private void jumpOverWall(){
-
-    }
-
-    public void collectItems(){
+    public void collectItems() {
 
     }
 
@@ -55,12 +99,13 @@ public class SnackMan extends EatingMob {
     /**
      * Collects the snack on the square if there is one.
      * If there is one that remove it from the square.
+     *
      * @param square to eat the snack from
      */
-    public void consumeSnackOnSquare(Square square){
+    public void consumeSnackOnSquare(Square square) {
         Snack snackOnSquare = square.getSnack();
 
-        if(snackOnSquare != null){
+        if (snackOnSquare != null) {
             try {
                 super.gainKcal(snackOnSquare.getCalories());
             } catch (Exception e) {
