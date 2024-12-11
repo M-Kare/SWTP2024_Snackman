@@ -151,7 +151,7 @@ public class Chicken extends EatingMob implements Runnable {
         Snack snackOnSquare = currentSquare.getSnack();
 
         if (snackOnSquare != null) {
-            super.kcal += snackOnSquare.getCalories();
+            super.gainKcal(snackOnSquare.getCalories());
 
             //set snack to null after consuming it
             currentSquare.setSnack(null);
@@ -318,11 +318,11 @@ public class Chicken extends EatingMob implements Runnable {
      */
     private void layEgg() {
         // TODO implement max kcal from chicken and when it has reached the maximum kcal, an egg must be laid
-        if (super.kcal > 0) {
+        if (super.getKcal() > 0) {
             Square currentSquare = this.mapService.getSquareAtIndexXZ(this.posX, this.posZ);
 
             // new egg with current chicken-calories * 1.5
-            int eggCalories = (int) (super.kcal * 1.5);
+            int eggCalories = (int) (super.getKcal() * 1.5);
             Snack egg = new Snack(SnackType.EGG);
             egg.setCalories(eggCalories);
 
@@ -330,7 +330,7 @@ public class Chicken extends EatingMob implements Runnable {
             this.mapService.addEggToSquare(currentSquare, egg);
 
             // Chicken becomes thin again and has no calories after it has laid an egg
-            super.kcal = 0;
+            super.setKcal(0);
             this.setThickness(Thickness.THIN);
 
             startNewTimer();
@@ -352,7 +352,7 @@ public class Chicken extends EatingMob implements Runnable {
                 ", posX=" + posX +
                 ", posZ=" + posZ +
                 ", lookingDirection=" + lookingDirection +
-                ", kcal=" + kcal +
+                ", kcal=" + super.getKcal() +
                 '}';
     }
 }
