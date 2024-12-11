@@ -24,7 +24,7 @@ public class SnackManTest {
     private ReadMazeService readMazeService;
 
     private SnackMan snackMan;
-    
+
     @BeforeEach
     public void setUp() {
         snackMan = new SnackMan(new MapService(frontendMessageService, readMazeService), GameConfig.SNACKMAN_SPEED, GameConfig.SNACKMAN_RADIUS);

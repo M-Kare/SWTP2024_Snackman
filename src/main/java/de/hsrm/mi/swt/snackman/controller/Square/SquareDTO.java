@@ -8,7 +8,6 @@ public record SquareDTO(long id, int indexX, int indexZ, MapObjectType type, Sna
 
     public static SquareDTO fromSquare(Square s){
         SnackDTO snackDTO = (s.getSnack() != null) ? SnackDTO.fromSnack(s.getSnack()) : null;
-
         return new SquareDTO(s.getId(), s.getIndexX(), s.getIndexZ(), s.getType(), snackDTO);
     }
 }

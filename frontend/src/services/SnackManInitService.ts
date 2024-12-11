@@ -1,4 +1,4 @@
-import type { IPlayerInitDTD } from "@/stores/IPlayerInitDTD"
+import type { IPlayerInitDTD } from "@/stores/Player/IPlayerInitDTD"
 
 export async function fetchSnackManFromBackend(): Promise<IPlayerInitDTD> {
     // rest endpoint from backend
