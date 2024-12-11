@@ -28,8 +28,8 @@
     import SmallNavButton from '@/components/SmallNavButton.vue';
     import { useRouter } from 'vue-router';
     import { computed, onMounted, ref } from 'vue';
-    import { useLobbiesStore } from '@/stores/lobbiesstore';
-    import type { IPlayerClientDTD } from '@/stores/IPlayerClientDTD';
+    import { useLobbiesStore } from '@/stores/Lobby/lobbiesstore';
+    import type { IPlayerClientDTD } from '@/stores/Lobby/IPlayerClientDTD';
 
     const router = useRouter();
     const lobbiesStore = useLobbiesStore();
@@ -48,9 +48,9 @@
 
     const createLobby = async () => {
         const adminClient = currentPlayer;
-        adminClient.playerId = currentPlayer.playerId;
-        adminClient.playerName = currentPlayer.playerName;
-        adminClient.role = currentPlayer.role;
+        // adminClient.playerId = currentPlayer.playerId;
+        // adminClient.playerName = currentPlayer.playerName;
+        // adminClient.role = currentPlayer.role;
 
         if (!adminClient || adminClient.playerId === '' || adminClient.playerName === '') {
             alert("Admin client is not valid!");
@@ -62,14 +62,14 @@
             return;
         }
 
-        const isDuplicateName = lobbiesStore.lobbydata.lobbies.some(
-            (lobby) => lobby.name === lobbyName.value.trim()
-        );
+        // const isDuplicateName = lobbiesStore.lobbydata.lobbies.some(
+        //     // (lobby) => lobby.name === lobbyName.value.trim()
+        // );
 
-        if (isDuplicateName) {
-            alert("Lobby name already exists! Please choose another name.");
-            return;
-        }
+        // if (isDuplicateName) {
+        //     alert("Lobby name already exists! Please choose another name.");
+        //     return;
+        // }
 
         try{
             const newLobby = await lobbiesStore.createLobby(lobbyName.value.trim(), adminClient);

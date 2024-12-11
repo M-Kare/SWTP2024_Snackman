@@ -61,9 +61,9 @@
 
     import { useRouter } from 'vue-router';
     import { computed, onMounted, ref, watch } from 'vue';
-    import { useLobbiesStore } from '@/stores/lobbiesstore';
-    import type { ILobbyDTD } from '@/stores/ILobbyDTD';
-    import type { IPlayerClientDTD } from '@/stores/IPlayerClientDTD';
+    import { useLobbiesStore } from '@/stores/Lobby/lobbiesstore';
+    import type { ILobbyDTD } from '@/stores/Lobby/ILobbyDTD';
+    import type { IPlayerClientDTD } from '@/stores/Lobby/IPlayerClientDTD';
 
     const router = useRouter();
     const lobbiesStore = useLobbiesStore();
@@ -103,7 +103,6 @@
             if(joinedLobby) {
                 console.log('Successfully joined lobby', joinedLobby.name);
                 router.push({ name: "Lobby", params: { lobbyId: lobby.uuid } });
-                lobbiesStore.startLobbyLiveUpdate();
             }
         } catch (error: any){
             console.error('Error:', error);

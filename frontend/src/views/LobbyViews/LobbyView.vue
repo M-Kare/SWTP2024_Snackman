@@ -50,9 +50,9 @@
 
     import { useRoute, useRouter } from 'vue-router';
     import { computed, onMounted, ref } from 'vue';
-    import type { ILobbyDTD } from '@/stores/ILobbyDTD';
-    import { useLobbiesStore } from '@/stores/lobbiesstore';
-    import type { IPlayerClientDTD } from '@/stores/IPlayerClientDTD';
+    import type { ILobbyDTD } from '@/stores/Lobby/ILobbyDTD';
+    import { useLobbiesStore } from '@/stores/Lobby/lobbiesstore';
+    import type { IPlayerClientDTD } from '@/stores/Lobby/IPlayerClientDTD';
 
     const router = useRouter();
     const route = useRoute();

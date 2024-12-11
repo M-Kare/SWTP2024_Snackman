@@ -1,8 +1,8 @@
 import { defineStore } from 'pinia';
 import { reactive } from 'vue';
 import { Client } from '@stomp/stompjs';
-import type { IPlayerClientDTD } from './IPlayerClientDTD';
 import type { ILobbyDTD } from './ILobbyDTD';
+import type { IPlayerClientDTD } from './IPlayerClientDTD';
 
 const wsurl = `ws://${window.location.host}/stompbroker`
 const DEST = 'topic/lobbies'
@@ -17,7 +17,7 @@ export const useLobbiesStore = defineStore("lobbiesstore", () =>{
         } as IPlayerClientDTD //PlayerClient for each window, for check the sync
     })
 
-    let stompclient: Client | null = null
+    // let stompclient: Client | null = null
 
     // Each Window have only one Admin Client, for create new lobby
     // then join in another lobby, they become the normal player
@@ -46,9 +46,6 @@ export const useLobbiesStore = defineStore("lobbiesstore", () =>{
 
             if(response.ok){
                 const newPlayer = await response.json()
-                // lobbydata.currentPlayer.playerId = newPlayer.playerId
-                // lobbydata.currentPlayer.playerName = newPlayer.playerName
-                // lobbydata.currentPlayer.role = newPlayer.role
                 Object.assign(lobbydata.currentPlayer, newPlayer)
             } else {
                 const errorText = await response.text()
@@ -89,12 +86,14 @@ export const useLobbiesStore = defineStore("lobbiesstore", () =>{
      * Starts the STOMP client for real-time lobby updates.
      */
     async function startLobbyLiveUpdate(){
+        let stompclient: Client
+
+        stompclient = new Client({ brokerURL: wsurl })
+
         if(stompclient && stompclient.active){
             console.log('STOMP-Client activated.')
             return
         }
-
-        stompclient = new Client({ brokerURL: wsurl })
 
         stompclient.onConnect = (frame) => {
             console.log('STOMP connected:', frame)

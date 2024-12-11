@@ -1,4 +1,4 @@
-package de.hsrm.mi.swt.snackman.controller;
+package de.hsrm.mi.swt.snackman.controller.Lobby;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
