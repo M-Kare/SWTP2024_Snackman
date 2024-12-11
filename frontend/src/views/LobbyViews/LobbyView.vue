@@ -77,7 +77,7 @@
             router.push({name: "LobbyList"});
         }
 
-        await lobbiesStore.updateLobbies();
+        lobbiesStore.startLobbyLiveUpdate();
     })
 
     const leaveLobby = async () => {

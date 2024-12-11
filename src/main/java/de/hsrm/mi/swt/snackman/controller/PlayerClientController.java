@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import de.hsrm.mi.swt.snackman.entities.lobby.Lobby;
 import de.hsrm.mi.swt.snackman.entities.lobby.PlayerClient;
 import de.hsrm.mi.swt.snackman.services.LobbyManagerService;
 
@@ -28,8 +27,8 @@ public class PlayerClientController {
     @Autowired
     private LobbyManagerService lobbyManagerService;
 
-    //@Autowired
-    //private SimpMessagingTemplate messagingTemplate;
+    @Autowired
+    private SimpMessagingTemplate messagingTemplate;
     
     private final Logger logger = LoggerFactory.getLogger(PlayerClientController.class);
 
@@ -46,6 +45,7 @@ public class PlayerClientController {
         }
 
         PlayerClient newPlayerClient = lobbyManagerService.createNewClient(name);
+        //messagingTemplate.convertAndSend("/topic/playerclients");
         logger.info("Creating new player with name: {} and playerUuid: {}", newPlayerClient.getPlayerName(), newPlayerClient.getPlayerId());
         
         return ResponseEntity.ok(newPlayerClient);

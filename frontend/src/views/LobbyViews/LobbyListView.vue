@@ -60,7 +60,7 @@
     import CreateLobbyForm from '@/components/CreateLobbyForm.vue';
 
     import { useRouter } from 'vue-router';
-    import { computed, onMounted, ref } from 'vue';
+    import { computed, onMounted, ref, watch } from 'vue';
     import { useLobbiesStore } from '@/stores/lobbiesstore';
     import type { ILobbyDTD } from '@/stores/ILobbyDTD';
     import type { IPlayerClientDTD } from '@/stores/IPlayerClientDTD';
@@ -68,8 +68,13 @@
     const router = useRouter();
     const lobbiesStore = useLobbiesStore();
 
-    const lobbies = computed(() => lobbiesStore.lobbydata.lobbies as Array<ILobbyDTD>);
+    const lobbies = computed(() => lobbiesStore.lobbydata.lobbies);
     const currentPlayer = lobbiesStore.lobbydata.currentPlayer as IPlayerClientDTD;
+
+    watch(lobbies, (newVal) => {
+        console.log("Updated lobbies:", newVal);
+    });
+
     const showNewLobbyForm = ref(false);
 
     const backToMainMenu = () => {
@@ -97,8 +102,8 @@
 
             if(joinedLobby) {
                 console.log('Successfully joined lobby', joinedLobby.name);
-                await lobbiesStore.updateLobbies();
                 router.push({ name: "Lobby", params: { lobbyId: lobby.uuid } });
+                lobbiesStore.startLobbyLiveUpdate();
             }
         } catch (error: any){
             console.error('Error:', error);
@@ -129,7 +134,8 @@
 
         console.log("Current Player:", lobbiesStore.lobbydata.currentPlayer);
 
-        await lobbiesStore.updateLobbies();
+        lobbiesStore.startLobbyLiveUpdate();
+        console.log("Start Live Lobby Update");
     })
 
 </script>

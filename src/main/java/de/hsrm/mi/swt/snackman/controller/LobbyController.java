@@ -59,6 +59,9 @@ public class LobbyController {
             try {
                   Lobby newLobby = lobbyManagerService.createLobby(name, client);
                   messagingTemplate.convertAndSend("/topic/lobbies", lobbyManagerService.getAllLobbies());
+
+                  logger.info("Updated lobbies sent to /topic/lobbies: {}", lobbyManagerService.getAllLobbies());
+
                   logger.info("Creating lobby with name: {} and creatorUuid: {}", name, creatorUuid);
                   
                   return ResponseEntity.ok(newLobby);
@@ -103,6 +106,8 @@ public class LobbyController {
             try {
                   Lobby joiningLobby = lobbyManagerService.joinLobby(lobbyId, playerId);
                   messagingTemplate.convertAndSend("/topic/lobbies/" + lobbyId, joiningLobby);
+                  logger.info("Updated lobbies sent to /topic/lobbies: {}", lobbyManagerService.getAllLobbies());
+
 
                   return ResponseEntity.ok(joiningLobby);
             } catch (GameAlreadyStartedException e) {
@@ -121,7 +126,9 @@ public class LobbyController {
       @PostMapping("/{lobbyId}/leave")
       public ResponseEntity<Void> leaveLobby(@PathVariable("lobbyId") String lobbyId, @RequestParam("playerId") String playerId) {
             lobbyManagerService.leaveLobby(lobbyId, playerId);
-            messagingTemplate.convertAndSend("/topic/lobbies/" + lobbyId, lobbyManagerService.findLobbyByUUID(lobbyId));
+            //messagingTemplate.convertAndSend("/topic/lobbies/" + lobbyId, lobbyManagerService.findLobbyByUUID(lobbyId));
+            messagingTemplate.convertAndSend("/topic/lobbies", lobbyManagerService.getAllLobbies());
+            logger.info("Updated lobbies sent to /topic/lobbies: {}", lobbyManagerService.getAllLobbies());
 
             return ResponseEntity.ok().build();
       }

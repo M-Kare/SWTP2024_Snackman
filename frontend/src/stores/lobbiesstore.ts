@@ -46,9 +46,10 @@ export const useLobbiesStore = defineStore("lobbiesstore", () =>{
 
             if(response.ok){
                 const newPlayer = await response.json()
-                lobbydata.currentPlayer.playerId = newPlayer.playerId
-                lobbydata.currentPlayer.playerName = newPlayer.playerName
-                lobbydata.currentPlayer.role = newPlayer.role
+                // lobbydata.currentPlayer.playerId = newPlayer.playerId
+                // lobbydata.currentPlayer.playerName = newPlayer.playerName
+                // lobbydata.currentPlayer.role = newPlayer.role
+                Object.assign(lobbydata.currentPlayer, newPlayer)
             } else {
                 const errorText = await response.text()
                 console.error(`Failed to create a new player client: ${response.statusText}`)
@@ -67,22 +68,22 @@ export const useLobbiesStore = defineStore("lobbiesstore", () =>{
      * Updates the list of lobbies.
      * Fetches data from the server and triggers live updates.
      */
-    async function updateLobbies(): Promise<void>{
-        try{
-            const url = `/api/lobbies`
-            const response = await fetch(url)
+    // async function updateLobbies(): Promise<void>{
+    //     try{
+    //         const url = `/api/lobbies`
+    //         const response = await fetch(url)
 
-            if(!response.ok) throw new Error(response.statusText)
+    //         if(!response.ok) throw new Error(response.statusText)
 
-            const data = await response.json()
-            lobbydata.lobbies = data
+    //         const data = await response.json()
+    //         lobbydata.lobbies = data
 
-            startLobbyLiveUpdate()
+    //         //startLobbyLiveUpdate()
 
-        } catch (error: any){
-            console.error('Error:', error)
-        }
-    }
+    //     } catch (error: any){
+    //         console.error('Error:', error)
+    //     }
+    // }
     
     /**
      * Starts the STOMP client for real-time lobby updates.
@@ -96,11 +97,26 @@ export const useLobbiesStore = defineStore("lobbiesstore", () =>{
         stompclient = new Client({ brokerURL: wsurl })
 
         stompclient.onConnect = (frame) => {
-            stompclient!.subscribe(DEST, async (message) => {
-                const eventobject = JSON.parse(message.body)
-                console.log('Received lobby update:', eventobject)
-                await updateLobbies()
-            })
+            console.log('STOMP connected:', frame)
+
+            if (stompclient) {
+                stompclient.subscribe(DEST, async (message) => {
+                    console.log('STOMP Client subscribe')
+                    try {
+                        const updatedLobbies = JSON.parse(message.body);
+                        lobbydata.lobbies = [...updatedLobbies];
+                        console.log('Received lobby update:', updatedLobbies);
+                    } catch (error) {
+                        console.error('Error parsing message:', error);
+                    }
+                });
+            } else {
+                console.error('STOMP client is not initialized.');
+            }
+        }
+
+        stompclient.onWebSocketError = (error) => {
+            console.error('WebSocket Error:', error);
         }
 
         stompclient.onStompError = (frame) => {
@@ -138,7 +154,6 @@ export const useLobbiesStore = defineStore("lobbiesstore", () =>{
             if(response.ok){
                 const lobby: ILobbyDTD = await response.json()
                 lobbydata.lobbies.push(lobby)
-                await updateLobbies()
                 return lobby
             } else {
                 console.error(`Failed to create lobby: ${response.statusText}`)
@@ -182,7 +197,6 @@ export const useLobbiesStore = defineStore("lobbiesstore", () =>{
             if(response.ok){
                 const lobby: ILobbyDTD = await response.json()
                 console.log('lobbiesStore joinLobby successful')
-                await updateLobbies()
                 return lobby
             } else {
                 console.error(`Failed to join lobby: ${response.statusText}`)
@@ -214,7 +228,6 @@ export const useLobbiesStore = defineStore("lobbiesstore", () =>{
                 throw new Error(`Failed to leave lobby: ${response.statusText}`)
             }
 
-            await updateLobbies()
         } catch (error: any){
             console.error('Error leaving lobby:', error)
         }
@@ -279,7 +292,6 @@ export const useLobbiesStore = defineStore("lobbiesstore", () =>{
     return{
         lobbydata,
         createPlayer,
-        updateLobbies,
         startLobbyLiveUpdate,
         createLobby,
         joinLobby,
