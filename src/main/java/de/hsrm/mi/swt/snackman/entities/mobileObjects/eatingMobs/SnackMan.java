@@ -25,7 +25,6 @@ public class SnackMan extends EatingMob {
         super(mapService, speed, radius, posX, posY, posZ);
     }
 
-    @Override
     public void gainKcal() {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'gainKcal'");
