@@ -15,12 +15,8 @@ import de.hsrm.mi.swt.snackman.services.MapService;
 public class SnackMan extends EatingMob {
 
     //JUMPING
-    //private static final double JUMP_STRENGTH = 6;
-    //private static final double DOUBLEJUMP_STRENGTH = JUMP_STRENGTH * 0.1;
-    //private static final double GRAVITY = -20;
     private boolean isJumping = false;
     private double velocityY = 0.0;
-    //private boolean hasDoubleJumped = false;
     //JUMPING
 
     private int currentCalories;
