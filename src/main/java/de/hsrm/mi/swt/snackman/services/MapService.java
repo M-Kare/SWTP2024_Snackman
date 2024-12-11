@@ -12,16 +12,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.beans.PropertyChangeEvent;
 import java.util.ArrayList;
 import java.util.List;
-
+import java.util.Properties;
+import org.python.core.PyObject;
 import org.python.util.PythonInterpreter;
 
 /**
  * Service class for managing the game map
- * This class is responsible for loading and providing access to the game map data
+ * This class is responsible for loading and providing access to the game map
+ * data
  */
 @Service
 public class MapService {
@@ -30,6 +31,8 @@ public class MapService {
     private FrontendMessageService frontendMessageService;
     private String filePath;
     private GameMap gameMap;
+    private PythonInterpreter pythonInterpreter = null;
+    private Properties pythonProps = new Properties();
 
     /**
      * Constructs a new MapService
@@ -37,17 +40,17 @@ public class MapService {
      */
     @Autowired
     public MapService(FrontendMessageService frontendMessageService, ReadMazeService readMazeService) {
-        this(frontendMessageService, readMazeService, "mini-maze.txt");
+        this(frontendMessageService, readMazeService, "Maze.txt");
     }
 
     public MapService(FrontendMessageService frontendMessageService, ReadMazeService readMazeService,
-                      String filePath) {
+            String filePath) {
         this.frontendMessageService = frontendMessageService;
-        //generateNewMaze();
+        generateNewMaze();
         this.filePath = filePath;
         char[][] mazeData = readMazeService.readMazeFromFile(this.filePath);
         gameMap = convertMazeDataGameMap(mazeData);
-        //printGameMap();
+        // printGameMap();
     }
 
     /**
@@ -78,12 +81,13 @@ public class MapService {
      * Generates a new Maze and saves it in a Maze.txt file
      */
     public void generateNewMaze() {
-        String path = System.getProperty("user.dir") + "/src/main/java/de/hsrm/mi/swt/snackman/Maze.py";
-
-        //generates a new randome Maze
-        try (PythonInterpreter interpreter = new PythonInterpreter()) {
-            interpreter.execfile(path);
-        }
+        pythonProps.setProperty("python.path", "src/main/java/de/hsrm/mi/swt/snackman");
+        PythonInterpreter.initialize(System.getProperties(), pythonProps, new String[0]);
+        log.debug("Initialised jython for maze generation");
+        this.pythonInterpreter = new PythonInterpreter();
+        pythonInterpreter.exec("from Maze import main");
+        PyObject func = pythonInterpreter.get("main");
+        func.__call__();
     }
 
     /**
@@ -125,7 +129,8 @@ public class MapService {
 
                 newChicken.addPropertyChangeListener((PropertyChangeEvent evt) -> {
                     if (evt.getPropertyName().equals("chicken")) {
-                        FrontendChickenMessageEvent messageEvent = new FrontendChickenMessageEvent(EventType.CHICKEN, ChangeType.UPDATE, (Chicken) evt.getNewValue());
+                        FrontendChickenMessageEvent messageEvent = new FrontendChickenMessageEvent(EventType.CHICKEN,
+                                ChangeType.UPDATE, (Chicken) evt.getNewValue());
 
                         frontendMessageService.sendChickenEvent(messageEvent);
                     }
@@ -142,25 +147,31 @@ public class MapService {
     /**
      * @param currentPosition  the square the chicken is standing on top of
      * @param lookingDirection
-     * @return a list of 8 square which are around the current square + the direction the chicken is looking in the order:
-     * northwest_square, north_square, northeast_square, east_square, southeast_square, south_square, southwest_square, west_square, direction
+     * @return a list of 8 square which are around the current square + the
+     *         direction the chicken is looking in the order:
+     *         northwest_square, north_square, northeast_square, east_square,
+     *         southeast_square, south_square, southwest_square, west_square,
+     *         direction
      */
     public synchronized List<String> getSquaresVisibleForChicken(Square currentPosition, Direction lookingDirection) {
         List<String> squares = new ArrayList<>();
         squares.add(Direction.NORTH_WEST.getNorthWestSquare(this, currentPosition).getPrimaryType());
-        log.debug("NORTH_WEST square of chicken: {}", Direction.NORTH_WEST.getNorthWestSquare(this, currentPosition).toString());
+        log.debug("NORTH_WEST square of chicken: {}",
+                Direction.NORTH_WEST.getNorthWestSquare(this, currentPosition).toString());
 
         squares.add(Direction.NORTH.getNorthSquare(this, currentPosition).getPrimaryType());
         log.debug("NORTH square of chicken: {}", Direction.NORTH.getNorthWestSquare(this, currentPosition).toString());
 
         squares.add(Direction.NORTH_EAST.getNorthEastSquare(this, currentPosition).getPrimaryType());
-        log.debug("NORTH_EAST square of chicken: {}", Direction.NORTH_EAST.getNorthWestSquare(this, currentPosition).toString());
+        log.debug("NORTH_EAST square of chicken: {}",
+                Direction.NORTH_EAST.getNorthWestSquare(this, currentPosition).toString());
 
         squares.add(Direction.EAST.getEastSquare(this, currentPosition).getPrimaryType());
         log.debug("EAST square of chicken: {}", Direction.EAST.getNorthWestSquare(this, currentPosition).toString());
 
         squares.add(Direction.SOUTH_EAST.getSouthEastSquare(this, currentPosition).getPrimaryType());
-        log.debug("SOUTH_EAST square of chicken: {}", Direction.SOUTH_EAST.getNorthWestSquare(this, currentPosition).toString());
+        log.debug("SOUTH_EAST square of chicken: {}",
+                Direction.SOUTH_EAST.getNorthWestSquare(this, currentPosition).toString());
 
         squares.add(Direction.SOUTH.getSouthSquare(this, currentPosition).getPrimaryType());
         log.debug("SOUTH square of chicken: {}", Direction.SOUTH.getNorthWestSquare(this, currentPosition).toString());
@@ -199,9 +210,9 @@ public class MapService {
     public void printGameMap() {
         Square[][] gameMap = this.gameMap.getGameMap();
 
-        for (int x = 0; x < gameMap.length; x++) { //x = Zeilen
+        for (int x = 0; x < gameMap.length; x++) { // x = Zeilen
             System.out.print("x");
-            for (int z = 0; z < gameMap[x].length; z++) { //y = Spalten
+            for (int z = 0; z < gameMap[x].length; z++) { // y = Spalten
                 Square square = gameMap[x][z];
                 System.out.print(square.getPrimaryType());
             }
