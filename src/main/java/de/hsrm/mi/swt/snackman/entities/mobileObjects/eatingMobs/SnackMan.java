@@ -15,11 +15,12 @@ import de.hsrm.mi.swt.snackman.services.MapService;
 public class SnackMan extends EatingMob {
 
     //JUMPING
-    private static final double JUMP_STRENGTH = 6;
-    private static final double GRAVITY = -20;
+    //private static final double JUMP_STRENGTH = 6;
+    //private static final double DOUBLEJUMP_STRENGTH = JUMP_STRENGTH * 0.1;
+    //private static final double GRAVITY = -20;
     private boolean isJumping = false;
     private double velocityY = 0.0;
-    private boolean hasDoubleJumped = false;
+    //private boolean hasDoubleJumped = false;
     //JUMPING
 
     private int currentCalories;
@@ -195,31 +196,31 @@ public class SnackMan extends EatingMob {
     //JUMPING
     public void jump() {
         if (!isJumping) {
-            this.velocityY = JUMP_STRENGTH;
+            this.velocityY = GameConfig.JUMP_STRENGTH;
             this.isJumping = true;
-            this.hasDoubleJumped = false;
+            //this.hasDoubleJumped = false;
             currentCalories = currentCalories - 100;
         }
     }
 
     public void doubleJump() {
         if (isJumping) {
-            this.velocityY += JUMP_STRENGTH * 0.1;
-            this.hasDoubleJumped = true;
+            this.velocityY += GameConfig.DOUBLEJUMP_STRENGTH;
+            //this.hasDoubleJumped = true;
             currentCalories = currentCalories - 100;
         }
     }
 
     public void updateJumpPosition(double deltaTime) {
         if (isJumping) {
-            this.velocityY += GRAVITY * deltaTime;
+            this.velocityY += GameConfig.GRAVITY * deltaTime;
             this.posY += this.velocityY * deltaTime;
 
             if (this.posY <= GameConfig.SNACKMAN_GROUND_LEVEL) {
                 this.posY = GameConfig.SNACKMAN_GROUND_LEVEL;
                 this.isJumping = false;
                 this.velocityY = 0;
-                this.hasDoubleJumped = false; 
+                //this.hasDoubleJumped = false; 
             }
         }
     }

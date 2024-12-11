@@ -27,10 +27,8 @@ public class PlayerMovementController {
       if (player.jump()) {
         if (player.doubleJump()) {
           snackman.doubleJump();
-          System.out.println("doublejump");
         } else {
           snackman.jump();
-          System.out.println("singlejump" + "   " + player.doubleJump());
         }
       } 
       snackman.updateJumpPosition(player.delta());
