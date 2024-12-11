@@ -7,14 +7,15 @@ public class SnackMan extends EatingMob {
     private boolean isJumping = false;
     private double velocityY = 0.0;
 
-    public SnackMan(MapService mapService){
+    public SnackMan(MapService mapService) {
         this(mapService, GameConfig.SNACKMAN_SPEED, GameConfig.SNACKMAN_RADIUS);
     }
 
-    public SnackMan(MapService mapService, int speed, double radius){
-        super(mapService, speed, radius);    }
+    public SnackMan(MapService mapService, int speed, double radius) {
+        super(mapService, speed, radius);
+    }
 
-    public SnackMan(MapService mapService, int speed, double radius, double posX, double posY, double posZ){
+    public SnackMan(MapService mapService, int speed, double radius, double posX, double posY, double posZ) {
         super(mapService, speed, radius, posX, posY, posZ);
     }
 
@@ -53,29 +54,29 @@ public class SnackMan extends EatingMob {
     public void updateJumpPosition(double deltaTime) {
         if (isJumping) {
             this.velocityY += GameConfig.GRAVITY * deltaTime;
-            this.posY += this.velocityY * deltaTime;
+            setPosY(getPosY() + velocityY * deltaTime);
 
-            if (this.posY <= GameConfig.SNACKMAN_GROUND_LEVEL) {
-                this.posY = GameConfig.SNACKMAN_GROUND_LEVEL;
+            if (getPosY() <= GameConfig.SNACKMAN_GROUND_LEVEL) {
+                setPosY(GameConfig.SNACKMAN_GROUND_LEVEL);
                 this.isJumping = false;
                 this.velocityY = 0;
             }
         }
     }
 
-    private void jumpOverChicken(){
+    private void jumpOverChicken() {
 
     }
 
-    private void jumpToSeeMap(){
+    private void jumpToSeeMap() {
 
     }
 
-    private void jumpOverWall(){
+    private void jumpOverWall() {
 
     }
 
-    public void collectItems(){
+    public void collectItems() {
 
     }
 
