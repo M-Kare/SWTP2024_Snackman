@@ -3,21 +3,22 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, onUnmounted, ref } from 'vue'
+import {onMounted, onUnmounted, ref} from 'vue'
 import * as THREE from 'three'
 import { Client } from '@stomp/stompjs'
 import { Player } from '@/components/Player';
 import type { IPlayerDTD } from '@/stores/IPlayerDTD';
-import {fetchMazeDataFromBackend} from "@/services/MazeDataService";
-import {MazeRenderer} from "@/renderer/MazeRenderer";
+import { fetchSnackManFromBackend } from '@/services/SnackManInitService';
+import { GameMapRenderer } from '@/renderer/GameMapRenderer';
+import { useGameMapStore } from '@/stores/gameMapStore';
+import type { IGameMap } from '@/stores/IGameMapDTD';
 
-const DECELERATION = 20.0
-const ACCELERATION = 300.0
 const WSURL = `ws://${window.location.host}/stompbroker`
 const DEST = '/topic/player'
+const targetHz = 30
 
 // stomp
-const stompclient = new Client({ brokerURL: WSURL })
+const stompclient = new Client({brokerURL: WSURL})
 stompclient.onWebSocketError = event => {
   //console.log(event)
 }
@@ -31,7 +32,6 @@ stompclient.onConnect = frame => {
     // empfangene Nutzdaten in message.body abrufbar,
     // ggf. mit JSON.parse(message.body) zu JS konvertieren
     const event: IPlayerDTD = JSON.parse(message.body)
-    //console.log(`Received: (${event.posX}|${event.posZ})`)
     player.setPosition(event.posX, event.posY, event.posZ);
   })
 }
@@ -41,10 +41,10 @@ const canvasRef = ref()
 let renderer: THREE.WebGLRenderer
 let player: Player;
 let scene: THREE.Scene
+let prevTime = performance.now();
 
 // camera setup
 let camera: THREE.PerspectiveCamera;
-
 
 
 // used to calculate fps in animate()
@@ -57,45 +57,54 @@ let counter = 0;
 function animate() {
   fps = 1 / clock.getDelta()
   player.updatePlayer();
-  if (counter >= fps / 30) {
+  if (counter >= fps / targetHz) {
+    // console.log(`${player.getCamera().position.x}  |  ${player.getCamera().position.z}`)
+    const time = performance.now()
+    const delta = (time - prevTime) / 1000
     try {
       //Sende and /topic/player/update
-      const messageObject = {
-        posX: player.getCamera().position.x,
-        posY: player.getCamera().position.y,
-        posZ: player.getCamera().position.z,
-        dirY: player.getCamera().rotation.y,
-      };
       stompclient.publish({
         destination: DEST + "/update", headers: {},
-        body: JSON.stringify(messageObject)
+        body: JSON.stringify(Object.assign({}, player.getInput(), {
+          qX: player.getCamera().quaternion.x,
+          qY: player.getCamera().quaternion.y,
+          qZ: player.getCamera().quaternion.z,
+          qW: player.getCamera().quaternion.w
+        }, {delta: delta}))
       });
     } catch (fehler) {
       console.log(fehler)
     }
+    prevTime = time;
     counter = 0
   }
   counter++;
   renderer.render(scene, camera)
 }
 
-onMounted(async () => {
-// for rendering the scene, create maze in 3d and change window size
-  const {initRenderer, createMaze, getScene} = MazeRenderer()
+onMounted(async () =>{
+// for rendering the scene, create gameMap in 3d and change window size
+  const {initRenderer, createGameMap, getScene} = GameMapRenderer()
   scene = getScene()
   renderer = initRenderer(canvasRef.value)
 
-  player = new Player(renderer, DECELERATION, ACCELERATION)
+  //Add gameMap
+  try {
+    const gameMapStore = useGameMapStore()
+    await gameMapStore.initGameMap()
+
+    const mapContent = gameMapStore.mapContent
+    createGameMap(mapContent as IGameMap)
+
+    await gameMapStore.startGameMapLiveUpdate()
+  } catch (error) {
+    console.error('Error when retrieving the gameMap:', error)
+  }
+
+  const playerData = await fetchSnackManFromBackend();
+  player = new Player(renderer, playerData.posX, playerData.posY, playerData.posZ, playerData.radius, playerData.speed)
   camera = player.getCamera()
   scene.add(player.getControls().object)
-
-  //Add maze
-  try {
-    const mazeData = await fetchMazeDataFromBackend()
-    createMaze(mazeData)
-  } catch (error) {
-    console.error('Error when retrieving the maze:', error)
-  }
 
   renderer.render(scene, camera)
   renderer.setAnimationLoop(animate)

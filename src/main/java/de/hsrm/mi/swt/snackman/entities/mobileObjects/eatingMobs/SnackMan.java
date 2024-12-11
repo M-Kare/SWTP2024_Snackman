@@ -1,79 +1,23 @@
 package de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs;
 
 import de.hsrm.mi.swt.snackman.configuration.GameConfig;
+import de.hsrm.mi.swt.snackman.entities.map.Square;
+import de.hsrm.mi.swt.snackman.entities.mapObject.snack.Snack;
+import de.hsrm.mi.swt.snackman.services.MapService;
 
 public class SnackMan extends EatingMob {
-    
-    private double posX;
-    private double posY;
-    private double posZ;
-    private double dirY;
-    private double radius;
 
-    public SnackMan(double x, double z){
-        super();
+    private int currentCalories;
 
-        posY = GameConfig.SNACKMAN_GROUND_LEVEL;
-        posX = x;
-        posZ = z;
-        dirY = 0;
-        radius = GameConfig.SNACKMAN_RADIUS;
+    public SnackMan(MapService mapService){
+        this(mapService, GameConfig.SNACKMAN_SPEED, GameConfig.SNACKMAN_RADIUS);
     }
 
-    public double getPosX() {
-        return posX;
-    }
+    public SnackMan(MapService mapService, int speed, double radius){
+        super(mapService, speed, radius);    }
 
-    public void setPosX(double posX) {
-        this.posX = posX;
-    }
-
-    public double getPosY() {
-        return posY;
-    }
-
-    public void setPosY(double posY) {
-        this.posY = posY;
-    }
-
-    public double getPosZ() {
-        return posZ;
-    }
-
-    public void setPosZ(double posZ) {
-        this.posZ = posZ;
-    }
-
-    public double getDirY() {
-        return dirY;
-    }
-
-    public double getRadius() {
-        return radius;
-    }
-
-    public void setRadius(double radius) {
-        this.radius = radius;
-    }
-
-    @Override
-    public void move(double x, double y, double z) {
-        if(x-radius > -4){
-            posX = x;
-        }
-        posZ = z;
-        calcMapIndex(posX, posZ);
-    }
-
-
-    private void calcMapIndex(double x, double z){
-        int squareIndexX = (int)(x / GameConfig.SQUARE_SIZE);
-        int squareIndexZ = (int)(z / GameConfig.SQUARE_SIZE);
-        //setSquare(setMap.getSquare(squareIndexX, squareIndexZ));
-    }
-    
-    public void setDirY(double angleY){
-        dirY = angleY;
+    public SnackMan(MapService mapService, int speed, double radius, double posX, double posY, double posZ){
+        super(mapService, speed, radius, posX, posY, posZ);
     }
 
     @Override
@@ -87,7 +31,7 @@ public class SnackMan extends EatingMob {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'loseKcal'");
     }
-    
+
     public void jump(){
 
     }
@@ -108,4 +52,29 @@ public class SnackMan extends EatingMob {
 
     }
 
+    @Override
+    public void move(double x, double y, double z) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'move'");
+    }
+
+    public int getCurrentCalories() {
+        return currentCalories;
+    }
+
+    /**
+     * Collects the snack on the square if there is one.
+     * If there is one that remove it from the square.
+     * @param square to eat the snack from
+     */
+    public void consumeSnackOnSquare(Square square){
+        Snack snackOnSquare = square.getSnack();
+
+        if(snackOnSquare != null){
+            currentCalories += snackOnSquare.getCalories();
+
+            //set snack to null after consuming it
+            square.setSnack(null);
+        }
+    }
 }
