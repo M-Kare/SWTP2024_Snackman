@@ -32,7 +32,6 @@ public class PlayerMovementController {
         }
       } 
       snackman.updateJumpPosition(player.delta());
-      //JUMPING
 
       messagingTemplate.convertAndSend("/topic/player", new SnackManPositionDTO(snackman.getPosX(), snackman.getPosY(), snackman.getPosZ()));
     }

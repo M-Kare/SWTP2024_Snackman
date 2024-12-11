@@ -20,13 +20,10 @@ export class Player {
 
     private movementDirection: THREE.Vector3;
 
-    //JUMPING
     private isJumping: boolean;
     private lastJumpTime: number;
     private doubleJump: boolean;
-    private hasDoubleJumped: boolean;
     private spacePressed: boolean;
-    //JUMPING
 
     constructor(renderer: WebGLRenderer, posX: number, posY: number, posZ: number, radius: number, speed: number){
         this.prevTime = performance.now();
@@ -37,13 +34,10 @@ export class Player {
         this.canJump = true;
         this.movementDirection = new THREE.Vector3();
 
-        //JUMPING
         this.isJumping = false;
         this.lastJumpTime = 0;
         this.doubleJump = false;
-        this.hasDoubleJumped = false;
         this.spacePressed = false;
-        //JUMPING
 
         this.radius = radius;
         this.speed = speed;
@@ -117,40 +111,21 @@ export class Player {
           case 'KeyD':
             this.moveRight = true
             break
-          //JUMPING//
           case 'Space':
-            /*
-            const currentTime = performance.now();
-            if (!this.isJumping) {
-              //Single Jump
-              this.isJumping = true;
-              this.lastJumpTime = currentTime;
-              this.hasDoubleJumped = false;
-            } else if (!this.hasDoubleJumped && (currentTime - this.lastJumpTime <= 500)) {
-              //Double Jump
-              this.doubleJump = true;
-              this.hasDoubleJumped = true;
-              this.lastJumpTime = currentTime;
-            }
-            break
-            */
-            if (!this.spacePressed) { // Prüfen, ob die Leertaste bereits gedrückt wurde
-              this.spacePressed = true; // Setzen, damit weitere Aktionen blockiert werden
+            if (!this.spacePressed) {
+              this.spacePressed = true;
               const currentTime = performance.now();
               if (!this.isJumping) {
-                  // Einzelsprung
+                  //Single Jump
                   this.isJumping = true;
                   this.lastJumpTime = currentTime;
-                  this.hasDoubleJumped = false;
-              } else if (!this.hasDoubleJumped && (currentTime - this.lastJumpTime <= 600)) {
-                  // Doppelsprung
+              } else if (!this.doubleJump && (currentTime - this.lastJumpTime <= 600)) {
+                  //Double Jump
                   this.doubleJump = true;
-                  this.hasDoubleJumped = true;
                   this.lastJumpTime = currentTime;
               }
           }
           break;
-          //JUMPING//
         }
       }
 
@@ -164,7 +139,6 @@ export class Player {
       if (y <= 2) {
         this.isJumping = false
         this.doubleJump = false
-        this.hasDoubleJumped = false
       }
     }
 

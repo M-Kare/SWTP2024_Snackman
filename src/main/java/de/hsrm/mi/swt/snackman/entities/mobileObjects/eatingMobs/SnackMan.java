@@ -221,7 +221,6 @@ public class SnackMan extends EatingMob {
             }
         }
     }
-    //JUMPING
 
     private void jumpOverChicken(){
 
