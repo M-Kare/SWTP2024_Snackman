@@ -196,18 +196,20 @@ public class SnackMan extends EatingMob {
     //JUMPING
     public void jump() {
         if (!isJumping) {
-            this.velocityY = GameConfig.JUMP_STRENGTH;
-            this.isJumping = true;
-            //this.hasDoubleJumped = false;
-            currentCalories = currentCalories - 100;
+            if (currentCalories >= 100) {
+                this.velocityY = GameConfig.JUMP_STRENGTH;
+                this.isJumping = true;
+                currentCalories = currentCalories - 100;
+            }
         }
     }
 
     public void doubleJump() {
         if (isJumping) {
-            this.velocityY += GameConfig.DOUBLEJUMP_STRENGTH;
-            //this.hasDoubleJumped = true;
-            currentCalories = currentCalories - 100;
+            if (currentCalories >= 100) {
+                this.velocityY += GameConfig.DOUBLEJUMP_STRENGTH;
+                currentCalories = currentCalories - 100;
+            }    
         }
     }
 
@@ -220,7 +222,6 @@ public class SnackMan extends EatingMob {
                 this.posY = GameConfig.SNACKMAN_GROUND_LEVEL;
                 this.isJumping = false;
                 this.velocityY = 0;
-                //this.hasDoubleJumped = false; 
             }
         }
     }
