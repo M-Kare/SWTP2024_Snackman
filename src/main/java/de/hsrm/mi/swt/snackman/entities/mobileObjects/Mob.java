@@ -2,23 +2,21 @@ package de.hsrm.mi.swt.snackman.entities.mobileObjects;
 
 import org.joml.Quaterniond;
 import org.joml.Vector3d;
-
 import de.hsrm.mi.swt.snackman.configuration.GameConfig;
-import de.hsrm.mi.swt.snackman.entities.map.GameMap;
 import de.hsrm.mi.swt.snackman.entities.map.Square;
 import de.hsrm.mi.swt.snackman.entities.mapObject.MapObjectType;
 import de.hsrm.mi.swt.snackman.services.MapService;
 
+/**
+ * A mobile object with the ability to move its position
+ */
 public abstract class Mob {
     private Vector3d position;
     private double radius;
     private Quaterniond quat;
     private Square currentSquare;
     private int speed;
-
-    private MapService mapService;
-    private GameMap gameMap;
-
+    protected MapService mapService;
     private Vector3d spawn;
 
     /**
@@ -32,12 +30,16 @@ public abstract class Mob {
         this.speed = speed;
         this.radius = radius;
         this.mapService = mapService;
-        gameMap = this.mapService.getGameMap();
-        spawn = new Vector3d((gameMap.getGameMap()[0].length / 2.0) * GameConfig.SQUARE_SIZE, GameConfig.SNACKMAN_GROUND_LEVEL, (gameMap.getGameMap()[0].length / 2.0) * GameConfig.SQUARE_SIZE);
+        spawn = new Vector3d((mapService.getGameMap().getGameMap()[0].length / 2.0) * GameConfig.SQUARE_SIZE, GameConfig.SNACKMAN_GROUND_LEVEL, (mapService.getGameMap().getGameMap()[0].length / 2.0) * GameConfig.SQUARE_SIZE);
         position = new Vector3d(spawn);
         radius = GameConfig.SNACKMAN_RADIUS;
         quat = new Quaterniond();
         setCurrentSquareWithIndex(position.x, position.z);
+    }
+
+    public Mob(MapService mapService) {
+        this.mapService = mapService;
+        position = new Vector3d();
     }
 
     /**
@@ -101,7 +103,7 @@ public abstract class Mob {
      * @param z z-position
      */
     public void setCurrentSquareWithIndex(double x, double z) {
-        currentSquare = gameMap.getSquareAtIndexXZ(calcMapIndexOfCoordinate(x), calcMapIndexOfCoordinate(z));
+        currentSquare = mapService.getGameMap().getSquareAtIndexXZ(calcMapIndexOfCoordinate(x), calcMapIndexOfCoordinate(z));
     }
 
     /**
@@ -185,8 +187,8 @@ public abstract class Mob {
      * respawns the mob at his spawn-location
      */
     public void respawn() {
-        this.position.x = (gameMap.getGameMap().length / 2) * GameConfig.SQUARE_SIZE;
-        this.position.z = (gameMap.getGameMap()[0].length / 2) * GameConfig.SQUARE_SIZE;
+        this.position.x = (mapService.getGameMap().getGameMap().length / 2) * GameConfig.SQUARE_SIZE;
+        this.position.z = (mapService.getGameMap().getGameMap()[0].length / 2) * GameConfig.SQUARE_SIZE;
         setCurrentSquareWithIndex(position.x, position.z);
     }
 
@@ -203,7 +205,7 @@ public abstract class Mob {
      * 3 = both / diagonal collision / corner
      */
     public int checkWallCollision(double x, double z) throws IndexOutOfBoundsException {
-        if (gameMap.getSquareAtIndexXZ(calcMapIndexOfCoordinate(x), calcMapIndexOfCoordinate(z)).getType() == MapObjectType.WALL) {
+        if (mapService.getGameMap().getSquareAtIndexXZ(calcMapIndexOfCoordinate(x), calcMapIndexOfCoordinate(z)).getType() == MapObjectType.WALL) {
             return 3;
         }
 
@@ -215,11 +217,11 @@ public abstract class Mob {
         int horizontalRelativeToCenter = (x - squareCenterX <= 0) ? -1 : 1;
         int verticalRelativeToCenter = (z - squareCenterZ <= 0) ? -1 : 1;
 
-        Square squareLeftRight = gameMap.getSquareAtIndexXZ(currentSquare.getIndexX() + horizontalRelativeToCenter,
+        Square squareLeftRight = mapService.getGameMap().getSquareAtIndexXZ(currentSquare.getIndexX() + horizontalRelativeToCenter,
                 currentSquare.getIndexZ());
-        Square squareTopBottom = gameMap.getSquareAtIndexXZ(currentSquare.getIndexX(),
+        Square squareTopBottom = mapService.getGameMap().getSquareAtIndexXZ(currentSquare.getIndexX(),
                 currentSquare.getIndexZ() + verticalRelativeToCenter);
-        Square squareDiagonal = gameMap.getSquareAtIndexXZ(currentSquare.getIndexX() + horizontalRelativeToCenter,
+        Square squareDiagonal = mapService.getGameMap().getSquareAtIndexXZ(currentSquare.getIndexX() + horizontalRelativeToCenter,
                 currentSquare.getIndexZ() + verticalRelativeToCenter);
 
         if (squareLeftRight.getType() == MapObjectType.WALL) {

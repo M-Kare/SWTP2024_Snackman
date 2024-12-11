@@ -87,8 +87,8 @@ export const GameMapRenderer = () => {
     // add chickens
     for (let currentChicken of mapData.chickens) {
       const chickenToAdd = gameObjectRenderer.createChickenOnFloor(
-        currentChicken.posX * DEFAULT_SIDE_LENGTH + OFFSET,
-        currentChicken.posZ * DEFAULT_SIDE_LENGTH + OFFSET,
+        currentChicken.chickenPosX * DEFAULT_SIDE_LENGTH + OFFSET,
+        currentChicken.chickenPosZ * DEFAULT_SIDE_LENGTH + OFFSET,
         DEFAULT_SIDE_LENGTH,
         currentChicken.thickness,
       )

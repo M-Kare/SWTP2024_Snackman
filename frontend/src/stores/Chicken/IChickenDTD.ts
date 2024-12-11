@@ -1,15 +1,15 @@
 export interface IChickenDTD {
   id: number,
-  posX: number,
-  posZ: number,
+  chickenPosX: number,
+  chickenPosZ: number,
   thickness: ChickenThickness;
   lookingDirection: Direction
 }
 
 export interface IChicken {
   id: number,
-  posX: number,
-  posZ: number,
+  chickenPosX: number,
+  chickenPosZ: number,
   thickness: ChickenThickness;
   lookingDirection: Direction
   meshId: number

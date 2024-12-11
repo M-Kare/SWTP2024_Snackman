@@ -1,4 +1,4 @@
-package de.hsrm.mi.swt.snackman.entities.mob;
+package de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken;
 
 /**
  * The level of Thickness of the chicken

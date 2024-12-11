@@ -4,7 +4,6 @@ import de.hsrm.mi.swt.snackman.configuration.GameConfig;
 import de.hsrm.mi.swt.snackman.entities.map.Square;
 import de.hsrm.mi.swt.snackman.entities.mapObject.snack.Snack;
 import de.hsrm.mi.swt.snackman.entities.mapObject.snack.SnackType;
-import de.hsrm.mi.swt.snackman.entities.mob.eatingMobs.SnackMan;
 import de.hsrm.mi.swt.snackman.messaging.FrontendMessageService;
 import de.hsrm.mi.swt.snackman.services.MapService;
 import de.hsrm.mi.swt.snackman.services.ReadMazeService;

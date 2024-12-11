@@ -4,8 +4,12 @@ import de.hsrm.mi.swt.snackman.configuration.GameConfig;
 import de.hsrm.mi.swt.snackman.entities.map.Square;
 import de.hsrm.mi.swt.snackman.entities.mapObject.snack.Snack;
 import de.hsrm.mi.swt.snackman.services.MapService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class SnackMan extends EatingMob {
+
+    private final Logger log = LoggerFactory.getLogger(SnackMan.class);
 
     public SnackMan(MapService mapService){
         this(mapService, GameConfig.SNACKMAN_SPEED, GameConfig.SNACKMAN_RADIUS);
@@ -45,7 +49,7 @@ public class SnackMan extends EatingMob {
     }
 
     public int getCurrentCalories() {
-        return currentCalories;
+        return super.getKcal();
     }
 
     /**
@@ -57,7 +61,11 @@ public class SnackMan extends EatingMob {
         Snack snackOnSquare = square.getSnack();
 
         if(snackOnSquare != null){
-            currentCalories += snackOnSquare.getCalories();
+            try {
+                super.gainKcal(snackOnSquare.getCalories());
+            } catch (Exception e) {
+                log.error(e.getMessage());
+            }
 
             //set snack to null after consuming it
             square.setSnack(null);

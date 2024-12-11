@@ -27,12 +27,4 @@ public class Ghost extends Mob {
     private void scareSnackMan(){
 
     }
-
-    @Override
-    public void move() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'move'");
-    }
-
-    
 }

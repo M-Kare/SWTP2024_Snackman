@@ -120,7 +120,7 @@ export const useGameMapStore = defineStore('gameMap', () => {
             if (currentChicken.thickness != chickenUpdate.thickness) {
               updateThickness(currentChicken, chickenUpdate)
             }
-            if (chickenUpdate.posX == currentChicken!.posX && chickenUpdate.posZ == currentChicken!.posZ) {
+            if (chickenUpdate.chickenPosX == currentChicken!.chickenPosX && chickenUpdate.chickenPosZ == currentChicken!.chickenPosZ) {
               updateLookingDirection(currentChicken, chickenUpdate)
             } else {
               updateWalkingDirection(currentChicken, chickenUpdate, DEFAULT_SIDE_LENGTH, OFFSET)
@@ -164,11 +164,11 @@ export const useGameMapStore = defineStore('gameMap', () => {
     console.log("Chicken moved")
     const chickenMesh = scene.getObjectById(currentChicken.meshId)
 
-    currentChicken.posX = chickenUpdate.posX
-    currentChicken.posZ = chickenUpdate.posZ
+    currentChicken.chickenPosX = chickenUpdate.chickenPosX
+    currentChicken.chickenPosZ = chickenUpdate.chickenPosZ
 
     //chickenMesh!.position.lerp(new THREE.Vector3(currentChicken.posX * DEFAULT_SIDE_LENGTH + OFFSET, 0, currentChicken.posZ * DEFAULT_SIDE_LENGTH + OFFSET), CHICKEN_MOVEMENT_SPEED)  // interpolates between original point and new point
-    chickenMesh!.position.set(currentChicken.posX * DEFAULT_SIDE_LENGTH + OFFSET, 0, currentChicken.posZ * DEFAULT_SIDE_LENGTH + OFFSET)
+    chickenMesh!.position.set(currentChicken.chickenPosX * DEFAULT_SIDE_LENGTH + OFFSET, 0, currentChicken.chickenPosZ * DEFAULT_SIDE_LENGTH + OFFSET)
   }
 
   function setSnackMeshId(squareId: number, meshId: number) {
