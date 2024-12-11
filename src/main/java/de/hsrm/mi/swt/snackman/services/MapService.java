@@ -69,7 +69,7 @@ public class MapService {
                     squaresBuildingMap[x][z] = squareToAdd;
 
                 } catch (IllegalArgumentException e) {
-                    log.debug(e.getMessage());
+                    log.error(e.getMessage());
                 }
             }
         }
@@ -156,32 +156,13 @@ public class MapService {
     public synchronized List<String> getSquaresVisibleForChicken(Square currentPosition, Direction lookingDirection) {
         List<String> squares = new ArrayList<>();
         squares.add(Direction.NORTH_WEST.getNorthWestSquare(this, currentPosition).getPrimaryType());
-        log.debug("NORTH_WEST square of chicken: {}",
-                Direction.NORTH_WEST.getNorthWestSquare(this, currentPosition).toString());
-
         squares.add(Direction.NORTH.getNorthSquare(this, currentPosition).getPrimaryType());
-        log.debug("NORTH square of chicken: {}", Direction.NORTH.getNorthWestSquare(this, currentPosition).toString());
-
         squares.add(Direction.NORTH_EAST.getNorthEastSquare(this, currentPosition).getPrimaryType());
-        log.debug("NORTH_EAST square of chicken: {}",
-                Direction.NORTH_EAST.getNorthWestSquare(this, currentPosition).toString());
-
         squares.add(Direction.EAST.getEastSquare(this, currentPosition).getPrimaryType());
-        log.debug("EAST square of chicken: {}", Direction.EAST.getNorthWestSquare(this, currentPosition).toString());
-
         squares.add(Direction.SOUTH_EAST.getSouthEastSquare(this, currentPosition).getPrimaryType());
-        log.debug("SOUTH_EAST square of chicken: {}",
-                Direction.SOUTH_EAST.getNorthWestSquare(this, currentPosition).toString());
-
         squares.add(Direction.SOUTH.getSouthSquare(this, currentPosition).getPrimaryType());
-        log.debug("SOUTH square of chicken: {}", Direction.SOUTH.getNorthWestSquare(this, currentPosition).toString());
-
         squares.add(Direction.SOUTH_WEST.getSouthWestSquare(this, currentPosition).getPrimaryType());
-        log.debug("SOUTH_WEST square of chicken: {}", Direction.SOUTH_WEST.getNorthWestSquare(this, currentPosition));
-
         squares.add(Direction.WEST.getWestSquare(this, currentPosition).getPrimaryType());
-        log.debug("WEST square of chicken: {}", Direction.WEST.getNorthWestSquare(this, currentPosition).toString());
-
         squares.add(lookingDirection.toString());
         return squares;
     }
@@ -210,9 +191,9 @@ public class MapService {
     public void printGameMap() {
         Square[][] gameMap = this.gameMap.getGameMap();
 
-        for (int x = 0; x < gameMap.length; x++) { // x = Zeilen
+        for (int x = 0; x < gameMap.length; x++) {
             System.out.print("x");
-            for (int z = 0; z < gameMap[x].length; z++) { // y = Spalten
+            for (int z = 0; z < gameMap[x].length; z++) {
                 Square square = gameMap[x][z];
                 System.out.print(square.getPrimaryType());
             }
