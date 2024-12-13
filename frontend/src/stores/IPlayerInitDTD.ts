@@ -4,4 +4,5 @@ export interface IPlayerInitDTD {
     posZ: number
     radius: number
     speed: number
+    uuid: string
   }

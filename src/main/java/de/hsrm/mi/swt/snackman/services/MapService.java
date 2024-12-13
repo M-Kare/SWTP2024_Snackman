@@ -1,6 +1,7 @@
 package de.hsrm.mi.swt.snackman.services;
 
 import java.beans.PropertyChangeEvent;
+import java.util.HashMap;
 
 import org.python.util.PythonInterpreter;
 import org.slf4j.Logger;
@@ -32,6 +33,7 @@ public class MapService {
     private String filePath;
     private GameMap gameMap;
     private SnackMan snackman;
+    private HashMap<String, SnackMan> snackmans;
 
     /**
      * Constructs a new MapService
@@ -50,7 +52,7 @@ public class MapService {
         char[][] mazeData = readMazeService.readMazeFromFile(this.filePath);
         gameMap = convertMazeDataGameMap(mazeData);
         snackman = new SnackMan(this, GameConfig.SNACKMAN_SPEED, GameConfig.SNACKMAN_RADIUS);
-
+        snackmans = new HashMap<>();
     }
 
 
@@ -152,7 +154,13 @@ public class MapService {
         return gameMap.getSquareAtIndexXZ(x, z);
     }
 
-    public SnackMan getSnackMan(){
+    public SnackMan getSnackMan(String uuid){
+        return snackmans.get(uuid);
+    }
+
+    public SnackMan createSnackMan(String uuid){
+        SnackMan snackman = new SnackMan(this);
+        snackmans.put(uuid, snackman);
         return snackman;
     }
 }

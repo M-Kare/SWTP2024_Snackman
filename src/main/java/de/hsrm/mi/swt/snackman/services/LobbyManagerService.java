@@ -7,8 +7,8 @@ import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 
-import de.hsrm.mi.swt.snackman.entities.lobby.PlayerClient;
 import de.hsrm.mi.swt.snackman.entities.lobby.Lobby;
+import de.hsrm.mi.swt.snackman.entities.lobby.PlayerClient;
 import de.hsrm.mi.swt.snackman.entities.lobby.ROLE;
 
 /**
@@ -154,5 +154,13 @@ public class LobbyManagerService {
                         .filter(l -> l.getPlayerId().equals(clientID) && l.getPlayerName().equals(name))
                         .findFirst()
                         .orElse(createNewClient(name));
+      }
+
+      public List<String> getAllClients(){
+            List<String> playerIds = new ArrayList();
+            for(PlayerClient client : clients){
+                  playerIds.add(client.getPlayerId());
+            }
+            return playerIds;
       }
 }

@@ -12,10 +12,17 @@ import { fetchSnackManFromBackend } from '@/services/SnackManInitService';
 import { GameMapRenderer } from '@/renderer/GameMapRenderer';
 import { useGameMapStore } from '@/stores/gameMapStore';
 import type { IGameMap } from '@/stores/IGameMapDTD';
+import type { ClientsDTD } from '@/stores/ClientsDTD';
+import { useLobbiesStore } from '@/stores/lobbiesstore';
+
+const { lobbydata } = useLobbiesStore();
+
 
 const WSURL = `ws://${window.location.host}/stompbroker`
 const DEST = '/topic/player'
 const targetHz = 30
+let clients: ClientsDTD;
+let playerHashMap = new Map<String, THREE.Mesh>()
 
 // stomp
 const stompclient = new Client({brokerURL: WSURL})
@@ -32,7 +39,12 @@ stompclient.onConnect = frame => {
     // empfangene Nutzdaten in message.body abrufbar,
     // ggf. mit JSON.parse(message.body) zu JS konvertieren
     const event: IPlayerDTD = JSON.parse(message.body)
-    player.setPosition(event.posX, event.posY, event.posZ);
+    if(event.uuid === lobbydata.currentPlayer.playerId){
+      player.setPosition(event.posX, event.posY, event.posZ);
+    } else {
+      console.log(event.uuid)
+      playerHashMap.get(event.uuid)?.position.set(event.posX, event.posY, event.posZ)
+    }
   })
 }
 stompclient.activate()
@@ -70,7 +82,7 @@ function animate() {
           qY: player.getCamera().quaternion.y,
           qZ: player.getCamera().quaternion.z,
           qW: player.getCamera().quaternion.w
-        }, {delta: delta}))
+        }, {delta: delta}, {uuid: lobbydata.currentPlayer.playerId}))
       });
     } catch (fehler) {
       console.log(fehler)
@@ -88,6 +100,8 @@ onMounted(async () =>{
   scene = getScene()
   renderer = initRenderer(canvasRef.value)
 
+  clients = await fetchClients();
+
   //Add gameMap
   try {
     const gameMapStore = useGameMapStore()
@@ -101,8 +115,19 @@ onMounted(async () =>{
     console.error('Error when retrieving the gameMap:', error)
   }
 
-  const playerData = await fetchSnackManFromBackend();
-  player = new Player(renderer, playerData.posX, playerData.posY, playerData.posZ, playerData.radius, playerData.speed)
+  const playerData = await fetchSnackManFromBackend(lobbydata.currentPlayer.playerId);
+  clients.clients.forEach(it => {
+    if(it === lobbydata.currentPlayer.playerId){
+      player = new Player(renderer, playerData.posX, playerData.posY, playerData.posZ, playerData.radius, playerData.speed)
+    } else {
+      let material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } ) 
+      material.color = new THREE.Color(Math.random(), Math.random(), Math.random());
+      let cube = new THREE.Mesh( new THREE.BoxGeometry( 1, 3, 1 ),  material);
+      cube.position.lerp(new THREE.Vector3(playerData.posX, playerData.posY, playerData.posZ), 0.5)
+      scene.add(cube);
+      playerHashMap.set(it, cube);
+    }
+  });
   camera = player.getCamera()
   scene.add(player.getControls().object)
 
@@ -120,4 +145,13 @@ function resizeCallback() {
   camera.aspect = window.innerWidth / window.innerHeight
   camera.updateProjectionMatrix()
 }
+
+async function fetchClients(): Promise<ClientsDTD> {
+    // rest endpoint from backend
+    const response = await fetch('/api/lobbies/clients')
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`)
+    }
+    return await response.json()
+  }
 </script>

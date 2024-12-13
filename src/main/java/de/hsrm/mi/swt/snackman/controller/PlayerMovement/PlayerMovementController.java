@@ -20,10 +20,10 @@ public class PlayerMovementController {
     // Erhalte Messages von /topic/player/update
     @MessageMapping("/topic/player/update")
     public void spreadPlayerUpdate(SnackManFrontendDTO player) {
-      SnackMan snackman = mapService.getSnackMan();
+      SnackMan snackman = mapService.getSnackMan(player.uuid());
       snackman.setQuaternion(player.qX(), player.qY(), player.qZ(), player.qW());
       snackman.move(player.forward(), player.backward(), player.left(), player.right(), player.delta());
-      messagingTemplate.convertAndSend("/topic/player", new SnackManPositionDTO(snackman.getPosX(), snackman.getPosY(), snackman.getPosZ()));
+      messagingTemplate.convertAndSend("/topic/player", new SnackManPositionDTO(snackman.getPosX(), snackman.getPosY(), snackman.getPosZ(), player.uuid()));
     }
 
 }
