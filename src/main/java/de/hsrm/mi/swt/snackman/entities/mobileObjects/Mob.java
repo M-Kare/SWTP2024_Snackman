@@ -96,6 +96,14 @@ public abstract class Mob {
         return currentSquare;
     }
 
+    public int getSpeed() {
+        return speed;
+    }
+
+    public void setSpeed(int speed) {
+        this.speed = speed;
+    }
+
     /**
      * Calculates the square-indices to set the currentSquare
      *

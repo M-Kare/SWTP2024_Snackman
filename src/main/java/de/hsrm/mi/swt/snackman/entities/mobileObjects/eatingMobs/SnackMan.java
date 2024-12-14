@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 public class SnackMan extends EatingMob {
     private boolean isJumping = false;
     private double velocityY = 0.0;
+    private boolean isSprinting = false;
 
     private final Logger log = LoggerFactory.getLogger(SnackMan.class);
 
@@ -86,9 +87,23 @@ public class SnackMan extends EatingMob {
     }
 
     @Override
-    public void move(double x, double y, double z) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'move'");
+    public void move(boolean forward, boolean backward, boolean left, boolean right, double delta) {
+        if (forward && !backward && !left && !right && isSprinting) {
+            setSpeed((int) (GameConfig.SNACKMAN_SPEED * GameConfig.SNACKMAN_SPRINT_MULTIPLIER));
+        } else {
+            setSpeed(GameConfig.SNACKMAN_SPEED);
+            setSprinting(false);
+        }
+
+        super.move(forward, backward, left, right, delta);
+    }
+
+    public void setSprinting(boolean sprinting) {
+        this.isSprinting = sprinting;
+    }
+
+    public boolean isSprinting() {
+        return isSprinting;
     }
 
     public int getCurrentCalories() {

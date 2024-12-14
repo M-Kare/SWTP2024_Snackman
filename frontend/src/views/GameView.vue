@@ -102,7 +102,7 @@ onMounted(async () => {
   }
 
   const playerData = await fetchSnackManFromBackend();
-  player = new Player(renderer, playerData.posX, playerData.posY, playerData.posZ, playerData.radius, playerData.speed)
+  player = new Player(renderer, playerData.posX, playerData.posY, playerData.posZ, playerData.radius, playerData.speed, playerData.baseSpeed, playerData.sprintMultiplier)
   camera = player.getCamera()
   scene.add(player.getControls().object)
 

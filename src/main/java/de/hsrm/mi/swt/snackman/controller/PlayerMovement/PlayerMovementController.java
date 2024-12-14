@@ -22,7 +22,6 @@ public class PlayerMovementController {
     public void spreadPlayerUpdate(SnackManFrontendDTO player) {
       SnackMan snackman = mapService.getSnackMan();
       snackman.setQuaternion(player.qX(), player.qY(), player.qZ(), player.qW());
-      snackman.setSpeed(player.sprinting());
       snackman.move(player.forward(), player.backward(), player.left(), player.right(), player.delta());
 
       //JUMPING

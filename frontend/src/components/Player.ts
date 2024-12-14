@@ -14,9 +14,11 @@ export class Player {
   private moveLeft: boolean;
   private moveRight: boolean;
   private canJump: boolean;
+  private sprinting: boolean;
 
   private radius: number;
   private speed: number;
+  private sprintMultiplier: number;
 
   private camera: THREE.PerspectiveCamera;
   private controls: PointerLockControls;
@@ -42,13 +44,14 @@ export class Player {
    * @param radius size of the player
    * @param speed speed-modifier of the player
    */
-  constructor(renderer: WebGLRenderer, posX: number, posY: number, posZ: number, radius: number, speed: number) {
+  constructor(renderer: WebGLRenderer, posX: number, posY: number, posZ: number, radius: number, speed: number, baseSpeed: number, sprintMultiplier: number) {
     this.prevTime = performance.now();
     this.moveBackward = false;
     this.moveForward = false;
     this.moveLeft = false;
     this.moveRight = false;
     this.canJump = true;
+    this.sprinting = false;
     this.movementDirection = new THREE.Vector3();
 
     this.isJumping = false;
@@ -67,6 +70,7 @@ export class Player {
 
     this.radius = radius;
     this.speed = speed;
+    this.sprintMultiplier = sprintMultiplier;
 
     this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 60)
     this.camera.position.set(posX, posY, posZ)
@@ -118,6 +122,7 @@ export class Player {
       case 'ArrowUp':
       case 'KeyW':
         this.moveForward = false
+        this.sprinting = false;
         break
 
       case 'ArrowLeft':
@@ -138,6 +143,10 @@ export class Player {
       case 'Space':
         this.spacePressed = false;
         break
+
+      case 'ShiftLeft':
+        this.sprinting = false;
+        break;
     }
   }
 
@@ -150,6 +159,9 @@ export class Player {
       case 'ArrowUp':
       case 'KeyW':
         this.moveForward = true
+        if (event.shiftKey) {
+          this.sprinting = true;
+        }
         break
 
       case 'ArrowLeft':
@@ -180,6 +192,13 @@ export class Player {
             this.doubleJump = true;
             this.lastJumpTime = currentTime;
           }
+        }
+        break;
+
+      case 'ShiftLeft':
+        this.sprinting = this.moveForward;
+        if (this.moveForward) {
+          this.sprinting = true;
         }
         break;
     }
@@ -223,6 +242,7 @@ export class Player {
     const time = performance.now()
     const delta = (time - this.prevTime) / 1000
     let result = 3;
+    const currentSpeed = this.sprinting ? this.speed * this.sprintMultiplier : this.speed;
 
     this.movementDirection.z = Number(this.moveForward) - Number(this.moveBackward)
     this.movementDirection.x = Number(this.moveRight) - Number(this.moveLeft)
@@ -239,8 +259,8 @@ export class Player {
     move.y = 0;
     if (!(move.x == 0 && move.z == 0))
       move.normalize();
-    move.x = move.x * delta * this.speed
-    move.z = move.z * delta * this.speed
+    move.x = move.x * delta * currentSpeed;
+    move.z = move.z * delta * currentSpeed;
     const xNew = this.camera.position.x + move.x;
     const zNew = this.camera.position.z + move.z;
     try {
