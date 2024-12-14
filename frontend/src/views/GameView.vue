@@ -7,16 +7,15 @@ import {onMounted, onUnmounted, ref} from 'vue'
 import * as THREE from 'three'
 import {Client} from '@stomp/stompjs'
 import {Player} from '@/components/Player';
-import type {IPlayerDTD} from '@/stores/IPlayerDTD';
+import type {IPlayerDTD} from '@/stores/Player/IPlayerDTD';
 import {fetchSnackManFromBackend} from '@/services/SnackManInitService';
 import {GameMapRenderer} from "@/renderer/GameMapRenderer";
 import {useGameMapStore} from '@/stores/gameMapStore'
 import type {IGameMap} from "@/stores/IGameMapDTD";
 
-const DECELERATION = 20.0
-const ACCELERATION = 300.0
 const WSURL = `ws://${window.location.host}/stompbroker`
 const DEST = '/topic/player'
+const targetHz = 30
 
 // stomp
 const stompclient = new Client({brokerURL: WSURL})
@@ -58,7 +57,8 @@ let counter = 0;
 function animate() {
   fps = 1 / clock.getDelta()
   player.updatePlayer();
-  if (counter >= fps / 30) {
+  if (counter >= fps / targetHz) {
+    // console.log(`${player.getCamera().position.x}  |  ${player.getCamera().position.z}`)
     const time = performance.now()
     const delta = (time - prevTime) / 1000
     try {
@@ -70,7 +70,7 @@ function animate() {
           qY: player.getCamera().quaternion.y,
           qZ: player.getCamera().quaternion.z,
           qW: player.getCamera().quaternion.w
-        }, {delta: delta}))
+        }, {delta: delta}, { jump: player.getIsJumping()}, { doubleJump: player.getIsDoubleJumping()}))
       });
     } catch (fehler) {
       console.log(fehler)
@@ -88,11 +88,6 @@ onMounted(async () => {
   scene = getScene()
   renderer = initRenderer(canvasRef.value)
 
-  const playerData = await fetchSnackManFromBackend();
-  player = new Player(renderer, playerData.posX, playerData.posY, playerData.posZ, playerData.radius, playerData.speed, playerData.speed)
-  camera = player.getCamera()
-  scene.add(player.getControls().object)
-
   //Add gameMap
   try {
     const gameMapStore = useGameMapStore()
@@ -105,6 +100,11 @@ onMounted(async () => {
   } catch (error) {
     console.error('Error when retrieving the gameMap:', error)
   }
+
+  const playerData = await fetchSnackManFromBackend();
+  player = new Player(renderer, playerData.posX, playerData.posY, playerData.posZ, playerData.radius, playerData.speed, playerData.baseSpeed, playerData.sprintMultiplier)
+  camera = player.getCamera()
+  scene.add(player.getControls().object)
 
   renderer.render(scene, camera)
   renderer.setAnimationLoop(animate)
