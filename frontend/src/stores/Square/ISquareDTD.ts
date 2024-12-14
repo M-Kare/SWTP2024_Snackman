@@ -1,5 +1,6 @@
 import type {ISnack, ISnackDTD} from "@/stores/Snack/ISnackDTD";
 import {MapObjectType} from "@/stores/IGameMapDTD";
+import type {IChicken, IChickenDTD} from "@/stores/Chicken/IChickenDTD";
 
 export interface ISquareDTD {
   id: number,

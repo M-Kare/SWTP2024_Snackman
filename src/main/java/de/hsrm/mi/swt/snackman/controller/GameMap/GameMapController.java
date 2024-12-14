@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import de.hsrm.mi.swt.snackman.configuration.GameConfig;
-import de.hsrm.mi.swt.snackman.entities.map.GameMap;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.SnackMan;
 import de.hsrm.mi.swt.snackman.services.MapService;
 
@@ -25,9 +24,6 @@ public class GameMapController {
     @Autowired
     private MapService mapService;
 
-    @Autowired
-    private SnackMan snackman;
-
     Logger log = LoggerFactory.getLogger(MapService.class);
 
     @GetMapping("/game-map")
@@ -38,6 +34,7 @@ public class GameMapController {
 
     @GetMapping("/snackman")
     public ResponseEntity<SnackManInitDTO> getSnackManPos(){
+        SnackMan snackman = mapService.getSnackMan();
         return ResponseEntity.ok(new SnackManInitDTO(snackman.getPosX(), snackman.getPosY(), snackman.getPosZ(), snackman.getRadius(), GameConfig.SNACKMAN_SPEED));
     }
 }
