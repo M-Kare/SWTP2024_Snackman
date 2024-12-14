@@ -242,7 +242,9 @@ export class Player {
     const time = performance.now()
     const delta = (time - this.prevTime) / 1000
     let result = 3;
+
     const currentSpeed = this.sprinting ? this.speed * this.sprintMultiplier : this.speed;
+    const adjustedDelta = Math.min(delta, 0.016) // max. 60 FPS, otherwise it lags while sprinting
 
     this.movementDirection.z = Number(this.moveForward) - Number(this.moveBackward)
     this.movementDirection.x = Number(this.moveRight) - Number(this.moveLeft)
@@ -259,8 +261,8 @@ export class Player {
     move.y = 0;
     if (!(move.x == 0 && move.z == 0))
       move.normalize();
-    move.x = move.x * delta * currentSpeed;
-    move.z = move.z * delta * currentSpeed;
+    move.x = move.x * adjustedDelta * currentSpeed;
+    move.z = move.z * adjustedDelta * currentSpeed;
     const xNew = this.camera.position.x + move.x;
     const zNew = this.camera.position.z + move.z;
     try {
