@@ -62,14 +62,14 @@
             return;
         }
 
-        // const isDuplicateName = lobbiesStore.lobbydata.lobbies.some(
-        //     // (lobby) => lobby.name === lobbyName.value.trim()
-        // );
+        const isDuplicateName = lobbiesStore.lobbydata.lobbies.some(
+            (lobby) => lobby.name === lobbyName.value.trim()
+        );
 
-        // if (isDuplicateName) {
-        //     alert("Lobby name already exists! Please choose another name.");
-        //     return;
-        // }
+        if (isDuplicateName) {
+            alert("Lobby name already exists! Please choose another name.");
+            return;
+        }
 
         try{
             const newLobby = await lobbiesStore.createLobby(lobbyName.value.trim(), adminClient);

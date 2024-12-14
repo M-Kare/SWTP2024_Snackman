@@ -5,7 +5,7 @@ import type { ILobbyDTD } from './ILobbyDTD';
 import type { IPlayerClientDTD } from './IPlayerClientDTD';
 
 const wsurl = `ws://${window.location.host}/stompbroker`
-const DEST = 'topic/lobbies'
+const DEST = '/topic/lobbies'
 
 export const useLobbiesStore = defineStore("lobbiesstore", () =>{
     const lobbydata = reactive({
@@ -120,6 +120,10 @@ export const useLobbiesStore = defineStore("lobbiesstore", () =>{
 
         stompclient.onStompError = (frame) => {
             console.error('Full STOMP Error Frame: ', frame)
+        }
+
+        stompclient.onDisconnect = () => {
+            console.log('Stompclient disconnected.')
         }
 
         stompclient.activate()
