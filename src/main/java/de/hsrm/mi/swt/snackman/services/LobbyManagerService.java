@@ -96,6 +96,7 @@ public class LobbyManagerService {
             Lobby lobby = findLobbyByUUID(lobbyId);
             lobby.getMembers().removeIf(client -> client.getPlayerId().equals(playerId));
 
+            
             if (lobby.getAdminClientId().equals(playerId) || lobby.getMembers().isEmpty()) {
                   lobbies.remove(lobby);
             }
