@@ -214,6 +214,31 @@ export const useLobbiesStore = defineStore("lobbiesstore", () =>{
     }
 
     /**
+     * Starts the game in the specified lobby.
+     * @param lobbyId The ID of the lobby where the game is to be started.
+     */
+    async function startGame(lobbyId: string): Promise<void> {
+        try {
+            const url = `/api/lobbies/${lobbyId}/start`;
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            if (!response.ok) {
+                throw new Error(`Failed to start game: ${response.statusText}`);
+            }
+
+            console.log(`Game started successfully in lobby: ${lobbyId}`);
+        } catch (error: any) {
+            console.error(`Error starting game in lobby ${lobbyId}:`, error);
+            throw new Error('Could not start the game. Please try again.');
+        }
+    }
+
+    /**
      * Fetches a specific lobby by its ID.
      * @param lobbyId The ID of the lobby to fetch.
      * @returns The lobby object or null if not found.
@@ -249,6 +274,7 @@ export const useLobbiesStore = defineStore("lobbiesstore", () =>{
         createLobby,
         joinLobby,
         leaveLobby,
+        startGame,
         fetchLobbyById,
     }
 })

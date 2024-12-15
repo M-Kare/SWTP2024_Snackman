@@ -106,8 +106,19 @@
         router.push({ name: 'LobbyList' });
     }
 
-    const startGame = () => {
-        router.push({name: "GameStart"});
+    const startGame = async () => {
+        if (!lobby.value) {
+            console.error('Lobby not found');
+            return;
+        }
+        if(lobby.value.members.length < 2){
+            alert('Have not enough members to start game!');
+        }
+        await lobbiesStore.startGame(lobby.value.uuid);
+        
+        lobby.value.members.forEach((member) => {
+            router.push({ name: "GameStart" });
+        });
     }
 
 </script>

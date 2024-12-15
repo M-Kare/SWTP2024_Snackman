@@ -109,7 +109,7 @@ public class LobbyController {
                   Lobby joiningLobby = lobbyManagerService.joinLobby(lobbyId, playerId);
                   //session.setAttribute("currentLobby", joiningLobby);
                   //logger.info("Session: {}", session);
-                  messagingTemplate.convertAndSend("/topic/lobbies/" + lobbyId, joiningLobby);
+                  //messagingTemplate.convertAndSend("/topic/lobbies/" + lobbyId, joiningLobby);
                   messagingTemplate.convertAndSend("/topic/lobbies", lobbyManagerService.getAllLobbies());
                   logger.info("Updated lobbies sent to /topic/lobbies: {}", lobbyManagerService.getAllLobbies());
 
@@ -133,7 +133,7 @@ public class LobbyController {
             lobbyManagerService.leaveLobby(lobbyId, playerId);
             //session.removeAttribute("currentLobby");
             //logger.info("Session: {}", session);
-            messagingTemplate.convertAndSend("/topic/lobbies/" + lobbyId, lobbyManagerService.findLobbyByUUID(lobbyId));
+            //messagingTemplate.convertAndSend("/topic/lobbies/" + lobbyId, lobbyManagerService.findLobbyByUUID(lobbyId));
             messagingTemplate.convertAndSend("/topic/lobbies", lobbyManagerService.getAllLobbies());
             logger.info("Updated lobbies sent to /topic/lobbies: {}", lobbyManagerService.getAllLobbies());
 
