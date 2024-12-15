@@ -32,6 +32,10 @@
                         {{ member.playerName }}
                     </div>
 
+                    <div class="player-name">
+                        {{ member.playerId }}
+                    </div>
+
                     <div class="player-character">
                         {{ member.role }}
                     </div>
@@ -89,9 +93,15 @@
 
         // Update lobby data reactively if STOMP updates arrive
         lobbiesStore.$subscribe((mutation, state) => {
-            if (state.lobbydata.lobbies.some(l => l.uuid === lobbyId)) {
-                lobby.value = state.lobbydata.lobbies.find(l => l.uuid === lobbyId) || null;
+            const updatedLobby = state.lobbydata.lobbies.find(l => l.uuid === lobbyId);
+        
+            // If Lobby doesn't exit, come back to LobbyListView-Seite
+            if (!updatedLobby) {
+                router.push({ name: 'LobbyList' });
+                return;
             }
+
+            lobby.value = updatedLobby;
         });
     })
 
@@ -101,6 +111,14 @@
             console.error('Player or Lobby not found');
             return;
         }
+
+        if(playerId === lobby.value.adminClient.playerId){
+            for (const member of lobby.value.members) {
+                if (member.playerId !== playerId) {
+                    await lobbiesStore.leaveLobby(lobby.value.uuid, member.playerId);
+                }
+            }
+        } 
 
         await lobbiesStore.leaveLobby(lobby.value.uuid, playerId);
         router.push({ name: 'LobbyList' });
@@ -115,8 +133,8 @@
             alert('Have not enough members to start game!');
         }
         await lobbiesStore.startGame(lobby.value.uuid);
-        
-        lobby.value.members.forEach((member) => {
+
+        lobby.value.members.forEach(() => {
             router.push({ name: "GameStart" });
         });
     }

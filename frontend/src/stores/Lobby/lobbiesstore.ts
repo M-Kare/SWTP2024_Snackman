@@ -7,7 +7,9 @@ import type { IPlayerClientDTD } from './IPlayerClientDTD';
 const wsurl = `ws://${window.location.host}/stompbroker`
 const DEST = '/topic/lobbies'
 
-export const useLobbiesStore = defineStore("lobbiesstore", () =>{
+export const useLobbiesStore = defineStore('lobbiesstore', () =>{
+    let stompclient: Client
+    
     const lobbydata = reactive({
         lobbies: [] as Array<ILobbyDTD>,
         currentPlayer: {
@@ -67,7 +69,6 @@ export const useLobbiesStore = defineStore("lobbiesstore", () =>{
      * Starts the STOMP client for real-time lobby updates.
      */
     async function startLobbyLiveUpdate(){
-        let stompclient: Client
 
         stompclient = new Client({ brokerURL: wsurl })
 
