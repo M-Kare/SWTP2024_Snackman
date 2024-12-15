@@ -3,6 +3,7 @@ package de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs;
 import de.hsrm.mi.swt.snackman.configuration.GameConfig;
 import de.hsrm.mi.swt.snackman.entities.map.Square;
 import de.hsrm.mi.swt.snackman.entities.mapObject.snack.Snack;
+import de.hsrm.mi.swt.snackman.entities.mechanics.SprintHandler;
 import de.hsrm.mi.swt.snackman.services.MapService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,6 +12,8 @@ public class SnackMan extends EatingMob {
     private boolean isJumping = false;
     private double velocityY = 0.0;
     private boolean isSprinting = false;
+    
+    private SprintHandler sprintHandler = new SprintHandler();
 
     private final Logger log = LoggerFactory.getLogger(SnackMan.class);
 
@@ -88,18 +91,41 @@ public class SnackMan extends EatingMob {
 
     @Override
     public void move(boolean forward, boolean backward, boolean left, boolean right, double delta) {
-        if (forward && !backward && !left && !right && isSprinting) {
-            setSpeed((int) (GameConfig.SNACKMAN_SPEED * GameConfig.SNACKMAN_SPRINT_MULTIPLIER));
+        if (isSprinting) {
+            if (sprintHandler.canSprint()) {
+                setSpeed((int) (GameConfig.SNACKMAN_SPEED * GameConfig.SNACKMAN_SPRINT_MULTIPLIER));
+            } else {
+                sprintHandler.stopSprint();
+                setSpeed(GameConfig.SNACKMAN_SPEED);
+            }
         } else {
+            sprintHandler.stopSprint();
             setSpeed(GameConfig.SNACKMAN_SPEED);
-            setSprinting(false);
         }
-
+    
         super.move(forward, backward, left, right, delta);
     }
-
+    
     public void setSprinting(boolean sprinting) {
         this.isSprinting = sprinting;
+    
+        if (sprinting) {
+            if (sprintHandler.canSprint()) {
+                sprintHandler.startSprint();
+            } else {
+                this.isSprinting = false;
+            }
+        } else {
+            sprintHandler.stopSprint();
+        }
+    }
+
+    public int getSprintTimeLeft() {
+        return sprintHandler.getSprintTimeLeft();
+    }
+
+    public boolean isInCooldown() {
+        return sprintHandler.isInCooldown();
     }
 
     public boolean isSprinting() {
@@ -109,7 +135,6 @@ public class SnackMan extends EatingMob {
     public int getCurrentCalories() {
         return super.getKcal();
     }
-
     /**
      * Collects the snack on the square if there is one.
      * If there is one that remove it from the square.

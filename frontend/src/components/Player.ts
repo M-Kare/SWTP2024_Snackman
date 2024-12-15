@@ -381,4 +381,8 @@ export class Player {
   public getIsDoubleJumping() {
     return this.doubleJump;
   }
+
+  public get isSprinting(): boolean {
+    return this.sprinting;
+  }
 }

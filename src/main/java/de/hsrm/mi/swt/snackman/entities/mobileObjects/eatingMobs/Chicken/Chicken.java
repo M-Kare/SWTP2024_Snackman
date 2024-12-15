@@ -24,7 +24,7 @@ public class Chicken extends EatingMob implements Runnable {
     private static long idCounter = 0;
     private long id;
     private final PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
-    private final Logger log = LoggerFactory.getLogger(Chicken.class);
+    //private final Logger log = LoggerFactory.getLogger(Chicken.class);
     private boolean blockingPath = false;
     private Thickness thickness = Thickness.THIN;
     private int chickenPosX, chickenPosZ;
@@ -79,7 +79,7 @@ public class Chicken extends EatingMob implements Runnable {
     private void setNewPosition(List<String> newMove) {
         //get positions
         Direction walkingDirection = Direction.getDirection(newMove.getLast());
-        log.debug("Walking direction is: {}", walkingDirection);
+        //log.debug("Walking direction is: {}", walkingDirection);
 
         this.lookingDirection = walkingDirection;
         Square oldPosition = super.mapService.getSquareAtIndexXZ(this.chickenPosX, this.chickenPosZ);
@@ -87,10 +87,10 @@ public class Chicken extends EatingMob implements Runnable {
         propertyChangeSupport.firePropertyChange("chicken", null, this);
 
         try {
-            log.debug("Waiting " + WAITING_TIME + " sec before walking on next square.");
+            //log.debug("Waiting " + WAITING_TIME + " sec before walking on next square.");
             Thread.sleep(WAITING_TIME);
         } catch (InterruptedException e) {
-            log.error(e.getMessage());
+            //log.error(e.getMessage());
         }
 
         // set new position
@@ -114,21 +114,21 @@ public class Chicken extends EatingMob implements Runnable {
             // get 9 squares
             Square currentPosition = super.mapService.getSquareAtIndexXZ(this.chickenPosX, this.chickenPosZ);
             List<String> squares = super.mapService.getSquaresVisibleForChicken(currentPosition, lookingDirection);
-            log.debug("Squares chicken is seeing: {}", squares);
+            //log.debug("Squares chicken is seeing: {}", squares);
 
-            log.debug("Current position is x {} z {}", this.chickenPosX, this.chickenPosZ);
+            //log.debug("Current position is x {} z {}", this.chickenPosX, this.chickenPosZ);
             //super.mapService.printGameMap();
 
             List<String> newMove = executeMovementSkript(squares);
 
             // set new square you move to
             setNewPosition(newMove);
-            log.debug("New position is x {} z {}", this.chickenPosX, this.chickenPosZ);
+            //log.debug("New position is x {} z {}", this.chickenPosX, this.chickenPosZ);
 
             // consume snack if present
             currentPosition = super.mapService.getSquareAtIndexXZ(this.chickenPosX, this.chickenPosZ);
             if (currentPosition.getSnack() != null && getKcal() < MAX_KALORIEN) {
-                log.debug("Snack being eaten at x {} z {}", this.chickenPosX, this.chickenPosZ);
+                //log.debug("Snack being eaten at x {} z {}", this.chickenPosX, this.chickenPosZ);
                 consumeSnackOnSquare();
             }
         }
@@ -162,7 +162,7 @@ public class Chicken extends EatingMob implements Runnable {
     public void initJython() {
         pythonProps.setProperty("python.path", "src/main/java/de/hsrm/mi/swt/snackman");
         PythonInterpreter.initialize(System.getProperties(), pythonProps, new String[0]);
-        log.debug("Initialised jython for chicken movement");
+        //log.debug("Initialised jython for chicken movement");
         this.pythonInterpreter = new PythonInterpreter();
         pythonInterpreter.exec("from ChickenMovementSkript import choose_next_square");
     }
@@ -176,19 +176,19 @@ public class Chicken extends EatingMob implements Runnable {
      */
     public List<String> executeMovementSkript(List<String> squares) {
         try {
-            log.debug("Running python chicken script with: {}", squares.toString());
+            //log.debug("Running python chicken script with: {}", squares.toString());
             PyObject func = pythonInterpreter.get("choose_next_square");
             PyObject result = func.__call__(new PyList(squares));
 
             if (result instanceof PyList) {
                 PyList pyList = (PyList) result;
-                log.debug("Python chicken script return: {}", pyList);
+                //log.debug("Python chicken script return: {}", pyList);
                 return convertPythonList(pyList);
             }
 
             throw new Exception("Python chicken script did not load.");
         } catch (Exception ex) {
-            log.error("Error while executing chicken python script: ", ex);
+            //log.error("Error while executing chicken python script: ", ex);
             ex.printStackTrace();
         }
         return squares;
@@ -205,7 +205,7 @@ public class Chicken extends EatingMob implements Runnable {
         for (Object item : pyList) {
             javaList.add(item.toString());
         }
-        log.debug("Python script result is {}", javaList);
+        //log.debug("Python script result is {}", javaList);
         return javaList;
     }
 

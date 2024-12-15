@@ -24,11 +24,11 @@ public class GameMapController {
     @Autowired
     private MapService mapService;
 
-    Logger log = LoggerFactory.getLogger(MapService.class);
+    //Logger log = LoggerFactory.getLogger(MapService.class);
 
     @GetMapping("/game-map")
     public ResponseEntity<GameMapDTO> getGameMap() {
-        log.debug("Get GameMap");
+        //log.debug("Get GameMap");
         return ResponseEntity.ok(GameMapDTO.fromGameMap(mapService.getGameMap()));
     }
 
