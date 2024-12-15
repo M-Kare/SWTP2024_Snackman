@@ -39,7 +39,7 @@ stompclient.onConnect = frame => {
     sprintData.sprintTimeLeft = (event.sprintTimeLeft / 5) * 100;
     sprintData.isSprinting = event.isSprinting;
     sprintData.isCooldown = event.isInCooldown;
-    
+
     player.setPosition(event.posX, event.posY, event.posZ);
   })
 }
@@ -156,14 +156,13 @@ const sprintBarStyle = computed(() => {
 <style>
 .sprint-bar {
   position: absolute;
-  bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 300px;
-  height: 20px;
+  bottom: 3vh;
+  right: 3vh;
+  width: 25rem;
+  height: 2.5rem;
   background-color: #ccc;
-  border: 2px solid #000;
-  border-radius: 5px;
+  border: 0.25rem solid #000;
+  border-radius: 0.5rem;
   overflow: hidden;
 }
 
