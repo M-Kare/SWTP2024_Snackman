@@ -10,9 +10,12 @@
 #     W   W -> west_square, east_square
 #     W W W -> southwest_square, south_square, southeast_square
 #
-#     direction: the direction index in which the chickens head is looking
+#     direction: the direction index in which the chickens head is looking and last walked into
 #     e.g. if the solution liste is [W,G, ,W,2] the chicken is walking in south direction and looking into south direction too
 #
+#     The direction in which the chicken is moving is defined in the wiki. It moved according to the definition,
+#     it prefers walking into the same direction it last walked into. If this is (due to the wiki definition) not possible,
+#     it will randomly choose a walking direction (according to the wiki)
 #
 #    returns: [north_square, east_square, south_square, west_square, indexOfNextPosition]
 import random
