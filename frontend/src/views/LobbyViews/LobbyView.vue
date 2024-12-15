@@ -25,7 +25,7 @@
         <div class="inner-box">
             <ul>
                 <li
-                    v-for="member in members"
+                    v-for="member in members" :key="member.playerId"
                     class="player-list-items">
 
                     <div class="player-name">
@@ -70,6 +70,14 @@
             return;
         }
 
+        // const savedLobby = sessionStorage.getItem(`lobby_${lobbyId}`);
+        // if (savedLobby) {
+        //     lobby.value = JSON.parse(savedLobby);
+        // } else {
+        //     lobby.value = await lobbiesStore.fetchLobbyById(lobbyId);
+        //     sessionStorage.setItem(`lobby_${lobbyId}`, JSON.stringify(lobby.value));
+        // }
+
         lobby.value = await lobbiesStore.fetchLobbyById(lobbyId);
 
         if(!lobby.value){
@@ -78,6 +86,13 @@
         }
 
         lobbiesStore.startLobbyLiveUpdate();
+
+        // Update lobby data reactively if STOMP updates arrive
+        lobbiesStore.$subscribe((mutation, state) => {
+            if (state.lobbydata.lobbies.some(l => l.uuid === lobbyId)) {
+                lobby.value = state.lobbydata.lobbies.find(l => l.uuid === lobbyId) || null;
+            }
+        });
     })
 
     const leaveLobby = async () => {

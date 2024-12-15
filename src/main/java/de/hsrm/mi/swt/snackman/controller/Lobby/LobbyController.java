@@ -60,8 +60,8 @@ public class LobbyController {
 
             try {
                   Lobby newLobby = lobbyManagerService.createLobby(name, client);
-                  session.setAttribute("currentLobby", newLobby);
-
+                  //session.setAttribute("currentLobby", newLobby);
+                  //logger.info("Session: {}", session);
                   messagingTemplate.convertAndSend("/topic/lobbies", lobbyManagerService.getAllLobbies());
                   logger.info("Creating lobby with name: {} and creatorUuid: {}", name, creatorUuid);
                   
@@ -107,10 +107,10 @@ public class LobbyController {
                                                 HttpSession session) {
             try {
                   Lobby joiningLobby = lobbyManagerService.joinLobby(lobbyId, playerId);
-                  session.setAttribute("currentLobby", joiningLobby);
-
+                  //session.setAttribute("currentLobby", joiningLobby);
+                  //logger.info("Session: {}", session);
                   messagingTemplate.convertAndSend("/topic/lobbies/" + lobbyId, joiningLobby);
-                  
+                  messagingTemplate.convertAndSend("/topic/lobbies", lobbyManagerService.getAllLobbies());
                   logger.info("Updated lobbies sent to /topic/lobbies: {}", lobbyManagerService.getAllLobbies());
 
                   return ResponseEntity.ok(joiningLobby);
@@ -131,9 +131,10 @@ public class LobbyController {
       public ResponseEntity<Void> leaveLobby(@PathVariable("lobbyId") String lobbyId, @RequestParam("playerId") String playerId,
                                                 HttpSession session) {
             lobbyManagerService.leaveLobby(lobbyId, playerId);
-            session.removeAttribute("currentLobby");
+            //session.removeAttribute("currentLobby");
+            //logger.info("Session: {}", session);
             messagingTemplate.convertAndSend("/topic/lobbies/" + lobbyId, lobbyManagerService.findLobbyByUUID(lobbyId));
-            //messagingTemplate.convertAndSend("/topic/lobbies", lobbyManagerService.getAllLobbies());
+            messagingTemplate.convertAndSend("/topic/lobbies", lobbyManagerService.getAllLobbies());
             logger.info("Updated lobbies sent to /topic/lobbies: {}", lobbyManagerService.getAllLobbies());
 
             return ResponseEntity.ok().build();

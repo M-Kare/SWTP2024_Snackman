@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import de.hsrm.mi.swt.snackman.entities.lobby.PlayerClient;
 import de.hsrm.mi.swt.snackman.services.LobbyManagerService;
+import jakarta.servlet.http.HttpSession;
 
 /**
  * The PlayerClientController handles HTTP request relalted to managing player client.
@@ -39,7 +40,7 @@ public class PlayerClientController {
      * @return  the newly created {@link PlayerClient} object
      */
     @PostMapping("/create")
-    public ResponseEntity<PlayerClient> createPlayerClient(@RequestParam("name") String name){
+    public ResponseEntity<PlayerClient> createPlayerClient(@RequestParam("name") String name, HttpSession session){
         if(name == null){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }

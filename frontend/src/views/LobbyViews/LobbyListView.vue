@@ -70,7 +70,8 @@
 
     const lobbies = computed(() => lobbiesStore.lobbydata.lobbies);
     const currentPlayer = lobbiesStore.lobbydata.currentPlayer as IPlayerClientDTD;
-
+    
+    // lobby value tracking
     watch(lobbies, (newVal) => {
         console.log("Updated lobbies:", newVal);
     });
@@ -127,6 +128,24 @@
     // ]);
 
     onMounted(async () => {
+        // const savedPlayer = sessionStorage.getItem("currentPlayer");
+        // const savedLobbies = sessionStorage.getItem('lobbies');
+
+        // if (savedPlayer) {
+        //     lobbiesStore.lobbydata.currentPlayer = JSON.parse(savedPlayer);
+        //     console.log("Restored player data:", savedLobbies);
+        // } else {
+        //     console.log("No player data found in sessionStorage.");
+        // }
+
+        // if (savedLobbies) {
+        //     lobbiesStore.lobbydata.lobbies = JSON.parse(savedLobbies);
+        //     console.log("Restored lobby data:", savedLobbies);
+        // } else {
+        //     lobbiesStore.startLobbyLiveUpdate();
+        //     console.log("No lobby data found in sessionStorage.");
+        // }
+
         if (!lobbiesStore.lobbydata.currentPlayer || lobbiesStore.lobbydata.currentPlayer.playerId === '' || lobbiesStore.lobbydata.currentPlayer.playerName === '') {
             lobbiesStore.createPlayer('Player Test');
         }

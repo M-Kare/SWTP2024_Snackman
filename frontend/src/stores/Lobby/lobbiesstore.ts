@@ -17,10 +17,12 @@ export const useLobbiesStore = defineStore("lobbiesstore", () =>{
         } as IPlayerClientDTD //PlayerClient for each window, for check the sync
     })
 
-    // let stompclient: Client | null = null
+    // Function to set player
+    function setPlayer(player: IPlayerClientDTD) {
+        lobbydata.currentPlayer = { ...player }; // Cập nhật toàn bộ thông tin của player
+        console.log('Player has been set:', player);
+    }
 
-    // Each Window have only one Admin Client, for create new lobby
-    // then join in another lobby, they become the normal player
     // For Test all Players have the same name 'Player Test'
     /**
      * Creates a new player client.
@@ -62,27 +64,6 @@ export const useLobbiesStore = defineStore("lobbiesstore", () =>{
     }
 
     /**
-     * Updates the list of lobbies.
-     * Fetches data from the server and triggers live updates.
-     */
-    // async function updateLobbies(): Promise<void>{
-    //     try{
-    //         const url = `/api/lobbies`
-    //         const response = await fetch(url)
-
-    //         if(!response.ok) throw new Error(response.statusText)
-
-    //         const data = await response.json()
-    //         lobbydata.lobbies = data
-
-    //         //startLobbyLiveUpdate()
-
-    //     } catch (error: any){
-    //         console.error('Error:', error)
-    //     }
-    // }
-    
-    /**
      * Starts the STOMP client for real-time lobby updates.
      */
     async function startLobbyLiveUpdate(){
@@ -101,21 +82,17 @@ export const useLobbiesStore = defineStore("lobbiesstore", () =>{
             if (stompclient) {
                 stompclient.subscribe(DEST, async (message) => {
                     console.log('STOMP Client subscribe')
-                    try {
-                        const updatedLobbies = JSON.parse(message.body);
-                        lobbydata.lobbies = [...updatedLobbies];
-                        console.log('Received lobby update:', updatedLobbies);
-                    } catch (error) {
-                        console.error('Error parsing message:', error);
-                    }
-                });
+                    const updatedLobbies = JSON.parse(message.body)
+                    lobbydata.lobbies = [...updatedLobbies]
+                    console.log('Received lobby update:', updatedLobbies)
+                })
             } else {
-                console.error('STOMP client is not initialized.');
+                console.error('STOMP client is not initialized.')
             }
         }
 
         stompclient.onWebSocketError = (error) => {
-            console.error('WebSocket Error:', error);
+            console.error('WebSocket Error:', error)
         }
 
         stompclient.onStompError = (frame) => {
@@ -264,42 +241,14 @@ export const useLobbiesStore = defineStore("lobbiesstore", () =>{
         } 
     }
 
-    /**
-     * Fetches a specific player by their ID.
-     * @param playerId The ID of the player to fetch.
-     * @returns The player object or null if not found.
-     */
-    async function fetchClientById(playerId: String): Promise<IPlayerClientDTD | null> {
-        try{
-            const url = `/api/playerclients/player/${playerId}`
-            const response = await fetch(url, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-            })
-
-            if(!response.ok){
-                throw new Error(`HTTP error! status: ${response.status}`)
-            }
-
-            const client: IPlayerClientDTD = await response.json()
-            console.log('Fetched Lobby: ', client)
-            return client
-        } catch (error: any){
-            console.error('Error:', error)
-            return null
-        } 
-    }
-
     return{
         lobbydata,
+        setPlayer,
         createPlayer,
         startLobbyLiveUpdate,
         createLobby,
         joinLobby,
         leaveLobby,
         fetchLobbyById,
-        fetchClientById,
     }
 })
