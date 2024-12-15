@@ -38,6 +38,18 @@ stompclient.onConnect = frame => {
 
     sprintData.sprintTimeLeft = (event.sprintTimeLeft / 5) * 100;
     sprintData.isSprinting = event.isSprinting;
+
+    // If the cooldown is active in the backend and the local state is not yet in cooldown
+    if (event.isInCooldown && !sprintData.isCooldown) {
+      const usedSprintTime = 5 - event.sprintTimeLeft;
+      startCooldownFill(usedSprintTime);
+    }
+
+    // When the backend cooldown has ended, but the local state is still in cooldown
+    if (!event.isInCooldown && sprintData.isCooldown) {
+      stopCooldownFill();
+    }
+
     sprintData.isCooldown = event.isInCooldown;
 
     player.setPosition(event.posX, event.posY, event.posZ);
@@ -130,14 +142,55 @@ function resizeCallback() {
 }
 
 // SPRINT-BAR 
+let cooldownAnimationFrame: number | null = null;
+
+// Starts the cooldown animation for the sprint bar, filling it dynamically
+function startCooldownFill(usedSprintTime: number) {
+  if (cooldownAnimationFrame) return; // Prevent starting a new animation if one is already running
+
+  const cooldownDuration = usedSprintTime * 2 * 1000; // Total cooldown duration in ms
+  const startTime = performance.now();
+  const startValue = sprintData.sprintTimeLeft;
+  const fillAmount = 100 - startValue;
+
+  sprintData.isCooldown = true;
+
+  /**
+   * Recursive function to animate the cooldown fill using requestAnimationFrame.
+   */
+  function animateFill() {
+    const now = performance.now();
+    const elapsed = now - startTime;
+    const progress = Math.min(elapsed / cooldownDuration, 1);
+    sprintData.sprintTimeLeft = startValue + progress * fillAmount;
+
+    if (progress < 1) {
+      // If the animation is not complete, request the next animation frame
+      cooldownAnimationFrame = requestAnimationFrame(animateFill);
+    } else {
+      stopCooldownFill();
+      sprintData.isCooldown = false;
+      sprintData.sprintTimeLeft = 100;
+    }
+  }
+
+  cooldownAnimationFrame = requestAnimationFrame(animateFill);
+}
+
+// Stops the cooldown fill animation and cleans up the animation frame reference.
+function stopCooldownFill() {
+  if (cooldownAnimationFrame) {
+    cancelAnimationFrame(cooldownAnimationFrame);
+    cooldownAnimationFrame = null;
+  }
+}
+
 const sprintData = reactive({
   sprintTimeLeft: 100, // percentage (0-100)
   isSprinting: false,
   isCooldown: false,
-  cooldownDuration: 0, // Total cooldown duration in seconds
 });
 
-// Computed style for sprint bar
 const sprintBarStyle = computed(() => {
   let color = 'green';
   if (sprintData.isSprinting) {
