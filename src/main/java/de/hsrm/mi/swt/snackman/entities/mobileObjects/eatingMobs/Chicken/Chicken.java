@@ -2,18 +2,20 @@ package de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import de.hsrm.mi.swt.snackman.entities.map.Square;
 import de.hsrm.mi.swt.snackman.entities.mapObject.snack.Snack;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.EatingMob;
+import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken.Characters.Behavior;
+import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken.Characters.DefaultChickenBehavior;
+import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken.Characters.TalaChickenBehavior;
 import de.hsrm.mi.swt.snackman.services.MapService;
-import org.python.core.PyList;
-import org.python.core.PyObject;
 import org.python.util.PythonInterpreter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  * Represents a chicken entity in the game, capable of moving around the map,
@@ -35,9 +37,23 @@ public class Chicken extends EatingMob implements Runnable {
     // python
     private PythonInterpreter pythonInterpreter = null;
     private Properties pythonProps = new Properties();
+    @JsonIgnore
+    public Behavior behavior;
 
-    public Chicken() {
+    public Chicken() { //Nur zum testen????
         super(null);
+        behavior = new DefaultChickenBehavior();
+    }
+    
+    public Chicken(Behavior behavior){ //Nur zum testen????
+        super(null);
+        this.behavior = behavior;
+    }
+
+    public List<String> act(List<String> squares){
+        log.info("Behavior: {}", behavior);
+        List<String> result = behavior.execute(squares);
+        return result;
     }
 
     public Chicken(Square initialPosition, MapService mapService) {
@@ -46,7 +62,19 @@ public class Chicken extends EatingMob implements Runnable {
         this.chickenPosX = initialPosition.getIndexX();
         this.chickenPosZ = initialPosition.getIndexZ();
         initialPosition.addMob(this);
+        behavior = new DefaultChickenBehavior();
+        this.isWalking = true;
+        this.lookingDirection = Direction.NORTH;
+        initTimer();
+    }
 
+    public Chicken(Square initialPosition, MapService mapService, Behavior behavior) {
+        super(mapService);
+        id = generateId();
+        this.chickenPosX = initialPosition.getIndexX();
+        this.chickenPosZ = initialPosition.getIndexZ();
+        initialPosition.addMob(this);
+        this.behavior = behavior;
         this.isWalking = true;
         this.lookingDirection = Direction.NORTH;
         initTimer();
@@ -119,7 +147,7 @@ public class Chicken extends EatingMob implements Runnable {
             log.debug("Current position is x {} z {}", this.chickenPosX, this.chickenPosZ);
             //super.mapService.printGameMap();
 
-            List<String> newMove = executeMovementSkript(squares);
+            List<String> newMove = act(squares);
 
             // set new square you move to
             setNewPosition(newMove);
@@ -160,53 +188,11 @@ public class Chicken extends EatingMob implements Runnable {
      * Sets up the required Python environment and interpreter.
      */
     public void initJython() {
-        pythonProps.setProperty("python.path", "src/main/java/de/hsrm/mi/swt/snackman");
+        pythonProps.setProperty("python.path", "src/main/java/de/hsrm/mi/swt/snackman/entities/mobileObjects/eatingMobs/Chicken/Characters/MovementSkripts");
         PythonInterpreter.initialize(System.getProperties(), pythonProps, new String[0]);
         log.debug("Initialised jython for chicken movement");
         this.pythonInterpreter = new PythonInterpreter();
         pythonInterpreter.exec("from ChickenMovementSkript import choose_next_square");
-    }
-
-    /**
-     * Executes the chicken's movement script written in Python and determines the
-     * next move.
-     *
-     * @param squares a list of squares visible from the chicken's current position.
-     * @return a list of moves resulting from the Python script's execution.
-     */
-    public List<String> executeMovementSkript(List<String> squares) {
-        try {
-            log.debug("Running python chicken script with: {}", squares.toString());
-            PyObject func = pythonInterpreter.get("choose_next_square");
-            PyObject result = func.__call__(new PyList(squares));
-
-            if (result instanceof PyList) {
-                PyList pyList = (PyList) result;
-                log.debug("Python chicken script return: {}", pyList);
-                return convertPythonList(pyList);
-            }
-
-            throw new Exception("Python chicken script did not load.");
-        } catch (Exception ex) {
-            log.error("Error while executing chicken python script: ", ex);
-            ex.printStackTrace();
-        }
-        return squares;
-    }
-
-    /**
-     * Converts a Python list to a Java list.
-     *
-     * @param pyList the Python list to convert.
-     * @return the corresponding Java list.
-     */
-    private List<String> convertPythonList(PyList pyList) {
-        List<String> javaList = new ArrayList<>();
-        for (Object item : pyList) {
-            javaList.add(item.toString());
-        }
-        log.debug("Python script result is {}", javaList);
-        return javaList;
     }
 
     /**
