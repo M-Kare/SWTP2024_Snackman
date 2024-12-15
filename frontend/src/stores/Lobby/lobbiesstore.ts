@@ -9,7 +9,7 @@ const DEST = '/topic/lobbies'
 
 export const useLobbiesStore = defineStore('lobbiesstore', () =>{
     let stompclient: Client
-    
+
     const lobbydata = reactive({
         lobbies: [] as Array<ILobbyDTD>,
         currentPlayer: {
@@ -52,7 +52,6 @@ export const useLobbiesStore = defineStore('lobbiesstore', () =>{
                 const newPlayer = await response.json()
                 Object.assign(lobbydata.currentPlayer, newPlayer)
             } else {
-                const errorText = await response.text()
                 console.error(`Failed to create a new player client: ${response.statusText}`)
             }
 
@@ -195,7 +194,7 @@ export const useLobbiesStore = defineStore('lobbiesstore', () =>{
      * @param lobbyId The ID of the lobby.
      * @param playerId The ID of the player leaving the lobby.
      */
-    async function leaveLobby(lobbyId: String, playerId: string): Promise<void> {
+    async function leaveLobby(lobbyId: string, playerId: string): Promise<void> {
         try{
             const url = `/api/lobbies/${lobbyId}/leave?playerId=${playerId}`
             const response = await fetch(url, {
@@ -244,7 +243,7 @@ export const useLobbiesStore = defineStore('lobbiesstore', () =>{
      * @param lobbyId The ID of the lobby to fetch.
      * @returns The lobby object or null if not found.
      */
-    async function fetchLobbyById(lobbyId: String): Promise<ILobbyDTD | null> {
+    async function fetchLobbyById(lobbyId: string): Promise<ILobbyDTD | null> {
         try{
             const url = `/api/lobbies/lobby/${lobbyId}`
             const response = await fetch(url, {

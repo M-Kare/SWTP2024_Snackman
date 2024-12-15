@@ -102,6 +102,10 @@
             }
 
             lobby.value = updatedLobby;
+
+            if (updatedLobby.isGameStarted === true){
+                router.push({ name: 'GameView' });
+            }
         });
     })
 
@@ -125,18 +129,25 @@
     }
 
     const startGame = async () => {
-        if (!lobby.value) {
-            console.error('Lobby not found');
+        const playerId = lobbiesStore.lobbydata.currentPlayer.playerId;
+
+        if (!playerId ||!lobby.value) {
+            console.error('Player or Lobby not found');
             return;
         }
+
         if(lobby.value.members.length < 2){
             alert('Have not enough members to start game!');
         }
-        await lobbiesStore.startGame(lobby.value.uuid);
 
-        lobby.value.members.forEach(() => {
-            router.push({ name: "GameStart" });
-        });
+        if(playerId === lobby.value.adminClient.playerId){
+            await lobbiesStore.startGame(lobby.value.uuid);
+            lobby.value.members.forEach(() => {
+                router.push({ name: "GameStart" });
+            });
+        } else {
+            alert('Just Admin Snackman can start the game!');
+        }
     }
 
 </script>

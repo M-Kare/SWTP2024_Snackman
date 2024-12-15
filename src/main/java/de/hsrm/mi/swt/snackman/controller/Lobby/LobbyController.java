@@ -149,8 +149,8 @@ public class LobbyController {
       @PostMapping("/{lobbyId}/start")
       public ResponseEntity<Void> startGame(@PathVariable("lobbyId") String lobbyId) {
             lobbyManagerService.startGame(lobbyId);
-            messagingTemplate.convertAndSend("/topic/lobbies/" + lobbyId, lobbyManagerService.findLobbyByUUID(lobbyId));
-
+            //messagingTemplate.convertAndSend("/topic/lobbies/" + lobbyId, lobbyManagerService.findLobbyByUUID(lobbyId));
+            messagingTemplate.convertAndSend("/topic/lobbies", lobbyManagerService.getAllLobbies());
             return ResponseEntity.ok().build();
       }
 

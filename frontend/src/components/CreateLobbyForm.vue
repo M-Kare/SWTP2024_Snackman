@@ -48,10 +48,7 @@
 
     const createLobby = async () => {
         const adminClient = currentPlayer;
-        // adminClient.playerId = currentPlayer.playerId;
-        // adminClient.playerName = currentPlayer.playerName;
-        // adminClient.role = currentPlayer.role;
-
+    
         if (!adminClient || adminClient.playerId === '' || adminClient.playerName === '') {
             alert("Admin client is not valid!");
             return;
