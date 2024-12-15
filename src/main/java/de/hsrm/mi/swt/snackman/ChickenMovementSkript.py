@@ -13,31 +13,33 @@
 #     direction: the direction index in which the chickens head is looking
 #     e.g. if the solution liste is [W,G, ,W,2] the chicken is walking in south direction and looking into south direction too
 #
+#
 #    returns: [north_square, east_square, south_square, west_square, indexOfNextPosition]
 import random
 
 def choose_next_square(squares_liste):
     northwest_square, north_square, northeast_square, east_square, southeast_square, south_square, southwest_square, west_square, direction = list(squares_liste)
+    direction = int(direction)
     solution_liste = [north_square, east_square, south_square, west_square]
     # make sure you cannot walk into a wall
     solution_liste = eliminate_walls_as_options(solution_liste)
     # make sure you do not walk into a ghost
     if all_squares_have_ghosts(solution_liste):
-        return add_walking_direction(choose_random_element(solution_liste, "G"))
+        return add_walking_direction(choose_random_square(solution_liste, "G", direction))
     # choose square with snack
     if all_squares_have_snack(solution_liste):
         # choose random snack
-        return add_walking_direction(choose_random_element(solution_liste, "S"))
+        return add_walking_direction(choose_random_square(solution_liste, "S", direction))
     elif at_least_one_square_with_snack(solution_liste):
         # choose a square with snack (far away from ghost)
-        return add_walking_direction(choose_snack_away_from_ghost(solution_liste))
+        return add_walking_direction(choose_snack_away_from_ghost(solution_liste, direction))
     elif at_least_one_square_with_ghost(solution_liste):
         # choose square without snack, away from ghosts
         north, east, south, west = solution_liste
-        return add_walking_direction(choose_square_without_snack_away_from_ghost(north, east, south, west))
+        return add_walking_direction(choose_square_without_snack_away_from_ghost(north, east, south, west, direction))
     else:
         # choose random square, no snacks there + no ghosts
-        return add_walking_direction(choose_random_element(solution_liste, "L"))
+        return add_walking_direction(choose_random_square(solution_liste, "L", direction))
 
 def eliminate_walls_as_options(liste):
     return ['X' if item == 'W' else item for item in liste]
@@ -46,7 +48,11 @@ def all_squares_have_ghosts(liste):
     return all('G' == element or 'X' == element for element in liste)
 
 # replaces a random element which is of the kind of toReplace
-def choose_random_element(liste, toReplace):
+def choose_random_square(liste, toReplace, direction):
+    # check if current walking direction is ok
+    if liste[direction] == toReplace:
+        liste[direction] = " "
+        return liste
     # get list of indexes of things to replace
     indexes_to_choose_from = []
     for i in range(len(liste)):
@@ -73,41 +79,44 @@ def at_least_one_square_with_snack(original_liste):
 def at_least_one_square_with_ghost(original_liste):
     return "G" in original_liste
 
-def choose_snack_away_from_ghost(original_liste):
+def choose_snack_away_from_ghost(original_liste, direction):
     north_square, east_square, south_square, west_square = original_liste
     # check if there are ghosts, if not -> choose snack
     if not at_least_one_square_with_ghost(original_liste):
         if at_least_one_square_with_snack(original_liste):
             # choose snack
-            return choose_random_element(original_liste, "S")
+            return choose_random_square(original_liste, "S", direction)
         else:
-            # choose empthy space
-            return choose_random_element(original_liste, "L")
+            # choose empty space
+            return choose_random_square(original_liste, "L", direction)
     # alle gegenüber der G anschauen, wenn S da: dort hingehen
-    if (north_square == "G" and south_square == "S") or (north_square == "S" and south_square == "G"):
-        if north_square == "G" and south_square == "S":
-            return [north_square, east_square, " ", west_square]
-        if north_square == "S" and south_square == "G":
-            return [" ", east_square, south_square, west_square]
-    elif (west_square == "G" and east_square == "S") or (west_square == "S" and east_square == "G"):
-        if west_square == "G" and east_square == "S":
-            return [north_square, " ", south_square, west_square]
-        if west_square == "S" and east_square == "G":
-            return [north_square, east_square, south_square, " "]
+    if original_liste[direction] == "S":
+        original_liste[direction] = " "
+        return original_liste
+    if north_square == "G" and south_square == "S":
+        return [north_square, east_square, " ", west_square]
+    if north_square == "S" and south_square == "G":
+        return [" ", east_square, south_square, west_square]
+    if west_square == "G" and east_square == "S":
+        return [north_square, " ", south_square, west_square]
+    if west_square == "S" and east_square == "G":
+        return [north_square, east_square, south_square, " "]
     # wenn L da: weiter nach S ggü von G suchen
-    return choose_square_without_snack_away_from_ghost(north_square, east_square, south_square, west_square)
+    return choose_square_without_snack_away_from_ghost(north_square, east_square, south_square, west_square, direction)
 
-def choose_square_without_snack_away_from_ghost(north_square, east_square, south_square, west_square):
-    if (north_square == "G" and south_square == "L") or (north_square == "L" and south_square == "G"):
-        if north_square == "G" and south_square == "L":
-            return [north_square, east_square, " ", west_square]
-        if north_square == "L" and south_square == "G":
-            return [" ", east_square, south_square, west_square]
-    elif (west_square == "G" and east_square == "L") or (west_square == "L" and east_square == "G"):
-        if north_square == "G" and south_square == "L":
-            return [north_square, east_square, " ", west_square]
-        if north_square == "L" and south_square == "G":
-            return [" ", east_square, south_square, west_square]
+def choose_square_without_snack_away_from_ghost(north_square, east_square, south_square, west_square, direction):
+    if list([north_square, east_square, south_square, west_square])[direction] == "L":
+        solution_list =  list([north_square, east_square, south_square, west_square])
+        solution_list[direction] = " "
+        return solution_list
+    if north_square == "G" and south_square == "L":
+        return [north_square, east_square, " ", west_square]
+    if north_square == "L" and south_square == "G":
+        return [" ", east_square, south_square, west_square]
+    if north_square == "G" and south_square == "L":
+        return [north_square, east_square, " ", west_square]
+    if north_square == "L" and south_square == "G":
+        return [" ", east_square, south_square, west_square]
     # wenn nichts gefunden: irgendein L nehmen
-    return choose_random_element([north_square, east_square, south_square, west_square], "L")
+    return choose_random_square([north_square, east_square, south_square, west_square], "L", direction)
 
