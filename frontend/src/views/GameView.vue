@@ -1,9 +1,12 @@
 <template>
   <canvas ref="canvasRef"></canvas>
+  <div class="sprint-bar">
+    <div class="sprint-bar-inner" :style="sprintBarStyle"></div>
+  </div>
 </template>
 
 <script setup lang="ts">
-import {onMounted, onUnmounted, ref} from 'vue'
+import {computed, onMounted, onUnmounted, reactive, ref} from 'vue'
 import * as THREE from 'three'
 import {Client} from '@stomp/stompjs'
 import {Player} from '@/components/Player';
@@ -32,6 +35,11 @@ stompclient.onConnect = frame => {
     // empfangene Nutzdaten in message.body abrufbar,
     // ggf. mit JSON.parse(message.body) zu JS konvertieren
     const event: IPlayerDTD = JSON.parse(message.body)
+
+    sprintData.sprintTimeLeft = (event.sprintTimeLeft / 5) * 100;
+    sprintData.isSprinting = event.isSprinting;
+    sprintData.isCooldown = event.isInCooldown;
+    
     player.setPosition(event.posX, event.posY, event.posZ);
   })
 }
@@ -120,4 +128,47 @@ function resizeCallback() {
   camera.aspect = window.innerWidth / window.innerHeight
   camera.updateProjectionMatrix()
 }
+
+// SPRINT-BAR 
+const sprintData = reactive({
+  sprintTimeLeft: 100, // percentage (0-100)
+  isSprinting: false,
+  isCooldown: false,
+  cooldownDuration: 0, // Total cooldown duration in seconds
+});
+
+// Computed style for sprint bar
+const sprintBarStyle = computed(() => {
+  let color = 'green';
+  if (sprintData.isSprinting) {
+    color = 'red';
+  } else if (sprintData.isCooldown) {
+    color = 'blue';
+  }
+
+  return {
+    width: `${sprintData.sprintTimeLeft}%`,
+    backgroundColor: color,
+  };
+});
 </script>
+
+<style>
+.sprint-bar {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 300px;
+  height: 20px;
+  background-color: #ccc;
+  border: 2px solid #000;
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.sprint-bar-inner {
+  height: 100%;
+  transition: width 0.1s ease-out, background-color 0.2s ease-out;
+}
+</style>
