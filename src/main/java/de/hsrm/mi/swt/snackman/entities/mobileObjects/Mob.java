@@ -14,7 +14,7 @@ public abstract class Mob {
     private double radius;
     private Quaterniond quat;
     private Square currentSquare;
-    private int speed;
+    private double speed;
 
     private MapService mapService;
     private GameMap gameMap;
@@ -90,6 +90,14 @@ public abstract class Mob {
 
     public Square getCurrentSquare() {
         return currentSquare;
+    }
+
+    public double getSpeed(){
+        return speed;
+    }
+
+    public void setSpeed(double speed){
+        this.speed = speed;
     }
 
     /**

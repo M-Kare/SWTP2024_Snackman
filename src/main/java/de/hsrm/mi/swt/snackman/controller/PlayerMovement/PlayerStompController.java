@@ -9,7 +9,7 @@ import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.SnackMan;
 import de.hsrm.mi.swt.snackman.services.MapService;
 
 @Controller
-public class PlayerMovementController {
+public class PlayerStompController {
 
   @Autowired
     private SimpMessagingTemplate messagingTemplate;
@@ -18,12 +18,12 @@ public class PlayerMovementController {
     private MapService mapService;
 
     // Erhalte Messages von /topic/player/update
-    @MessageMapping("/topic/player/update")
-    public void spreadPlayerUpdate(SnackManFrontendDTO player) {
+    //TODO: In MapService HashMap von <UUID, Mob> und dann entsprechende Figur holen zum verschicken
+    @MessageMapping("topic/player/update")
+    public void spreadPlayerUpdate(PlayerToBackendDTO player) {
       SnackMan snackman = mapService.getSnackMan(player.uuid());
       snackman.setQuaternion(player.qX(), player.qY(), player.qZ(), player.qW());
       snackman.move(player.forward(), player.backward(), player.left(), player.right(), player.delta());
-      messagingTemplate.convertAndSend("/topic/player", new SnackManPositionDTO(snackman.getPosX(), snackman.getPosY(), snackman.getPosZ(), player.uuid()));
+      messagingTemplate.convertAndSend("/topic/player", new PlayerToFrontendDTO(snackman.getPosX(), snackman.getPosY(), snackman.getPosZ(), snackman.getRadius(), snackman.getSpeed(), player.uuid()));
     }
-
-}
+  }
