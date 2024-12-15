@@ -129,7 +129,7 @@
 
     onMounted(async () => {
         // const savedPlayer = sessionStorage.getItem("currentPlayer");
-        // const savedLobbies = sessionStorage.getItem('lobbies');
+        // const savedLobbies = sessionStorage.getItem('currentLobby');
 
         // if (savedPlayer) {
         //     lobbiesStore.lobbydata.currentPlayer = JSON.parse(savedPlayer);
@@ -142,7 +142,7 @@
         //     lobbiesStore.lobbydata.lobbies = JSON.parse(savedLobbies);
         //     console.log("Restored lobby data:", savedLobbies);
         // } else {
-        //     lobbiesStore.startLobbyLiveUpdate();
+        //      lobbiesStore.startLobbyLiveUpdate();
         //     console.log("No lobby data found in sessionStorage.");
         // }
 
