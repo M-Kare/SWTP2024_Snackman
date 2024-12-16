@@ -1,5 +1,6 @@
 package de.hsrm.mi.swt.snackman.controller.GameMap;
 
+import de.hsrm.mi.swt.snackman.entities.mobileObjects.Ghost;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,4 +38,12 @@ public class GameMapController {
         SnackMan snackman = mapService.getSnackMan();
         return ResponseEntity.ok(new SnackManInitDTO(snackman.getPosX(), snackman.getPosY(), snackman.getPosZ(), snackman.getRadius(), GameConfig.SNACKMAN_SPEED));
     }
+
+    @GetMapping("/ghost")
+    public ResponseEntity<GhostInitDTO> getGhostPos(){
+        Ghost ghost = mapService.getGhost();
+        return ResponseEntity.ok(new GhostInitDTO(ghost.getId(), ghost.getPosX(), ghost.getPosY(), ghost.getPosZ(), ghost.getRadius(), GameConfig.GHOST_SPEED));
+    }
+
+
 }

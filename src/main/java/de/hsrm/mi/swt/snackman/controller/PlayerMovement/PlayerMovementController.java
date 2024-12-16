@@ -34,6 +34,15 @@ public class PlayerMovementController {
       } 
       snackman.updateJumpPosition(player.delta());
 
+
+      /*
+      * Ghost einfügen
+      *
+      *
+      *
+      * 
+      * */
+
       messagingTemplate.convertAndSend("/topic/player", new SnackManPositionDTO(snackman.getPosX(), snackman.getPosY(), snackman.getPosZ()));
     }
 }

@@ -1,6 +1,8 @@
 package de.hsrm.mi.swt.snackman.services;
 
 import java.beans.PropertyChangeEvent;
+
+import de.hsrm.mi.swt.snackman.entities.mobileObjects.Ghost;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken.Chicken;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken.Direction;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.SnackMan;
@@ -40,6 +42,7 @@ public class MapService {
     private PythonInterpreter pythonInterpreter = null;
     private Properties pythonProps = new Properties();
     private SnackMan snackman;
+    private Ghost ghost;
 
     /**
      * Constructs a new MapService
@@ -58,6 +61,7 @@ public class MapService {
         char[][] mazeData = readMazeService.readMazeFromFile(this.filePath);
         gameMap = convertMazeDataGameMap(mazeData);
         snackman = new SnackMan(this, GameConfig.SNACKMAN_SPEED, GameConfig.SNACKMAN_RADIUS);
+        ghost = new Ghost(this, GameConfig.GHOST_SPEED , GameConfig.GHOST_RADIUS);
     }
 
     /**
@@ -211,5 +215,8 @@ public class MapService {
 
     public SnackMan getSnackMan() {
         return snackman;
+    }
+    public Ghost getGhost(){
+        return ghost;
     }
 }
