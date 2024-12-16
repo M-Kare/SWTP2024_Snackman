@@ -103,7 +103,7 @@
 
             lobby.value = updatedLobby;
 
-            if (updatedLobby.isGameStarted === true){
+            if (updatedLobby.isGameStarted){
                 router.push({ name: 'GameView' });
             }
         });
