@@ -100,6 +100,9 @@ public abstract class Mob {
         this.speed = speed;
     }
 
+    public Quaterniond getRotationQuaternion(){
+        return this.quat;
+    }
     /**
      * Calculates the square-indices to set the currentSquare
      * @param x x-position

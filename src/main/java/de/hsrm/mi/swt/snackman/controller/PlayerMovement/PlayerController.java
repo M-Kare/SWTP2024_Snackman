@@ -20,7 +20,7 @@ public class PlayerController {
     @PostMapping("/snackman")
     public ResponseEntity<PlayerToFrontendDTO> initSnackman(@RequestParam("uuid") String uuid){
         SnackMan snackman = mapService.createSnackMan(uuid);
-        return ResponseEntity.ok(new PlayerToFrontendDTO(snackman.getPosX(), snackman.getPosY(), snackman.getPosZ(), snackman.getRadius(), snackman.getSpeed(), uuid));
+        return ResponseEntity.ok(new PlayerToFrontendDTO(snackman.getPosX(), snackman.getPosY(), snackman.getPosZ(), snackman.getRotationQuaternion().x, snackman.getRotationQuaternion().y, snackman.getRotationQuaternion().z, snackman.getRotationQuaternion().w, snackman.getRadius(), snackman.getSpeed(), uuid));
     }
 
     // TODO: Ghost ertsellen

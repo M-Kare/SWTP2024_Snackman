@@ -44,6 +44,7 @@ stompclient.onConnect = frame => {
     } else {
       console.log(event.uuid)
       playerHashMap.get(event.uuid)?.position.set(event.posX, event.posY, event.posZ)
+      playerHashMap.get(event.uuid)?.setRotationFromQuaternion(new THREE.Quaternion(event.qX, event.qY, event.qZ, event.qW))
     }
   })
 }
