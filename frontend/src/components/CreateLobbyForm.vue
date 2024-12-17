@@ -73,7 +73,7 @@
             if (newLobby && newLobby.uuid) {
                 alert("Lobby created successfully!");
                 cancelLobbyCreation();
-                router.push({ name: "Lobby", params: { lobbyId: newLobby.uuid } });
+                router.push({ name: "LobbyView", params: { lobbyId: newLobby.uuid } });
             } else {
                 throw new Error("Lobby creation returned invalid response.");
             }

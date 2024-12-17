@@ -4,6 +4,6 @@ export interface ILobbyDTD{
     uuid: string
     name: string
     adminClient: IPlayerClientDTD
-    isGameStarted: boolean
+    gameStarted: boolean
     members: Array<IPlayerClientDTD>
 }

@@ -86,7 +86,7 @@
 
         if(!lobby.value){
             alert('Lobby not found or failed to load.');
-            router.push({name: "LobbyList"});
+            router.push({name: 'LobbyListView'});
         }
 
         lobbiesStore.startLobbyLiveUpdate();
@@ -97,13 +97,14 @@
         
             // If Lobby doesn't exit, come back to LobbyListView-Seite
             if (!updatedLobby) {
-                router.push({ name: 'LobbyList' });
+                router.push({ name: 'LobbyListView' });
                 return;
             }
 
             lobby.value = updatedLobby;
 
-            if (updatedLobby.isGameStarted){
+            if (updatedLobby.gameStarted){
+                console.log('Game has started! Redirecting to GameView...');
                 router.push({ name: 'GameView' });
             }
         });
@@ -125,7 +126,7 @@
         } 
 
         await lobbiesStore.leaveLobby(lobby.value.uuid, playerId);
-        router.push({ name: 'LobbyList' });
+        router.push({ name: 'LobbyListView' });
     }
 
     const startGame = async () => {
@@ -142,9 +143,6 @@
 
         if(playerId === lobby.value.adminClient.playerId){
             await lobbiesStore.startGame(lobby.value.uuid);
-            lobby.value.members.forEach(() => {
-                router.push({ name: "GameStart" });
-            });
         } else {
             alert('Just Admin Snackman can start the game!');
         }

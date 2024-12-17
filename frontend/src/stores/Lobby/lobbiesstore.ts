@@ -117,7 +117,7 @@ export const useLobbiesStore = defineStore('lobbiesstore', () =>{
             uuid: '',
             name: lobbyName,
             adminClient: adminClient,
-            isGameStarted: false, 
+            gameStarted: false, 
             members: [adminClient]
         }
 

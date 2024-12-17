@@ -98,12 +98,17 @@
             return;
         }
 
+        if(lobby.gameStarted){
+            alert(`Lobby "${lobby.name}" started game! Please select another one.`);
+            return;
+        }
+
         try{
             const joinedLobby = await lobbiesStore.joinLobby(lobby.uuid, currentPlayer.playerId);
 
             if(joinedLobby) {
                 console.log('Successfully joined lobby', joinedLobby.name);
-                router.push({ name: "Lobby", params: { lobbyId: lobby.uuid } });
+                router.push({ name: "LobbyView", params: { lobbyId: lobby.uuid } });
             }
         } catch (error: any){
             console.error('Error:', error);
