@@ -131,8 +131,13 @@ public class Chicken extends EatingMob implements Runnable {
 
             // consume snack if present
             currentPosition = super.mapService.getSquareAtIndexXZ(this.chickenPosX, this.chickenPosZ);
-            if (currentPosition.getSnack() != null && super.getKcal() < MAX_KALORIEN) {
-                log.debug("Snack being eaten at x {} z {}", this.chickenPosX, this.chickenPosZ);
+            if (currentPosition.getSnack() != null && super.getKcal() < MAX_KALORIEN
+                    && currentPosition.getSnack().getSnackType() != SnackType.EGG) {
+                log.info("Chicken {} {} kcal – Snack {} {} being eaten at square {}",
+                        this.id, super.getKcal(),
+                        currentPosition.getSnack().getSnackType().toString(),
+                        currentPosition.getSnack().getCalories(),
+                        currentPosition.getId());
                 consumeSnackOnSquare();
             }
         }
@@ -292,6 +297,7 @@ public class Chicken extends EatingMob implements Runnable {
             eggLayingTimer.cancel();
         }
         eggLayingTimer = new Timer();
+        log.info("New timer for chicken {}", id);
 
         TimerTask task = new TimerTask() {
             public void run() {
@@ -304,11 +310,12 @@ public class Chicken extends EatingMob implements Runnable {
         long delayBecauseIsScared = 10000;
 
         if (this.isScared) {
-            System.out.println("Scared Chicken-Timer " + delayBecauseIsScared / 1000 + " seconds"); // TODO delete
+            log.info("Scared Chicken {} Timer + {} seconds", this.id, delayBecauseIsScared / 1000); // TODO .debug everywhere instead of .info
             eggLayingTimer.scheduleAtFixedRate(task, (randomIntervalForLayingANewEgg) + delayBecauseIsScared, randomIntervalForLayingANewEgg);
             this.isScared = false;
         } else {
             this.eggLayingTimer.scheduleAtFixedRate(task, randomIntervalForLayingANewEgg, randomIntervalForLayingANewEgg);
+            log.info("Chicken {} – new randomInterval: {}", id, randomIntervalForLayingANewEgg / 1000);
         }
     }
 
@@ -331,9 +338,13 @@ public class Chicken extends EatingMob implements Runnable {
             this.mapService.addEggToSquare(currentSquare, egg);
 
             // Chicken becomes thin again and has no calories after it has laid an egg
-            super.setKcal(0);
             this.setThickness(Thickness.THIN);
+            super.setKcal(0);
+            log.info("Chicken {} laid an egg -> thin again and {} kcal", this.id, super.getKcal());
 
+            startNewTimer();
+        } else {
+            log.info("Chicken {} has no kcal left to lay an egg", this.id);
             startNewTimer();
         }
     }
