@@ -15,6 +15,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
+/**
+ * The ScriptGhost represents a ghost entity in the game that
+ * moves autonomously by executing Python scripts. It extends the Mob class
+ * and implements Runnable to handle threaded movement logic.
+ * Based on the visible squares around its current position, the script decides
+ * the next move for the ghost.
+ */
 public class ScriptGhost extends Mob implements Runnable {
 
     private static long idCounter = 0;
@@ -49,7 +56,7 @@ public class ScriptGhost extends Mob implements Runnable {
     }
 
     /**
-     * Method to generate the next id of a new Square. It is synchronized because of thread-safety.
+     * Method to generate the next id of a new ScriptGhost. It is synchronized because of thread-safety.
      *
      * @return the next incremented id
      */
@@ -59,8 +66,7 @@ public class ScriptGhost extends Mob implements Runnable {
 
     /**
      * Contains the movement logic for the ghost. The ghost calculates its next
-     * move,
-     * updates its position and consumes any snacks found at its current location.
+     * moves and updates its position.
      */
     protected void move() {
         initJython();

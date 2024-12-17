@@ -57,7 +57,7 @@ public class Chicken extends EatingMob implements Runnable {
     }
 
     /**
-     * Method to generate the next id of a new Square. It is synchronized because of thread-safety.
+     * Method to generate the next id of a new Chicken. It is synchronized because of thread-safety.
      *
      * @return the next incremented id
      */
