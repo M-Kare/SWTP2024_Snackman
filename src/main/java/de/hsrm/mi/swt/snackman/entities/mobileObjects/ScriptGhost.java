@@ -30,7 +30,7 @@ public class ScriptGhost extends Mob implements Runnable {
     private final Properties pythonProps = new Properties();
 
     public ScriptGhost() {
-        super(null, 0, 0, 0, 0, 0);
+        super(null);
     }
 
     public ScriptGhost(MapService mapService, int speed, double radius, double posX, double posY, double posZ) {
