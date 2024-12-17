@@ -18,7 +18,7 @@
   const router = useRouter();
 
   const showLobbies = () => {
-      router.push({name: 'LobbyList'});
+      router.push({name: 'LobbyListView'});
   }
 
 </script>
