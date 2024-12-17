@@ -154,7 +154,7 @@ public class ScriptGhost extends Mob implements Runnable {
         this.lookingDirection = walkingDirection;
         Square oldPosition = super.mapService.getSquareAtIndexXZ(this.ghostPosX, this.ghostPosZ);
         Square newPosition = walkingDirection.getNewPosition(super.mapService, this.ghostPosX, this.ghostPosZ, walkingDirection);
-        propertyChangeSupport.firePropertyChange("ghost", null, this);
+        propertyChangeSupport.firePropertyChange("ghost", null, this);      // todo update in frontend + init in backend
 
         try {
             log.debug("Waiting " + WAITING_TIME + " sec before walking on next square.");
@@ -170,7 +170,7 @@ public class ScriptGhost extends Mob implements Runnable {
         this.setPosZ(newPosition.getIndexZ());
         oldPosition.removeMob(this);
         newPosition.addMob(this);
-        propertyChangeSupport.firePropertyChange("ghost", null, this);
+        propertyChangeSupport.firePropertyChange("ghost", null, this);      // todo update in frontend + init in backend
     }
 
     /**
