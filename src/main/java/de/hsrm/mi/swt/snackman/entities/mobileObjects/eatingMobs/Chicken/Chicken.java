@@ -158,7 +158,7 @@ public class Chicken extends EatingMob implements Runnable {
                 //set snack to null after consuming it
                 currentSquare.setSnack(null);
                 if (super.getKcal() >= this.MAX_CALORIES) {
-                    log.info("Chicken {} has reached {} kcal", this.id, super.getKcal());
+                    //log.info("Chicken {} has reached {} kcal", this.id, super.getKcal());
                     layEgg();
                 }
             } catch (Exception e) {
