@@ -1,6 +1,6 @@
 package de.hsrm.mi.swt.snackman.entities.mob.Chicken;
 
-import de.hsrm.mi.swt.snackman.entities.mob.eatingMobs.Chicken.Chicken;
+import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken.Chicken;
 import org.junit.jupiter.api.Test;
 import java.util.List;
 

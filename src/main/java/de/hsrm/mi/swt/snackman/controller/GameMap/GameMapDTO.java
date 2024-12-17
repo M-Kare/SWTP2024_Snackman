@@ -3,11 +3,10 @@ package de.hsrm.mi.swt.snackman.controller.GameMap;
 import de.hsrm.mi.swt.snackman.controller.Square.ChickenDTO;
 import de.hsrm.mi.swt.snackman.controller.Square.SquareDTO;
 import de.hsrm.mi.swt.snackman.entities.map.GameMap;
-import de.hsrm.mi.swt.snackman.entities.mob.eatingMobs.Chicken.Chicken;
+import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken.Chicken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;

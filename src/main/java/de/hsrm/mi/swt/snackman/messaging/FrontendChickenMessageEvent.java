@@ -1,6 +1,6 @@
 package de.hsrm.mi.swt.snackman.messaging;
 
-import de.hsrm.mi.swt.snackman.entities.mob.eatingMobs.Chicken.Chicken;
+import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken.Chicken;
 
 public record FrontendChickenMessageEvent(EventType eventType, ChangeType changeType, Chicken chicken) {
 

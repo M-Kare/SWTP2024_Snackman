@@ -1,6 +1,6 @@
 package de.hsrm.mi.swt.snackman.controller.PlayerMovement;
 
-import de.hsrm.mi.swt.snackman.entities.mob.eatingMobs.SnackMan;
+import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.SnackMan;
 
 public record SnackManPositionDTO(double posX, double posY, double posZ) {
 

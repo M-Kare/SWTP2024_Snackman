@@ -2,13 +2,12 @@ package de.hsrm.mi.swt.snackman.entities.map;
 
 import de.hsrm.mi.swt.snackman.entities.mapObject.MapObjectType;
 import de.hsrm.mi.swt.snackman.entities.mapObject.snack.Snack;
-import de.hsrm.mi.swt.snackman.entities.mob.Mob;
-import de.hsrm.mi.swt.snackman.entities.mob.Ghost;
+import de.hsrm.mi.swt.snackman.entities.mobileObjects.Ghost;
+import de.hsrm.mi.swt.snackman.entities.mobileObjects.Mob;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
 import java.util.List;
-
 
 /**
  * Class that represents a Square. A Square is part of the game map. Multiple squares representing a game map.
@@ -25,13 +24,13 @@ public class Square {
 
     private Snack snack;
 
-    private final List<Mob> mobs = new ArrayList<>();
+    private List<Mob> mobs = new ArrayList<Mob>();
 
-    public Square(int indexX, int indexY) {
+    public Square(int indexX, int indexZ) {
         id = generateId();
         type = MapObjectType.FLOOR;
         this.indexX = indexX;
-        this.indexZ = indexY;
+        this.indexZ = indexZ;
     }
 
     public Square(MapObjectType type, int indexX, int indexZ) {

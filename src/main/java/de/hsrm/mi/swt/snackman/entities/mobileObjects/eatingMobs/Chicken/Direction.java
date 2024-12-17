@@ -1,4 +1,4 @@
-package de.hsrm.mi.swt.snackman.entities.mob.eatingMobs.Chicken;
+package de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken;
 
 import de.hsrm.mi.swt.snackman.entities.map.Square;
 import de.hsrm.mi.swt.snackman.services.MapService;
