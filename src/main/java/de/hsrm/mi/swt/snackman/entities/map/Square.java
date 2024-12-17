@@ -4,6 +4,10 @@ import de.hsrm.mi.swt.snackman.entities.mapObject.MapObjectType;
 import de.hsrm.mi.swt.snackman.entities.mapObject.snack.Snack;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.Ghost;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.Mob;
+import de.hsrm.mi.swt.snackman.entities.mobileObjects.ScriptGhost;
+import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken.Chicken;
+import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.SnackMan;
+
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
@@ -87,14 +91,31 @@ public class Square {
 
     /**
      *
-     * @return the dominant type of MapObject
+     * @return the dominant type of MapObject for the chicken
      */
-    public String getPrimaryType() {
+    public String getPrimaryTypeForChicken() {
         if (type == MapObjectType.WALL) {
             return  "W";
         } else if (type == MapObjectType.FLOOR) {
             if(this.mobs.stream().anyMatch(mob -> mob instanceof Ghost)) return "G";
             //if(this.mobs.stream().anyMatch(mob -> mob instanceof Chicken)) return "C";
+            else if(this.snack != null) return "S";
+        }
+        return "L";
+    }
+
+    /**
+     *
+     * @return the dominant type of MapObject for the ghost
+     */
+    public String getPrimaryTypeForGhost() {
+        if (type == MapObjectType.WALL) {
+            return  "W";
+        } else if (type == MapObjectType.FLOOR) {
+            if(this.mobs.stream().anyMatch(mob -> mob instanceof SnackMan)) return "M";
+            if(this.mobs.stream().anyMatch(mob -> mob instanceof Chicken)) return "C";
+            if(this.mobs.stream().anyMatch(mob -> mob instanceof Ghost)) return "G";
+            if(this.mobs.stream().anyMatch(mob -> mob instanceof ScriptGhost)) return "G";
             else if(this.snack != null) return "S";
         }
         return "L";

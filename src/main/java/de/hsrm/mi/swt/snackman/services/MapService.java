@@ -163,14 +163,37 @@ public class MapService {
      */
     public synchronized List<String> getSquaresVisibleForChicken(Square currentPosition, Direction lookingDirection) {
         List<String> squares = new ArrayList<>();
-        squares.add(Direction.NORTH_WEST.getNorthWestSquare(this, currentPosition).getPrimaryType());
-        squares.add(Direction.NORTH.getNorthSquare(this, currentPosition).getPrimaryType());
-        squares.add(Direction.NORTH_EAST.getNorthEastSquare(this, currentPosition).getPrimaryType());
-        squares.add(Direction.EAST.getEastSquare(this, currentPosition).getPrimaryType());
-        squares.add(Direction.SOUTH_EAST.getSouthEastSquare(this, currentPosition).getPrimaryType());
-        squares.add(Direction.SOUTH.getSouthSquare(this, currentPosition).getPrimaryType());
-        squares.add(Direction.SOUTH_WEST.getSouthWestSquare(this, currentPosition).getPrimaryType());
-        squares.add(Direction.WEST.getWestSquare(this, currentPosition).getPrimaryType());
+        squares.add(Direction.NORTH_WEST.getNorthWestSquare(this, currentPosition).getPrimaryTypeForChicken());
+        squares.add(Direction.NORTH.getNorthSquare(this, currentPosition).getPrimaryTypeForChicken());
+        squares.add(Direction.NORTH_EAST.getNorthEastSquare(this, currentPosition).getPrimaryTypeForChicken());
+        squares.add(Direction.EAST.getEastSquare(this, currentPosition).getPrimaryTypeForChicken());
+        squares.add(Direction.SOUTH_EAST.getSouthEastSquare(this, currentPosition).getPrimaryTypeForChicken());
+        squares.add(Direction.SOUTH.getSouthSquare(this, currentPosition).getPrimaryTypeForChicken());
+        squares.add(Direction.SOUTH_WEST.getSouthWestSquare(this, currentPosition).getPrimaryTypeForChicken());
+        squares.add(Direction.WEST.getWestSquare(this, currentPosition).getPrimaryTypeForChicken());
+        squares.add(lookingDirection.toString());
+        return squares;
+    }
+
+    /**
+     * @param currentPosition  the square the ghost is standing on top of
+     * @param lookingDirection
+     * @return a list of 8 square which are around the current square + the
+     * direction the ghost is looking in the order:
+     * northwest_square, north_square, northeast_square, east_square,
+     * southeast_square, south_square, southwest_square, west_square,
+     * direction
+     */
+    public synchronized List<String> getSquaresVisibleForGhost(Square currentPosition, Direction lookingDirection) {
+        List<String> squares = new ArrayList<>();
+        squares.add(Direction.NORTH_WEST.getNorthWestSquare(this, currentPosition).getPrimaryTypeForGhost());
+        squares.add(Direction.NORTH.getNorthSquare(this, currentPosition).getPrimaryTypeForGhost());
+        squares.add(Direction.NORTH_EAST.getNorthEastSquare(this, currentPosition).getPrimaryTypeForGhost());
+        squares.add(Direction.EAST.getEastSquare(this, currentPosition).getPrimaryTypeForGhost());
+        squares.add(Direction.SOUTH_EAST.getSouthEastSquare(this, currentPosition).getPrimaryTypeForGhost());
+        squares.add(Direction.SOUTH.getSouthSquare(this, currentPosition).getPrimaryTypeForGhost());
+        squares.add(Direction.SOUTH_WEST.getSouthWestSquare(this, currentPosition).getPrimaryTypeForGhost());
+        squares.add(Direction.WEST.getWestSquare(this, currentPosition).getPrimaryTypeForGhost());
         squares.add(lookingDirection.toString());
         return squares;
     }
@@ -203,7 +226,7 @@ public class MapService {
             System.out.print("x");
             for (int z = 0; z < gameMap[x].length; z++) {
                 Square square = gameMap[x][z];
-                System.out.print(square.getPrimaryType());
+                System.out.print(square.getPrimaryTypeForChicken());
             }
             System.out.println("");
         }
