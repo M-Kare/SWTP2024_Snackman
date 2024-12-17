@@ -17,8 +17,6 @@
 
 def choose_next_square(squares_liste):
     squares_liste = list(squares_liste)
-    # print("Python chicken skript working with list of:")
-    # print(squares_liste)
 
     northwest_square, north_square, northeast_square, east_square, southeast_square, south_square, southwest_square, west_square, direction = squares_liste
     solution_liste = [north_square, east_square, south_square, west_square]
