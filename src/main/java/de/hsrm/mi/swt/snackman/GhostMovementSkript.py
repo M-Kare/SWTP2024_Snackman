@@ -102,7 +102,7 @@ def choose_target_square(liste, toReplace, direction):
      """
     # check if current walking direction is ok
     if liste[direction] == toReplace:
-        liste[direction] = EMPTY
+        liste[direction] = " "
         return liste
 
     # get list of indexes of things to replace
@@ -113,7 +113,7 @@ def choose_target_square(liste, toReplace, direction):
 
     # replace random index
     zufall_index = random.choice(indexes_to_choose_from)
-    liste[zufall_index] = EMPTY
+    liste[zufall_index] = " "
     return liste
 
 
@@ -122,6 +122,6 @@ def add_walking_direction(liste):
     Append the index of the first EMPTY square to the list, indicating the direction.
     """
     new_liste = [liste[0]] + liste[1:]
-    first_empty_index = next((i for i, x in enumerate(new_liste) if x == EMPTY), None)
+    first_empty_index = next((i for i, x in enumerate(new_liste) if x == " "), None)
     result = new_liste + [first_empty_index]
     return result
