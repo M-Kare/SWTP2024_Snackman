@@ -23,7 +23,7 @@ public class Chicken extends EatingMob implements Runnable {
 
     private static long idCounter = 0;
     private final int WAITING_TIME = 2000;  // in ms
-    private final int MAX_KALORIEN = 3000;
+    private final int MAX_CALORIES = 3000;
     private final PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
     private final Logger log = LoggerFactory.getLogger(Chicken.class);
     private long id;
@@ -131,7 +131,7 @@ public class Chicken extends EatingMob implements Runnable {
 
             // consume snack if present
             currentPosition = super.mapService.getSquareAtIndexXZ(this.chickenPosX, this.chickenPosZ);
-            if (currentPosition.getSnack() != null && super.getKcal() < MAX_KALORIEN
+            if (currentPosition.getSnack() != null && super.getKcal() < MAX_CALORIES
                     && currentPosition.getSnack().getSnackType() != SnackType.EGG) {
                 log.info("Chicken {} {} kcal – Snack {} {} being eaten at square {}",
                         this.id, super.getKcal(),
@@ -155,12 +155,15 @@ public class Chicken extends EatingMob implements Runnable {
 
             try {
                 super.gainKcal(snackOnSquare.getCalories());
+                //set snack to null after consuming it
+                currentSquare.setSnack(null);
+                if (super.getKcal() >= this.MAX_CALORIES) {
+                    log.info("Chicken {} has reached {} kcal", this.id, super.getKcal());
+                    layEgg();
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }
-
-            //set snack to null after consuming it
-            currentSquare.setSnack(null);
         }
     }
 

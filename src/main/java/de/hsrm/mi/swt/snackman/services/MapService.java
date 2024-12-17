@@ -187,7 +187,7 @@ public class MapService {
      * @param laidEgg The snack representing the egg that has been laid
      */
     public void addEggToSquare(Square square, Snack laidEgg) {
-        log.info("{} cal egg add to square {}", laidEgg.getCalories(), square.getId()); // TODO log.debug
+        log.info("{} kcal egg add to square {}", laidEgg.getCalories(), square.getId()); // TODO log.debug
         square.setSnack(laidEgg);
     }
 
