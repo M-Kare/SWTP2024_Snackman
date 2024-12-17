@@ -1,20 +1,19 @@
 package de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken;
 
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
 import de.hsrm.mi.swt.snackman.entities.map.Square;
 import de.hsrm.mi.swt.snackman.entities.mapObject.snack.Snack;
+import de.hsrm.mi.swt.snackman.entities.mapObject.snack.SnackType;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.EatingMob;
-import de.hsrm.mi.swt.snackman.entities.mob.Thickness;
 import de.hsrm.mi.swt.snackman.services.MapService;
 import org.python.core.PyList;
 import org.python.core.PyObject;
 import org.python.util.PythonInterpreter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
+import java.util.*;
 
 /**
  * Represents a chicken entity in the game, capable of moving around the map,
@@ -23,22 +22,18 @@ import org.slf4j.LoggerFactory;
 public class Chicken extends EatingMob implements Runnable {
 
     private static long idCounter = 0;
-
-    private long id;
-    private int chickenPosX, chickenPosZ;
-
-    private boolean isWalking;
-    private boolean blockingPath = false;
-    private boolean isScared = false;
-
-    private Direction lookingDirection;
-    private Thickness thickness = Thickness.THIN;
-    private Timer eggLayingTimer;
-
     private final int WAITING_TIME = 2000;  // in ms
     private final int MAX_KALORIEN = 3000;
     private final PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
     private final Logger log = LoggerFactory.getLogger(Chicken.class);
+    private long id;
+    private int chickenPosX, chickenPosZ;
+    private boolean isWalking;
+    private boolean blockingPath = false;
+    private boolean isScared = false;
+    private Direction lookingDirection;
+    private Thickness thickness = Thickness.THIN;
+    private Timer eggLayingTimer;
     // python
     private PythonInterpreter pythonInterpreter = null;
     private Properties pythonProps = new Properties();
@@ -59,10 +54,6 @@ public class Chicken extends EatingMob implements Runnable {
         initTimer();
     }
 
-    public void addPropertyChangeListener(PropertyChangeListener listener) {
-        this.propertyChangeSupport.addPropertyChangeListener(listener);
-    }
-
     /**
      * Method to generate the next id of a new Square. It is synchronized because of thread-safety.
      *
@@ -72,10 +63,14 @@ public class Chicken extends EatingMob implements Runnable {
         return idCounter++;
     }
 
+    public void addPropertyChangeListener(PropertyChangeListener listener) {
+        this.propertyChangeSupport.addPropertyChangeListener(listener);
+    }
+
     /**
      * initialises the timer for laying eggs
      */
-        private void initTimer() {
+    private void initTimer() {
         this.eggLayingTimer = new Timer();
         startNewTimer();
     }
@@ -248,12 +243,12 @@ public class Chicken extends EatingMob implements Runnable {
         return this.blockingPath;
     }
 
-    public Thickness getThickness() {
-        return this.thickness;
-    }
-
     public void setBlockingPath(boolean blockingPath) {
         this.blockingPath = blockingPath;
+    }
+
+    public Thickness getThickness() {
+        return this.thickness;
     }
 
     public void setThickness(Thickness thickness) {
@@ -309,7 +304,7 @@ public class Chicken extends EatingMob implements Runnable {
         long delayBecauseIsScared = 10000;
 
         if (this.isScared) {
-            System.out.println("Scared Chicken-Timer " + delayBecauseIsScared/1000 + " seconds"); // TODO delete
+            System.out.println("Scared Chicken-Timer " + delayBecauseIsScared / 1000 + " seconds"); // TODO delete
             eggLayingTimer.scheduleAtFixedRate(task, (randomIntervalForLayingANewEgg) + delayBecauseIsScared, randomIntervalForLayingANewEgg);
             this.isScared = false;
         } else {
@@ -325,7 +320,7 @@ public class Chicken extends EatingMob implements Runnable {
     private void layEgg() {
         // TODO implement max kcal from chicken and when it has reached the maximum kcal, an egg must be laid
         if (super.getKcal() > 0) {
-            Square currentSquare = this.mapService.getSquareAtIndexXZ(this.posX, this.posZ);
+            Square currentSquare = this.mapService.getSquareAtIndexXZ(this.chickenPosX, this.chickenPosZ);
 
             // new egg with current chicken-calories * 1.5
             int eggCalories = (int) (super.getKcal() * 1.5);
