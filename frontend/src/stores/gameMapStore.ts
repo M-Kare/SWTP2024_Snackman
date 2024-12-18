@@ -88,6 +88,8 @@ export const useGameMapStore = defineStore('gameMap', () => {
             currentSquareInPinia!.snack = square.snack
             scene.add(eggToAdd)
             setSnackMeshId(currentSquareInPinia!.id, eggToAdd.id)
+
+            mapData.gameMap.set(change.square.id, change.square as ISquare)
           } else if (change.changeType == 'UPDATE') {
             // TODO fix bug "Unhandled Promise Rejection: TypeError: null is not an object (evaluating 'mapData.gameMap.get(change.square.id).snack.meshId')"
             if (mapData.gameMap.get(change.square.id)!.snack.meshId != null) {
