@@ -178,7 +178,7 @@ public class MapService {
      *
      * @param square to put snack in
      */
-    private void addRandomSnackToSquare(Square square) {
+    protected void addRandomSnackToSquare(Square square) {
         if (square.getType() == MapObjectType.FLOOR) {
             SnackType randomSnackType = SnackType.getRandomSnack();
 
