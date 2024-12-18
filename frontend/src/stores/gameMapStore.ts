@@ -78,7 +78,7 @@ export const useGameMapStore = defineStore('gameMap', () => {
 
             const snack = square.snack
 
-            if (snack) {
+            if (snack && mapData.gameMap.get(square.id)) {
               const sideLength = mapData.DEFAULT_SQUARE_SIDE_LENGTH
               const xPosition = square.indexX * sideLength + sideLength / 2
               const zPosition = square.indexZ * sideLength + sideLength / 2
@@ -92,15 +92,18 @@ export const useGameMapStore = defineStore('gameMap', () => {
                 snack.snackType,
               )
 
-              mapData.gameMap.get(square.id)!.snack.meshId = newSnackMesh.id
+              if (mapData.gameMap.get(square.id)!.snack) {
+                mapData.gameMap.get(square.id)!.snack.meshId = newSnackMesh.id
+              }
 
               scene.add(newSnackMesh)
             }
           } else if (change.changeType == 'UPDATE') {
-            const savedMeshId = mapData.gameMap.get(change.square.id)!.snack
-              .meshId
+            // TODO fix bug "Unhandled Promise Rejection: TypeError: null is not an object (evaluating 'mapData.gameMap.get(change.square.id).snack.meshId')"
+            if (mapData.gameMap.get(change.square.id)!.snack.meshId != null) {
+              const savedMeshId = mapData.gameMap.get(change.square.id)!.snack
+                .meshId
 
-            if (savedMeshId != null) {
               removeMeshFromScene(scene, savedMeshId)
 
               mapData.gameMap.set(change.square.id, change.square as ISquare)

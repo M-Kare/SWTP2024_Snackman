@@ -194,8 +194,12 @@ public class MapService {
      */
     public void addEggToSquare(Square square, Snack laidEgg) {
         log.info("{} kcal egg add to square {}", laidEgg.getCalories(), square.getId()); // TODO log.debug
-        this.frontendMessageService.sendEvent(new FrontendMessageEvent(EventType.SNACK, ChangeType.CREATE, square));
+        // this.frontendMessageService.sendEvent(new FrontendMessageEvent(EventType.SNACK, ChangeType.CREATE, square));
         square.setSnack(laidEgg);
+
+        Square squareCopy = new Square(square.getType(), square.getIndexX(), square.getIndexZ());
+        squareCopy.setSnack(laidEgg);
+        frontendMessageService.sendEvent(new FrontendMessageEvent(EventType.SNACK, ChangeType.CREATE, squareCopy));
     }
 
     public void printGameMap() {
