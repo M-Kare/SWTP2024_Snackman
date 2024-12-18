@@ -101,6 +101,7 @@ public class SnackMan extends EatingMob {
      *
      * @param square to eat the snack from
      */
+    @Override
     public void consumeSnackOnSquare(Square square) {
         Snack snackOnSquare = square.getSnack();
 

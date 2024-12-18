@@ -15,7 +15,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
-public class SnackManTest {
+class SnackManTest {
 
     @Autowired
     private FrontendMessageService frontendMessageService;
@@ -23,11 +23,13 @@ public class SnackManTest {
     @Autowired
     private ReadMazeService readMazeService;
 
+
     private SnackMan snackMan;
 
     @BeforeEach
     public void setUp() {
-        snackMan = new SnackMan(new MapService(frontendMessageService, readMazeService), GameConfig.SNACKMAN_SPEED, GameConfig.SNACKMAN_RADIUS);
+        MapService mapService = new MapService(frontendMessageService, readMazeService);
+        snackMan = new SnackMan(mapService, GameConfig.SNACKMAN_SPEED, GameConfig.SNACKMAN_RADIUS);
     }
 
     @Test

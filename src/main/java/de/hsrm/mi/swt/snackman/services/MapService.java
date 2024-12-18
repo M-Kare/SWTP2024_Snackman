@@ -9,20 +9,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import de.hsrm.mi.swt.snackman.configuration.GameConfig;
 import de.hsrm.mi.swt.snackman.entities.map.GameMap;
 import de.hsrm.mi.swt.snackman.entities.map.Square;
 import de.hsrm.mi.swt.snackman.entities.mapObject.MapObjectType;
 import de.hsrm.mi.swt.snackman.entities.mapObject.snack.Snack;
 import de.hsrm.mi.swt.snackman.entities.mapObject.snack.SnackType;
-import de.hsrm.mi.swt.snackman.messaging.ChangeType;
-import de.hsrm.mi.swt.snackman.messaging.EventType;
-import de.hsrm.mi.swt.snackman.messaging.FrontendMessageEvent;
-import de.hsrm.mi.swt.snackman.messaging.FrontendMessageService;
+
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
-import org.python.core.PyObject;
 import de.hsrm.mi.swt.snackman.messaging.*;
 
 /**
@@ -35,10 +31,10 @@ public class MapService {
 
     Logger log = LoggerFactory.getLogger(MapService.class);
     private FrontendMessageService frontendMessageService;
+    private ReadMazeService readMazeService;
     private String filePath;
+    private char[][] mazeData;
     private GameMap gameMap;
-    private PythonInterpreter pythonInterpreter = null;
-    private Properties pythonProps = new Properties();
     private SnackMan snackman;
 
     /**
@@ -47,16 +43,23 @@ public class MapService {
      */
     @Autowired
     public MapService(FrontendMessageService frontendMessageService, ReadMazeService readMazeService) {
-        this(frontendMessageService, readMazeService, "Maze.txt");
+        this(frontendMessageService, readMazeService, "./extensions/Map/Maze.txt");
     }
 
     public MapService(FrontendMessageService frontendMessageService, ReadMazeService readMazeService,
                       String filePath) {
         this.frontendMessageService = frontendMessageService;
-        generateNewMaze();
         this.filePath = filePath;
-        char[][] mazeData = readMazeService.readMazeFromFile(this.filePath);
-        gameMap = convertMazeDataGameMap(mazeData);
+        this.readMazeService = readMazeService;
+
+        generateNewMaze();
+
+        this.mazeData = readMazeService.readMazeFromFile(this.filePath);
+        if (this.mazeData == null) {
+            throw new IllegalStateException("Maze data cannot be null. Check your ReadMazeService.");
+        }
+
+        gameMap = convertMazeDataGameMap(this.mazeData);
         snackman = new SnackMan(this, GameConfig.SNACKMAN_SPEED, GameConfig.SNACKMAN_RADIUS);
     }
 
@@ -65,7 +68,8 @@ public class MapService {
      *
      * @param mazeData the char array representing the maze
      */
-    private GameMap convertMazeDataGameMap(char[][] mazeData) {
+    public GameMap convertMazeDataGameMap(char[][] mazeData) {
+
         Square[][] squaresBuildingMap = new Square[mazeData.length][mazeData[0].length];
 
         for (int x = 0; x < mazeData.length; x++) {
@@ -89,13 +93,16 @@ public class MapService {
      * Generates a new Maze and saves it in a Maze.txt file
      */
     public void generateNewMaze() {
-        pythonProps.setProperty("python.path", "src/main/java/de/hsrm/mi/swt/snackman");
-        PythonInterpreter.initialize(System.getProperties(), pythonProps, new String[0]);
-        log.debug("Initialised jython for maze generation");
-        this.pythonInterpreter = new PythonInterpreter();
-        pythonInterpreter.exec("from Maze import main");
-        PyObject func = pythonInterpreter.get("main");
-        func.__call__();
+        String mazeScriptPath = "./extensions/Maze/Maze.py";
+        try (PythonInterpreter localPythonInterpreter = new PythonInterpreter()) {
+            localPythonInterpreter.execfile(mazeScriptPath);
+            try{
+                localPythonInterpreter.exec("from Maze import main");
+                localPythonInterpreter.exec("main()");
+            } catch (Exception e) {
+                log.error("Failed to execute maze generation script: {}", e.getMessage());
+            }
+        }
     }
 
     /**
@@ -106,7 +113,7 @@ public class MapService {
      * @param z      index
      * @return a created Square
      */
-    private Square createSquare(char symbol, int x, int z) {
+    public Square createSquare(char symbol, int x, int z) {
         Square square;
 
         switch (symbol) {
@@ -180,7 +187,7 @@ public class MapService {
      *
      * @param square to put snack in
      */
-    private void addRandomSnackToSquare(Square square) {
+    public void addRandomSnackToSquare(Square square) {
         if (square.getType() == MapObjectType.FLOOR) {
             SnackType randomSnackType = SnackType.getRandomSnack();
 
@@ -200,12 +207,12 @@ public class MapService {
         Square[][] gameMap = this.gameMap.getGameMap();
 
         for (int x = 0; x < gameMap.length; x++) {
-            System.out.print("x");
+            log.info("x");
             for (int z = 0; z < gameMap[x].length; z++) {
                 Square square = gameMap[x][z];
-                System.out.print(square.getPrimaryType());
+                log.info(square.getPrimaryType());
             }
-            System.out.println("");
+            log.info("");
         }
     }
 
