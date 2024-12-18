@@ -31,16 +31,18 @@ def choose_next_square(squares_liste):
     squares_liste = list(squares_liste)
     print("SichtfeldTalaGanzzzz: ", squares_liste)
     print("Python chicken skript working with list of:")
-    #print(squares_liste)
+    print(squares_liste)
 
-    northwest_square, north_square, northeast_square, east_square, southeast_square, south_square, southwest_square, west_square, direction = squares_liste
-    solution_liste = [north_square, east_square, south_square, west_square]
+    #northwest_square, north_square, northeast_square, east_square, southeast_square, south_square, southwest_square, west_square, direction = squares_liste
+    #solution_liste = [north_square, east_square, south_square, west_square]
+    solution_liste = [squares_liste[7], squares_liste[11], squares_liste[13], squares_liste[17]]
     print("SolutionListe: ", solution_liste)
     # make sure you cannot walk into a wall
     solution_liste = eliminate_walls_as_options(solution_liste)
 
     if(one_fiels_has_SnackMan(solution_liste)):
-        if(len(squares_liste) == 81):
+        if(len(squares_liste) > 9):
+            print("--------------------------")
             return choose_next_square_to_get_to_SnackMan()
         liste_without_SM = replace_SM(solution_liste)
         return add_direction(liste_without_SM)
@@ -50,7 +52,7 @@ def choose_next_square(squares_liste):
 def choose_next_square_to_get_to_SnackMan(squares_liste):
     """Checks if Snackman is in chickens field of view and returns solution list, with next step in direction to Snackman"""
     #generates solutionList with Indexes next to Chicken(because Chicken just can go one step
-    solution_liste = [squares_liste[31], squares_liste[39], squares_liste[41], squares_liste[49]]
+    solution_liste = [squares_liste[7], squares_liste[11], squares_liste[13], squares_liste[17]]
     if "SM" in squares_liste:
         solution_liste =  findWayToSM(solution_liste, squares_liste)
         return solution_liste
@@ -60,10 +62,10 @@ def choose_next_square_to_get_to_SnackMan(squares_liste):
 
 def findWayToSM(solution, liste):
     """Finds Way to Snackman and returns solution_list with next step in direction to Snackman"""
-    Chickenindex = 40
-    directionListe =  [-9, +9, -1, +1]
+    Chickenindex = 12
+    directionListe =  [-5, +5, -1, +1]
     chickensStepisSet = False
-    nextDirectionIndex = 40
+    nextDirectionIndex = 12
     chickensStepBefore = 0
     versuche = 0
     stack = []
@@ -92,23 +94,23 @@ def findWayToSM(solution, liste):
         #print()
 
         zahl = random.randint(0, 3)
-        if(0 <= Chickenindex + zahl <= 80 ):
-            if 0 <= (Chickenindex + directionListe[zahl]) <= 80 and (Chickenindex + directionListe[zahl]) != chickensStepBefore: #neuer index muss innerhalb des Sichtfeldes(liste) liegen -- und darf nicht der letzte Indes sein
+        if(0 <= Chickenindex + zahl <= 24):
+            if 0 <= (Chickenindex + directionListe[zahl]) <= 24 and (Chickenindex + directionListe[zahl]) != chickensStepBefore: #neuer index muss innerhalb des Sichtfeldes(liste) liegen -- und darf nicht der letzte Indes sein
                 if liste[(Chickenindex + directionListe[zahl])] != 'W': #neuer index darf keine Wand sein
                     Chickenindex += directionListe[zahl]
                     if(not chickensStepisSet):
                         nextDirectionIndex = Chickenindex
                         chickensStepisSet = True
-                    if 0 > Chickenindex or Chickenindex > 80:
-                        Chickenindex = 40
+                    if 0 > Chickenindex or Chickenindex > 24:
+                        Chickenindex = 12
                         anzahlZurueckGesetzt += 1
-                        chickensStepBefore = 40
+                        chickensStepBefore = 12
                         chickensStepisSet = False
                         continue
         else:
-            Chickenindex = 40
+            Chickenindex = 12
             anzahlZurueckGesetzt += 1
-            chickensStepBefore = 40
+            chickensStepBefore = 12
             chickensStepisSet = False
     
     print("Snackman ist hier???: Index ", Chickenindex)
@@ -117,43 +119,34 @@ def findWayToSM(solution, liste):
     print("Verscuhe: ",  versuche, "Gegangene Schritte: ", [int for int in stack])
     print("Anz zurueckgesetzt: ", anzahlZurueckGesetzt)
 
-    if Chickenindex == 31:
+    print("NewDirectionIndex ", nextDirectionIndex)
+    if Chickenindex == 7:#31
         if(solution[0] == 'SM'):
             solution = replace_Element_with_whiteSpace_and_append_ElementIndex(solution, 0)
-    if Chickenindex == 39:
+    if Chickenindex == 11:#39
         if(solution[1] == 'SM'):
             solution = replace_Element_with_whiteSpace_and_append_ElementIndex(solution, 1)
-    if Chickenindex == 41:
+    if Chickenindex == 13:#41
         if(solution[2] == 'SM'):
             solution = replace_Element_with_whiteSpace_and_append_ElementIndex(solution, 2)
-    if Chickenindex == 49:
+    if Chickenindex == 17:#49
         if(solution[3] == 'SM'):
             solution = replace_Element_with_whiteSpace_and_append_ElementIndex(solution, 3)
 
-    if nextDirectionIndex == 31:
-        if(solution[0] == 'SM'):
-            solution = replace_Element_with_whiteSpace_and_append_ElementIndex(solution, 0)
+    if nextDirectionIndex == 7:
+        solution = replace_Element_with_whiteSpace_and_append_ElementIndex(solution, 0)
         return solution
-    if nextDirectionIndex == 39:
-        if(solution[1] == 'SM'):
-            solution = replace_Element_with_whiteSpace_and_append_ElementIndex(solution, 1)
+    if nextDirectionIndex == 11:
+        solution = replace_Element_with_whiteSpace_and_append_ElementIndex(solution, 1)
         #solution[1] = ''
         return solution
-    if nextDirectionIndex == 41:
-        if(solution[2] == 'SM'):
-            solution = replace_Element_with_whiteSpace_and_append_ElementIndex(solution, 2)
+    if nextDirectionIndex == 13:
+        solution = replace_Element_with_whiteSpace_and_append_ElementIndex(solution, 2)
         #solution[2] = ''
         return solution
-    if nextDirectionIndex == 49:
-        if(solution[3] == 'SM'):
-            solution = replace_Element_with_whiteSpace_and_append_ElementIndex(solution, 3)
-            solution.append(3)
+    if nextDirectionIndex == 17:
+        solution = replace_Element_with_whiteSpace_and_append_ElementIndex(solution, 3)
         #solution[3] = ''
-        return solution
-
-def findWayToSMRekursiv(solution, liste, stack):
-
-    if(stack.size() == 0 or stack.size() <= 100):
         return solution
 
 def replace_Element_with_whiteSpace_and_append_ElementIndex(solution, index):
@@ -280,4 +273,10 @@ liste3 = ["W", "W", "W", "W", "W", "W", "W", "W", "W",
           "W", "L", "W", "L", "L", "L", "W", "L", "W",
           "W", "L", "W", "L", "W", "W", "W", "L", "W"]
 
-print(choose_next_square_to_get_to_SnackMan(liste))
+liste4 = ["W", "W", "W", "L", "W",
+                    "SM", "L", "L", "L", "L",
+                    "L", "W", "H", "W", "L",
+                    "L", "W", "L", "W", "L",
+                    "L", "W", "L", "W", "L"]
+
+print("Ergebnis: ", choose_next_square_to_get_to_SnackMan(liste4))

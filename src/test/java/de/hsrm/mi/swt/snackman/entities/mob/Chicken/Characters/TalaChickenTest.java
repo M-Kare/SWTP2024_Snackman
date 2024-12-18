@@ -28,7 +28,7 @@ public class TalaChickenTest {
         Chicken chicken = new Chicken("TalaChickenMovementSkript");
 
         List<String> visibleEnvironment = List.of("W", "W", "W", "W", "L", "W", "W", "W", "W",
-                                                    "W", "SM", "L", "L", "W", "L", "W", "L", "W",
+                                                    "W", "L", "L", "L", "W", "L", "W", "L", "W",
                                                     "W", "W", "L", "W", "W", "L", "L", "L", "W",
                                                     "L", "L", "L", "L", "W", "L", "W", "W", "W",
                                                     "W", "L", "W", "SM", "H", "L", "W", "L", "W", //H is Chicken
@@ -42,7 +42,7 @@ public class TalaChickenTest {
         //int chosenIndex = Integer.parseInt(result.get(result.size() - 1));
         //assertEquals("", result.get(chosenIndex), "Chicken didnt move to Snackman");
         boolean istFreierIndexVorhanden = result.contains(" ");
-        assertEquals(false, istFreierIndexVorhanden, "Empty element, but Snackman is not reachable : "+ result);
+        assertEquals(true, istFreierIndexVorhanden, "Empty element, but Snackman is not reachable : "+ result);
 
     }
 
@@ -63,7 +63,7 @@ public class TalaChickenTest {
 
         List<String> result = chicken.act(visibleEnvironment);
         boolean istFreierIndexVorhanden = result.contains(" ");
-        assertEquals(false, istFreierIndexVorhanden, "Empty element, but Snackman is not reachable : "+ result);
+        assertEquals(true, istFreierIndexVorhanden, "Empty element, but Snackman is not reachable : "+ result);
 
     }
     

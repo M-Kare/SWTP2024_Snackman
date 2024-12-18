@@ -89,7 +89,7 @@ public class MapService {
      * Generates a new Maze and saves it in a Maze.txt file
      */
     public void generateNewMaze() {
-        pythonProps.setProperty("python.path", "src/main/java/de/hsrm/mi/swt/snackman");
+        pythonProps.setProperty("python.path", "./scripts");
         PythonInterpreter.initialize(System.getProperties(), pythonProps, new String[0]);
         log.debug("Initialised jython for maze generation");
         this.pythonInterpreter = new PythonInterpreter();

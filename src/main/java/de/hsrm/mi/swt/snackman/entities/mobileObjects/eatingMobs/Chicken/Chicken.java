@@ -41,7 +41,7 @@ public class Chicken extends EatingMob implements Runnable {
 
     public Chicken() { //Nur zum testen????
         super(null);
-        this.fileName = "TalaChickenMovementSkript";
+        this.fileName = "ChickenMovementSkript";
         initJython();
     }
     
@@ -58,12 +58,14 @@ public class Chicken extends EatingMob implements Runnable {
     }
 
     public List<String> executeMovementSkript(List<String> squares) {
+        log.info("Python Path: {}", System.getProperty("python.path"));
         try {
             log.debug("Running python chicken script with: {}", squares.toString());
             log.info("Chicken Sichtfeld: {}", squares);
             pythonInterpreter.exec(interpreterCommand);
             PyObject func = pythonInterpreter.get("choose_next_square");
             PyObject result = func.__call__(new PyList(squares));
+            
 
             if (result instanceof PyList) {
                 PyList pyList = (PyList) result;
