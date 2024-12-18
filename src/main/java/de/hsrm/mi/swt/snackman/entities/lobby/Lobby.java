@@ -15,7 +15,7 @@ public class Lobby {
     private boolean isGameStarted;
     private List<PlayerClient> members;
     private GameMap gameMap;
-    private Map<PlayerClient, Mob> clientMobMap;
+    private Map<String, Mob> clientMobMap;
 
 
     public Lobby(String lobbyId, String name, PlayerClient adminClient, boolean isGameStarted, GameMap gameMap) {
@@ -29,7 +29,7 @@ public class Lobby {
         this.clientMobMap = new HashMap<>();
     }
 
-    public Map<PlayerClient, Mob> getClientMobMap() { return clientMobMap; };
+    public Map<String, Mob> getClientMobMap() { return clientMobMap; };
 
     public String getName() {
         return name;

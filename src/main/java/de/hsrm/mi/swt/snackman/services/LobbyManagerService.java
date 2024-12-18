@@ -60,7 +60,7 @@ public class LobbyManagerService {
 
         admin.setRole(ROLE.SNACKMAN);
 
-        lobbies.put(uuid, lobby);
+        lobbies.put(lobby.getLobbyId(), lobby);
         return lobby;
     }
 
@@ -123,7 +123,7 @@ public class LobbyManagerService {
         }
         //TODO spieler zwischen Geistern und Snackman aufteilen
         for(PlayerClient client : lobby.getMembers()){
-            lobby.getClientMobMap().put(client, new SnackMan(lobby.getGameMap()));
+            lobby.getClientMobMap().put(client.getPlayerId(), new SnackMan(lobby.getGameMap()));
         }
         mapService.spawnMobs(lobby.getGameMap(), lobby.getLobbyId());
         lobby.setGameStarted(true);

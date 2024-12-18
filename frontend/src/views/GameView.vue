@@ -11,17 +11,15 @@ import { fetchSnackManFromBackend } from '@/services/SnackManInitService';
 import { GameMapRenderer } from '@/renderer/GameMapRenderer';
 import { useGameMapStore } from '@/stores/gameMapStore';
 import type { IGameMap } from '@/stores/IGameMapDTD';
-import type { ClientsDTD } from '@/stores/ClientsDTD';
 import { useLobbiesStore } from '@/stores/Lobby/lobbiesstore';
 import type { IPlayerDTD } from '@/stores/Player/IPlayerDTD';
+import type {IPlayerClientDTD} from "@/stores/Lobby/IPlayerClientDTD";
 
 const { lobbydata } = useLobbiesStore();
 
-
 const WSURL = `ws://${window.location.host}/stompbroker`
-const DEST = '/topic/player'
 const targetHz = 30
-let clients: ClientsDTD;
+let clients: Array<IPlayerClientDTD>;
 let playerHashMap = new Map<String, THREE.Mesh>()
 
 // stomp
@@ -34,18 +32,19 @@ stompclient.onStompError = frame => {
 }
 stompclient.onConnect = frame => {
   // Callback: erfolgreicher Verbindugsaufbau zu Broker
-  stompclient.subscribe(DEST, message => {
+  stompclient.subscribe(`/topic/lobbies/${lobbydata.currentPlayer.joinedLobby?.lobbyId!}/player`, message => {
     // Callback: Nachricht auf DEST empfangen
     // empfangene Nutzdaten in message.body abrufbar,
     // ggf. mit JSON.parse(message.body) zu JS konvertieren
     const event: IPlayerDTD = JSON.parse(message.body)
+
     //To differ the player
-    if(event.uuid === lobbydata.currentPlayer.playerId){
+    if(event.playerId === lobbydata.currentPlayer.playerId){
       player.setPosition(event.posX, event.posY, event.posZ);
     } else {
-      console.log(event.uuid)
-      playerHashMap.get(event.uuid)?.position.set(event.posX, event.posY, event.posZ)
-      playerHashMap.get(event.uuid)?.setRotationFromQuaternion(new THREE.Quaternion(event.qX, event.qY, event.qZ, event.qW))
+      playerHashMap.get(event.playerId)?.position.set(event.posX, event.posY, event.posZ)
+      playerHashMap.get(event.playerId)?.setRotationFromQuaternion(new THREE.Quaternion(event.qX, event.qY, event.qZ,
+        event.qW))
     }
   })
 }
@@ -70,7 +69,7 @@ let counter = 0;
 // only sends updates to backend at 30hz
 function animate() {
   fps = 1 / clock.getDelta()
-  player.updatePlayer();
+  //player.updatePlayer();
   if (counter >= fps / targetHz) {
     // console.log(`${player.getCamera().position.x}  |  ${player.getCamera().position.z}`)
     const time = performance.now()
@@ -78,15 +77,14 @@ function animate() {
     try {
       //Sende and /topic/player/update
       stompclient.publish({
-        destination: DEST + "/update", headers: {},
-        body: JSON.stringify(Object.assign({}, player.getInput(), {
-          qX: player.getCamera().quaternion.x,
-          qY: player.getCamera().quaternion.y,
-          qZ: player.getCamera().quaternion.z,
-          qW: player.getCamera().quaternion.w
-        }, {delta: delta}, {jump: player.getIsJumping()},
-          {doubleJump: player.getIsDoubleJumping()},
-          {uuid: lobbydata.currentPlayer.playerId}))
+        destination: `/topic/lobbies/${lobbydata.currentPlayer.joinedLobby?.lobbyId!}/player/update`, headers: {},
+        body: JSON.stringify(Object.assign({}, player.getInput(), {jump: player.getIsJumping()},
+          {doubleJump: player.getIsDoubleJumping()}, {
+            qX: player.getCamera().quaternion.x,
+            qY: player.getCamera().quaternion.y,
+            qZ: player.getCamera().quaternion.z,
+            qW: player.getCamera().quaternion.w
+          }, {delta: delta}, {playerId: lobbydata.currentPlayer.playerId})),
       });
     } catch (fehler) {
       console.log(fehler)
@@ -95,6 +93,8 @@ function animate() {
     counter = 0
   }
   counter++;
+
+
   renderer.render(scene, camera)
 }
 
@@ -103,9 +103,6 @@ onMounted(async () => {
   const {initRenderer, createGameMap, getScene} = GameMapRenderer()
   scene = getScene()
   renderer = initRenderer(canvasRef.value)
-
-  clients = await fetchClients();
-
   //Add gameMap
   try {
     const gameMapStore = useGameMapStore()
@@ -119,9 +116,12 @@ onMounted(async () => {
     console.error('Error when retrieving the gameMap:', error)
   }
 
-  const playerData = await fetchSnackManFromBackend(lobbydata.currentPlayer.playerId);
-  clients.clients.forEach(it => {
-    if(it === lobbydata.currentPlayer.playerId){
+  clients = lobbydata.currentPlayer.joinedLobby?.members!
+  console.log(clients)
+  const playerData = await
+    fetchSnackManFromBackend(lobbydata.currentPlayer.joinedLobby?.lobbyId!, lobbydata.currentPlayer.playerId);
+  clients.forEach(it => {
+    if(it.playerId === lobbydata.currentPlayer.playerId){
       player = new Player(renderer, playerData.posX, playerData.posY, playerData.posZ, playerData.radius, playerData.speed)
     } else {
       let material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } )
@@ -129,9 +129,10 @@ onMounted(async () => {
       let cube = new THREE.Mesh( new THREE.BoxGeometry( 1, 3, 1 ),  material);
       cube.position.lerp(new THREE.Vector3(playerData.posX, playerData.posY, playerData.posZ), 0.5)
       scene.add(cube);
-      playerHashMap.set(it, cube);
+      playerHashMap.set(it.playerId, cube);
     }
   });
+
   camera = player.getCamera()
   scene.add(player.getControls().object)
 
@@ -149,13 +150,4 @@ function resizeCallback() {
   camera.aspect = window.innerWidth / window.innerHeight
   camera.updateProjectionMatrix()
 }
-//TODO Remove, just for test purposes
-async function fetchClients(): Promise<ClientsDTD> {
-    // rest endpoint from backend
-    const response = await fetch('/api/lobbies/clients')
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`)
-    }
-    return await response.json()
-  }
 </script>

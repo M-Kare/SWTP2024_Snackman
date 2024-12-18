@@ -1,26 +1,29 @@
 package de.hsrm.mi.swt.snackman.controller.PlayerMovement;
 
+import de.hsrm.mi.swt.snackman.services.LobbyManagerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
-import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.SnackMan;
-import de.hsrm.mi.swt.snackman.services.MapService;
 
 @Controller
 @RequestMapping("/api")
 public class PlayerController {
     @Autowired
-    private MapService mapService;
+    private LobbyManagerService lobbyService;
     
     // Zum Registrieren eines neuen Spielers
-    @PostMapping("/snackman")
-    public ResponseEntity<PlayerToFrontendDTO> initSnackman(@RequestParam("uuid") String uuid){
-        SnackMan snackman = mapService.createSnackMan(uuid);
-        return ResponseEntity.ok(new PlayerToFrontendDTO(snackman.getPosX(), snackman.getPosY(), snackman.getPosZ(), snackman.getRotationQuaternion().x, snackman.getRotationQuaternion().y, snackman.getRotationQuaternion().z, snackman.getRotationQuaternion().w, snackman.getRadius(), snackman.getSpeed(), uuid));
+
+    //TODO Snackman erstellen
+    @GetMapping("/lobbies/{lobbyId}/player/{playerId}")
+    public ResponseEntity<PlayerToFrontendDTO> initSnackman(@PathVariable("lobbyId") String lobbyId, @PathVariable("playerId") String playerId) {
+        var playerMob = lobbyService.findLobbyByLobbyId(lobbyId).getClientMobMap().get(playerId);
+
+        return ResponseEntity.ok(new PlayerToFrontendDTO(playerMob.getPosX(), playerMob.getPosY(), playerMob.getPosZ(),
+                playerMob.getRotationQuaternion().x, playerMob.getRotationQuaternion().y,
+                playerMob.getRotationQuaternion().z, playerMob.getRotationQuaternion().w, playerMob.getRadius(),
+                playerMob.getSpeed(), playerId));
     }
 
     // TODO: Ghost ertsellen

@@ -8,5 +8,5 @@ export interface IPlayerDTD {
     qW: number
     radius: number
     speed: number
-    uuid: string
+    playerId: string
   }

@@ -2,7 +2,6 @@ package de.hsrm.mi.swt.snackman.controller.Lobby;
 
 import java.util.List;
 
-import de.hsrm.mi.swt.snackman.controller.ClientsDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -157,10 +156,4 @@ public class LobbyController {
             messagingTemplate.convertAndSend("/topic/lobbies", lobbyManagerService.getAllLobbies());
             return ResponseEntity.ok().build();
       }
-
-      @GetMapping("/clients")
-      public ResponseEntity<ClientsDTO> sendClients(){
-            return ResponseEntity.ok(new ClientsDTO(lobbyManagerService.getAllClients()));
-      }
-
 }
