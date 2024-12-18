@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import de.hsrm.mi.swt.snackman.entities.lobby.PlayerClient;
 import de.hsrm.mi.swt.snackman.entities.lobby.Lobby;
@@ -78,9 +79,11 @@ public class LobbyController {
        * @return a list of all {@link Lobby} objects
        */
       @GetMapping
-      public ResponseEntity<List<Lobby>> getAllLobbies() {
+      @ResponseBody
+      public List <Lobby> getAllLobbies() {
             List<Lobby> lobbies = lobbyManagerService.getAllLobbies();
-            return ResponseEntity.ok(lobbies);
+            
+            return lobbies;
       }
 
       /**

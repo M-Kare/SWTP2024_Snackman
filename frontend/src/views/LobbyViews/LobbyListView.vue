@@ -146,7 +146,9 @@
         //      lobbiesStore.startLobbyLiveUpdate();
         //     console.log("No lobby data found in sessionStorage.");
         // }
-
+        lobbiesStore.fetchLobbyList();
+        console.log(lobbies)
+        
         if (!lobbiesStore.lobbydata.currentPlayer || lobbiesStore.lobbydata.currentPlayer.playerId === '' || lobbiesStore.lobbydata.currentPlayer.playerName === '') {
             lobbiesStore.createPlayer('Player Test');
         }
