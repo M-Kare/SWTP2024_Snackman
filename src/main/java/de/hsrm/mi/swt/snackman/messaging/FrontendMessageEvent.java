@@ -3,7 +3,7 @@ package de.hsrm.mi.swt.snackman.messaging;
 
 import de.hsrm.mi.swt.snackman.entities.map.Square;
 
-public record FrontendMessageEvent(EventType eventType, ChangeType changeType, Square square) {
+public record FrontendMessageEvent(EventType eventType, ChangeType changeType, String lobbyId, Square square) {
 
     @Override
     public EventType eventType() {
@@ -18,5 +18,10 @@ public record FrontendMessageEvent(EventType eventType, ChangeType changeType, S
     @Override
     public Square square() {
         return square;
+    }
+
+    @Override
+    public String lobbyId() {
+        return lobbyId;
     }
 }

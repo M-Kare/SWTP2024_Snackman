@@ -58,7 +58,7 @@ public class LobbyController {
 
             
             //PlayerClient client = lobbyManagerService.getClient(name, creatorUuid);
-            PlayerClient client = lobbyManagerService.getClient("Player Test", creatorUuid);
+            PlayerClient client = lobbyManagerService.findClientByClientId(creatorUuid);
 
             try {
                   Lobby newLobby = lobbyManagerService.createLobby(name, client);
@@ -82,7 +82,7 @@ public class LobbyController {
       @GetMapping
       @ResponseBody
       public List <Lobby> getAllLobbies() {
-            List<Lobby> lobbies = lobbyManagerService.getAllLobbies();
+            List<Lobby> lobbies = lobbyManagerService.getAllLobbies().values().stream().toList();
             
             return lobbies;
       }
@@ -94,7 +94,7 @@ public class LobbyController {
        */
       @GetMapping("/lobby/{lobbyId}")
       public ResponseEntity<Lobby> findLobbyById(@PathVariable("lobbyId") String lobbyId){
-            Lobby lobby = lobbyManagerService.findLobbyByUUID(lobbyId);
+            Lobby lobby = lobbyManagerService.findLobbyByLobbyId(lobbyId);
             return ResponseEntity.ok(lobby);
       }
 

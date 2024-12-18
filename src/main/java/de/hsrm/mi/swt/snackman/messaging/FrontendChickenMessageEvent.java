@@ -2,7 +2,8 @@ package de.hsrm.mi.swt.snackman.messaging;
 
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken.Chicken;
 
-public record FrontendChickenMessageEvent(EventType eventType, ChangeType changeType, Chicken chicken) {
+public record FrontendChickenMessageEvent(EventType eventType, ChangeType changeType, String lobbyId,
+                                          Chicken chicken) {
 
     @Override
     public EventType eventType() {
@@ -26,5 +27,10 @@ public record FrontendChickenMessageEvent(EventType eventType, ChangeType change
                 ", changeType=" + changeType +
                 ", chicken=" + chicken +
                 '}';
+    }
+
+    @Override
+    public String lobbyId() {
+        return lobbyId;
     }
 }

@@ -1,5 +1,7 @@
 package de.hsrm.mi.swt.snackman.services;
 
+import org.python.core.PyObject;
+import org.python.util.PythonInterpreter;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
@@ -7,9 +9,13 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 @Service
 public class ReadMazeService {
+
+    private PythonInterpreter pythonInterpreter = null;
+    private Properties pythonProps = new Properties();
 
     /**
      * Reads maze data from a file and converts it into a char array with [x][z]-coordinates
@@ -43,4 +49,17 @@ public class ReadMazeService {
 
         return mazeAsCharArray;
     }
+
+    /**
+     * Generates a new Maze and saves it in a Maze.txt file
+     */
+    public void generateNewMaze() {
+        pythonProps.setProperty("python.path", "src/main/java/de/hsrm/mi/swt/snackman");
+        PythonInterpreter.initialize(System.getProperties(), pythonProps, new String[0]);
+        this.pythonInterpreter = new PythonInterpreter();
+        pythonInterpreter.exec("from Maze import main");
+        PyObject func = pythonInterpreter.get("main");
+        func.__call__();
+    }
+
 }
