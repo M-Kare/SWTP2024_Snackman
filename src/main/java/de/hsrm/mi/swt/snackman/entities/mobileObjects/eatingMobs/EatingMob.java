@@ -23,12 +23,12 @@ public abstract class EatingMob extends Mob {
         super(mapService);
     }
 
-    protected void setKcal(int value) {
-        kcal = value;
+    public int getKcal() {
+        return kcal;
     }
 
-    protected int getKcal() {
-        return kcal;
+    public void setKcal(int value) {
+        kcal = value;
     }
 
     protected void gainKcal(int addingKcal) throws Exception {

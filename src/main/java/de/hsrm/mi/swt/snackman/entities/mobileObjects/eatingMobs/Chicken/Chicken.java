@@ -327,7 +327,7 @@ public class Chicken extends EatingMob implements Runnable {
      * The calories of the egg are calculated as 1.5 times the current calories of the chicken
      * After laying the egg, the chicken's calories are reset to 0 and its thickness is set to thin
      */
-    private void layEgg() {
+    protected void layEgg() {
         // TODO implement max kcal from chicken and when it has reached the maximum kcal, an egg must be laid
         if (super.getKcal() > 0) {
             Square currentSquare = this.mapService.getSquareAtIndexXZ(this.chickenPosX, this.chickenPosZ);
