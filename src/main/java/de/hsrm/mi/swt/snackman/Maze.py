@@ -39,7 +39,7 @@ def generateSpawnChicken(maze):
 
     return maze
 
-def generateFreeCenter(maze):
+def generateFreeCenter(maze, width, height):
     for y in range(len(maze)):
         for x in range(len(maze[y])):
             if(width/3 < x < 2*width/3 and height/3 < y <(2*height/3)):
@@ -83,9 +83,9 @@ def generateLabyrinth(width, height):
 
     maze = generateSpawnChicken(maze)
 
-    maze = generateFreeCenter(maze)
+    maze = generateFreeCenter(maze, width, height)
 
-    maze = generateFreeCenter(maze)
+    maze = generateFreeCenter(maze, width, height)
 
     maze = generateSpawnSnackman(maze)
 
@@ -96,6 +96,7 @@ def saveFile(maze, filename="Maze.txt"):
         for row in maze:
             file.write("".join(row) + "\n")
 
-width, height = 20, 20
-maze = generateLabyrinth(width, height)
-saveFile(maze)
+def main():
+    width, height = 100, 100
+    maze = generateLabyrinth(width, height)
+    saveFile(maze)

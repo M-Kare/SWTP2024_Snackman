@@ -5,13 +5,13 @@
 <script setup lang="ts">
 import {onMounted, onUnmounted, ref} from 'vue'
 import * as THREE from 'three'
-import { Client } from '@stomp/stompjs'
-import { Player } from '@/components/Player';
-import type { IPlayerDTD } from '@/stores/IPlayerDTD';
-import { fetchSnackManFromBackend } from '@/services/SnackManInitService';
-import { GameMapRenderer } from '@/renderer/GameMapRenderer';
-import { useGameMapStore } from '@/stores/gameMapStore';
-import type { IGameMap } from '@/stores/IGameMapDTD';
+import {Client} from '@stomp/stompjs'
+import {Player} from '@/components/Player';
+import type {IPlayerDTD} from '@/stores/Player/IPlayerDTD';
+import {fetchSnackManFromBackend} from '@/services/SnackManInitService';
+import {GameMapRenderer} from "@/renderer/GameMapRenderer";
+import {useGameMapStore} from '@/stores/gameMapStore'
+import type {IGameMap} from "@/stores/IGameMapDTD";
 
 const WSURL = `ws://${window.location.host}/stompbroker`
 const DEST = '/topic/player'
@@ -70,7 +70,7 @@ function animate() {
           qY: player.getCamera().quaternion.y,
           qZ: player.getCamera().quaternion.z,
           qW: player.getCamera().quaternion.w
-        }, {delta: delta}))
+        }, {delta: delta}, { jump: player.getIsJumping()}, { doubleJump: player.getIsDoubleJumping()}))
       });
     } catch (fehler) {
       console.log(fehler)
@@ -82,7 +82,7 @@ function animate() {
   renderer.render(scene, camera)
 }
 
-onMounted(async () =>{
+onMounted(async () => {
 // for rendering the scene, create gameMap in 3d and change window size
   const {initRenderer, createGameMap, getScene} = GameMapRenderer()
   scene = getScene()
