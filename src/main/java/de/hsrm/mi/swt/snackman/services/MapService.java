@@ -212,4 +212,8 @@ public class MapService {
     public SnackMan getSnackMan() {
         return snackman;
     }
+
+    public String getFilePath(){
+        return this.filePath;
+    }
 }

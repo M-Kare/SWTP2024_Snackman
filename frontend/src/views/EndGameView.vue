@@ -3,7 +3,7 @@
       <div class="background"></div>
       <div class="overlay"></div>
       <h1 class="title">Game End!</h1>
-      <MainMenuButton class="map-exportieren-button" @click="exportMap">Map exportieren</MainMenuButton>
+      <MainMenuButton class="map-exportieren-button" @click="downloadMap">Map exportieren</MainMenuButton>
     </div>
   </template>
 
@@ -13,8 +13,28 @@
 
     const router = useRouter();
 
-    const exportMap = () => {
-        //router.push({name: 'GameStart'});
+    const downloadMap = async () => {
+      try{
+        const response = await fetch(`/api/download`);
+
+        if(!response.ok) throw new Error('Failed to download map.');
+
+        const blob = await response.blob();
+        const link = document.createElement('a');   // Create an anchor element to trigger the download
+        const url = URL.createObjectURL(blob);
+        link.href = url;
+        link.download = 'SnackManMap.txt';
+        document.body.appendChild(link);            // Append the link to the DOM
+        link.click();                               // Simulate a click to start the download
+        document.body.removeChild(link);            // Remove the link after the download
+
+        // Revoke the object URL to free up memory
+        URL.revokeObjectURL(url);
+  
+            
+      } catch(error: any){
+        console.error('Error downloading file:', error);
+      }
     }
 
   </script>
