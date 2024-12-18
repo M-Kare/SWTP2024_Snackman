@@ -15,18 +15,25 @@ public enum SnackType {
         this.calories = calories;
     }
 
-    public int getCalories() {
-        return calories;
-    }
-
     /**
      * Gets a random snack
+     *
      * @return random snack
      */
     public static SnackType getRandomSnack() {
         SnackType[] snacks = values();
         Random random = new Random();
         int randomIndex = random.nextInt(snacks.length);
-        return snacks[randomIndex];
+        SnackType returnSnack = snacks[randomIndex];
+
+        if (returnSnack != SnackType.EGG) {
+            return snacks[randomIndex];
+        } else {
+            return getRandomSnack();
+        }
+    }
+
+    public int getCalories() {
+        return calories;
     }
 }
