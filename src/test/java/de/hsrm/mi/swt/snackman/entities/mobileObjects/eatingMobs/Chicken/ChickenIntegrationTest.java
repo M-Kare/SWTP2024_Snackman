@@ -1,13 +1,12 @@
-package de.hsrm.mi.swt.snackman.entities.mob.Chicken;
+package de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken;
 
-import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken.Chicken;
 import org.junit.jupiter.api.Test;
 import org.python.util.PythonInterpreter;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
 /**
@@ -59,7 +58,7 @@ public class ChickenIntegrationTest {
             pyInterp.exec("result = choose_next_square(['W', 'L', 'W', 'L', 'W', 'L', 'W', 'L', 0])");
 
             String result = pyInterp.get("result").toString();
-            
+
             String expectedResult = "[' ', 'L', 'L', 'L', 0]";
             assertEquals(expectedResult, result,
                     "The Python script should correctly determine the next move (' ').");
