@@ -1,132 +1,215 @@
 package de.hsrm.mi.swt.snackman.services;
 
-import de.hsrm.mi.swt.snackman.entities.mapObject.floor.Floor;
-import de.hsrm.mi.swt.snackman.entities.mapObject.MapObject;
-import de.hsrm.mi.swt.snackman.entities.mapObject.wall.Wall;
-import de.hsrm.mi.swt.snackman.entities.square.Square;
+import java.beans.PropertyChangeEvent;
+import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken.Chicken;
+import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken.Direction;
+import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.SnackMan;
+import org.python.util.PythonInterpreter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
+import de.hsrm.mi.swt.snackman.configuration.GameConfig;
+import de.hsrm.mi.swt.snackman.entities.map.GameMap;
+import de.hsrm.mi.swt.snackman.entities.map.Square;
+import de.hsrm.mi.swt.snackman.entities.mapObject.MapObjectType;
+import de.hsrm.mi.swt.snackman.entities.mapObject.snack.Snack;
+import de.hsrm.mi.swt.snackman.entities.mapObject.snack.SnackType;
+import de.hsrm.mi.swt.snackman.messaging.ChangeType;
+import de.hsrm.mi.swt.snackman.messaging.EventType;
+import de.hsrm.mi.swt.snackman.messaging.FrontendMessageEvent;
+import de.hsrm.mi.swt.snackman.messaging.FrontendMessageService;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.Properties;
+import org.python.core.PyObject;
+import de.hsrm.mi.swt.snackman.messaging.*;
 
 /**
  * Service class for managing the game map
- * This class is responsible for loading and providing access to the maze data
+ * This class is responsible for loading and providing access to the game map
+ * data
  */
 @Service
 public class MapService {
 
-    // TODO map is currently "unnecessary", it will probably be needed as soon as snacks and other items are added
-    // private final Map map;
-
+    Logger log = LoggerFactory.getLogger(MapService.class);
+    private FrontendMessageService frontendMessageService;
     private String filePath;
-
-    private Square[][] maze;
-
-    private List<MapObject> mapObjects;
+    private GameMap gameMap;
+    private PythonInterpreter pythonInterpreter = null;
+    private Properties pythonProps = new Properties();
+    private SnackMan snackman;
 
     /**
      * Constructs a new MapService
      * Initializes the maze data by reading from a file and creates a Map object
      */
-    public MapService() {
-        this.filePath = "mini-maze.txt";
-        char[][] mazeData = readMazeFromFile(this.filePath);
-        this.maze = new Square[mazeData.length][mazeData[0].length];
-        switchMazeDataIntoMapObjectsInMaze(mazeData);
+    @Autowired
+    public MapService(FrontendMessageService frontendMessageService, ReadMazeService readMazeService) {
+        this(frontendMessageService, readMazeService, "Maze.txt");
+    }
+
+    public MapService(FrontendMessageService frontendMessageService, ReadMazeService readMazeService,
+                      String filePath) {
+        this.frontendMessageService = frontendMessageService;
+        generateNewMaze();
+        this.filePath = filePath;
+        char[][] mazeData = readMazeService.readMazeFromFile(this.filePath);
+        gameMap = convertMazeDataGameMap(mazeData);
+        snackman = new SnackMan(this, GameConfig.SNACKMAN_SPEED, GameConfig.SNACKMAN_RADIUS);
     }
 
     /**
-     * Reads maze data from a file and converts it into a char array with [x][z]-coordinates
-     *
-     * @param filePath the path to the file containing the maze data
-     * @return a char array representing the maze
-     * @throws RuntimeException if there's an error reading the file
-     */
-    protected char[][] readMazeFromFile(String filePath) {
-        List<String> lines = new ArrayList<>();
-        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                lines.add(line);
-            }
-        } catch (IOException e) {
-            throw new RuntimeException("Fehler beim Lesen der Labyrinth-Datei", e);
-        }
-
-        int rows = lines.size();
-        int cols = lines.getFirst().length();
-        char[][] mazeAsCharArray = new char[rows][cols];
-
-        for (int i = 0; i < rows; i++) {
-            mazeAsCharArray[i] = lines.get(i).toCharArray();
-        }
-        return mazeAsCharArray;
-    }
-
-    /**
-     * Converts the char array maze data into MapObjects and populates the maze
+     * Converts the char array maze data into MapObjects and populates the game map
      *
      * @param mazeData the char array representing the maze
      */
-    protected void switchMazeDataIntoMapObjectsInMaze(char[][] mazeData) {
-        for (int i = 0; i < mazeData.length; i++) {
-            for (int j = 0; j < mazeData[0].length; j++) {
-                switch (mazeData[i][j]) {
-                    case '#':
-                        Wall wall = new Wall();
-                        this.mapObjects = new ArrayList<>();
-                        this.mapObjects.add(wall);
-                        this.maze[i][j] = new Square(mapObjects);
-                        break;
-                    case ' ':
-                        Floor floor = new Floor();
-                        this.maze[i][j] = new Square(new ArrayList<>());
-                        this.mapObjects = new ArrayList<>();
-                        this.mapObjects.add(floor);
-                        this.maze[i][j] = new Square(mapObjects);
-                        break;
-                    // TODO hier weitere mögliche mapObjects hinzufügen mit ihren Zeichen
-                    default:
-                        System.out.println("CAN'T BUILD! " + mazeData[i][j] + " doesn't exist");
+    private GameMap convertMazeDataGameMap(char[][] mazeData) {
+        Square[][] squaresBuildingMap = new Square[mazeData.length][mazeData[0].length];
+
+        for (int x = 0; x < mazeData.length; x++) {
+            for (int z = 0; z < mazeData[0].length; z++) {
+                try {
+                    Square squareToAdd = createSquare(mazeData[x][z], x, z);
+
+                    squaresBuildingMap[x][z] = squareToAdd;
+                } catch (IllegalArgumentException e) {
+                    log.error(e.getMessage());
                 }
             }
         }
+
+        return new GameMap(squaresBuildingMap);
+    }
+
+    //TODO Maze.py map größe als Argumente herein reichen statt in der python-file selbst zu hinterlegen
+
+    /**
+     * Generates a new Maze and saves it in a Maze.txt file
+     */
+    public void generateNewMaze() {
+        pythonProps.setProperty("python.path", "src/main/java/de/hsrm/mi/swt/snackman");
+        PythonInterpreter.initialize(System.getProperties(), pythonProps, new String[0]);
+        log.debug("Initialised jython for maze generation");
+        this.pythonInterpreter = new PythonInterpreter();
+        pythonInterpreter.exec("from Maze import main");
+        PyObject func = pythonInterpreter.get("main");
+        func.__call__();
     }
 
     /**
-     * Prepares the maze data for JSON serialization
+     * Creates a Square by given indexes
      *
-     * @return a Map containing the maze data in a format suitable for JSON conversion
+     * @param symbol from char array
+     * @param x      index
+     * @param z      index
+     * @return a created Square
      */
-    public Map<String, Object> prepareMazeForJson() {
-        List<Map<String, Object>> mapList = new ArrayList<>();
+    private Square createSquare(char symbol, int x, int z) {
+        Square square;
 
-        for (int i = 0; i < this.maze.length; i++) {
-            for (int j = 0; j < this.maze[i].length; j++) {
-                Map<String, Object> squareInfo = new HashMap<>();
-                squareInfo.put("x", j);
-                squareInfo.put("z", i);
+        switch (symbol) {
+            case '#': {
+                square = new Square(MapObjectType.WALL, x, z);
+                break;
+            }
+            case ' ': {
+                square = new Square(MapObjectType.FLOOR, x, z);
+                addRandomSnackToSquare(square);
 
-                if (this.maze[i][j].getMapObjects().getFirst() instanceof Wall) {
-                    squareInfo.put("type", "wall");
-                } else if (this.maze[i][j].getMapObjects().getFirst() instanceof Floor) {
-                    squareInfo.put("type", "floor");
-                }
-                mapList.add(squareInfo);
+                square.addPropertyChangeListener((PropertyChangeEvent evt) -> {
+                    if (evt.getPropertyName().equals("square")) {
+                        FrontendMessageEvent messageEvent = new FrontendMessageEvent(EventType.SNACK, ChangeType.UPDATE,
+                                (Square) evt.getNewValue());
+
+                        frontendMessageService.sendEvent(messageEvent);
+                    }
+                });
+                break;
+            }
+            case 'C':
+                log.debug("Initialising chicken");
+                square = new Square(MapObjectType.FLOOR, x, z);
+                Chicken newChicken = new Chicken(square, this);
+                Thread chickenThread = new Thread(newChicken);
+                chickenThread.start();
+
+                newChicken.addPropertyChangeListener((PropertyChangeEvent evt) -> {
+                    if (evt.getPropertyName().equals("chicken")) {
+                        FrontendChickenMessageEvent messageEvent = new FrontendChickenMessageEvent(EventType.CHICKEN,
+                                ChangeType.UPDATE, (Chicken) evt.getNewValue());
+
+                        frontendMessageService.sendChickenEvent(messageEvent);
+                    }
+                });
+                break;
+            default: {
+                square = new Square(MapObjectType.FLOOR, x, z);
             }
         }
 
-        Map<String, Object> responseMap = new HashMap<>();
-        responseMap.put("map", mapList);
-        responseMap.put("height", Wall.DEFAULT_HEIGHT);
-        responseMap.put("default-side-length", Square.DEFAULT_SIDE_LENGTH);
+        return square;
+    }
 
-        return responseMap;
+    /**
+     * @param currentPosition  the square the chicken is standing on top of
+     * @param lookingDirection
+     * @return a list of 8 square which are around the current square + the
+     * direction the chicken is looking in the order:
+     * northwest_square, north_square, northeast_square, east_square,
+     * southeast_square, south_square, southwest_square, west_square,
+     * direction
+     */
+    public synchronized List<String> getSquaresVisibleForChicken(Square currentPosition, Direction lookingDirection) {
+        List<String> squares = new ArrayList<>();
+        squares.add(Direction.NORTH_WEST.getNorthWestSquare(this, currentPosition).getPrimaryType());
+        squares.add(Direction.NORTH.getNorthSquare(this, currentPosition).getPrimaryType());
+        squares.add(Direction.NORTH_EAST.getNorthEastSquare(this, currentPosition).getPrimaryType());
+        squares.add(Direction.EAST.getEastSquare(this, currentPosition).getPrimaryType());
+        squares.add(Direction.SOUTH_EAST.getSouthEastSquare(this, currentPosition).getPrimaryType());
+        squares.add(Direction.SOUTH.getSouthSquare(this, currentPosition).getPrimaryType());
+        squares.add(Direction.SOUTH_WEST.getSouthWestSquare(this, currentPosition).getPrimaryType());
+        squares.add(Direction.WEST.getWestSquare(this, currentPosition).getPrimaryType());
+        squares.add(lookingDirection.toString());
+        return squares;
+    }
+
+    /**
+     * Adds a random generated snack inside a square of type FLOOR
+     *
+     * @param square to put snack in
+     */
+    private void addRandomSnackToSquare(Square square) {
+        if (square.getType() == MapObjectType.FLOOR) {
+            SnackType randomSnackType = SnackType.getRandomSnack();
+
+            square.setSnack(new Snack(randomSnackType));
+        }
+    }
+
+    public GameMap getGameMap() {
+        return gameMap;
+    }
+
+    public Square getSquareAtIndexXZ(int x, int z) {
+        return gameMap.getSquareAtIndexXZ(x, z);
+    }
+
+    public void printGameMap() {
+        Square[][] gameMap = this.gameMap.getGameMap();
+
+        for (int x = 0; x < gameMap.length; x++) {
+            System.out.print("x");
+            for (int z = 0; z < gameMap[x].length; z++) {
+                Square square = gameMap[x][z];
+                System.out.print(square.getPrimaryType());
+            }
+            System.out.println("");
+        }
+    }
+
+    public SnackMan getSnackMan() {
+        return snackman;
     }
 }
