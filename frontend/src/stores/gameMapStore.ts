@@ -73,31 +73,21 @@ export const useGameMapStore = defineStore('gameMap', () => {
           const change: IFrontendMessageEvent = JSON.parse(message.body)
 
           if (change.changeType == 'CREATE') {
+            const OFFSET = mapData.DEFAULT_SQUARE_SIDE_LENGTH / 2
+            const DEFAULT_SIDE_LENGTH = mapData.DEFAULT_SQUARE_SIDE_LENGTH
+
             const square = change.square as ISquare
-            mapData.gameMap.set(square.id, square)
+            const currentSquareInPinia = mapData.gameMap.get(square.id)
+            const eggToAdd = gameObjectRenderer.createSnackOnFloor(
+              square.indexX * DEFAULT_SIDE_LENGTH + OFFSET,
+              square.indexZ * DEFAULT_SIDE_LENGTH + OFFSET,
+              DEFAULT_SIDE_LENGTH,
+              square.snack?.snackType,
+            )
 
-            const snack = square.snack
-
-            if (snack && mapData.gameMap.get(square.id)) {
-              const sideLength = mapData.DEFAULT_SQUARE_SIDE_LENGTH
-              const xPosition = square.indexX * sideLength + sideLength / 2
-              const zPosition = square.indexZ * sideLength + sideLength / 2
-
-              // console.debug('New egg created: ' + square.id)
-
-              const newSnackMesh = gameObjectRenderer.createSnackOnFloor(
-                xPosition,
-                zPosition,
-                sideLength,
-                snack.snackType,
-              )
-
-              if (mapData.gameMap.get(square.id)!.snack) {
-                mapData.gameMap.get(square.id)!.snack.meshId = newSnackMesh.id
-              }
-
-              scene.add(newSnackMesh)
-            }
+            currentSquareInPinia!.snack = square.snack
+            scene.add(eggToAdd)
+            setSnackMeshId(currentSquareInPinia!.id, eggToAdd.id)
           } else if (change.changeType == 'UPDATE') {
             // TODO fix bug "Unhandled Promise Rejection: TypeError: null is not an object (evaluating 'mapData.gameMap.get(change.square.id).snack.meshId')"
             if (mapData.gameMap.get(change.square.id)!.snack.meshId != null) {

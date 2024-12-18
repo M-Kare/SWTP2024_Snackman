@@ -140,6 +140,8 @@ public class MapService {
                         if (squareToAddEgg != null && squareToAddEgg.getSnack() != null && squareToAddEgg.getSnack().getSnackType() == SnackType.EGG) {
                             FrontendMessageEvent messageEvent = new FrontendMessageEvent(EventType.SNACK, ChangeType.CREATE, squareToAddEgg);
                             frontendMessageService.sendEvent(messageEvent);
+                            log.info("Sending FrontendMessageEvent: EventType={}, ChangeType={}, SquareId={}",
+                                    messageEvent.eventType().name(), messageEvent.changeType().name(), messageEvent.square().getId());
                         }
                     }
                 });
@@ -193,12 +195,15 @@ public class MapService {
      * @param laidEgg The snack representing the egg that has been laid
      */
     public void addEggToSquare(Square square, Snack laidEgg) {
-        //log.debug("{} kcal egg add to square {}", laidEgg.getCalories(), square.getId());
+        //Square squareCopy = new Square(square.getType(), square.getIndexX(), square.getIndexZ());
+        //squareCopy.setSnack(laidEgg);
         square.setSnack(laidEgg);
 
-        Square squareCopy = new Square(square.getType(), square.getIndexX(), square.getIndexZ());
-        squareCopy.setSnack(laidEgg);
-        frontendMessageService.sendEvent(new FrontendMessageEvent(EventType.SNACK, ChangeType.CREATE, squareCopy));
+        //log.info("{} kcal egg add to square {} and squareCopy {}", laidEgg.getCalories(), square.getId(), squareCopy.getId());
+        log.info("{} kcal egg add to square {} and square {}", laidEgg.getCalories(), square.getId(), square.getId());
+
+        //frontendMessageService.sendEvent(new FrontendMessageEvent(EventType.SNACK, ChangeType.CREATE, squareCopy));
+        frontendMessageService.sendEvent(new FrontendMessageEvent(EventType.SNACK, ChangeType.CREATE, square));
     }
 
     public void printGameMap() {

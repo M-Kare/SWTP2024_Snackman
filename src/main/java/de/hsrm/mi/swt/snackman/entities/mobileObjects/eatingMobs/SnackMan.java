@@ -8,10 +8,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class SnackMan extends EatingMob {
+    private final Logger log = LoggerFactory.getLogger(SnackMan.class);
     private boolean isJumping = false;
     private double velocityY = 0.0;
-
-    private final Logger log = LoggerFactory.getLogger(SnackMan.class);
 
     public SnackMan(MapService mapService) {
         this(mapService, GameConfig.SNACKMAN_SPEED, GameConfig.SNACKMAN_RADIUS);
@@ -103,10 +102,12 @@ public class SnackMan extends EatingMob {
      */
     public void consumeSnackOnSquare(Square square) {
         Snack snackOnSquare = square.getSnack();
+        log.info("SNACKMAN - snackOnSquare: {} with calories: {}", snackOnSquare, snackOnSquare.getCalories());
 
         if (snackOnSquare != null) {
             try {
                 super.gainKcal(snackOnSquare.getCalories());
+                log.info("SNACKMAN - new kcal: {}", super.getKcal());
             } catch (Exception e) {
                 log.error(e.getMessage());
             }

@@ -339,15 +339,16 @@ public class Chicken extends EatingMob implements Runnable {
 
             // add egg to current square
             this.mapService.addEggToSquare(currentSquare, egg);
+            log.info("add egg to with {} kcal current square in Chicken {} -> {}", eggCalories, this.id, currentSquare.getId());
 
             // Chicken becomes thin again and has no calories after it has laid an egg
             this.setThickness(Thickness.THIN);
             super.setKcal(0);
-            // log.debug("Chicken {} laid an egg -> thin again and {} kcal", this.id, super.getKcal());
-            propertyChangeSupport.firePropertyChange("egg", null, currentSquare);
+            log.info("Chicken {} laid an egg -> thin again and {} kcal", this.id, super.getKcal());
+            //propertyChangeSupport.firePropertyChange("egg", null, currentSquare);
             startNewTimer();
         } else {
-            log.debug("Chicken {} has no kcal left to lay an egg", this.id);
+            log.info("Chicken {} has no kcal left to lay an egg", this.id);
             startNewTimer();
         }
     }
