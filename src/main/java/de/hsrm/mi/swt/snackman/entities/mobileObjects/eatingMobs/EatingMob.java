@@ -32,7 +32,9 @@ public abstract class EatingMob extends Mob {
     }
 
     protected void setKcal(int value) {
+        int oldKcal = kcal;
         kcal = value;
+        propertyChangeSupport.firePropertyChange("currentCalories", oldKcal, this.kcal);
     }
 
     public int getKcal() {
