@@ -61,7 +61,7 @@ public class MapService {
         char[][] mazeData = readMazeService.readMazeFromFile(this.filePath);
         gameMap = convertMazeDataGameMap(mazeData);
         snackman = new SnackMan(this, GameConfig.SNACKMAN_SPEED, GameConfig.SNACKMAN_RADIUS);
-        ghost = new Ghost(this, GameConfig.GHOST_SPEED , GameConfig.GHOST_RADIUS);
+
     }
 
     /**
@@ -148,6 +148,19 @@ public class MapService {
                     }
                 });
                 break;
+            case'G':
+                log.debug("Initialising ghost");
+                  square = new Square(MapObjectType.FLOOR,  x, z);
+                //square = new Square(MapObjectType.FLOOR, 0 , 0);
+                ghost = new Ghost(square, this, GameConfig.GHOST_SPEED , GameConfig.GHOST_RADIUS);
+                // ghost = new Ghost(this.getSquareAtIndexXZ(0,0) , this , GameConfig.GHOST_SPEED, GameConfig.GHOST_RADIUS);
+                FrontendGhostMessageEvent message = new FrontendGhostMessageEvent( EventType.GHOST , ChangeType.CREATE , ghost);
+
+                frontendMessageService.sendGhostEvent(message);
+                System.out.println("message: " + message);
+
+                break;
+
             default: {
                 square = new Square(MapObjectType.FLOOR, x, z);
             }

@@ -40,9 +40,9 @@ public class GameMapController {
     }
 
     @GetMapping("/ghost")
-    public ResponseEntity<GhostInitDTO> getGhostPos(){
+    public ResponseEntity<GhostDTO> getGhostPos(){
         Ghost ghost = mapService.getGhost();
-        return ResponseEntity.ok(new GhostInitDTO(ghost.getId(), ghost.getPosX(), ghost.getPosY(), ghost.getPosZ(), ghost.getRadius(), GameConfig.GHOST_SPEED));
+        return ResponseEntity.ok(new GhostDTO(ghost.getId(), ghost.getPosX(), ghost.getPosY(), ghost.getPosZ(), ghost.getRadius(), GameConfig.GHOST_SPEED));
     }
 
 
