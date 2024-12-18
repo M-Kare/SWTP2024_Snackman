@@ -132,14 +132,6 @@ onMounted(async () => {
 
   loadPlayerModel(SNACKMAN_TEXTURE);
 
-  //Add maze
-  try {
-    const mazeData = await fetchMazeDataFromBackend()
-    createMaze(mazeData)
-  } catch (error) {
-    console.error('Error when retrieving the maze:', error)
-  }
-
   renderer.render(scene, camera)
   renderer.setAnimationLoop(animate)
   window.addEventListener('resize', resizeCallback)
