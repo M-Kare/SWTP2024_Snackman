@@ -1,7 +1,7 @@
 import random
 
 #returns next free(not a Wall) adjacent field
-def searchFreeFieldAdjacent(maze, x, y):
+def search_free_field_adjacent(maze, x, y):
 
     if maze[x + 1][y + 1] != '#':
         return (x + 1, y + 1)
@@ -16,30 +16,31 @@ def searchFreeFieldAdjacent(maze, x, y):
     
     return None
 
-def generateSpawnGhost(maze):
-    for i in range(5):
-        randome1 = random.randint(1, len(maze) - 2)
-        randome2 = random.randint(1, len(maze) - 2)
-        if maze[randome1][randome2] != '#':
-            maze[randome1][randome2] = 'G'
+def generate_spawn_ghost(maze):
+    for _ in range(5):
+        random1 = random.randint(1, len(maze) - 2)
+        random2 = random.randint(1, len(maze) - 2)
+        if maze[random1][random2] != '#':
+            maze[random1][random2] = 'G'
         else:
-            randome1, randome2 = searchFreeFieldAdjacent(maze, randome1, randome2)
-            maze[randome1][randome2] = 'G'
+            random1, random2 = search_free_field_adjacent(maze, random1, random2)
+            maze[random1][random2] = 'G'
 
     return maze
 
-def generateSpawnChicken(maze):
-    for i in range(10):
-        randome1 = random.randint(1, len(maze) - 2)
-        randome2 = random.randint(1, len(maze) - 2)
-        if maze[randome1][randome2] != '#' or maze[randome1][randome2] != 'G' or maze[randome1][randome2] != 'S':
-            maze[randome1][randome2] = 'C'
+def generate_spawn_chicken(maze):
+    for _ in range(10):
+        random1 = random.randint(1, len(maze) - 2)
+        random2 = random.randint(1, len(maze) - 2)
+        if maze[random1][random2] != '#' and maze[random1][random2] != 'G' and maze[random1][random2] != 'S':
+            maze[random1][random2] = 'C'
         else:
-            randome1, randome2 = searchFreeFieldAdjacent(maze, randome1, randome2)
+            random1, random2 = search_free_field_adjacent(maze, random1, random2)
+            maze[random1][random2] = 'C'
 
     return maze
 
-def generateFreeCenter(maze, width, height):
+def generate_free_center(maze, width, height):
     for y in range(len(maze)):
         for x in range(len(maze[y])):
             if(width/3 < x < 2*width/3 and height/3 < y <(2*height/3)):
@@ -47,29 +48,29 @@ def generateFreeCenter(maze, width, height):
     
     return maze
 
-def generateSpawnSnackman(maze):
+def generate_spawn_snackman(maze):
     center = (int) (len(maze)/2)
     maze[center][center] = 'S'
 
     return maze
 
 
-def generateLabyrinth(width, height):
-    maze = [["#" for i in range(width)] for i in range(height)] 
+def generate_labyrinth(width, height):
+    maze = [["#" for _ in range(width)] for _ in range(height)] 
     stack = [(1, 1)]
     maze[1][1] = " "
 
     while stack:
         x, y = stack[-1]
-        richtungen = [(0, 2), (2, 0), (0, -2), (-2, 0)]
-        random.shuffle(richtungen)
+        directions = [(0, 2), (2, 0), (0, -2), (-2, 0)]
+        random.shuffle(directions)
 
-        for rx, ry in richtungen:
+        for rx, ry in directions:
             aktx, akty = x + rx, y + ry
             if 1 <= aktx < width - 1 and 1 <= akty < height -1 and maze[akty][aktx] == "#":
-                randomeNumber = random.randint(1, 10) #snacks spawn in ratio 1:10
-                if(randomeNumber == 1):
-                    maze[akty][aktx] == "o"
+                random_number = random.randint(1, 10) #snacks spawn in ratio 1:10
+                if(random_number == 1):
+                    maze[akty][aktx] = "o"
                     maze[y + ry//2][x + rx//2] = "o"
                 else:
                     maze[akty][aktx] = " "
@@ -79,24 +80,22 @@ def generateLabyrinth(width, height):
         else:
             stack.pop()
         
-    maze = generateSpawnGhost(maze)
+    maze = generate_spawn_ghost(maze)
 
-    maze = generateSpawnChicken(maze)
+    maze = generate_spawn_chicken(maze)
 
-    maze = generateFreeCenter(maze, width, height)
+    maze = generate_free_center(maze, width, height)
 
-    maze = generateFreeCenter(maze, width, height)
-
-    maze = generateSpawnSnackman(maze)
+    maze = generate_spawn_snackman(maze)
 
     return maze
 
-def saveFile(maze, filename="Maze.txt"):
+def save_file(maze, filename="Maze.txt"):
     with open(filename, "w") as file:
         for row in maze:
             file.write("".join(row) + "\n")
 
 def main():
     width, height = 100, 100
-    maze = generateLabyrinth(width, height)
-    saveFile(maze)
+    maze = generate_labyrinth(width, height)
+    save_file(maze)

@@ -7,37 +7,13 @@ import java.nio.file.Paths;
 import java.util.List;
 
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.python.util.PythonInterpreter;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
 class MazeTest {
     
-    private static final String MAZE_SCRIPT_PATH = "./src/main/java/de/hsrm/mi/swt/snackman/Maze.py";
     private static final String MAZE_FILE_PATH = "./Maze.txt";
-
-    @BeforeEach
-    void executePythonScript() {
-        Path mazeFilePath = Paths.get(MAZE_FILE_PATH);
-
-        // Delete existing Maze.txt if it exists (clean state)
-        if (Files.exists(mazeFilePath)) {
-            try {
-                Files.delete(mazeFilePath);
-            } catch (IOException e) {
-                throw new RuntimeException("Failed to delete existing Maze.txt", e);
-            }
-        }
-
-        // Execute the Python script
-        try (PythonInterpreter interpreter = new PythonInterpreter()) {
-            interpreter.execfile(MAZE_SCRIPT_PATH);
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to execute Python script: " + MAZE_SCRIPT_PATH, e);
-        }
-    }
 
     @Test
     void mazeExists() {
