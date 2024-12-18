@@ -47,10 +47,6 @@ export class Player {
         return this.camera;
     }
 
-    public getPosition(): THREE.Vector3  {
-      return this.camera.position;
-    }
-
     public getControls():PointerLockControls{
         return this.controls;
     }
