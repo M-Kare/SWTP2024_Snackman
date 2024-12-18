@@ -81,23 +81,6 @@ export const GameObjectRenderer = () => {
     return chicken
   }
 
-  /*
-  const createEggOnFloor = (xPosition: number, zPosition: number) => {
-    const eggColor = 'white'
-    const eggMaterial = new THREE.MeshStandardMaterial({ color: eggColor })
-
-    const EGG_SIZE = 0.4
-    const eggGeometry = new THREE.BoxGeometry(EGG_SIZE, EGG_SIZE, EGG_SIZE)
-
-    const egg = new THREE.Mesh(eggGeometry, eggMaterial)
-    egg.castShadow = true
-    egg.receiveShadow = true
-    egg.position.set(xPosition, 0, zPosition)
-
-    return egg
-  }
-  */
-
   const createFloorSquare = (
     xPosition: number,
     zPosition: number,
