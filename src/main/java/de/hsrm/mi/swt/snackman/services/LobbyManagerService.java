@@ -69,8 +69,8 @@ public class LobbyManagerService {
      *
      * @return list of lobbies
      */
-    public Map<String, Lobby> getAllLobbies() {
-        return this.lobbies;
+    public List<Lobby> getAllLobbies() {
+        return lobbies.values().stream().toList();
     }
 
     /**

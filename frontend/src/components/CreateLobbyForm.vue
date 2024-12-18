@@ -11,14 +11,14 @@
             id="cancel-lobby-creation-button"
             class="small-nav-buttons"
             @click="cancelLobbyCreation">
-            
+
             Cancel
         </SmallNavButton>
         <SmallNavButton
             id="create-lobby-button"
             class="small-nav-buttons"
-            @click="createLobby"> 
-            
+            @click="createLobby">
+
             Create Lobby
         </SmallNavButton>
     </div>
@@ -34,17 +34,17 @@
     const router = useRouter();
     const lobbiesStore = useLobbiesStore();
     const currentPlayer = lobbiesStore.lobbydata.currentPlayer as IPlayerClientDTD;
-    
+
     const lobbyName = ref('');
 
     const emit = defineEmits<{
         (event: 'cancelLobbyCreation', value: boolean): void;
         (event: 'createLobby', value: string): void;
     }>()
-    
+
     /**
      * Emits an event to cancel the lobby creation process.
-     * 
+     *
      * @function cancelLobbyCreation
      * @returns {void}
      */
@@ -57,7 +57,7 @@
      * Validates the admin client and lobby name before attempting to create the lobby.
      * Alerts the user if there are any validation errors or if the lobby creation fails.
      * On success, redirects to the newly created lobby view.
-     * 
+     *
      * @async
      * @function createLobby
      * @throws {Error} Throws an alert if the admin client is invalid or the lobby name is empty or already taken.
@@ -66,7 +66,7 @@
      */
     const createLobby = async () => {
         const adminClient = currentPlayer;
-    
+
         if (!adminClient || adminClient.playerId === '' || adminClient.playerName === '') {
             alert("Admin client is not valid!");
             return;
@@ -88,10 +88,10 @@
 
         try{
             const newLobby = await lobbiesStore.createLobby(lobbyName.value.trim(), adminClient);
-            if (newLobby && newLobby.uuid) {
+            if (newLobby && newLobby.lobbyId) {
                 alert("Lobby created successfully!");
                 cancelLobbyCreation();
-                router.push({ name: "LobbyView", params: { lobbyId: newLobby.uuid } });
+                router.push({ name: "LobbyView", params: { lobbyId: newLobby.lobbyId } });
             } else {
                 throw new Error("Lobby creation returned invalid response.");
             }

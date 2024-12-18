@@ -15,7 +15,7 @@
             id="menu-back-button"
             class="small-nav-buttons"
             @click="backToMainMenu">
-            
+
             Back
         </SmallNavButton>
         <SmallNavButton
@@ -29,14 +29,14 @@
         <div class="inner-box"> <!-- :key for order? -->
             <ul>
                 <li
-                    v-for="lobby in lobbies" :key="lobby.uuid"
+                    v-for="lobby in lobbies" :key="lobby.lobbyId"
                     class="lobby-list-items"
                     @click="joinLobby(lobby)">
 
                     <div class="lobby-name">
                         {{ lobby.name }}
                     </div>
-                    
+
                     <div class="playercount">
                         {{ lobby.members.length }} / {{ maxPlayerCount }}
                     </div>
@@ -70,7 +70,7 @@
 
     const lobbies = computed(() => lobbiesStore.lobbydata.lobbies);
     const currentPlayer = lobbiesStore.lobbydata.currentPlayer as IPlayerClientDTD;
-    
+
     const maxPlayerCount = 4;
 
     // lobby value tracking
@@ -96,7 +96,7 @@
      * Joins a specified lobby if it is not full and the game has not started.
      * Alerts the user if the lobby is full or if the game has already started.
      * On successful join, redirects to the lobby view.
-     * 
+     *
      * @async
      * @function joinLobby
      * @param {ILobbyDTD} lobby - The lobby object that the player wants to join.
@@ -104,7 +104,7 @@
      * @throws {Error} Throws an alert if there is an error joining the lobby.
      */
     const joinLobby = async (lobby: ILobbyDTD) => {
-        
+
         if(lobby.members.length >= maxPlayerCount){
             alert(`Lobby "${lobby.name}" is full! Please select another one.`);
             return;
@@ -116,11 +116,11 @@
         }
 
         try{
-            const joinedLobby = await lobbiesStore.joinLobby(lobby.uuid, currentPlayer.playerId);
+            const joinedLobby = await lobbiesStore.joinLobby(lobby.lobbyId, currentPlayer.playerId);
 
             if(joinedLobby) {
                 console.log('Successfully joined lobby', joinedLobby.name);
-                router.push({ name: "LobbyView", params: { lobbyId: lobby.uuid } });
+                router.push({ name: "LobbyView", params: { lobbyId: lobby.lobbyId } });
             }
         } catch (error: any){
             console.error('Error:', error);
@@ -148,7 +148,7 @@
         // }
         lobbiesStore.fetchLobbyList();
         console.log(lobbies)
-        
+
         if (!lobbiesStore.lobbydata.currentPlayer || lobbiesStore.lobbydata.currentPlayer.playerId === '' || lobbiesStore.lobbydata.currentPlayer.playerName === '') {
             lobbiesStore.createPlayer('Player Test');
         }

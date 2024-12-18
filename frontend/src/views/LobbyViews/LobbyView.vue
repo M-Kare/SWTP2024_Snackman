@@ -7,7 +7,7 @@
             id="menu-back-button"
             class="small-nav-buttons"
             @click="leaveLobby">
-            
+
             Leave Lobby
         </SmallNavButton>
         <SmallNavButton
@@ -66,7 +66,7 @@
     const members = computed(() => lobby.value?.members || [] as Array<IPlayerClientDTD>);
     const playerCount = computed(() => members.value.length);
     const maxPlayerCount = ref(4);
-    
+
     onMounted(async () => {
         const lobbyId = route.params.lobbyId as string;
         if (!lobbyId) {
@@ -93,8 +93,8 @@
 
         // Update lobby data reactively if STOMP updates arrive
         lobbiesStore.$subscribe((mutation, state) => {
-            const updatedLobby = state.lobbydata.lobbies.find(l => l.uuid === lobbyId);
-        
+            const updatedLobby = state.lobbydata.lobbies.find(l => l.lobbyId === lobbyId);
+
             // If Lobby doesn't exit, come back to LobbyListView-Seite
             if (!updatedLobby) {
                 router.push({ name: 'LobbyListView' });
@@ -114,7 +114,7 @@
     /**
      * Leaves the current lobby. If the player is the admin, it will remove other members from the lobby first.
      * After leaving the lobby, the user is redirected to the Lobby List View.
-     * 
+     *
      * @async
      * @function leaveLobby
      * @throws {Error} If the player or lobby is not found.
@@ -129,19 +129,19 @@
         if(playerId === lobby.value.adminClient.playerId){
             for (const member of lobby.value.members) {
                 if (member.playerId !== playerId) {
-                    await lobbiesStore.leaveLobby(lobby.value.uuid, member.playerId);
+                    await lobbiesStore.leaveLobby(lobby.value.lobbyId, member.playerId);
                 }
             }
-        } 
+        }
 
-        await lobbiesStore.leaveLobby(lobby.value.uuid, playerId);
+        await lobbiesStore.leaveLobby(lobby.value.lobbyId, playerId);
         router.push({ name: 'LobbyListView' });
     }
 
     /**
      * Starts the game if the player is the admin and there are enough members in the lobby.
      * If the player is not the admin or there are not enough members, an alert will be shown.
-     * 
+     *
      * @async
      * @function startGame
      * @throws {Error} If the player or lobby is not found.

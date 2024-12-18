@@ -59,9 +59,9 @@ export const useLobbiesStore = defineStore('lobbiesstore', () =>{
 
         } catch (error: any){
             console.error('Error: ', error)
-            
+
         }
-        
+
     }
 
     async function fetchLobbyList(){
@@ -83,7 +83,7 @@ export const useLobbiesStore = defineStore('lobbiesstore', () =>{
 
         } catch (error: any){
             console.error('Error: ', error)
-            
+
         }
     }
 
@@ -137,10 +137,10 @@ export const useLobbiesStore = defineStore('lobbiesstore', () =>{
      */
     async function createLobby(lobbyName: string, adminClient: IPlayerClientDTD): Promise<ILobbyDTD | null> {
         const newLobby: ILobbyDTD = {
-            uuid: '',
+            lobbyId: '',
             name: lobbyName,
             adminClient: adminClient,
-            gameStarted: false, 
+            gameStarted: false,
             members: [adminClient]
         }
 
@@ -226,7 +226,7 @@ export const useLobbiesStore = defineStore('lobbiesstore', () =>{
                     'Content-Type': 'application/json',
                 },
             })
-    
+
             if (!response.ok) {
                 throw new Error(`Failed to leave lobby: ${response.statusText}`)
             }
@@ -286,7 +286,7 @@ export const useLobbiesStore = defineStore('lobbiesstore', () =>{
         } catch (error: any){
             console.error('Error:', error)
             return null
-        } 
+        }
     }
 
     return{

@@ -82,7 +82,7 @@ public class LobbyController {
       @GetMapping
       @ResponseBody
       public List <Lobby> getAllLobbies() {
-            List<Lobby> lobbies = lobbyManagerService.getAllLobbies().values().stream().toList();
+            List<Lobby> lobbies = lobbyManagerService.getAllLobbies();
             
             return lobbies;
       }
