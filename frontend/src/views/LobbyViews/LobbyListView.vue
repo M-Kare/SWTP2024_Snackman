@@ -4,13 +4,6 @@
     <h1 class="title">Lobbies</h1>
     <div class="outer-box">
 
-        <!--This is used just for test, can delete later-->
-        <div class="player-info" v-if="currentPlayer">
-            <p>Player ID:   {{ currentPlayer.playerId }}</p>
-            <p>Player Name: {{ currentPlayer.playerName }}</p>
-        </div>
-        <!---->
-
         <SmallNavButton
             id="menu-back-button"
             class="small-nav-buttons"
@@ -199,6 +192,7 @@
     border: 0.5px solid black;
     border-radius: 0.2rem;
     font-size: 1.2rem;
+    color: #000000;
     padding: 0.5rem;
     margin: 1rem;
 }
