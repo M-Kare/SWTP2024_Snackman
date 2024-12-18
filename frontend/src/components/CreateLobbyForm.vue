@@ -41,11 +41,29 @@
         (event: 'cancelLobbyCreation', value: boolean): void;
         (event: 'createLobby', value: string): void;
     }>()
-
+    
+    /**
+     * Emits an event to cancel the lobby creation process.
+     * 
+     * @function cancelLobbyCreation
+     * @returns {void}
+     */
     const cancelLobbyCreation = () => {
         emit('cancelLobbyCreation', false);
     }
 
+    /**
+     * Creates a new lobby with the specified name and admin client.
+     * Validates the admin client and lobby name before attempting to create the lobby.
+     * Alerts the user if there are any validation errors or if the lobby creation fails.
+     * On success, redirects to the newly created lobby view.
+     * 
+     * @async
+     * @function createLobby
+     * @throws {Error} Throws an alert if the admin client is invalid or the lobby name is empty or already taken.
+     * @throws {Error} Throws an alert if there is an error creating the lobby.
+     * @returns {void}
+     */
     const createLobby = async () => {
         const adminClient = currentPlayer;
     

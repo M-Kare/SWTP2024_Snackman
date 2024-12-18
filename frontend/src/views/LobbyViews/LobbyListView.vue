@@ -71,10 +71,12 @@
     const lobbies = computed(() => lobbiesStore.lobbydata.lobbies);
     const currentPlayer = lobbiesStore.lobbydata.currentPlayer as IPlayerClientDTD;
     
+    const maxPlayerCount = 4;
+
     // lobby value tracking
-    watch(lobbies, (newVal) => {
-        console.log("Updated lobbies:", newVal);
-    });
+    // watch(lobbies, (newVal) => {
+    //     console.log("Updated lobbies:", newVal);
+    // });
 
     const showNewLobbyForm = ref(false);
 
@@ -90,7 +92,17 @@
         showNewLobbyForm.value = false;
     }
 
-    //join in lobby
+    /**
+     * Joins a specified lobby if it is not full and the game has not started.
+     * Alerts the user if the lobby is full or if the game has already started.
+     * On successful join, redirects to the lobby view.
+     * 
+     * @async
+     * @function joinLobby
+     * @param {ILobbyDTD} lobby - The lobby object that the player wants to join.
+     * @throws {Error} Throws an alert if the lobby is full or the game has already started.
+     * @throws {Error} Throws an alert if there is an error joining the lobby.
+     */
     const joinLobby = async (lobby: ILobbyDTD) => {
         
         if(lobby.members.length >= maxPlayerCount){
@@ -115,22 +127,6 @@
             alert("Error join Lobby!");
         }
     }
-
-    const maxPlayerCount = 4;
-    // const lobbies = ref<Lobby[]>([
-    //     {lobbyName: "Lobby 1", playerCount: 1},
-    //     {lobbyName: "Lobby 2", playerCount: 3},
-    //     {lobbyName: "Lobby 3", playerCount: 4},
-    //     {lobbyName: "Lobby x", playerCount: 4},
-    //     {lobbyName: "Lobby x", playerCount: 4},
-    //     {lobbyName: "Lobby x", playerCount: 4},
-    //     {lobbyName: "Lobby x", playerCount: 4},
-    //     {lobbyName: "Lobby x", playerCount: 4},
-    //     {lobbyName: "Lobby x", playerCount: 4},
-    //     {lobbyName: "Lobby x", playerCount: 4},
-    //     {lobbyName: "Lobby x", playerCount: 4},
-    //     {lobbyName: "Lobby x", playerCount: 4}
-    // ]);
 
     onMounted(async () => {
         // const savedPlayer = sessionStorage.getItem("currentPlayer");

@@ -28,8 +28,8 @@ public class PlayerClientController {
     @Autowired
     private LobbyManagerService lobbyManagerService;
 
-    @Autowired
-    private SimpMessagingTemplate messagingTemplate;
+    // @Autowired
+    // private SimpMessagingTemplate messagingTemplate;
     
     private final Logger logger = LoggerFactory.getLogger(PlayerClientController.class);
 
@@ -52,14 +52,4 @@ public class PlayerClientController {
         return ResponseEntity.ok(newPlayerClient);
     }
 
-    /**
-     * Find Client by Player UUID
-     * @param playerId player client UUID
-     * @return {@link PlayerClient} object
-     */
-    @GetMapping("/player/{playerId}")
-    public ResponseEntity<PlayerClient> findClientById(@PathVariable("playerId") String playerId){
-        PlayerClient playerClient = lobbyManagerService.findClientByUUID(playerId);
-        return ResponseEntity.ok(playerClient);
-    }      
 }

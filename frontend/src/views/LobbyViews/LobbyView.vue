@@ -103,6 +103,7 @@
 
             lobby.value = updatedLobby;
 
+            // If Game is started, Lobby-View of all Player change to Game-View
             if (updatedLobby.gameStarted){
                 console.log('Game has started! Redirecting to GameView...');
                 router.push({ name: 'GameView' });
@@ -110,6 +111,14 @@
         });
     })
 
+    /**
+     * Leaves the current lobby. If the player is the admin, it will remove other members from the lobby first.
+     * After leaving the lobby, the user is redirected to the Lobby List View.
+     * 
+     * @async
+     * @function leaveLobby
+     * @throws {Error} If the player or lobby is not found.
+     */
     const leaveLobby = async () => {
         const playerId = lobbiesStore.lobbydata.currentPlayer.playerId;
         if (!playerId || !lobby.value) {
@@ -129,6 +138,14 @@
         router.push({ name: 'LobbyListView' });
     }
 
+    /**
+     * Starts the game if the player is the admin and there are enough members in the lobby.
+     * If the player is not the admin or there are not enough members, an alert will be shown.
+     * 
+     * @async
+     * @function startGame
+     * @throws {Error} If the player or lobby is not found.
+     */
     const startGame = async () => {
         const playerId = lobbiesStore.lobbydata.currentPlayer.playerId;
 
