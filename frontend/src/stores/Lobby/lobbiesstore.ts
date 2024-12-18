@@ -1,13 +1,15 @@
 import { defineStore } from 'pinia';
 import { reactive } from 'vue';
 import { Client } from '@stomp/stompjs';
-import type { IPlayerClientDTD } from './IPlayerClientDTD';
 import type { ILobbyDTD } from './ILobbyDTD';
+import type { IPlayerClientDTD } from './IPlayerClientDTD';
 
 const wsurl = `ws://${window.location.host}/stompbroker`
-const DEST = 'topic/lobbies'
+const DEST = '/topic/lobbies'
 
-export const useLobbiesStore = defineStore("lobbiesstore", () =>{
+export const useLobbiesStore = defineStore('lobbiesstore', () =>{
+    let stompclient: Client
+
     const lobbydata = reactive({
         lobbies: [] as Array<ILobbyDTD>,
         currentPlayer: {
@@ -17,10 +19,12 @@ export const useLobbiesStore = defineStore("lobbiesstore", () =>{
         } as IPlayerClientDTD //PlayerClient for each window, for check the sync
     })
 
-    let stompclient: Client | null = null
+    // Function to set player
+    function setPlayer(player: IPlayerClientDTD) {
+        lobbydata.currentPlayer = { ...player }; // Cập nhật toàn bộ thông tin của player
+        console.log('Player has been set:', player);
+    }
 
-    // Each Window have only one Admin Client, for create new lobby
-    // then join in another lobby, they become the normal player
     // For Test all Players have the same name 'Player Test'
     /**
      * Creates a new player client.
@@ -46,12 +50,8 @@ export const useLobbiesStore = defineStore("lobbiesstore", () =>{
 
             if(response.ok){
                 const newPlayer = await response.json()
-                // lobbydata.currentPlayer.playerId = newPlayer.playerId
-                // lobbydata.currentPlayer.playerName = newPlayer.playerName
-                // lobbydata.currentPlayer.role = newPlayer.role
                 Object.assign(lobbydata.currentPlayer, newPlayer)
             } else {
-                const errorText = await response.text()
                 console.error(`Failed to create a new player client: ${response.statusText}`)
             }
 
@@ -65,36 +65,16 @@ export const useLobbiesStore = defineStore("lobbiesstore", () =>{
     }
 
     /**
-     * Updates the list of lobbies.
-     * Fetches data from the server and triggers live updates.
-     */
-    // async function updateLobbies(): Promise<void>{
-    //     try{
-    //         const url = `/api/lobbies`
-    //         const response = await fetch(url)
-
-    //         if(!response.ok) throw new Error(response.statusText)
-
-    //         const data = await response.json()
-    //         lobbydata.lobbies = data
-
-    //         //startLobbyLiveUpdate()
-
-    //     } catch (error: any){
-    //         console.error('Error:', error)
-    //     }
-    // }
-    
-    /**
      * Starts the STOMP client for real-time lobby updates.
      */
     async function startLobbyLiveUpdate(){
+
+        stompclient = new Client({ brokerURL: wsurl })
+
         if(stompclient && stompclient.active){
             console.log('STOMP-Client activated.')
             return
         }
-
-        stompclient = new Client({ brokerURL: wsurl })
 
         stompclient.onConnect = (frame) => {
             console.log('STOMP connected:', frame)
@@ -102,25 +82,25 @@ export const useLobbiesStore = defineStore("lobbiesstore", () =>{
             if (stompclient) {
                 stompclient.subscribe(DEST, async (message) => {
                     console.log('STOMP Client subscribe')
-                    try {
-                        const updatedLobbies = JSON.parse(message.body);
-                        lobbydata.lobbies = [...updatedLobbies];
-                        console.log('Received lobby update:', updatedLobbies);
-                    } catch (error) {
-                        console.error('Error parsing message:', error);
-                    }
-                });
+                    const updatedLobbies = JSON.parse(message.body)
+                    lobbydata.lobbies = [...updatedLobbies]
+                    console.log('Received lobby update:', updatedLobbies)
+                })
             } else {
-                console.error('STOMP client is not initialized.');
+                console.error('STOMP client is not initialized.')
             }
         }
 
         stompclient.onWebSocketError = (error) => {
-            console.error('WebSocket Error:', error);
+            console.error('WebSocket Error:', error)
         }
 
         stompclient.onStompError = (frame) => {
             console.error('Full STOMP Error Frame: ', frame)
+        }
+
+        stompclient.onDisconnect = () => {
+            console.log('Stompclient disconnected.')
         }
 
         stompclient.activate()
@@ -137,7 +117,7 @@ export const useLobbiesStore = defineStore("lobbiesstore", () =>{
             uuid: '',
             name: lobbyName,
             adminClient: adminClient,
-            isGameStarted: false, 
+            gameStarted: false, 
             members: [adminClient]
         }
 
@@ -214,7 +194,7 @@ export const useLobbiesStore = defineStore("lobbiesstore", () =>{
      * @param lobbyId The ID of the lobby.
      * @param playerId The ID of the player leaving the lobby.
      */
-    async function leaveLobby(lobbyId: String, playerId: string): Promise<void> {
+    async function leaveLobby(lobbyId: string, playerId: string): Promise<void> {
         try{
             const url = `/api/lobbies/${lobbyId}/leave?playerId=${playerId}`
             const response = await fetch(url, {
@@ -234,11 +214,36 @@ export const useLobbiesStore = defineStore("lobbiesstore", () =>{
     }
 
     /**
+     * Starts the game in the specified lobby.
+     * @param lobbyId The ID of the lobby where the game is to be started.
+     */
+    async function startGame(lobbyId: string): Promise<void> {
+        try {
+            const url = `/api/lobbies/${lobbyId}/start`;
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            if (!response.ok) {
+                throw new Error(`Failed to start game: ${response.statusText}`);
+            }
+
+            console.log(`Game started successfully in lobby: ${lobbyId}`);
+        } catch (error: any) {
+            console.error(`Error starting game in lobby ${lobbyId}:`, error);
+            throw new Error('Could not start the game. Please try again.');
+        }
+    }
+
+    /**
      * Fetches a specific lobby by its ID.
      * @param lobbyId The ID of the lobby to fetch.
      * @returns The lobby object or null if not found.
      */
-    async function fetchLobbyById(lobbyId: String): Promise<ILobbyDTD | null> {
+    async function fetchLobbyById(lobbyId: string): Promise<ILobbyDTD | null> {
         try{
             const url = `/api/lobbies/lobby/${lobbyId}`
             const response = await fetch(url, {
@@ -261,42 +266,15 @@ export const useLobbiesStore = defineStore("lobbiesstore", () =>{
         } 
     }
 
-    /**
-     * Fetches a specific player by their ID.
-     * @param playerId The ID of the player to fetch.
-     * @returns The player object or null if not found.
-     */
-    async function fetchClientById(playerId: String): Promise<IPlayerClientDTD | null> {
-        try{
-            const url = `/api/playerclients/player/${playerId}`
-            const response = await fetch(url, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-            })
-
-            if(!response.ok){
-                throw new Error(`HTTP error! status: ${response.status}`)
-            }
-
-            const client: IPlayerClientDTD = await response.json()
-            console.log('Fetched Lobby: ', client)
-            return client
-        } catch (error: any){
-            console.error('Error:', error)
-            return null
-        } 
-    }
-
     return{
         lobbydata,
+        setPlayer,
         createPlayer,
         startLobbyLiveUpdate,
         createLobby,
         joinLobby,
         leaveLobby,
+        startGame,
         fetchLobbyById,
-        fetchClientById,
     }
 })

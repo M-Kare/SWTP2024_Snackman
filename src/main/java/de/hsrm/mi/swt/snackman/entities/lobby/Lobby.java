@@ -47,6 +47,8 @@ public class Lobby {
             this.isGameStarted = isGameStarted;
       }
 
-      
+      public PlayerClient getAdminClient(){
+            return adminClient;
+      }
 
 }

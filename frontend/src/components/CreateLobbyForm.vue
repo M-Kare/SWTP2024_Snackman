@@ -28,8 +28,8 @@
     import SmallNavButton from '@/components/SmallNavButton.vue';
     import { useRouter } from 'vue-router';
     import { computed, onMounted, ref } from 'vue';
-    import { useLobbiesStore } from '@/stores/lobbiesstore';
-    import type { IPlayerClientDTD } from '@/stores/IPlayerClientDTD';
+    import { useLobbiesStore } from '@/stores/Lobby/lobbiesstore';
+    import type { IPlayerClientDTD } from '@/stores/Lobby/IPlayerClientDTD';
 
     const router = useRouter();
     const lobbiesStore = useLobbiesStore();
@@ -41,17 +41,32 @@
         (event: 'cancelLobbyCreation', value: boolean): void;
         (event: 'createLobby', value: string): void;
     }>()
-
+    
+    /**
+     * Emits an event to cancel the lobby creation process.
+     * 
+     * @function cancelLobbyCreation
+     * @returns {void}
+     */
     const cancelLobbyCreation = () => {
         emit('cancelLobbyCreation', false);
     }
 
+    /**
+     * Creates a new lobby with the specified name and admin client.
+     * Validates the admin client and lobby name before attempting to create the lobby.
+     * Alerts the user if there are any validation errors or if the lobby creation fails.
+     * On success, redirects to the newly created lobby view.
+     * 
+     * @async
+     * @function createLobby
+     * @throws {Error} Throws an alert if the admin client is invalid or the lobby name is empty or already taken.
+     * @throws {Error} Throws an alert if there is an error creating the lobby.
+     * @returns {void}
+     */
     const createLobby = async () => {
         const adminClient = currentPlayer;
-        adminClient.playerId = currentPlayer.playerId;
-        adminClient.playerName = currentPlayer.playerName;
-        adminClient.role = currentPlayer.role;
-
+    
         if (!adminClient || adminClient.playerId === '' || adminClient.playerName === '') {
             alert("Admin client is not valid!");
             return;
@@ -76,7 +91,7 @@
             if (newLobby && newLobby.uuid) {
                 alert("Lobby created successfully!");
                 cancelLobbyCreation();
-                router.push({ name: "Lobby", params: { lobbyId: newLobby.uuid } });
+                router.push({ name: "LobbyView", params: { lobbyId: newLobby.uuid } });
             } else {
                 throw new Error("Lobby creation returned invalid response.");
             }

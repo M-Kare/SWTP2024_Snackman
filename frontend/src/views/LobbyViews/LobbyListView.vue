@@ -61,19 +61,22 @@
 
     import { useRouter } from 'vue-router';
     import { computed, onMounted, ref, watch } from 'vue';
-    import { useLobbiesStore } from '@/stores/lobbiesstore';
-    import type { ILobbyDTD } from '@/stores/ILobbyDTD';
-    import type { IPlayerClientDTD } from '@/stores/IPlayerClientDTD';
+    import { useLobbiesStore } from '@/stores/Lobby/lobbiesstore';
+    import type { ILobbyDTD } from '@/stores/Lobby/ILobbyDTD';
+    import type { IPlayerClientDTD } from '@/stores/Lobby/IPlayerClientDTD';
 
     const router = useRouter();
     const lobbiesStore = useLobbiesStore();
 
     const lobbies = computed(() => lobbiesStore.lobbydata.lobbies);
     const currentPlayer = lobbiesStore.lobbydata.currentPlayer as IPlayerClientDTD;
+    
+    const maxPlayerCount = 4;
 
-    watch(lobbies, (newVal) => {
-        console.log("Updated lobbies:", newVal);
-    });
+    // lobby value tracking
+    // watch(lobbies, (newVal) => {
+    //     console.log("Updated lobbies:", newVal);
+    // });
 
     const showNewLobbyForm = ref(false);
 
@@ -89,11 +92,26 @@
         showNewLobbyForm.value = false;
     }
 
-    //join in lobby
+    /**
+     * Joins a specified lobby if it is not full and the game has not started.
+     * Alerts the user if the lobby is full or if the game has already started.
+     * On successful join, redirects to the lobby view.
+     * 
+     * @async
+     * @function joinLobby
+     * @param {ILobbyDTD} lobby - The lobby object that the player wants to join.
+     * @throws {Error} Throws an alert if the lobby is full or the game has already started.
+     * @throws {Error} Throws an alert if there is an error joining the lobby.
+     */
     const joinLobby = async (lobby: ILobbyDTD) => {
         
         if(lobby.members.length >= maxPlayerCount){
             alert(`Lobby "${lobby.name}" is full! Please select another one.`);
+            return;
+        }
+
+        if(lobby.gameStarted){
+            alert(`Lobby "${lobby.name}" started game! Please select another one.`);
             return;
         }
 
@@ -102,8 +120,7 @@
 
             if(joinedLobby) {
                 console.log('Successfully joined lobby', joinedLobby.name);
-                router.push({ name: "Lobby", params: { lobbyId: lobby.uuid } });
-                lobbiesStore.startLobbyLiveUpdate();
+                router.push({ name: "LobbyView", params: { lobbyId: lobby.uuid } });
             }
         } catch (error: any){
             console.error('Error:', error);
@@ -111,23 +128,25 @@
         }
     }
 
-    const maxPlayerCount = 4;
-    // const lobbies = ref<Lobby[]>([
-    //     {lobbyName: "Lobby 1", playerCount: 1},
-    //     {lobbyName: "Lobby 2", playerCount: 3},
-    //     {lobbyName: "Lobby 3", playerCount: 4},
-    //     {lobbyName: "Lobby x", playerCount: 4},
-    //     {lobbyName: "Lobby x", playerCount: 4},
-    //     {lobbyName: "Lobby x", playerCount: 4},
-    //     {lobbyName: "Lobby x", playerCount: 4},
-    //     {lobbyName: "Lobby x", playerCount: 4},
-    //     {lobbyName: "Lobby x", playerCount: 4},
-    //     {lobbyName: "Lobby x", playerCount: 4},
-    //     {lobbyName: "Lobby x", playerCount: 4},
-    //     {lobbyName: "Lobby x", playerCount: 4}
-    // ]);
-
     onMounted(async () => {
+        // const savedPlayer = sessionStorage.getItem("currentPlayer");
+        // const savedLobbies = sessionStorage.getItem('currentLobby');
+
+        // if (savedPlayer) {
+        //     lobbiesStore.lobbydata.currentPlayer = JSON.parse(savedPlayer);
+        //     console.log("Restored player data:", savedLobbies);
+        // } else {
+        //     console.log("No player data found in sessionStorage.");
+        // }
+
+        // if (savedLobbies) {
+        //     lobbiesStore.lobbydata.lobbies = JSON.parse(savedLobbies);
+        //     console.log("Restored lobby data:", savedLobbies);
+        // } else {
+        //      lobbiesStore.startLobbyLiveUpdate();
+        //     console.log("No lobby data found in sessionStorage.");
+        // }
+
         if (!lobbiesStore.lobbydata.currentPlayer || lobbiesStore.lobbydata.currentPlayer.playerId === '' || lobbiesStore.lobbydata.currentPlayer.playerName === '') {
             lobbiesStore.createPlayer('Player Test');
         }

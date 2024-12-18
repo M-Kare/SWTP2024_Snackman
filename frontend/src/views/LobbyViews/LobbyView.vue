@@ -25,11 +25,15 @@
         <div class="inner-box">
             <ul>
                 <li
-                    v-for="member in members"
+                    v-for="member in members" :key="member.playerId"
                     class="player-list-items">
 
                     <div class="player-name">
                         {{ member.playerName }}
+                    </div>
+
+                    <div class="player-name">
+                        {{ member.playerId }}
                     </div>
 
                     <div class="player-character">
@@ -50,9 +54,9 @@
 
     import { useRoute, useRouter } from 'vue-router';
     import { computed, onMounted, ref } from 'vue';
-    import type { ILobbyDTD } from '@/stores/ILobbyDTD';
-    import { useLobbiesStore } from '@/stores/lobbiesstore';
-    import type { IPlayerClientDTD } from '@/stores/IPlayerClientDTD';
+    import type { ILobbyDTD } from '@/stores/Lobby/ILobbyDTD';
+    import { useLobbiesStore } from '@/stores/Lobby/lobbiesstore';
+    import type { IPlayerClientDTD } from '@/stores/Lobby/IPlayerClientDTD';
 
     const router = useRouter();
     const route = useRoute();
@@ -70,16 +74,51 @@
             return;
         }
 
+        // const savedLobby = sessionStorage.getItem(`lobby_${lobbyId}`);
+        // if (savedLobby) {
+        //     lobby.value = JSON.parse(savedLobby);
+        // } else {
+        //     lobby.value = await lobbiesStore.fetchLobbyById(lobbyId);
+        //     sessionStorage.setItem(`lobby_${lobbyId}`, JSON.stringify(lobby.value));
+        // }
+
         lobby.value = await lobbiesStore.fetchLobbyById(lobbyId);
 
         if(!lobby.value){
             alert('Lobby not found or failed to load.');
-            router.push({name: "LobbyList"});
+            router.push({name: 'LobbyListView'});
         }
 
         lobbiesStore.startLobbyLiveUpdate();
+
+        // Update lobby data reactively if STOMP updates arrive
+        lobbiesStore.$subscribe((mutation, state) => {
+            const updatedLobby = state.lobbydata.lobbies.find(l => l.uuid === lobbyId);
+        
+            // If Lobby doesn't exit, come back to LobbyListView-Seite
+            if (!updatedLobby) {
+                router.push({ name: 'LobbyListView' });
+                return;
+            }
+
+            lobby.value = updatedLobby;
+
+            // If Game is started, Lobby-View of all Player change to Game-View
+            if (updatedLobby.gameStarted){
+                console.log('Game has started! Redirecting to GameView...');
+                router.push({ name: 'GameView' });
+            }
+        });
     })
 
+    /**
+     * Leaves the current lobby. If the player is the admin, it will remove other members from the lobby first.
+     * After leaving the lobby, the user is redirected to the Lobby List View.
+     * 
+     * @async
+     * @function leaveLobby
+     * @throws {Error} If the player or lobby is not found.
+     */
     const leaveLobby = async () => {
         const playerId = lobbiesStore.lobbydata.currentPlayer.playerId;
         if (!playerId || !lobby.value) {
@@ -87,12 +126,43 @@
             return;
         }
 
+        if(playerId === lobby.value.adminClient.playerId){
+            for (const member of lobby.value.members) {
+                if (member.playerId !== playerId) {
+                    await lobbiesStore.leaveLobby(lobby.value.uuid, member.playerId);
+                }
+            }
+        } 
+
         await lobbiesStore.leaveLobby(lobby.value.uuid, playerId);
-        router.push({ name: 'LobbyList' });
+        router.push({ name: 'LobbyListView' });
     }
 
-    const startGame = () => {
-        router.push({name: "GameStart"});
+    /**
+     * Starts the game if the player is the admin and there are enough members in the lobby.
+     * If the player is not the admin or there are not enough members, an alert will be shown.
+     * 
+     * @async
+     * @function startGame
+     * @throws {Error} If the player or lobby is not found.
+     */
+    const startGame = async () => {
+        const playerId = lobbiesStore.lobbydata.currentPlayer.playerId;
+
+        if (!playerId ||!lobby.value) {
+            console.error('Player or Lobby not found');
+            return;
+        }
+
+        if(lobby.value.members.length < 2){
+            alert('Have not enough members to start game!');
+        }
+
+        if(playerId === lobby.value.adminClient.playerId){
+            await lobbiesStore.startGame(lobby.value.uuid);
+        } else {
+            alert('Just Admin Snackman can start the game!');
+        }
     }
 
 </script>
