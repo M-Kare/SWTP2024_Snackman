@@ -39,6 +39,7 @@ stompclient.onConnect = frame => {
     // empfangene Nutzdaten in message.body abrufbar,
     // ggf. mit JSON.parse(message.body) zu JS konvertieren
     const event: IPlayerDTD = JSON.parse(message.body)
+    //To differ the player
     if(event.uuid === lobbydata.currentPlayer.playerId){
       player.setPosition(event.posX, event.posY, event.posZ);
     } else {
@@ -83,7 +84,9 @@ function animate() {
           qY: player.getCamera().quaternion.y,
           qZ: player.getCamera().quaternion.z,
           qW: player.getCamera().quaternion.w
-        }, {delta: delta}, {uuid: lobbydata.currentPlayer.playerId}))
+        }, {delta: delta}, {jump: player.getIsJumping()},
+          {doubleJump: player.getIsDoubleJumping()},
+          {uuid: lobbydata.currentPlayer.playerId}))
       });
     } catch (fehler) {
       console.log(fehler)
@@ -95,7 +98,7 @@ function animate() {
   renderer.render(scene, camera)
 }
 
-onMounted(async () =>{
+onMounted(async () => {
 // for rendering the scene, create gameMap in 3d and change window size
   const {initRenderer, createGameMap, getScene} = GameMapRenderer()
   scene = getScene()
@@ -121,7 +124,7 @@ onMounted(async () =>{
     if(it === lobbydata.currentPlayer.playerId){
       player = new Player(renderer, playerData.posX, playerData.posY, playerData.posZ, playerData.radius, playerData.speed)
     } else {
-      let material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } ) 
+      let material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } )
       material.color = new THREE.Color(Math.random(), Math.random(), Math.random());
       let cube = new THREE.Mesh( new THREE.BoxGeometry( 1, 3, 1 ),  material);
       cube.position.lerp(new THREE.Vector3(playerData.posX, playerData.posY, playerData.posZ), 0.5)
@@ -146,7 +149,7 @@ function resizeCallback() {
   camera.aspect = window.innerWidth / window.innerHeight
   camera.updateProjectionMatrix()
 }
-
+//TODO Remove, just for test purposes
 async function fetchClients(): Promise<ClientsDTD> {
     // rest endpoint from backend
     const response = await fetch('/api/lobbies/clients')

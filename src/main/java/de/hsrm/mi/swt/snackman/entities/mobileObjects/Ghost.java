@@ -27,5 +27,4 @@ public class Ghost extends Mob {
     private void scareSnackMan(){
 
     }
-
 }

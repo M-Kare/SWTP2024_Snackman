@@ -24,6 +24,16 @@ public class PlayerStompController {
       SnackMan snackman = mapService.getSnackMan(player.uuid());
       snackman.setQuaternion(player.qX(), player.qY(), player.qZ(), player.qW());
       snackman.move(player.forward(), player.backward(), player.left(), player.right(), player.delta());
+
+        //JUMPING
+        if (player.jump()) {
+            if (player.doubleJump()) {
+                snackman.doubleJump();
+            } else {
+                snackman.jump();
+            }
+        }
+        snackman.updateJumpPosition(player.delta());
       messagingTemplate.convertAndSend("/topic/player", new PlayerToFrontendDTO(snackman.getPosX(), snackman.getPosY(), snackman.getPosZ(), snackman.getRotationQuaternion().x, snackman.getRotationQuaternion().y, snackman.getRotationQuaternion().z, snackman.getRotationQuaternion().w, snackman.getRadius(), snackman.getSpeed(), player.uuid()));
     }
   }

@@ -24,7 +24,7 @@ public class SnackManTest {
     private ReadMazeService readMazeService;
 
     private SnackMan snackMan;
-    
+
     @BeforeEach
     public void setUp() {
         snackMan = new SnackMan(new MapService(frontendMessageService, readMazeService), GameConfig.SNACKMAN_SPEED, GameConfig.SNACKMAN_RADIUS);
@@ -36,13 +36,13 @@ public class SnackManTest {
         Square secondSquare = new Square(new Snack(SnackType.ORANGE), 0, 1);
 
         snackMan.consumeSnackOnSquare(firstSquare);
-        assertEquals(snackMan.getCurrentCalories(), SnackType.APPLE.getCalories(), "After consuming an Apple the " +
+        assertEquals(snackMan.getKcal(), SnackType.APPLE.getCalories(), "After consuming an Apple the " +
                 "calories of snackman should increase.");
         assertNull(firstSquare.getSnack(), "After consuming an snack on the squarem the square should not have a" +
                 "snack anymore.");
 
         snackMan.consumeSnackOnSquare(secondSquare);
-        assertEquals(snackMan.getCurrentCalories(), SnackType.APPLE.getCalories() + SnackType.ORANGE.getCalories(), "After " +
+        assertEquals(snackMan.getKcal(), SnackType.APPLE.getCalories() + SnackType.ORANGE.getCalories(), "After " +
                 "consuming an Apple and a Orange the calories of Snackman should be the sum of both snacks.");
         assertNull(secondSquare.getSnack(), "After consuming an snack on the squarem the square should not have a" +
                 "snack anymore.");

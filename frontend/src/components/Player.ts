@@ -1,9 +1,9 @@
-import { useGameMapStore } from '@/stores/gameMapStore';
-import { MapObjectType, type IGameMap } from '@/stores/IGameMapDTD';
-import type { ISquare } from '@/stores/Square/ISquareDTD';
-import type { WebGLRenderer } from 'three'
+import {useGameMapStore} from '@/stores/gameMapStore';
+import {MapObjectType, type IGameMap} from '@/stores/IGameMapDTD';
+import type {ISquare} from '@/stores/Square/ISquareDTD';
+import type {WebGLRenderer} from 'three'
 import * as THREE from 'three'
-import { PointerLockControls } from 'three/addons/controls/PointerLockControls.js'
+import {PointerLockControls} from 'three/addons/controls/PointerLockControls.js'
 
 export class Player {
   private prevTime: DOMHighResTimeStamp
@@ -23,6 +23,11 @@ export class Player {
 
   private movementDirection: THREE.Vector3;
 
+  private isJumping: boolean;
+  private lastJumpTime: number;
+  private doubleJump: boolean;
+  private spacePressed: boolean;
+
   //TODO: ersetzten durch das maze im pinia store
   private squareSize: Readonly<number>;
   private gameMap: ISquare[][];
@@ -34,7 +39,7 @@ export class Player {
    * @param posX x-spawn-sosition
    * @param posY y-spawn-position
    * @param posZ z-spawn-position
-   * @param radius size of the player 
+   * @param radius size of the player
    * @param speed speed-modifier of the player
    */
   constructor(renderer: WebGLRenderer, posX: number, posY: number, posZ: number, radius: number, speed: number) {
@@ -46,12 +51,17 @@ export class Player {
     this.canJump = true;
     this.movementDirection = new THREE.Vector3();
 
-    const { mapContent } = useGameMapStore();
+    this.isJumping = false;
+    this.lastJumpTime = 0;
+    this.doubleJump = false;
+    this.spacePressed = false;
+
+    const {mapContent} = useGameMapStore();
     this.squareSize = mapContent.DEFAULT_SQUARE_SIDE_LENGTH;
 
     const mapArray = Array.from(mapContent.gameMap.values())
-    let lastSquare = mapArray[mapArray.length-1]
-    this.gameMap = this.reshapeArray(mapArray, lastSquare?.indexX!+1, lastSquare?.indexZ!+1) // lastSquare is of type ISquare|undefined because promise
+    let lastSquare = mapArray[mapArray.length - 1]
+    this.gameMap = this.reshapeArray(mapArray, lastSquare?.indexX! + 1, lastSquare?.indexZ! + 1) // lastSquare is of type ISquare|undefined because promise
 
     this.currentSquare = this.gameMap[this.calcMapIndexOfCoordinate(posX)][this.calcMapIndexOfCoordinate(posY)];
 
@@ -61,9 +71,15 @@ export class Player {
     this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 60)
     this.camera.position.set(posX, posY, posZ)
     this.controls = new PointerLockControls(this.camera, renderer.domElement)
-    document.addEventListener('keydown', (event) => { this.onKeyDown(event) })
-    document.addEventListener('keyup', (event) => { this.onKeyUp(event) })
-    document.addEventListener('click', () => { this.controls.lock() })
+    document.addEventListener('keydown', (event) => {
+      this.onKeyDown(event)
+    })
+    document.addEventListener('keyup', (event) => {
+      this.onKeyUp(event)
+    })
+    document.addEventListener('click', () => {
+      this.controls.lock()
+    })
   }
 
   private reshapeArray(arr: Array<any>, rows: number, cols: number) {
@@ -118,11 +134,16 @@ export class Player {
       case 'KeyD':
         this.moveRight = false
         break
+
+      case 'Space':
+        this.spacePressed = false;
+        break
     }
   }
+
   /**
    * sets pressed keys
-   * @param event keyboard-events 
+   * @param event keyboard-events
    */
   public onKeyDown(event: any) {
     switch (event.code) {
@@ -145,14 +166,31 @@ export class Player {
       case 'KeyD':
         this.moveRight = true
         break
+
+      case 'Space':
+        if (!this.spacePressed) {
+          this.spacePressed = true;
+          const currentTime = performance.now();
+          if (!this.isJumping) {
+            //Single Jump
+            this.isJumping = true;
+            this.lastJumpTime = currentTime;
+          } else if (!this.doubleJump && (currentTime - this.lastJumpTime <= 600)) {
+            //Double Jump
+            this.doubleJump = true;
+            this.lastJumpTime = currentTime;
+          }
+        }
+        break;
     }
   }
+
   /**
    * get booleans of held inputs
    * @returns Object with inputs-values
    */
   public getInput(): object {
-    return { forward: this.moveForward, backward: this.moveBackward, left: this.moveLeft, right: this.moveRight }
+    return {forward: this.moveForward, backward: this.moveBackward, left: this.moveLeft, right: this.moveRight}
   }
 
   /**
@@ -160,6 +198,11 @@ export class Player {
    */
   public setPosition(x: number, y: number, z: number) {
     this.camera.position.lerp(new THREE.Vector3(x, y, z), 0.5);
+
+    if (y <= 2) {
+      this.isJumping = false
+      this.doubleJump = false
+    }
   }
 
   /**
@@ -174,7 +217,7 @@ export class Player {
 
   /**
    * code inspired by from https://github.com/mrdoob/three.js/blob/master/examples/misc_controls_pointerlock.html
-   * new position is calculated based on which keys are held, rotation and how much time passed since the last update 
+   * new position is calculated based on which keys are held, rotation and how much time passed since the last update
    */
   public updatePlayer() {
     const time = performance.now()
@@ -200,9 +243,9 @@ export class Player {
     move.z = move.z * delta * this.speed
     const xNew = this.camera.position.x + move.x;
     const zNew = this.camera.position.z + move.z;
-    try{
+    try {
       result = this.checkWallCollision(xNew, zNew);
-    } catch(e){
+    } catch (e) {
       console.log(e)
     }
     switch (result) {
@@ -299,13 +342,21 @@ export class Player {
    * calculates whether the player-cirlce intersects with a line
    * @param xNew target x-position
    * @param zNew target z-position
-   * @param origin 
-   * @param direction 
-   * @returns 
+   * @param origin
+   * @param direction
+   * @returns
    */
   public calcIntersectionWithLine(xNew: number, zNew: number, origin: THREE.Vector3, direction: THREE.Vector3): boolean {
     const line = origin.cross(direction);
     const dist = Math.abs(line.x * xNew + line.y * zNew + line.z) / Math.sqrt(line.x * line.x + line.y * line.y);
     return dist <= this.radius;
+  }
+
+  public getIsJumping() {
+    return this.isJumping;
+  }
+
+  public getIsDoubleJumping() {
+    return this.doubleJump;
   }
 }
