@@ -10,6 +10,7 @@ import {Scene} from "three";
 import type {IChicken, IChickenDTD} from "@/stores/Chicken/IChickenDTD";
 import {Direction} from "@/stores/Chicken/IChickenDTD";
 import {GameObjectRenderer} from "@/renderer/GameObjectRenderer";
+import {useLobbiesStore} from "@/stores/Lobby/lobbiesstore";
 
 /**
  * Defines the pinia store used for saving the map from
@@ -34,7 +35,8 @@ export const useGameMapStore = defineStore('gameMap', () => {
   async function initGameMap() {
     try {
 
-      const response: IGameMapDTD = await fetchGameMapDataFromBackend()
+      const lobbyStore = useLobbiesStore()
+      const response: IGameMapDTD = await fetchGameMapDataFromBackend(lobbyStore.lobbydata.currentPlayer.joinedLobbyId!)
       mapData.DEFAULT_SQUARE_SIDE_LENGTH = response.DEFAULT_SQUARE_SIDE_LENGTH
       mapData.DEFAULT_WALL_HEIGHT = response.DEFAULT_WALL_HEIGHT
 

@@ -1,12 +1,11 @@
 package de.hsrm.mi.swt.snackman.controller.GameMap;
 
+import de.hsrm.mi.swt.snackman.services.LobbyManagerService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import de.hsrm.mi.swt.snackman.services.MapService;
 
@@ -20,13 +19,13 @@ import de.hsrm.mi.swt.snackman.services.MapService;
 public class GameMapController {
 
     @Autowired
-    private MapService mapService;
+    private LobbyManagerService lobbyManagerService;
 
     Logger log = LoggerFactory.getLogger(MapService.class);
 
-    @GetMapping("/game-map")
-    public ResponseEntity<GameMapDTO> getGameMap() {
+    @GetMapping("/lobby/{lobbyId}/game-map")
+    public ResponseEntity<GameMapDTO> getGameMap(@PathVariable String lobbyId) {
         log.debug("Get GameMap");
-        return ResponseEntity.ok(GameMapDTO.fromGameMap(mapService.getGameMap()));
+        return ResponseEntity.ok(GameMapDTO.fromGameMap(lobbyManagerService.getGameMapByLobbyId(lobbyId)));
     }
 }
