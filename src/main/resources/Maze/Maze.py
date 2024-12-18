@@ -1,4 +1,5 @@
 import random
+import os
 
 #returns next free(not a Wall) adjacent field
 def search_free_field_adjacent(maze, x, y):
@@ -91,7 +92,11 @@ def generate_labyrinth(width, height):
     return maze
 
 def save_file(maze, filename="Maze.txt"):
-    with open(filename, "w") as file:
+    directory = "extensions/Map"
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+    filepath = os.path.join(directory, filename)
+    with open(filepath, "w") as file:
         for row in maze:
             file.write("".join(row) + "\n")
 
