@@ -96,7 +96,7 @@ function loadPlayerModel(texture: string) {
             // rotation in radians (Bogenmaß), 180° doesnt work as intended
             snackManModel.rotation.y = Math.PI;
             // optional offset for thirdPersonView
-            snackManModel.position.set(0, -1.55, -5);
+            // snackManModel.position.set(0, -1.55, -5);
             player.getCamera().add(snackManModel);
         }
       )
