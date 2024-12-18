@@ -64,6 +64,29 @@ export const useLobbiesStore = defineStore('lobbiesstore', () =>{
         
     }
 
+    async function fetchLobbyList(){
+        try{
+            const url = `/api/lobbies`
+            const response = await fetch(url, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+            })
+
+            if(response.ok){
+                const data = await response.json()
+                lobbydata.lobbies = [...data]
+            } else {
+                console.error(`Failed to create a new player client: ${response.statusText}`)
+            }
+
+        } catch (error: any){
+            console.error('Error: ', error)
+            
+        }
+    }
+
     /**
      * Starts the STOMP client for real-time lobby updates.
      */
@@ -270,6 +293,7 @@ export const useLobbiesStore = defineStore('lobbiesstore', () =>{
         lobbydata,
         setPlayer,
         createPlayer,
+        fetchLobbyList,
         startLobbyLiveUpdate,
         createLobby,
         joinLobby,
