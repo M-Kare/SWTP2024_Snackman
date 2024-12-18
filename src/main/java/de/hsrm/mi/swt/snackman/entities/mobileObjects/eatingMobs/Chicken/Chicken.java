@@ -5,6 +5,8 @@ import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+
+import de.hsrm.mi.swt.snackman.entities.map.GameMap;
 import de.hsrm.mi.swt.snackman.entities.map.Square;
 import de.hsrm.mi.swt.snackman.entities.mapObject.snack.Snack;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.EatingMob;
@@ -40,12 +42,13 @@ public class Chicken extends EatingMob implements Runnable {
         super(null);
     }
 
-    public Chicken(Square initialPosition, MapService mapService) {
-        super(mapService);
+    public Chicken(Square initialPosition, GameMap gameMap) {
+        super(gameMap);
         id = generateId();
         this.chickenPosX = initialPosition.getIndexX();
         this.chickenPosZ = initialPosition.getIndexZ();
         initialPosition.addMob(this);
+        gameMap.addMob(this);
 
         this.isWalking = true;
         this.lookingDirection = Direction.NORTH;
@@ -82,8 +85,9 @@ public class Chicken extends EatingMob implements Runnable {
         log.debug("Walking direction is: {}", walkingDirection);
 
         this.lookingDirection = walkingDirection;
-        Square oldPosition = super.mapService.getSquareAtIndexXZ(this.chickenPosX, this.chickenPosZ);
-        Square newPosition = walkingDirection.getNewPosition(super.mapService, this.chickenPosX, this.chickenPosZ, walkingDirection);
+        Square oldPosition = super.getGameMap().getSquareAtIndexXZ(this.chickenPosX, this.chickenPosZ);
+        Square newPosition = walkingDirection.getNewPosition(super.getGameMap(), this.chickenPosX, this.chickenPosZ,
+                walkingDirection);
         propertyChangeSupport.firePropertyChange("chicken", null, this);
 
         try {
@@ -112,8 +116,8 @@ public class Chicken extends EatingMob implements Runnable {
         initJython();
         while (isWalking) {
             // get 9 squares
-            Square currentPosition = super.mapService.getSquareAtIndexXZ(this.chickenPosX, this.chickenPosZ);
-            List<String> squares = super.mapService.getSquaresVisibleForChicken(currentPosition, lookingDirection);
+            Square currentPosition = super.getGameMap().getSquareAtIndexXZ(this.chickenPosX, this.chickenPosZ);
+            List<String> squares = getSquaresVisibleForChicken(super.getGameMap(), currentPosition, lookingDirection);
             log.debug("Squares chicken is seeing: {}", squares);
 
             log.debug("Current position is x {} z {}", this.chickenPosX, this.chickenPosZ);
@@ -126,7 +130,7 @@ public class Chicken extends EatingMob implements Runnable {
             log.debug("New position is x {} z {}", this.chickenPosX, this.chickenPosZ);
 
             // consume snack if present
-            currentPosition = super.mapService.getSquareAtIndexXZ(this.chickenPosX, this.chickenPosZ);
+            currentPosition = super.getGameMap().getSquareAtIndexXZ(this.chickenPosX, this.chickenPosZ);
             if (currentPosition.getSnack() != null && getKcal() < MAX_KALORIEN) {
                 log.debug("Snack being eaten at x {} z {}", this.chickenPosX, this.chickenPosZ);
                 consumeSnackOnSquare();
@@ -139,7 +143,7 @@ public class Chicken extends EatingMob implements Runnable {
      * If there is one that remove it from the square.
      */
     public void consumeSnackOnSquare() {
-        Square currentSquare = super.mapService.getSquareAtIndexXZ(this.chickenPosX, this.chickenPosZ);
+        Square currentSquare = super.getGameMap().getSquareAtIndexXZ(this.chickenPosX, this.chickenPosZ);
         Snack snackOnSquare = currentSquare.getSnack();
 
         if (snackOnSquare != null) {
@@ -289,5 +293,31 @@ public class Chicken extends EatingMob implements Runnable {
                 ", lookingDirection=" + lookingDirection +
                 ", kcal=" + super.getKcal() +
                 '}';
+    }
+
+
+    /**
+     * @param currentPosition  the square the chicken is standing on top of
+     * @param lookingDirection
+     * @return a list of 8 square which are around the current square + the
+     * direction the chicken is looking in the order:
+     * northwest_square, north_square, northeast_square, east_square,
+     * southeast_square, south_square, southwest_square, west_square,
+     * direction
+     */
+    public synchronized List<String> getSquaresVisibleForChicken(GameMap gameMap, Square currentPosition,
+                                                                 Direction lookingDirection) {
+        List<String> squares = new ArrayList<>();
+        squares.add(Direction.NORTH_WEST.getNorthWestSquare(gameMap, currentPosition).getPrimaryType());
+        squares.add(Direction.NORTH.getNorthSquare(gameMap, currentPosition).getPrimaryType());
+        squares.add(Direction.NORTH_EAST.getNorthEastSquare(gameMap, currentPosition).getPrimaryType());
+        squares.add(Direction.EAST.getEastSquare(gameMap, currentPosition).getPrimaryType());
+        squares.add(Direction.SOUTH_EAST.getSouthEastSquare(gameMap, currentPosition).getPrimaryType());
+        squares.add(Direction.SOUTH.getSouthSquare(gameMap, currentPosition).getPrimaryType());
+        squares.add(Direction.SOUTH_WEST.getSouthWestSquare(gameMap, currentPosition).getPrimaryType());
+        squares.add(Direction.WEST.getWestSquare(gameMap, currentPosition).getPrimaryType());
+        squares.add(lookingDirection.toString());
+
+        return squares;
     }
 }

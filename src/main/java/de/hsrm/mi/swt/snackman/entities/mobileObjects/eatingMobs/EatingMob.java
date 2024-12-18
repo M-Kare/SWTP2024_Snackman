@@ -1,9 +1,9 @@
 package de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs;
 
+import de.hsrm.mi.swt.snackman.entities.map.GameMap;
 import de.hsrm.mi.swt.snackman.entities.map.Square;
 import de.hsrm.mi.swt.snackman.entities.mapObject.snack.Snack;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.Mob;
-import de.hsrm.mi.swt.snackman.services.MapService;
 
 /**
  * A mob which can consume snacks
@@ -11,16 +11,16 @@ import de.hsrm.mi.swt.snackman.services.MapService;
 public abstract class EatingMob extends Mob {
     private int kcal;
 
-    public EatingMob(MapService mapService, int speed, double radius) {
-        super(mapService, speed, radius);
+    public EatingMob(GameMap gameMap, int speed, double radius) {
+        super(gameMap, speed, radius);
     }
 
-    public EatingMob(MapService mapService, int speed, double radius, double posX, double posY, double posZ) {
-        super(mapService, speed, radius, posX, posY, posZ);
+    public EatingMob(GameMap gameMap, int speed, double radius, double posX, double posY, double posZ) {
+        super(gameMap, speed, radius, posX, posY, posZ);
     }
 
-    public EatingMob(MapService mapService) {
-        super(mapService);
+    public EatingMob(GameMap gameMap) {
+        super(gameMap);
     }
 
     protected void setKcal(int value) {

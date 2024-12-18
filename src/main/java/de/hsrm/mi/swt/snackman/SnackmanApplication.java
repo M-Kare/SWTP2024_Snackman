@@ -1,6 +1,6 @@
 package de.hsrm.mi.swt.snackman;
 
-import de.hsrm.mi.swt.snackman.services.MapService;
+import de.hsrm.mi.swt.snackman.services.LobbyManagerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -9,7 +9,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class SnackmanApplication {
 
     @Autowired
-    private MapService mapService;
+    private LobbyManagerService lobbyManagerService;
 
 	public static void main(String[] args) {
 		SpringApplication.run(SnackmanApplication.class, args);

@@ -1,7 +1,7 @@
 package de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken;
 
+import de.hsrm.mi.swt.snackman.entities.map.GameMap;
 import de.hsrm.mi.swt.snackman.entities.map.Square;
-import de.hsrm.mi.swt.snackman.services.MapService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,45 +62,45 @@ public enum Direction {
      * @param direction in which the chicken decided to go
      * @return the square which is laying in the direction of the currentPosition
      */
-    public synchronized Square getNewPosition(MapService mapService, int x, int z, Direction direction) {
-        Square currentChickenPosition = mapService.getSquareAtIndexXZ(x, z);
+    public synchronized Square getNewPosition(GameMap gameMap, int x, int z, Direction direction) {
+        Square currentChickenPosition = gameMap.getSquareAtIndexXZ(x, z);
 
-        return mapService.getSquareAtIndexXZ(
+        return gameMap.getSquareAtIndexXZ(
                 currentChickenPosition.getIndexX() + direction.deltaX,
                 currentChickenPosition.getIndexZ() + direction.deltaZ
         );
     }
 
-    public Square getNorthSquare(MapService mapService, Square currentPosition) {
-        return mapService.getSquareAtIndexXZ(currentPosition.getIndexX() + NORTH.deltaX, currentPosition.getIndexZ() + NORTH.deltaZ);
+    public Square getNorthSquare(GameMap gameMap, Square currentPosition) {
+        return gameMap.getSquareAtIndexXZ(currentPosition.getIndexX() + NORTH.deltaX, currentPosition.getIndexZ() + NORTH.deltaZ);
     }
 
-    public Square getEastSquare(MapService mapService, Square currentPosition) {
-        return mapService.getSquareAtIndexXZ(currentPosition.getIndexX() + EAST.deltaX, currentPosition.getIndexZ() + EAST.deltaZ);
+    public Square getEastSquare(GameMap gameMap, Square currentPosition) {
+        return gameMap.getSquareAtIndexXZ(currentPosition.getIndexX() + EAST.deltaX, currentPosition.getIndexZ() + EAST.deltaZ);
     }
 
-    public Square getSouthSquare(MapService mapService, Square currentPosition) {
-        return mapService.getSquareAtIndexXZ(currentPosition.getIndexX() + SOUTH.deltaX, currentPosition.getIndexZ() + SOUTH.deltaZ);
+    public Square getSouthSquare(GameMap gameMap, Square currentPosition) {
+        return gameMap.getSquareAtIndexXZ(currentPosition.getIndexX() + SOUTH.deltaX, currentPosition.getIndexZ() + SOUTH.deltaZ);
     }
 
-    public Square getWestSquare(MapService mapService, Square currentPosition) {
-        return mapService.getSquareAtIndexXZ(currentPosition.getIndexX() + WEST.deltaX, currentPosition.getIndexZ() + WEST.deltaZ);
+    public Square getWestSquare(GameMap gameMap, Square currentPosition) {
+        return gameMap.getSquareAtIndexXZ(currentPosition.getIndexX() + WEST.deltaX, currentPosition.getIndexZ() + WEST.deltaZ);
     }
 
-    public Square getNorthWestSquare(MapService mapService, Square currentPosition) {
-        return mapService.getSquareAtIndexXZ(currentPosition.getIndexX() + NORTH_WEST.deltaX, currentPosition.getIndexZ() + NORTH_WEST.deltaZ);
+    public Square getNorthWestSquare(GameMap gameMap, Square currentPosition) {
+        return gameMap.getSquareAtIndexXZ(currentPosition.getIndexX() + NORTH_WEST.deltaX, currentPosition.getIndexZ() + NORTH_WEST.deltaZ);
     }
 
-    public Square getNorthEastSquare(MapService mapService, Square currentPosition) {
-        return mapService.getSquareAtIndexXZ(currentPosition.getIndexX() + NORTH_EAST.deltaX, currentPosition.getIndexZ() + NORTH_EAST.deltaZ);
+    public Square getNorthEastSquare(GameMap gameMap, Square currentPosition) {
+        return gameMap.getSquareAtIndexXZ(currentPosition.getIndexX() + NORTH_EAST.deltaX, currentPosition.getIndexZ() + NORTH_EAST.deltaZ);
     }
 
-    public Square getSouthEastSquare(MapService mapService, Square currentPosition) {
-        return mapService.getSquareAtIndexXZ(currentPosition.getIndexX() + SOUTH_EAST.deltaX, currentPosition.getIndexZ() + SOUTH_EAST.deltaZ);
+    public Square getSouthEastSquare(GameMap gameMap, Square currentPosition) {
+        return gameMap.getSquareAtIndexXZ(currentPosition.getIndexX() + SOUTH_EAST.deltaX, currentPosition.getIndexZ() + SOUTH_EAST.deltaZ);
     }
 
-    public Square getSouthWestSquare(MapService mapService, Square currentPosition) {
-        return mapService.getSquareAtIndexXZ(currentPosition.getIndexX() + SOUTH_WEST.deltaX, currentPosition.getIndexZ() + SOUTH_WEST.deltaZ);
+    public Square getSouthWestSquare(GameMap gameMap, Square currentPosition) {
+        return gameMap.getSquareAtIndexXZ(currentPosition.getIndexX() + SOUTH_WEST.deltaX, currentPosition.getIndexZ() + SOUTH_WEST.deltaZ);
     }
 
     @Override
