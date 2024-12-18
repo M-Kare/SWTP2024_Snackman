@@ -135,6 +135,12 @@ public class MapService {
                                 ChangeType.UPDATE, (Chicken) evt.getNewValue());
 
                         frontendMessageService.sendChickenEvent(messageEvent);
+                    } else if (evt.getPropertyName().equals("egg")) {
+                        Snack newSnack = (Snack) evt.getNewValue();
+                        if (newSnack != null && newSnack.getSnackType() == SnackType.EGG) {
+                            FrontendMessageEvent messageEvent = new FrontendMessageEvent(EventType.SNACK, ChangeType.CREATE, (Square) evt.getNewValue());
+                            frontendMessageService.sendEvent(messageEvent);
+                        }
                     }
                 });
                 break;
@@ -188,6 +194,7 @@ public class MapService {
      */
     public void addEggToSquare(Square square, Snack laidEgg) {
         log.info("{} kcal egg add to square {}", laidEgg.getCalories(), square.getId()); // TODO log.debug
+        this.frontendMessageService.sendEvent(new FrontendMessageEvent(EventType.SNACK, ChangeType.CREATE, square));
         square.setSnack(laidEgg);
     }
 

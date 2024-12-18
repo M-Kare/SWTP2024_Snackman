@@ -3,10 +3,14 @@ export interface ISnackDTD {
 }
 
 export interface ISnack {
-  snackType: SnackType,
+  snackType: SnackType
   meshId: number
 }
 
 export enum SnackType {
-  CHERRY = 'CHERRY', STRAWBERRY = 'STRAWBERRY', ORANGE = 'ORANGE', APPLE = 'APPLE', EGG = 'EGG'
+  CHERRY = 'CHERRY',
+  STRAWBERRY = 'STRAWBERRY',
+  ORANGE = 'ORANGE',
+  APPLE = 'APPLE',
+  EGG = 'EGG',
 }

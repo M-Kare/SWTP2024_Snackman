@@ -3,7 +3,7 @@ import {reactive, readonly} from 'vue'
 import type {IGameMap, IGameMapDTD} from './IGameMapDTD'
 import {fetchGameMapDataFromBackend} from '@/services/GameMapDataService'
 import {Client} from '@stomp/stompjs'
-import type {IFrontendChickenMessageEvent, IFrontendMessageEvent,} from '@/services/IFrontendMessageEvent'
+import type {ChangeType, IFrontendChickenMessageEvent, IFrontendMessageEvent,} from '@/services/IFrontendMessageEvent'
 import type {ISquare} from '@/stores/Square/ISquareDTD'
 import * as THREE from 'three'
 import {Scene} from 'three'
@@ -72,12 +72,38 @@ export const useGameMapStore = defineStore('gameMap', () => {
         snackStompclient.subscribe(DEST_SQUARE, async message => {
           const change: IFrontendMessageEvent = JSON.parse(message.body)
 
-          const savedMeshId = mapData.gameMap.get(change.square.id)!.snack
-            .meshId
+          if (change.changeType == 'CREATE') {
+            const square = change.square as ISquare
+            mapData.gameMap.set(square.id, square)
 
-          removeMeshFromScene(scene, savedMeshId)
+            const snack = square.snack
 
-          mapData.gameMap.set(change.square.id, change.square as ISquare)
+            if (snack) {
+              const sideLength = mapData.DEFAULT_SQUARE_SIDE_LENGTH
+              const xPosition = square.indexX * sideLength + sideLength / 2
+              const zPosition = square.indexZ * sideLength + sideLength / 2
+
+              console.log('New snack created: ' + square.id)
+
+              const newSnackMesh = gameObjectRenderer.createSnackOnFloor(
+                xPosition,
+                zPosition,
+                sideLength,
+                snack.snackType,
+              )
+
+              mapData.gameMap.get(square.id)!.snack.meshId = newSnackMesh.id
+
+              scene.add(newSnackMesh)
+            }
+          } else if (change.changeType == 'UPDATE') {
+            const savedMeshId = mapData.gameMap.get(change.square.id)!.snack
+              .meshId
+
+            removeMeshFromScene(scene, savedMeshId)
+
+            mapData.gameMap.set(change.square.id, change.square as ISquare)
+          }
         })
       }
 

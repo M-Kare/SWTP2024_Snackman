@@ -344,7 +344,7 @@ public class Chicken extends EatingMob implements Runnable {
             this.setThickness(Thickness.THIN);
             super.setKcal(0);
             log.info("Chicken {} laid an egg -> thin again and {} kcal", this.id, super.getKcal());
-
+            propertyChangeSupport.firePropertyChange("egg", null, currentSquare);
             startNewTimer();
         } else {
             log.info("Chicken {} has no kcal left to lay an egg", this.id);
