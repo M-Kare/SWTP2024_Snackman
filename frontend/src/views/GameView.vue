@@ -37,7 +37,6 @@ stompclient.onConnect = frame => {
     // empfangene Nutzdaten in message.body abrufbar,
     // ggf. mit JSON.parse(message.body) zu JS konvertieren
     const event: IPlayerDTD = JSON.parse(message.body)
-    //console.log(`Received: (${event.posX}|${event.posZ})`)
     player.setPosition(event.posX, event.posY, event.posZ);
   })
 }
@@ -94,9 +93,10 @@ function loadPlayerModel(texture: string) {
             snackManModel = gltf.scene;
 
             snackManModel.scale.set(1, 1, 1);
-            snackManModel.rotateY(0);
-            snackManModel.position.set(0, -1.57, -5);
-            // add 3D-Object as child of camera
+            // rotation in radians (Bogenmaß)
+            snackManModel.rotation.y = Math.PI;
+            // "thirdPersonView"
+            snackManModel.position.set(0, -1.55, -5);
             player.getCamera().add(snackManModel);
         },
 
