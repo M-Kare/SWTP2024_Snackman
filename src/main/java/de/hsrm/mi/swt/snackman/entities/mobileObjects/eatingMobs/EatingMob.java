@@ -5,14 +5,22 @@ import de.hsrm.mi.swt.snackman.entities.mapObject.snack.Snack;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.Mob;
 import de.hsrm.mi.swt.snackman.services.MapService;
 
-/**
- * A mob which can consume snacks
- */
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
+
 public abstract class EatingMob extends Mob {
     private int kcal;
 
+    private int MAXKCAL = 0;
+
+    private final PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
+
+
     public EatingMob(MapService mapService, int speed, double radius) {
         super(mapService, speed, radius);
+        if ((this) instanceof SnackMan) {
+            MAXKCAL = 3000;
+        }
     }
 
     public EatingMob(MapService mapService, int speed, double radius, double posX, double posY, double posZ) {
@@ -27,11 +35,15 @@ public abstract class EatingMob extends Mob {
         kcal = value;
     }
 
-    protected int getKcal() {
+    public int getKcal() {
         return kcal;
     }
 
-    protected void gainKcal(int addingKcal) throws Exception {
+    public int getMAXKCAL() {
+        return MAXKCAL;
+    }
+
+    public void gainKcal(int addingKcal) throws Exception {
         if ((this.kcal + addingKcal) > 0) {
             this.kcal += addingKcal;
         } else {
@@ -39,7 +51,7 @@ public abstract class EatingMob extends Mob {
         }
     }
 
-    protected void loseKcal() {
+    public void loseKcal() {
         // @todo
     }
 
@@ -53,7 +65,7 @@ public abstract class EatingMob extends Mob {
 
     /**
      * Collects the snack on the square if there is one.
-     * If there is one that remove it from the square.
+     * If there is one than remove it from the square.
      *
      * @param square to eat the snack from
      */
@@ -61,10 +73,33 @@ public abstract class EatingMob extends Mob {
         Snack snackOnSquare = square.getSnack();
 
         if (snackOnSquare != null) {
-            kcal += snackOnSquare.getCalories();
+            int oldCalories = this.kcal;
 
-            //set snack to null after consuming it
+            if ((kcal + snackOnSquare.getCalories()) >= MAXKCAL) {
+                setKcal(MAXKCAL);
+            } else {
+                setKcal( kcal += snackOnSquare.getCalories() );
+            }
+
             square.setSnack(null);
+
+            if ((this) instanceof SnackMan) {
+                System.out.println("Snackman fired calories");
+                propertyChangeSupport.firePropertyChange("currentCalories", oldCalories, kcal);
+                System.out.println("Snackman fired calories");
+            }
         }
+
     }
+
+    // Listener hinzufügen
+    public void addPropertyChangeListener(PropertyChangeListener listener) {
+        propertyChangeSupport.addPropertyChangeListener(listener);
+    }
+
+    // Listener entfernen
+    public void removePropertyChangeListener(PropertyChangeListener listener) {
+        propertyChangeSupport.removePropertyChangeListener(listener);
+    }
+
 }

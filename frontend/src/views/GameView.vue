@@ -1,27 +1,49 @@
 <template>
+  <div class ="Main">
   <canvas ref="canvasRef"></canvas>
+
+    <div class="Calories-Overlay" :style="getBackgroundStyle">
+      <div class="overlayContent">
+        <img src="@/assets/calories.svg" alt="calories" class="calories-icon" />
+        <p v-if="currentCalories<MAXCALORIES">{{ currentCalories }}kcal</p>
+        <p v-else>{{ caloriesMessage }}</p>
+      </div>
+    </div>
+  </div>
+
 </template>
 
 <script setup lang="ts">
-import {onMounted, onUnmounted, ref} from 'vue'
+import {computed, onMounted, onUnmounted, ref} from 'vue'
 import * as THREE from 'three'
-import {Client} from '@stomp/stompjs'
-import {Player} from '@/components/Player';
-import type {IPlayerDTD} from '@/stores/Player/IPlayerDTD';
-import {fetchSnackManFromBackend} from '@/services/SnackManInitService';
-import {GameMapRenderer} from "@/renderer/GameMapRenderer";
-import {useGameMapStore} from '@/stores/gameMapStore'
-import type {IGameMap} from "@/stores/IGameMapDTD";
+import { Client } from '@stomp/stompjs'
+import { Player } from '@/components/Player';
+import type { IPlayerDTD } from '@/stores/Player/IPlayerDTD';
+import { fetchSnackManFromBackend } from '@/services/SnackManInitService';
+import { GameMapRenderer } from '@/renderer/GameMapRenderer';
+import { useGameMapStore } from '@/stores/gameMapStore';
+import type { IGameMap } from '@/stores/IGameMapDTD';
+import type {IFrontendCaloriesMessageEvent} from "@/services/IFrontendMessageEvent";
 import { GLTFLoader } from 'three/examples/jsm/Addons.js';
 
 const WSURL = `ws://${window.location.host}/stompbroker`
 const DEST = '/topic/player'
+const targetHz = 30
+
+const UPDATE = '/topic/calories'
+
+//Reaktive Calories Variable
+const MAXCALORIES = 3000;
+const currentCalories  = ref(0);
+const caloriesMessage = ref('');
+
+
+
+
 
 const SNACKMAN_TEXTURE: string = 'src/assets/kirby.glb';
 let snackManModel: THREE.Group<THREE.Object3DEventMap>;
-const GHOST_TEXTURE: string = '';
 // other textures
-const targetHz = 30
 
 // stomp
 const stompclient = new Client({brokerURL: WSURL})
@@ -39,8 +61,47 @@ stompclient.onConnect = frame => {
     // ggf. mit JSON.parse(message.body) zu JS konvertieren
     const event: IPlayerDTD = JSON.parse(message.body)
     player.setPosition(event.posX, event.posY, event.posZ);
-  })
+
+
+
+  });
+
+  // Calories Verarbeitung
+  stompclient.subscribe(UPDATE, message => {
+    const event: IFrontendCaloriesMessageEvent = JSON.parse(message.body);
+
+
+    // Get Calories
+    if (event.calories !== undefined) {
+      currentCalories.value = event.calories;
+    }
+    if ( event.message) {
+      caloriesMessage.value = event.message;
+    }
+  });
+
 }
+
+
+// Kalorien-Overlay Fill berrechnen
+const getBackgroundStyle = computed(() => {
+  const maxCalories = 3000;
+  //Prozent berechnen
+  const percentage = Math.min(currentCalories.value / maxCalories, 1);
+
+  const color = `linear-gradient(to right, #EEC643 ${percentage * 100}%, #5E4A08 ${percentage * 100}%)`;
+
+  return {
+    background: color
+  };
+});
+
+
+
+
+
+
+
 stompclient.activate()
 
 const canvasRef = ref()
@@ -147,3 +208,33 @@ function resizeCallback() {
   camera.updateProjectionMatrix()
 }
 </script>
+
+
+<style>
+.Calories-Overlay{
+  color: black;
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  padding: 10px;
+  border-radius: 5px;
+  z-index: 10;
+  font-size: 25px;
+  width: 400px;
+  height: 60px;
+  display: flex;
+  justify-content: left;
+}
+
+.overlayContent {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.calories-icon {
+  width: 30px;
+  height: 30px;
+}
+
+</style>
