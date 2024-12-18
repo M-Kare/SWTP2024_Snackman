@@ -41,7 +41,7 @@ public class LobbyManagerService {
     }
 
     /**
-     * Creates a new lobby and adds it to the list.
+     * Creates a new lobby and adds it to the list. Initilizes the GameMap without Mobs.
      *
      * @param name Name of the lobby
      * @return The lobby created
