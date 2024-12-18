@@ -144,7 +144,7 @@ function resizeCallback() {
 // SPRINT-BAR 
 let cooldownAnimationFrame: number | null = null;
 
-// Starts the cooldown animation for the sprint bar, filling it dynamically
+// Starts the cooldown animation for the sprint bar, filling it dynamically (this function is mostly AI generated)
 function startCooldownFill(usedSprintTime: number) {
   if (cooldownAnimationFrame) return; // Prevent starting a new animation if one is already running
 
@@ -177,7 +177,7 @@ function startCooldownFill(usedSprintTime: number) {
   cooldownAnimationFrame = requestAnimationFrame(animateFill);
 }
 
-// Stops the cooldown fill animation and cleans up the animation frame reference.
+// Stops the cooldown fill animation and cleans up the animation frame reference. (this function is mostly AI generated)
 function stopCooldownFill() {
   if (cooldownAnimationFrame) {
     cancelAnimationFrame(cooldownAnimationFrame);

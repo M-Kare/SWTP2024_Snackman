@@ -17,7 +17,7 @@ public class PlayerMovementController {
   @Autowired
   private MapService mapService;
 
-    // Erhalte Messages von /topic/player/update
+  // Erhalte Messages von /topic/player/update
   @MessageMapping("/topic/player/update")
   public void spreadPlayerUpdate(SnackManFrontendDTO player) {
       SnackMan snackman = mapService.getSnackMan();

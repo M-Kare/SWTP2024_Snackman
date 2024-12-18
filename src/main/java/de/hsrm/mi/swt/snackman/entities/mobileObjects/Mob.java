@@ -15,7 +15,7 @@ public abstract class Mob {
     private double radius;
     private Quaterniond quat;
     private Square currentSquare;
-    private int speed;
+    private double speed;
     protected MapService mapService;
     private Vector3d spawn;
 
@@ -26,7 +26,7 @@ public abstract class Mob {
      * @param speed      speed of the mob
      * @param radius     size of the mob
      */
-    public Mob(MapService mapService, int speed, double radius) {
+    public Mob(MapService mapService, double speed, double radius) {
         this.speed = speed;
         this.radius = radius;
         this.mapService = mapService;
@@ -52,7 +52,7 @@ public abstract class Mob {
      * @param posY       y-spawn-positon
      * @param posZ       z-spawn-position
      */
-    public Mob(MapService mapService, int speed, double radius, double posX, double posY, double posZ) {
+    public Mob(MapService mapService, double speed, double radius, double posX, double posY, double posZ) {
         this(mapService, speed, radius);
 
         spawn = new Vector3d(posX, posY, posZ);
@@ -96,11 +96,11 @@ public abstract class Mob {
         return currentSquare;
     }
 
-    public int getSpeed() {
+    public double getSpeed() {
         return speed;
     }
 
-    public void setSpeed(int speed) {
+    public void setSpeed(double speed) {
         this.speed = speed;
     }
 

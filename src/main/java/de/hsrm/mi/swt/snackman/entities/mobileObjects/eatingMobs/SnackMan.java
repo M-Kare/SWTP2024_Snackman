@@ -21,11 +21,11 @@ public class SnackMan extends EatingMob {
         this(mapService, GameConfig.SNACKMAN_SPEED, GameConfig.SNACKMAN_RADIUS);
     }
 
-    public SnackMan(MapService mapService, int speed, double radius) {
+    public SnackMan(MapService mapService, double speed, double radius) {
         super(mapService, speed, radius);
     }
 
-    public SnackMan(MapService mapService, int speed, double radius, double posX, double posY, double posZ) {
+    public SnackMan(MapService mapService, double speed, double radius, double posX, double posY, double posZ) {
         super(mapService, speed, radius, posX, posY, posZ);
     }
 
@@ -93,7 +93,7 @@ public class SnackMan extends EatingMob {
     public void move(boolean forward, boolean backward, boolean left, boolean right, double delta) {
         if (isSprinting) {
             if (sprintHandler.canSprint()) {
-                setSpeed((int) (GameConfig.SNACKMAN_SPEED * GameConfig.SNACKMAN_SPRINT_MULTIPLIER));
+                setSpeed(GameConfig.SNACKMAN_SPEED * GameConfig.SNACKMAN_SPRINT_MULTIPLIER);
             } else {
                 sprintHandler.stopSprint();
                 setSpeed(GameConfig.SNACKMAN_SPEED);

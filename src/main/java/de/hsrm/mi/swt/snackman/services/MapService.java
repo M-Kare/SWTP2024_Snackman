@@ -33,7 +33,7 @@ import de.hsrm.mi.swt.snackman.messaging.*;
 @Service
 public class MapService {
 
-    //Logger log = LoggerFactory.getLogger(MapService.class);
+    Logger log = LoggerFactory.getLogger(MapService.class);
     private FrontendMessageService frontendMessageService;
     private String filePath;
     private GameMap gameMap;
@@ -75,7 +75,7 @@ public class MapService {
 
                     squaresBuildingMap[x][z] = squareToAdd;
                 } catch (IllegalArgumentException e) {
-                    //log.error(e.getMessage());
+                    log.error(e.getMessage());
                 }
             }
         }
@@ -91,7 +91,7 @@ public class MapService {
     public void generateNewMaze() {
         pythonProps.setProperty("python.path", "src/main/java/de/hsrm/mi/swt/snackman");
         PythonInterpreter.initialize(System.getProperties(), pythonProps, new String[0]);
-        //log.debug("Initialised jython for maze generation");
+        log.debug("Initialised jython for maze generation");
         this.pythonInterpreter = new PythonInterpreter();
         pythonInterpreter.exec("from Maze import main");
         PyObject func = pythonInterpreter.get("main");
@@ -129,7 +129,7 @@ public class MapService {
                 break;
             }
             case 'C':
-                //log.debug("Initialising chicken");
+                log.debug("Initialising chicken");
                 square = new Square(MapObjectType.FLOOR, x, z);
                 Chicken newChicken = new Chicken(square, this);
                 Thread chickenThread = new Thread(newChicken);
