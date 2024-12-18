@@ -17,8 +17,10 @@ const ACCELERATION = 300.0
 const WSURL = `ws://${window.location.host}/stompbroker`
 const DEST = '/topic/player'
 
-const SNACKMAN_TEXTURE = 'src/assets/kirby.glb';
-const GHOST_TEXTURE = '';
+const SNACKMAN_TEXTURE: string = 'src/assets/kirby.glb';
+let snackManModel: THREE.Group<THREE.Object3DEventMap>;
+const GHOST_TEXTURE: string = '';
+// other textures
 
 // stomp
 const stompclient = new Client({ brokerURL: WSURL })
@@ -49,8 +51,6 @@ let scene: THREE.Scene
 // camera setup
 let camera: THREE.PerspectiveCamera;
 
-
-
 // used to calculate fps in animate()
 const clock = new THREE.Clock();
 let fps: number;
@@ -59,8 +59,9 @@ let counter = 0;
 // is called every frame, changes camera position and velocity
 // only sends updates to backend at 30hz
 function animate() {
-  fps = 1 / clock.getDelta()
+  fps = 1 / clock.getDelta();
   player.updatePlayer();
+
   if (counter >= fps / 30) {
     try {
       //Sende and /topic/player/update
@@ -75,13 +76,40 @@ function animate() {
         body: JSON.stringify(messageObject)
       });
     } catch (fehler) {
-      console.log(fehler)
+      console.log(fehler);
     }
-    counter = 0
+    counter = 0;
   }
   counter++;
-  renderer.render(scene, camera)
+
+  renderer.render(scene, camera);
 }
+
+// initially loads the playerModel & attaches playerModel to playerCamera
+function loadPlayerModel(texture: string) {
+      const loader = new GLTFLoader();
+      loader.load(
+        texture,
+        (gltf) => {
+            snackManModel = gltf.scene;
+
+            snackManModel.scale.set(1, 1, 1);
+            snackManModel.rotateY(0);
+            snackManModel.position.set(0, -1.57, -5);
+            // add 3D-Object as child of camera
+            player.getCamera().add(snackManModel);
+        },
+
+        // // shows progess of loading the model
+        // xhr => {
+        //   console.log('PlayerModel - ' + ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+        // },
+        // // error while loading model
+        // error => {
+        //   console.log( 'An error happened' );
+        // }
+        )
+    }
 
 onMounted(async () => {
 // for rendering the scene, create maze in 3d and change window size
@@ -89,30 +117,11 @@ onMounted(async () => {
   scene = getScene()
   renderer = initRenderer(canvasRef.value)
 
-  player = new Player(renderer, DECELERATION, ACCELERATION)
+  player = new Player(renderer, DECELERATION, ACCELERATION, true)
   camera = player.getCamera()
   scene.add(player.getControls().object)
 
-  const loader = new GLTFLoader();
-  loader.load(
-    SNACKMAN_TEXTURE,
-    (gltf) => {
-        const playerModel = gltf.scene;
-        playerModel.position.set(10, 0, 10);
-        playerModel.scale.set(10, 10, 10);
-
-        scene.add(playerModel);
-    },
-
-    // shows progess of loading the playerModel
-    xhr => {
-      console.log('PlayerModel - ' + ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
-    },
-    // error while loading playerModel
-    error => {
-      console.log( 'An error happened' );
-    }
-  )
+  loadPlayerModel(SNACKMAN_TEXTURE);
 
   //Add maze
   try {
