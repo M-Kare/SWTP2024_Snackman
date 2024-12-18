@@ -1,5 +1,6 @@
 package de.hsrm.mi.swt.snackman.entities.mobileObjects;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import de.hsrm.mi.swt.snackman.entities.map.GameMap;
 import org.joml.Quaterniond;
 import org.joml.Vector3d;
@@ -17,6 +18,7 @@ public abstract class Mob {
     private Square currentSquare;
     private double speed;
 
+    @JsonIgnore
     private GameMap gameMap;
 
     private Vector3d spawn;

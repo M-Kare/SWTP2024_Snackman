@@ -28,6 +28,6 @@ public class FrontendLobbyMessageService {
         log.info("Send Event: eventType {}, changeTyp {}, chicken {} to lobby {}", ev.eventType(), ev.changeType(),
                 ev.chicken().toString(), ev.lobbyId());
 
-        messagingTemplate.convertAndSend("/topic/lobby/" + ev.lobbyId() + "/chicken/", ev);
+        messagingTemplate.convertAndSend("/topic/lobby/" + ev.lobbyId() + "/chicken", ev);
     }
 }

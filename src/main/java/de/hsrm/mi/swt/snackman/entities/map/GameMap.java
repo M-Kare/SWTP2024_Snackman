@@ -16,7 +16,7 @@ public class GameMap {
     //Like a chessboard for better handling of collision
     private Square[][] gameMapSquares;
 
-    private ArrayList<Mob> mobs;
+    private ArrayList<Mob> mobs = new ArrayList<>();
 
 
     /**

@@ -159,7 +159,7 @@
         }
 
         if(playerId === lobby.value.adminClient.playerId){
-            await lobbiesStore.startGame(lobby.value.uuid);
+            await lobbiesStore.startGame(lobby.value.lobbyId);
         } else {
             alert('Just Admin Snackman can start the game!');
         }

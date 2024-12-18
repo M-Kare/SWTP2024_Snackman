@@ -1,9 +1,9 @@
 package de.hsrm.mi.swt.snackman.messaging;
 
-import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken.Chicken;
+import de.hsrm.mi.swt.snackman.controller.Square.ChickenDTO;
 
 public record FrontendChickenMessageEvent(EventType eventType, ChangeType changeType, String lobbyId,
-                                          Chicken chicken) {
+                                          ChickenDTO chicken) {
 
     @Override
     public EventType eventType() {
@@ -16,7 +16,7 @@ public record FrontendChickenMessageEvent(EventType eventType, ChangeType change
     }
 
     @Override
-    public Chicken chicken() {
+    public ChickenDTO chicken() {
         return chicken;
     }
 

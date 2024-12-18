@@ -2,6 +2,7 @@ package de.hsrm.mi.swt.snackman.services;
 
 import java.beans.PropertyChangeEvent;
 
+import de.hsrm.mi.swt.snackman.controller.Square.ChickenDTO;
 import de.hsrm.mi.swt.snackman.entities.map.Spawnpoint;
 import de.hsrm.mi.swt.snackman.entities.map.SpawnpointMobType;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken.Chicken;
@@ -183,7 +184,8 @@ public class MapService {
                             newChicken.addPropertyChangeListener((PropertyChangeEvent evt) -> {
                                 if (evt.getPropertyName().equals("chicken")) {
                                     FrontendChickenMessageEvent messageEvent = new FrontendChickenMessageEvent(EventType.CHICKEN,
-                                            ChangeType.UPDATE, lobbyId, (Chicken) evt.getNewValue());
+                                            ChangeType.UPDATE, lobbyId,
+                                            ChickenDTO.fromChicken((Chicken) evt.getNewValue()));
 
                                     frontendLobbyMessageService.sendChickenEvent(messageEvent);
                                 }
