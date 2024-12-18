@@ -2,6 +2,7 @@ package de.hsrm.mi.swt.snackman.controller.Lobby;
 
 import java.util.List;
 
+import de.hsrm.mi.swt.snackman.controller.ClientsDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -86,7 +87,7 @@ public class LobbyController {
       /**
        * Find a Lobby with lobby UUID
        * @param lobbyId Lobby UUID
-       * @return {@link lobby} object
+       * @return {@link Lobby} object
        */
       @GetMapping("/lobby/{lobbyId}")
       public ResponseEntity<Lobby> findLobbyById(@PathVariable("lobbyId") String lobbyId){

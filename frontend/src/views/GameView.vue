@@ -12,8 +12,8 @@ import { GameMapRenderer } from '@/renderer/GameMapRenderer';
 import { useGameMapStore } from '@/stores/gameMapStore';
 import type { IGameMap } from '@/stores/IGameMapDTD';
 import type { ClientsDTD } from '@/stores/ClientsDTD';
-import { useLobbiesStore } from '@/stores/lobbiesstore';
-import type { IPlayerDTD } from '@/stores/IPlayerDTD';
+import { useLobbiesStore } from '@/stores/Lobby/lobbiesstore';
+import type { IPlayerDTD } from '@/stores/Player/IPlayerDTD';
 
 const { lobbydata } = useLobbiesStore();
 

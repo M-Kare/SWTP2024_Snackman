@@ -1,5 +1,6 @@
 package de.hsrm.mi.swt.snackman.entities.mobileObjects;
 
+import de.hsrm.mi.swt.snackman.entities.map.GameMap;
 import org.joml.Quaterniond;
 import org.joml.Vector3d;
 import de.hsrm.mi.swt.snackman.configuration.GameConfig;
