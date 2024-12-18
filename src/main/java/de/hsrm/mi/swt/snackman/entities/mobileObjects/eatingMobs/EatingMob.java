@@ -99,9 +99,4 @@ public abstract class EatingMob extends Mob {
         propertyChangeSupport.addPropertyChangeListener(listener);
     }
 
-    // Listener entfernen
-    public void removePropertyChangeListener(PropertyChangeListener listener) {
-        propertyChangeSupport.removePropertyChangeListener(listener);
-    }
-
 }
