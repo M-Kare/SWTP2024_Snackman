@@ -136,9 +136,9 @@ public class MapService {
 
                         frontendMessageService.sendChickenEvent(messageEvent);
                     } else if (evt.getPropertyName().equals("egg")) {
-                        Snack newSnack = (Snack) evt.getNewValue();
-                        if (newSnack != null && newSnack.getSnackType() == SnackType.EGG) {
-                            FrontendMessageEvent messageEvent = new FrontendMessageEvent(EventType.SNACK, ChangeType.CREATE, (Square) evt.getNewValue());
+                        Square squareToAddEgg = (Square) evt.getNewValue();
+                        if (squareToAddEgg != null && squareToAddEgg.getSnack() != null && squareToAddEgg.getSnack().getSnackType() == SnackType.EGG) {
+                            FrontendMessageEvent messageEvent = new FrontendMessageEvent(EventType.SNACK, ChangeType.CREATE, squareToAddEgg);
                             frontendMessageService.sendEvent(messageEvent);
                         }
                     }

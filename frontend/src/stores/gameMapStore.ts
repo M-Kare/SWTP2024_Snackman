@@ -100,9 +100,11 @@ export const useGameMapStore = defineStore('gameMap', () => {
             const savedMeshId = mapData.gameMap.get(change.square.id)!.snack
               .meshId
 
-            removeMeshFromScene(scene, savedMeshId)
+            if (savedMeshId != null) {
+              removeMeshFromScene(scene, savedMeshId)
 
-            mapData.gameMap.set(change.square.id, change.square as ISquare)
+              mapData.gameMap.set(change.square.id, change.square as ISquare)
+            }
           }
         })
       }
