@@ -20,7 +20,7 @@ export class Player {
     private velocity: THREE.Vector3;
     private movementDirection: THREE.Vector3;
 
-    constructor(renderer: WebGLRenderer, deceleration: number, acceleration: number){
+    constructor(renderer: WebGLRenderer, deceleration: number, acceleration: number, playerIsSnackman: boolean){
         this.DECELERATION = deceleration;
         this.ACCELERATION = acceleration;
 
@@ -36,6 +36,7 @@ export class Player {
 
         this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100)
         this.camera.position.set(0, 2, 0)
+
         this.controls = new PointerLockControls(this.camera, renderer.domElement)
         document.addEventListener('keydown', (event)=>{this.onKeyDown(event)})
         document.addEventListener('keyup', (event)=>{this.onKeyUp(event)})
@@ -44,6 +45,10 @@ export class Player {
 
     public getCamera():THREE.PerspectiveCamera{
         return this.camera;
+    }
+
+    public getPosition(): THREE.Vector3  {
+      return this.camera.position;
     }
 
     public getControls():PointerLockControls{
@@ -56,6 +61,30 @@ export class Player {
 
     public getMovementDirection(){
         return this.movementDirection;
+    }
+
+    public onKeyDown(event: any) {
+      switch (event.code) {
+        case 'ArrowUp':
+        case 'KeyW':
+          this.moveForward = true
+          break
+
+        case 'ArrowLeft':
+        case 'KeyA':
+          this.moveLeft = true
+          break
+
+        case 'ArrowDown':
+        case 'KeyS':
+          this.moveBackward = true
+          break
+
+        case 'ArrowRight':
+        case 'KeyD':
+          this.moveRight = true
+          break
+      }
     }
 
     public onKeyUp(event: any) {
@@ -78,30 +107,6 @@ export class Player {
           case 'ArrowRight':
           case 'KeyD':
             this.moveRight = false
-            break
-        }
-      }
-
-    public onKeyDown(event: any) {
-        switch (event.code) {
-          case 'ArrowUp':
-          case 'KeyW':
-            this.moveForward = true
-            break
-
-          case 'ArrowLeft':
-          case 'KeyA':
-            this.moveLeft = true
-            break
-
-          case 'ArrowDown':
-          case 'KeyS':
-            this.moveBackward = true
-            break
-
-          case 'ArrowRight':
-          case 'KeyD':
-            this.moveRight = true
             break
         }
       }
