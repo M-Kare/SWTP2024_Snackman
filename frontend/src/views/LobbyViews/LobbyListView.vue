@@ -129,26 +129,9 @@
     }
 
     onMounted(async () => {
-        // const savedPlayer = sessionStorage.getItem("currentPlayer");
-        // const savedLobbies = sessionStorage.getItem('currentLobby');
-
-        // if (savedPlayer) {
-        //     lobbiesStore.lobbydata.currentPlayer = JSON.parse(savedPlayer);
-        //     console.log("Restored player data:", savedLobbies);
-        // } else {
-        //     console.log("No player data found in sessionStorage.");
-        // }
-
-        // if (savedLobbies) {
-        //     lobbiesStore.lobbydata.lobbies = JSON.parse(savedLobbies);
-        //     console.log("Restored lobby data:", savedLobbies);
-        // } else {
-        //      lobbiesStore.startLobbyLiveUpdate();
-        //     console.log("No lobby data found in sessionStorage.");
-        // }
         lobbiesStore.fetchLobbyList();
         console.log(lobbies)
-        
+
         if (!lobbiesStore.lobbydata.currentPlayer || lobbiesStore.lobbydata.currentPlayer.playerId === '' || lobbiesStore.lobbydata.currentPlayer.playerName === '') {
             lobbiesStore.createPlayer('Player Test');
         }

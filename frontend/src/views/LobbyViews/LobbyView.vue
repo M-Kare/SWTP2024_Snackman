@@ -74,13 +74,6 @@
             return;
         }
 
-        // const savedLobby = sessionStorage.getItem(`lobby_${lobbyId}`);
-        // if (savedLobby) {
-        //     lobby.value = JSON.parse(savedLobby);
-        // } else {
-        //     lobby.value = await lobbiesStore.fetchLobbyById(lobbyId);
-        //     sessionStorage.setItem(`lobby_${lobbyId}`, JSON.stringify(lobby.value));
-        // }
 
         lobby.value = await lobbiesStore.fetchLobbyById(lobbyId);
 

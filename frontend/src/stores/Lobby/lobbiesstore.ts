@@ -19,12 +19,6 @@ export const useLobbiesStore = defineStore('lobbiesstore', () =>{
         } as IPlayerClientDTD //PlayerClient for each window, for check the sync
     })
 
-    // Function to set player
-    function setPlayer(player: IPlayerClientDTD) {
-        lobbydata.currentPlayer = { ...player }; // Cập nhật toàn bộ thông tin của player
-        console.log('Player has been set:', player);
-    }
-
     // For Test all Players have the same name 'Player Test'
     /**
      * Creates a new player client.
@@ -291,7 +285,6 @@ export const useLobbiesStore = defineStore('lobbiesstore', () =>{
 
     return{
         lobbydata,
-        setPlayer,
         createPlayer,
         fetchLobbyList,
         startLobbyLiveUpdate,

@@ -21,7 +21,6 @@ import de.hsrm.mi.swt.snackman.entities.lobby.Lobby;
 import de.hsrm.mi.swt.snackman.services.GameAlreadyStartedException;
 import de.hsrm.mi.swt.snackman.services.LobbyAlreadyExistsException;
 import de.hsrm.mi.swt.snackman.services.LobbyManagerService;
-import jakarta.servlet.http.HttpSession;
 
 /**
  * The LobbyController handles HTTP requests related to managing game lobbies.
@@ -49,20 +48,16 @@ public class LobbyController {
        *         lobby name already exists
        */
       @PostMapping("/create")
-      public ResponseEntity<Lobby> createLobby(@RequestParam("name") String name, @RequestParam("creatorUuid") String creatorUuid,
-                                                HttpSession session) {
+      public ResponseEntity<Lobby> createLobby(@RequestParam("name") String name, @RequestParam("creatorUuid") String creatorUuid) {
             if (name == null || creatorUuid == null) {
                   return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
             }
 
-            
-            //PlayerClient client = lobbyManagerService.getClient(name, creatorUuid);
+      
             PlayerClient client = lobbyManagerService.getClient("Player Test", creatorUuid);
 
             try {
                   Lobby newLobby = lobbyManagerService.createLobby(name, client);
-                  //session.setAttribute("currentLobby", newLobby);
-                  //logger.info("Session: {}", session);
                   messagingTemplate.convertAndSend("/topic/lobbies", lobbyManagerService.getAllLobbies());
                   logger.info("Creating lobby with name: {} and creatorUuid: {}", name, creatorUuid);
                   
@@ -82,7 +77,6 @@ public class LobbyController {
       @ResponseBody
       public List <Lobby> getAllLobbies() {
             List<Lobby> lobbies = lobbyManagerService.getAllLobbies();
-            
             return lobbies;
       }
 
@@ -106,13 +100,9 @@ public class LobbyController {
        *         the lobby has already started
        */
       @PostMapping("/{lobbyId}/join")
-      public ResponseEntity<Lobby> joinLobby(@PathVariable("lobbyId") String lobbyId, @RequestParam("playerId") String playerId,
-                                                HttpSession session) {
+      public ResponseEntity<Lobby> joinLobby(@PathVariable("lobbyId") String lobbyId, @RequestParam("playerId") String playerId) {
             try {
                   Lobby joiningLobby = lobbyManagerService.joinLobby(lobbyId, playerId);
-                  //session.setAttribute("currentLobby", joiningLobby);
-                  //logger.info("Session: {}", session);
-                  //messagingTemplate.convertAndSend("/topic/lobbies/" + lobbyId, joiningLobby);
                   messagingTemplate.convertAndSend("/topic/lobbies", lobbyManagerService.getAllLobbies());
                   logger.info("Updated lobbies sent to /topic/lobbies: {}", lobbyManagerService.getAllLobbies());
 
@@ -131,12 +121,8 @@ public class LobbyController {
        * @return a {@link ResponseEntity} with an HTTP 200 OK status
        */
       @PostMapping("/{lobbyId}/leave")
-      public ResponseEntity<Void> leaveLobby(@PathVariable("lobbyId") String lobbyId, @RequestParam("playerId") String playerId,
-                                                HttpSession session) {
+      public ResponseEntity<Void> leaveLobby(@PathVariable("lobbyId") String lobbyId, @RequestParam("playerId") String playerId) {
             lobbyManagerService.leaveLobby(lobbyId, playerId);
-            //session.removeAttribute("currentLobby");
-            //logger.info("Session: {}", session);
-            //messagingTemplate.convertAndSend("/topic/lobbies/" + lobbyId, lobbyManagerService.findLobbyByUUID(lobbyId));
             messagingTemplate.convertAndSend("/topic/lobbies", lobbyManagerService.getAllLobbies());
             logger.info("Updated lobbies sent to /topic/lobbies: {}", lobbyManagerService.getAllLobbies());
 
@@ -152,7 +138,6 @@ public class LobbyController {
       @PostMapping("/{lobbyId}/start")
       public ResponseEntity<Void> startGame(@PathVariable("lobbyId") String lobbyId) {
             lobbyManagerService.startGame(lobbyId);
-            //messagingTemplate.convertAndSend("/topic/lobbies/" + lobbyId, lobbyManagerService.findLobbyByUUID(lobbyId));
             messagingTemplate.convertAndSend("/topic/lobbies", lobbyManagerService.getAllLobbies());
             return ResponseEntity.ok().build();
       }
