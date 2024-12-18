@@ -113,18 +113,5 @@ public class SnackMan extends EatingMob {
      *
      * @param square to eat the snack from
      */
-    public void consumeSnackOnSquare(Square square) {
-        Snack snackOnSquare = square.getSnack();
 
-        if (snackOnSquare != null) {
-            try {
-                super.gainKcal(snackOnSquare.getCalories());
-            } catch (Exception e) {
-                log.error(e.getMessage());
-            }
-
-            //set snack to null after consuming it
-            square.setSnack(null);
-        }
-    }
 }
