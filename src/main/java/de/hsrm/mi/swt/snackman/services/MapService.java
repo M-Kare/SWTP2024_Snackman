@@ -193,8 +193,7 @@ public class MapService {
      * @param laidEgg The snack representing the egg that has been laid
      */
     public void addEggToSquare(Square square, Snack laidEgg) {
-        log.info("{} kcal egg add to square {}", laidEgg.getCalories(), square.getId()); // TODO log.debug
-        // this.frontendMessageService.sendEvent(new FrontendMessageEvent(EventType.SNACK, ChangeType.CREATE, square));
+        //log.debug("{} kcal egg add to square {}", laidEgg.getCalories(), square.getId());
         square.setSnack(laidEgg);
 
         Square squareCopy = new Square(square.getType(), square.getIndexX(), square.getIndexZ());

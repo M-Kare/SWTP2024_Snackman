@@ -83,7 +83,7 @@ export const useGameMapStore = defineStore('gameMap', () => {
               const xPosition = square.indexX * sideLength + sideLength / 2
               const zPosition = square.indexZ * sideLength + sideLength / 2
 
-              console.log('New snack created: ' + square.id)
+              // console.debug('New egg created: ' + square.id)
 
               const newSnackMesh = gameObjectRenderer.createSnackOnFloor(
                 xPosition,
