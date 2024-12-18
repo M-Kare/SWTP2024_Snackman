@@ -39,6 +39,20 @@ public class DefaultChickenTest {
     }
 
     @Test
+    public void testChickenDoesntSeeSnackMan() {
+        Chicken chicken = new Chicken();
+
+        List<String> visibleEnvironment = List.of("L", "G", "SM", "L", "L", "L", "L", "L", "0");
+
+        List<String> result = chicken.act(visibleEnvironment);
+
+        // The chicken should move to an empty space (' ').
+        int chosenDirectionIndex = Integer.parseInt(result.get(result.size() - 1));
+        assertEquals(" ", result.get(chosenDirectionIndex),
+                "The Chicken should avoid ghosts ('G') and move to a safe square (' ').");
+    }
+
+    @Test
     public void testChickenMovesToSnack() {
         Chicken chicken = new Chicken();
 

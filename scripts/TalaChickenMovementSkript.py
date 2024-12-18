@@ -36,6 +36,8 @@ def choose_next_square(squares_liste):
     solution_liste = eliminate_walls_as_options(solution_liste)
 
     if(one_fiels_has_SnackMan(solution_liste)):
+        if(len(squares_liste) == 81):
+            return choose_next_square_to_get_to_SnackMan()
         liste_without_SM = replace_SM(solution_liste)
         return add_direction(liste_without_SM)
 

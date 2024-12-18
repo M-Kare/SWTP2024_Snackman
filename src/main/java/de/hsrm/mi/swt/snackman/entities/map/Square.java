@@ -4,6 +4,8 @@ import de.hsrm.mi.swt.snackman.entities.mapObject.MapObjectType;
 import de.hsrm.mi.swt.snackman.entities.mapObject.snack.Snack;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.Ghost;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.Mob;
+import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.SnackMan;
+
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
@@ -94,6 +96,7 @@ public class Square {
             return  "W";
         } else if (type == MapObjectType.FLOOR) {
             if(this.mobs.stream().anyMatch(mob -> mob instanceof Ghost)) return "G";
+            else if(this.mobs.stream().anyMatch(mob -> mob instanceof SnackMan)) return "SM";
             //if(this.mobs.stream().anyMatch(mob -> mob instanceof Chicken)) return "C";
             else if(this.snack != null) return "S";
         }

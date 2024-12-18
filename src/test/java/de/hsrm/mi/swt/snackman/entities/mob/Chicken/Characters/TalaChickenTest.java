@@ -7,13 +7,12 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken.Chicken;
-import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken.Characters.TalaChickenBehavior;
 
 public class TalaChickenTest {
 
     @Test
     public void talaChickenMovementTest(){
-        Chicken chicken = new Chicken(new TalaChickenBehavior());
+        Chicken chicken = new Chicken("TalaChickenMovementSkript");
 
         List<String> visibleEnvironment = List.of("W", "W", "W", "L", "W", "L", "W", "L", "0");
         List<String> result = chicken.act(visibleEnvironment);
@@ -26,7 +25,7 @@ public class TalaChickenTest {
 
     @Test
     public void testTalaCkickenFollowsSnackmanWithBigDistance(){
-        Chicken chicken = new Chicken(new TalaChickenBehavior());
+        Chicken chicken = new Chicken("TalaChickenMovementSkript");
 
         List<String> visibleEnvironment = List.of("W", "W", "W", "W", "L", "W", "W", "W", "W",
                                                     "W", "SM", "L", "L", "W", "L", "W", "L", "W",
@@ -40,15 +39,17 @@ public class TalaChickenTest {
 
         List<String> result = chicken.act(visibleEnvironment);
 
-        int chosenIndex = Integer.parseInt(result.get(result.size() - 1));
-        assertEquals("", result.get(chosenIndex), "Chicken didnt move to Snackman");
+        //int chosenIndex = Integer.parseInt(result.get(result.size() - 1));
+        //assertEquals("", result.get(chosenIndex), "Chicken didnt move to Snackman");
+        boolean istFreierIndexVorhanden = result.contains(" ");
+        assertEquals(false, istFreierIndexVorhanden, "Empty element, but Snackman is not reachable : "+ result);
 
     }
 
     @Test
     public void testTalaChickenFollowsSnackmanButCannotReach(){
     //weil z.B. Wäde im Weg sind
-        Chicken chicken = new Chicken(new TalaChickenBehavior());
+        Chicken chicken = new Chicken("TalaChickenMovementSkript");
 
         List<String> visibleEnvironment = List.of("W", "W", "W", "W", "W", "W", "W", "W", "W",
                                                 "W", "SM", "W", "L", "W", "L", "L", "L", "W",

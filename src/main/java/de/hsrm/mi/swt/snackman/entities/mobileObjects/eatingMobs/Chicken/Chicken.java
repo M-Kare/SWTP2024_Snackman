@@ -2,20 +2,19 @@ package de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import de.hsrm.mi.swt.snackman.entities.map.Square;
 import de.hsrm.mi.swt.snackman.entities.mapObject.snack.Snack;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.EatingMob;
-import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken.Characters.Behavior;
-import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken.Characters.DefaultChickenBehavior;
-import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken.Characters.TalaChickenBehavior;
 import de.hsrm.mi.swt.snackman.services.MapService;
+
+import org.python.core.PyList;
+import org.python.core.PyObject;
 import org.python.util.PythonInterpreter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  * Represents a chicken entity in the game, capable of moving around the map,
@@ -37,23 +36,62 @@ public class Chicken extends EatingMob implements Runnable {
     // python
     private PythonInterpreter pythonInterpreter = null;
     private Properties pythonProps = new Properties();
-    @JsonIgnore
-    public Behavior behavior;
+    private String fileName;
+    private String interpreterCommand;
 
     public Chicken() { //Nur zum testen????
         super(null);
-        behavior = new DefaultChickenBehavior();
+        this.fileName = "TalaChickenMovementSkript";
+        initJython();
     }
     
-    public Chicken(Behavior behavior){ //Nur zum testen????
+    public Chicken(String fileName){ //Nur zum testen????
         super(null);
-        this.behavior = behavior;
+        this.fileName = fileName;
+        initJython();
     }
 
     public List<String> act(List<String> squares){
-        log.info("Behavior: {}", behavior);
-        List<String> result = behavior.execute(squares);
+        initJython();
+        List<String> result = executeMovementSkript(squares);
         return result;
+    }
+
+    public List<String> executeMovementSkript(List<String> squares) {
+        try {
+            log.debug("Running python chicken script with: {}", squares.toString());
+            log.info("Chicken Sichtfeld: {}", squares);
+            pythonInterpreter.exec(interpreterCommand);
+            PyObject func = pythonInterpreter.get("choose_next_square");
+            PyObject result = func.__call__(new PyList(squares));
+
+            if (result instanceof PyList) {
+                PyList pyList = (PyList) result;
+                log.debug("Python chicken script return: {}", pyList);
+                return convertPythonList(pyList);
+            }
+
+            throw new Exception("Python chicken script did not load.");
+        } catch (Exception ex) {
+            log.error("Error while executing chicken python script: ", ex);
+            ex.printStackTrace();
+        }
+        return squares;
+    }
+
+    /**
+     * Converts a Python list to a Java list.
+     *
+     * @param pyList the Python list to convert.
+     * @return the corresponding Java list.
+     */
+    private List<String> convertPythonList(PyList pyList) {
+        List<String> javaList = new ArrayList<>();
+        for (Object item : pyList) {
+            javaList.add(item.toString());
+        }
+        log.debug("Python script result is {}", javaList);
+        return javaList;
     }
 
     public Chicken(Square initialPosition, MapService mapService) {
@@ -62,21 +100,24 @@ public class Chicken extends EatingMob implements Runnable {
         this.chickenPosX = initialPosition.getIndexX();
         this.chickenPosZ = initialPosition.getIndexZ();
         initialPosition.addMob(this);
-        behavior = new DefaultChickenBehavior();
+        //behavior = new DefaultChickenBehavior();
+        this.fileName = "ChickenMovementSkript";
         this.isWalking = true;
         this.lookingDirection = Direction.NORTH;
+        initJython();
         initTimer();
     }
 
-    public Chicken(Square initialPosition, MapService mapService, Behavior behavior) {
+    public Chicken(Square initialPosition, MapService mapService, String fileName) {
         super(mapService);
         id = generateId();
         this.chickenPosX = initialPosition.getIndexX();
         this.chickenPosZ = initialPosition.getIndexZ();
         initialPosition.addMob(this);
-        this.behavior = behavior;
+        this.fileName = fileName;
         this.isWalking = true;
         this.lookingDirection = Direction.NORTH;
+        initJython();
         initTimer();
     }
 
@@ -137,7 +178,7 @@ public class Chicken extends EatingMob implements Runnable {
      * updates its position and consumes any snacks found at its current location.
      */
     protected void move() {
-        initJython();
+        //initJython();
         while (isWalking) {
             // get 9 squares
             Square currentPosition = super.mapService.getSquareAtIndexXZ(this.chickenPosX, this.chickenPosZ);
@@ -188,11 +229,13 @@ public class Chicken extends EatingMob implements Runnable {
      * Sets up the required Python environment and interpreter.
      */
     public void initJython() {
-        pythonProps.setProperty("python.path", "src/main/java/de/hsrm/mi/swt/snackman/entities/mobileObjects/eatingMobs/Chicken/Characters/MovementSkripts");
+        pythonProps.setProperty("python.path", "./scripts");
+        // pythonProps.setProperty("python.path", "./Characters/MovementSkripts");
         PythonInterpreter.initialize(System.getProperties(), pythonProps, new String[0]);
         log.debug("Initialised jython for chicken movement");
         this.pythonInterpreter = new PythonInterpreter();
-        pythonInterpreter.exec("from ChickenMovementSkript import choose_next_square");
+        this.interpreterCommand = String.format("from %s import choose_next_square", fileName);
+        pythonInterpreter.exec(interpreterCommand);
     }
 
     /**
