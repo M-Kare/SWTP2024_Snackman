@@ -23,9 +23,22 @@ import org.slf4j.LoggerFactory;
  *         SOUTHWEST           SOUTH           SOUTHEAST        *
  *          (1, -1)            (1, 0)            (1, 1)         *
  *
+ * 
+ * 2N2W | 2NW  |  2N  | 2NO  | 2N2O  |
+ *  N2W |  NW  |   N  |  NO  |  N2O  |
+ *   2W |   W  |      |   O  |   2O  |
+ *  S2W |  SW  |   S  |  SO  |  S2O  |
+ * 2S2W | 2SW  |  2S  | 2SO  | 2S2O  |
+ * --------------------------------------------------------------
  */
 public enum Direction {
-    NORTH_WEST("", -1, -1), NORTH("0", -1, 0), NORTH_EAST("", -1, 1), EAST("1", 0, 1), SOUTH_EAST("", 1, 1), SOUTH("2", 1, 0), SOUTH_WEST("", 1, -1), WEST("3", 0, -1);
+    NORTH_WEST("", -1, -1), NORTH("0", -1, 0), NORTH_EAST("", -1, 1), EAST("1", 0, 1), SOUTH_EAST("", 1, 1), SOUTH("2", 1, 0), SOUTH_WEST("", 1, -1), WEST("3", 0, -1),
+    
+    TWO_NORTH_TWO_WEST("", -2, -2), TWO_NORTH_ONE_WEST("", -2, -1), TWO_NORTH("", -2, 0), TWO_NORTH_ONE_EAST("", -2, 1), TWO_NORTH_TWO_EAST("", -2, 2),
+    ONE_NORTH_TWO_WEST("", -1, -2), ONE_NORTH_ONE_WEST("", -1, -1), ONE_NORTH("", -1, 0), ONE_NORTH_ONE_EAST("", -1, 1), ONE_NORTH_TWO_EAST("", -1, 2),
+    TWO_WEST("", 0, -2), ONE_WEST("", 0, -1), CHICKEN("", 0, 0), ONE_EAST("", 0, 1), TWO_EAST("", 0, 2),
+    ONE_SOUTH_TWO_WEST("", 1, -2), ONE_SOUTH_ONE_WEST("", 1, -1), ONE_SOUTH("", 1, 0), ONE_SOUTH_ONE_EAST("", 1, 1), ONE_SOUTH_TWO_EAST("", 1, 2),
+    TWO_SOUTH_TWO_WEST("", 2, -2), TWO_SOUTH_ONE_WEST("", 2, -1), TWO_SOUTH("", 2, 0), TWO_SOUTH_ONE_EAST("", 2, 1), TWO_SOUTH_TWO_EAST("", 2, 2);
 
     private final String indexOfList;
     private final int deltaX;

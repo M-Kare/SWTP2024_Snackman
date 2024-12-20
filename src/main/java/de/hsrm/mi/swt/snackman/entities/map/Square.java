@@ -96,8 +96,7 @@ public class Square {
             return  "W";
         } else if (type == MapObjectType.FLOOR) {
             if(this.mobs.stream().anyMatch(mob -> mob instanceof Ghost)) return "G";
-            else if(this.mobs.stream().anyMatch(mob -> mob instanceof Mob)) 
-            return "SM";
+            else if(this.mobs.stream().anyMatch(mob -> mob instanceof Mob)) return "SM";
             
             //if(this.mobs.stream().anyMatch(mob -> mob instanceof Chicken)) return "C";
             else if(this.snack != null) return "S";

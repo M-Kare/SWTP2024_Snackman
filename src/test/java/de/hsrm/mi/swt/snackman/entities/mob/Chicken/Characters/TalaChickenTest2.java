@@ -12,7 +12,7 @@ public class TalaChickenTest2 {
 
     @Test
     public void talaChickenMovementTest2(){
-        Chicken chicken = new Chicken("TalaChickenMovementSkriptSmall");
+        Chicken chicken = new Chicken("TalaChickenMovementSkript_new");
 
         List<String> visibleEnvironment = List.of("W", "W", "W", "L", "W",
                                                     "SM", "L", "L", "L", "L",
@@ -28,5 +28,4 @@ public class TalaChickenTest2 {
         assertEquals(" ", result.get(chosenDirectionIndex),
                 "The Chicken should move to the empty space (' ') matching its new direction.");
     }
-
 }
