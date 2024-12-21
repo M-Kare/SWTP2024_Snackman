@@ -1,7 +1,7 @@
 import * as THREE from 'three'
-import { type IGameMap, MapObjectType } from '@/stores/IGameMapDTD'
-import { useGameMapStore } from '@/stores/gameMapStore'
-import { GameObjectRenderer } from '@/renderer/GameObjectRenderer'
+import {type IGameMap, MapObjectType} from '@/stores/IGameMapDTD'
+import {useGameMapStore} from '@/stores/gameMapStore'
+import {GameObjectRenderer} from '@/renderer/GameObjectRenderer'
 
 /**
  * for rendering the game map
@@ -109,6 +109,19 @@ export const GameMapRenderer = () => {
       scene.add(ghostToAdd)
 
       gameMapStore.setGhostMeshId(ghostToAdd.id, currentGhost.id)
+    }
+
+    for (let currentGhost of mapData.scriptGhosts) {
+      console.log("Initialising script ghost with x {} y {}", currentGhost.ghostPosX, currentGhost.ghostPosZ)
+      const scriptGhostToAdd = gameObjectRenderer.createGhostOnFloor(
+        currentGhost.ghostPosX * DEFAULT_SIDE_LENGTH + OFFSET,
+        currentGhost.ghostPosZ * DEFAULT_SIDE_LENGTH + OFFSET,
+        0,
+        DEFAULT_SIDE_LENGTH
+      )
+      scene.add(scriptGhostToAdd)
+
+      gameMapStore.setScriptGhostMeshId(scriptGhostToAdd.id, currentGhost.id)
     }
   }
 
