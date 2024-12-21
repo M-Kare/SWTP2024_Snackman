@@ -6,7 +6,7 @@ import {Client} from "@stomp/stompjs";
 import type {
   IFrontendChickenMessageEvent,
   IFrontendGhostMessageEvent,
-  IFrontendMessageEvent
+  IFrontendMessageEvent, IFrontendScriptGhostMessageEvent
 } from "@/services/IFrontendMessageEvent";
 import type {ISquare} from "@/stores/Square/ISquareDTD";
 import * as THREE from "three";
@@ -15,6 +15,7 @@ import type {IChicken, IChickenDTD} from "@/stores/Chicken/IChickenDTD";
 import {Direction} from "@/stores/Chicken/IChickenDTD";
 import {GameObjectRenderer} from "@/renderer/GameObjectRenderer";
 import type {IGhost, IGhostDTD} from "@/stores/Ghost/IGhostDTD";
+import type {IScriptGhost, IScriptGhostDTD} from "@/stores/Ghost/IScriptGhostDTD";
 
 /**
  * Defines the pinia store used for saving the map from
@@ -26,6 +27,7 @@ export const useGameMapStore = defineStore('gameMap', () => {
   let snackStompclient: Client
   let chickenStompclient: Client
   let ghostStompclient: Client
+  let scriptGhostStompclient: Client
   const scene = new THREE.Scene()
   const gameObjectRenderer = GameObjectRenderer()
   const CHICKEN_MOVEMENT_SPEED = 0.1    // step size of the interpolation: between 0 and 1
@@ -35,7 +37,8 @@ export const useGameMapStore = defineStore('gameMap', () => {
     DEFAULT_WALL_HEIGHT: 0,
     gameMap: new Map<number, ISquare>(),
     chickens: [],
-    ghosts: []
+    ghosts: [],
+    scriptGhosts: []
   } as IGameMap);
 
   async function initGameMap() {
@@ -55,6 +58,10 @@ export const useGameMapStore = defineStore('gameMap', () => {
       for (const ghost of response.ghosts) {
         mapData.ghosts.push(ghost as IGhost)
       }
+
+      for (const ghost of response.scriptGhosts) {
+        mapData.scriptGhosts.push(ghost as IScriptGhost)
+      }
     } catch (reason) {
       throw reason //Throw again to pass to execution function
     }
@@ -66,6 +73,7 @@ export const useGameMapStore = defineStore('gameMap', () => {
     const DEST_SQUARE = '/topic/square'
     const DEST_CHICKEN = '/topic/chicken'
     const DEST_GHOST = '/topic/ghost'
+    const DEST_SCRIPT_GHOST = '/topic/scriptGhost'
 
     if (!snackStompclient) {
       snackStompclient = new Client({brokerURL: wsurl})
@@ -130,9 +138,9 @@ export const useGameMapStore = defineStore('gameMap', () => {
               updateThickness(currentChicken, chickenUpdate)
             }
             if (chickenUpdate.chickenPosX == currentChicken!.chickenPosX && chickenUpdate.chickenPosZ == currentChicken!.chickenPosZ) {
-              updateLookingDirection(currentChicken, chickenUpdate)
+              updateLookingDirectionChicken(currentChicken, chickenUpdate)
             } else {
-              updateWalkingDirection(currentChicken, chickenUpdate, DEFAULT_SIDE_LENGTH, OFFSET)
+              updateWalkingDirectionChicken(currentChicken, chickenUpdate, DEFAULT_SIDE_LENGTH, OFFSET)
             }
           }
         })
@@ -185,6 +193,49 @@ export const useGameMapStore = defineStore('gameMap', () => {
 
       ghostStompclient.activate()
     }
+
+    if (!scriptGhostStompclient) {
+      scriptGhostStompclient = new Client({brokerURL: wsurl})
+
+      scriptGhostStompclient.onWebSocketError = (event) => {
+        throw new Error('Script ghost Websocket with message: ' + event)
+      }
+
+      scriptGhostStompclient.onStompError = (frameElement) => {
+        throw new Error('Script ghost Stompclient with message: ' + frameElement)
+      }
+
+      scriptGhostStompclient.onConnect = () => {
+        console.log('Stompclient for script ghost connected')
+
+        scriptGhostStompclient.subscribe(DEST_SCRIPT_GHOST, async (message) => {
+          const change: IFrontendScriptGhostMessageEvent = JSON.parse(message.body)
+          console.log("Received a script ghost update: {} ghost: {}", change, change.scriptGhost)
+
+          const ghostUpdate: IScriptGhostDTD = change.scriptGhost
+          const OFFSET = mapData.DEFAULT_SQUARE_SIDE_LENGTH / 2
+          const DEFAULT_SIDE_LENGTH = mapData.DEFAULT_SQUARE_SIDE_LENGTH
+          const currentScriptGhost = mapData.scriptGhosts.find(ghost => ghost.id == ghostUpdate.id)
+          console.log("script ghost update {}", ghostUpdate)
+
+          if (currentScriptGhost == undefined) {
+            console.error("A script ghost is undefined in pinia")
+          } else {
+            if (ghostUpdate.ghostPosX == currentScriptGhost!.ghostPosX && ghostUpdate.ghostPosZ == currentScriptGhost!.ghostPosZ) {
+              updateLookingDirectionScriptGhost(currentScriptGhost, ghostUpdate)
+            } else {
+              updateWalkingDirectionScriptGhost(currentScriptGhost, ghostUpdate, DEFAULT_SIDE_LENGTH, OFFSET)
+            }
+          }
+        })
+      }
+
+      scriptGhostStompclient.onDisconnect = () => {
+        console.log('Scriptghost Stompclient disconnected.')
+      }
+
+      scriptGhostStompclient.activate()
+    }
   }
 
   function updateThickness(currentChicken: IChicken, chickenUpdate: IChickenDTD) {
@@ -195,7 +246,7 @@ export const useGameMapStore = defineStore('gameMap', () => {
     // todo update chicken thickness with new geometry
   }
 
-  function updateLookingDirection(currentChicken: IChicken, chickenUpdate: IChickenDTD) {
+  function updateLookingDirectionChicken(currentChicken: IChicken, chickenUpdate: IChickenDTD) {
     console.log("Chicken looking direction updated")
     const chickenMesh = scene.getObjectById(currentChicken.meshId)
 
@@ -210,7 +261,22 @@ export const useGameMapStore = defineStore('gameMap', () => {
     }
   }
 
-  function updateWalkingDirection(currentChicken: IChicken, chickenUpdate: IChickenDTD, DEFAULT_SIDE_LENGTH: number, OFFSET: number) {
+  function updateLookingDirectionScriptGhost(currentScriptGhost: IScriptGhost, scriptGhostUpdate: IScriptGhostDTD) {
+    console.log("ScriptGhost looking direction updated")
+    const scriptGhostMesh = scene.getObjectById(currentScriptGhost.meshId)
+
+    currentScriptGhost.lookingDirection = scriptGhostUpdate.lookingDirection
+    switch (currentScriptGhost.lookingDirection) {
+      case Direction.NORTH || Direction.SOUTH:
+        scriptGhostMesh!.setRotationFromEuler(new THREE.Euler(0))
+        break;
+      case Direction.EAST || Direction.WEST:
+        scriptGhostMesh!.setRotationFromEuler(new THREE.Euler(Math.PI / 2))
+        break;
+    }
+  }
+
+  function updateWalkingDirectionChicken(currentChicken: IChicken, chickenUpdate: IChickenDTD, DEFAULT_SIDE_LENGTH: number, OFFSET: number) {
     const chickenMesh = scene.getObjectById(currentChicken.meshId)
 
     currentChicken.chickenPosX = chickenUpdate.chickenPosX
@@ -218,6 +284,15 @@ export const useGameMapStore = defineStore('gameMap', () => {
 
     //chickenMesh!.position.lerp(new THREE.Vector3(currentChicken.posX * DEFAULT_SIDE_LENGTH + OFFSET, 0, currentChicken.posZ * DEFAULT_SIDE_LENGTH + OFFSET), CHICKEN_MOVEMENT_SPEED)  // interpolates between original point and new point
     chickenMesh!.position.set(currentChicken.chickenPosX * DEFAULT_SIDE_LENGTH + OFFSET, 0, currentChicken.chickenPosZ * DEFAULT_SIDE_LENGTH + OFFSET)
+  }
+
+  function updateWalkingDirectionScriptGhost(currentScriptGhost: IScriptGhost, scriptGhostUpdate: IScriptGhostDTD, DEFAULT_SIDE_LENGTH: number, OFFSET: number) {
+    const scriptGhostMesh = scene.getObjectById(currentScriptGhost.meshId)
+
+    currentScriptGhost.ghostPosX = scriptGhostUpdate.ghostPosX
+    currentScriptGhost.ghostPosZ = scriptGhostUpdate.ghostPosZ
+
+    scriptGhostMesh!.position.set(currentScriptGhost.ghostPosX * DEFAULT_SIDE_LENGTH + OFFSET, 0, currentScriptGhost.ghostPosZ * DEFAULT_SIDE_LENGTH + OFFSET)
   }
 
   function updateGhost(currentGhost: IGhost, ghostUpdate: IGhostDTD, DEFAULT_SIDE_LENGTH: number, OFFSET: number) {
@@ -248,6 +323,12 @@ export const useGameMapStore = defineStore('gameMap', () => {
       ghost.meshId = meshId
   }
 
+  function setScriptGhostMeshId(meshId: number, ghostId: number) {
+    const ghost = mapData.scriptGhosts.find(ghost => ghost.id === ghostId);
+    if (ghost != undefined)
+      ghost.meshId = meshId
+  }
+
   function removeMeshFromScene(scene: Scene, meshId: number) {
     const mesh = scene.getObjectById(meshId)
     if (mesh != undefined) {
@@ -266,6 +347,7 @@ export const useGameMapStore = defineStore('gameMap', () => {
     setSnackMeshId,
     setChickenMeshId,
     setGhostMeshId,
+    setScriptGhostMeshId,
     getScene
   };
 })
