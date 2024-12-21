@@ -34,7 +34,7 @@ public class FrontendMessageService {
     public void sendScriptGhostEvent(FrontendScriptGhostMessageEvent ev) {
         log.info("Send Event: eventType {}, changeTyp {}, scriptGhost {}", ev.eventType(), ev.changeType(), ev.scriptGhost());
 
-        messagingTemplate.convertAndSend("/topic/ghost", ev);
+        messagingTemplate.convertAndSend("/topic/scriptGhost", ev);
     }
 
     public void sendGhostEvent(FrontendGhostMessageEvent ev){
