@@ -37,49 +37,29 @@ CHICKEN = 'C'
 SNACKMAN = 'M'
 INVALID = 'X'
 
-lab = [
-    ["W", "W", "W", "W", "W", "W", "W", "W", "W", "W", "W", "W", "W", "W", "W"],
-    ["W", "M", "L", "L", "W", "L", "L", "L", "L", "L", "L", "L", "L", "L", "W"],
-    ["W", "L", "W", "L", "W", "W", "W", "W", "W", "W", "W", "W", "L", "W", "W"],
-    ["W", "L", "L", "L", "W", "L", "L", "L", "W", "L", "L", "L", "L", "L", "W"],
-    ["W", "L", "W", "L", "W", "W", "W", "W", "W", "L", "W", "W", "W", "W", "W"],
-    ["W", "L", "L", "L", "L", "L", "L", "L", "W", "L", "L", "L", "W", "L", "W"],
-    ["W", "L", "L", "W", "W", "L", "L", "L", "L", "L", "L", "W", "W", "W", "W"],
-    ["W", "L", "L", "L", "L", "L", "G", "L", "W", "L", "L", "L", "W", "L", "W"],
-    ["W", "W", "W", "L", "W", "W", "L", "L", "L", "W", "W", "W", "L", "W", "W"],
-    ["W", "L", "L", "L", "W", "L", "L", "L", "L", "L", "L", "L", "L", "L", "W"],
-    ["W", "W", "W", "L", "W", "L", "W", "W", "W", "W", "W", "W", "L", "W", "W"],
-    ["W", "L", "W", "L", "L", "L", "W", "L", "L", "L", "W", "L", "L", "L", "W"],
-    ["W", "L", "W", "W", "W", "L", "W", "L", "W", "L", "W", "W", "W", "W", "W"],
-    ["W", "L", "L", "L", "W", "L", "L", "L", "W", "L", "L", "L", "L", "L", "W"],
-    ["W", "W", "W", "W", "W", "W", "W", "W", "W", "W", "W", "W", "W", "W", "W"]
-]
-def choose_next_move(labyrinth, direction):
+def choose_next_move(labyrinth):
     """
     Chooses the next move for the ghost.
     :param labyrinth: Which the ghost can see
     :return: the index of the next cardinal point
     """
-    ghostPosition = (1,1)   # (x, z)
-    snackmanPosition = (1,1)    # (x, z)
-    result = choose_next_square_finding_snackman(labyrinth, ghostPosition, snackmanPosition)
-    if result is None:
-        x = ghostPosition[0]
-        z = ghostPosition[1]
-        northwest_square = labyrinth[x - 1][z - 1]
-        north_square = labyrinth[x - 1][z]
-        northeast_square = labyrinth[x - 1][z + 1]
-        east_square = labyrinth[x][z + 1]
-        southeast_square = labyrinth[x + 1][z + 1]
-        south_square = labyrinth[x + 1][z]
-        southwest_square = labyrinth[x + 1][z - 1]
-        west_square = labyrinth[x][z - 1]
-        last_direction = direction
+    ghost_position = find_ghost_position(labyrinth)   # (x, z)
+    snackman_position = find_snackman_position(labyrinth)    # (x, z)
+    return choose_next_square_finding_snackman(labyrinth, ghost_position, snackman_position)
 
-        return choose_simple_next_step(list(northwest_square, north_square, northeast_square, east_square, southeast_square, south_square, southwest_square, west_square, last_direction))
+def find_snackman_position(maze):
+    for row_index, row in enumerate(maze):
+        for col_index, cell in enumerate(row):
+            if cell == SNACKMAN:
+                return row_index, col_index
+    return None
 
-def seeing_snackman(lab):
-    return any('M' in row for row in lab)
+def find_ghost_position(maze):
+    for row_index, row in enumerate(maze):
+        for col_index, cell in enumerate(row):
+            if cell == GHOST:
+                return row_index, col_index
+    return None
 
 def choose_next_square_finding_snackman(labyrinth, ghostPosition, snackmanPosition):
     """
