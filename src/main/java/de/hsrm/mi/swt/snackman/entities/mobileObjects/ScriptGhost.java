@@ -40,12 +40,12 @@ public class ScriptGhost extends Mob implements Runnable {
         super(null);
     }
 
-    public ScriptGhost(MapService mapService, Square currentSquare) {
-        super(mapService, 0, 0, currentSquare.getIndexX(), 0, currentSquare.getIndexZ());
+    public ScriptGhost(MapService mapService, Square initialPosition) {
+        super(mapService);
         id = generateId();
-        this.ghostPosX = currentSquare.getIndexX();
-        this.ghostPosZ = currentSquare.getIndexZ();
-        this.mapService.getSquareAtIndexXZ(ghostPosX, ghostPosZ).addMob(this);
+        this.ghostPosX = initialPosition.getIndexX();
+        this.ghostPosZ = initialPosition.getIndexZ();
+        initialPosition.addMob(this);
 
         this.isWalking = true;
         this.lookingDirection = Direction.NORTH;
@@ -184,5 +184,31 @@ public class ScriptGhost extends Mob implements Runnable {
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public int getGhostPosX() {
+        return ghostPosX;
+    }
+
+    public int getGhostPosZ() {
+        return ghostPosZ;
+    }
+
+    public Direction getLookingDirection() {
+        return lookingDirection;
+    }
+
+    @Override
+    public String toString() {
+        return "ScriptGhost{" +
+                "ghostPosZ=" + ghostPosZ +
+                ", ghostPosX=" + ghostPosX +
+                ", id=" + id +
+                ", lookingDirection=" + lookingDirection +
+                '}';
     }
 }

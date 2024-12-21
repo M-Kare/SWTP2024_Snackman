@@ -4,7 +4,6 @@ import java.beans.PropertyChangeEvent;
 
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.ScriptGhost;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.Ghost;
-import de.hsrm.mi.swt.snackman.entities.mobileObjects.Ghost;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken.Chicken;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken.Direction;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.SnackMan;
@@ -44,7 +43,7 @@ public class MapService {
     private PythonInterpreter pythonInterpreter = null;
     private Properties pythonProps = new Properties();
     private SnackMan snackman;
-    private int AMOUNT_PLAYERS_FOR_GAME = 0;
+    private int AMOUNT_PLAYERS_FOR_GAME = 1;
     private int initialisedPlayers = 0;
     private Ghost ghost;
 
@@ -54,13 +53,13 @@ public class MapService {
      */
     @Autowired
     public MapService(FrontendMessageService frontendMessageService, ReadMazeService readMazeService) {
-        this(frontendMessageService, readMazeService, "Maze.txt");
+        this(frontendMessageService, readMazeService, "mini-maze.txt");
     }
 
     public MapService(FrontendMessageService frontendMessageService, ReadMazeService readMazeService,
                       String filePath) {
         this.frontendMessageService = frontendMessageService;
-        generateNewMaze();
+        //generateNewMaze();
         this.filePath = filePath;
         char[][] mazeData = readMazeService.readMazeFromFile(this.filePath);
         gameMap = convertMazeDataGameMap(mazeData);
@@ -155,14 +154,15 @@ public class MapService {
                 if (initialisedPlayers <= AMOUNT_PLAYERS_FOR_GAME) {
                     // init real players here aka Ghost
                     log.debug("Initialising ghost");
-                    square = new Square(MapObjectType.FLOOR,  x, z);
+                    square = new Square(MapObjectType.FLOOR, x, z);
                     //square = new Square(MapObjectType.FLOOR, 0 , 0);
-                    ghost = new Ghost(square, this, GameConfig.GHOST_SPEED , GameConfig.GHOST_RADIUS);
+                    ghost = new Ghost(square, this, GameConfig.GHOST_SPEED, GameConfig.GHOST_RADIUS);
                     // ghost = new Ghost(this.getSquareAtIndexXZ(0,0) , this , GameConfig.GHOST_SPEED, GameConfig.GHOST_RADIUS);
-                    FrontendGhostMessageEvent message = new FrontendGhostMessageEvent( EventType.GHOST , ChangeType.CREATE , ghost);
+                    FrontendGhostMessageEvent message = new FrontendGhostMessageEvent(EventType.GHOST, ChangeType.CREATE, ghost);
 
                     frontendMessageService.sendGhostEvent(message);
                     System.out.println("message: " + message);
+                    initialisedPlayers++;
                 } else {
                     log.debug("Initialising scriptGhost");
                     square = new Square(MapObjectType.FLOOR, x, z);
@@ -271,7 +271,8 @@ public class MapService {
     public SnackMan getSnackMan() {
         return snackman;
     }
-    public Ghost getGhost(){
+
+    public Ghost getGhost() {
         return ghost;
     }
 }
