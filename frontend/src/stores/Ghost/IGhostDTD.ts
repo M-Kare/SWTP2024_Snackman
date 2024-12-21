@@ -7,8 +7,6 @@ export interface IGhostDTD {
   speed: number
 }
 
-
-
 export interface IGhost {
   id: number,
   posX: number,

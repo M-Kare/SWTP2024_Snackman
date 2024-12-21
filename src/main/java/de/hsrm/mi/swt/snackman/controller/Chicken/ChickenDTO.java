@@ -1,4 +1,4 @@
-package de.hsrm.mi.swt.snackman.controller.Square;
+package de.hsrm.mi.swt.snackman.controller.Chicken;
 
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken.Thickness;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken.Chicken;
