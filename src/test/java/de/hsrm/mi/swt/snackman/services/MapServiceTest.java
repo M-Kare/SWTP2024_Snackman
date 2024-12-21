@@ -31,7 +31,7 @@ public class MapServiceTest {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		mapService.generateNewMaze();
+		mapService.createNewGameMap("1");
 
 		try {
 			mazeAfterMapService = Files.readAllLines(Paths.get("./Maze.txt"));

@@ -1,9 +1,6 @@
 package de.hsrm.mi.swt.snackman.entities.map;
 
 import de.hsrm.mi.swt.snackman.configuration.GameConfig;
-import de.hsrm.mi.swt.snackman.entities.mobileObjects.Mob;
-
-import java.util.ArrayList;
 
 /**
  * Represents a game map
@@ -15,9 +12,6 @@ public class GameMap {
 
     //Like a chessboard for better handling of collision
     private Square[][] gameMapSquares;
-
-    private ArrayList<Mob> mobs = new ArrayList<>();
-
 
     /**
      * Constructs a new Map with the given map data
@@ -42,9 +36,5 @@ public class GameMap {
 
     public Square getSquareAtIndexXZ(int x, int z) {
         return gameMapSquares[x][z];
-    }
-
-    public void addMob(Mob mob) {
-        mobs.add(mob);
     }
 }

@@ -24,7 +24,6 @@ public class SnackMan extends EatingMob {
 
     public SnackMan(GameMap gameMap, int speed, double radius) {
         super(gameMap, speed, radius);
-        gameMap.addMob(this);
     }
 
     public SnackMan(GameMap gameMap, int speed, double radius, double posX, double posY, double posZ) {

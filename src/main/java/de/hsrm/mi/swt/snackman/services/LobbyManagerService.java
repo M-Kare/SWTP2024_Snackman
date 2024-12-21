@@ -110,7 +110,7 @@ public class LobbyManagerService {
 
 
         if (lobby.getAdminClientId().equals(playerId) || lobby.getMembers().isEmpty()) {
-            lobbies.remove(lobby);
+            lobbies.remove(lobby.getLobbyId());
         }
     }
 
