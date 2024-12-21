@@ -1,15 +1,15 @@
 package de.hsrm.mi.swt.snackman.controller.PlayerMovement;
 
-import de.hsrm.mi.swt.snackman.entities.lobby.Lobby;
-import de.hsrm.mi.swt.snackman.entities.mobileObjects.Ghost;
-import de.hsrm.mi.swt.snackman.services.LobbyManagerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 
+import de.hsrm.mi.swt.snackman.entities.lobby.Lobby;
+import de.hsrm.mi.swt.snackman.entities.mobileObjects.Ghost;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.SnackMan;
+import de.hsrm.mi.swt.snackman.services.LobbyManagerService;
 
 @Controller
 public class PlayerStompController {
@@ -27,7 +27,7 @@ public class PlayerStompController {
             case SnackMan snackman -> jumpUpdate(player, snackman);
             case Ghost ghost -> ghost;
             default ->
-                    throw new IllegalStateException("Unexpected value: " + currentLobby.getClientMobMap().get(lobbyService.findClientByClientId(player.playerId())));
+                    throw new IllegalStateException("Unexpected value: " + currentLobby.getClientMobMap().get(player.playerId()));
         };
         //SnackMan snackman = mapService.getSnackMan(player.uuid());
         playerMob.setQuaternion(player.qX(), player.qY(), player.qZ(), player.qW());

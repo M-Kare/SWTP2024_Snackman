@@ -1,9 +1,12 @@
 package de.hsrm.mi.swt.snackman.entities.lobby;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.SortedMap;
+import java.util.TreeMap;
+
 import de.hsrm.mi.swt.snackman.entities.map.GameMap;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.Mob;
-
-import java.util.*;
 
 /**
  * Represents a lobby where players can gather to play a game together.
@@ -15,7 +18,7 @@ public class Lobby {
     private boolean isGameStarted;
     private List<PlayerClient> members;
     private GameMap gameMap;
-    private Map<String, Mob> clientMobMap;
+    private SortedMap<String, Mob> clientMobMap;
 
 
     public Lobby(String lobbyId, String name, PlayerClient adminClient, boolean isGameStarted, GameMap gameMap) {
@@ -26,10 +29,10 @@ public class Lobby {
         this.isGameStarted = isGameStarted;
         this.members = new ArrayList<>();
         this.members.add(adminClient);
-        this.clientMobMap = new HashMap<>();
+        this.clientMobMap = new TreeMap<>();
     }
 
-    public Map<String, Mob> getClientMobMap() { return clientMobMap; };
+    public SortedMap<String, Mob> getClientMobMap() { return clientMobMap; };
 
     public String getName() {
         return name;
