@@ -15,4 +15,11 @@ public class GameConfig {
     public static final double JUMP_STRENGTH = 8;
     public static final double DOUBLEJUMP_STRENGTH = JUMP_STRENGTH * 0.1;
     public static final double GRAVITY = -20;
+
+    //GHOST
+    public static final int GHOST_GROUND_LEVEL = 2;
+    public static final double GHOST_RADIUS = 0.3;
+    public static final int GHOST_SPEED = 10;
+    public  static  final int GHOST_DAMAGE = 300;
+    public static final int GHOST_HIGHT = 3;
 }

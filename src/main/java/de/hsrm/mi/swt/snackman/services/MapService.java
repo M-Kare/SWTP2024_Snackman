@@ -3,6 +3,8 @@ package de.hsrm.mi.swt.snackman.services;
 import java.beans.PropertyChangeEvent;
 
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.ScriptGhost;
+import de.hsrm.mi.swt.snackman.entities.mobileObjects.Ghost;
+import de.hsrm.mi.swt.snackman.entities.mobileObjects.Ghost;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken.Chicken;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken.Direction;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.SnackMan;
@@ -21,11 +23,9 @@ import de.hsrm.mi.swt.snackman.messaging.ChangeType;
 import de.hsrm.mi.swt.snackman.messaging.EventType;
 import de.hsrm.mi.swt.snackman.messaging.FrontendMessageEvent;
 import de.hsrm.mi.swt.snackman.messaging.FrontendMessageService;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
-
 import org.python.core.PyObject;
 import de.hsrm.mi.swt.snackman.messaging.*;
 
@@ -46,6 +46,7 @@ public class MapService {
     private SnackMan snackman;
     private int AMOUNT_PLAYERS_FOR_GAME = 0;
     private int initialisedPlayers = 0;
+    private Ghost ghost;
 
     /**
      * Constructs a new MapService
@@ -135,14 +136,14 @@ public class MapService {
                 break;
             }
             case 'C':
-                log.debug("Initialising scriptGhost");
+                log.debug("Initialising chicken");
                 square = new Square(MapObjectType.FLOOR, x, z);
                 Chicken newChicken = new Chicken(square, this);
                 Thread chickenThread = new Thread(newChicken);
                 chickenThread.start();
 
                 newChicken.addPropertyChangeListener((PropertyChangeEvent evt) -> {
-                    if (evt.getPropertyName().equals("scriptGhost")) {
+                    if (evt.getPropertyName().equals("chicken")) {
                         FrontendChickenMessageEvent messageEvent = new FrontendChickenMessageEvent(EventType.CHICKEN,
                                 ChangeType.UPDATE, (Chicken) evt.getNewValue());
 
@@ -153,6 +154,15 @@ public class MapService {
             case 'G':
                 if (initialisedPlayers <= AMOUNT_PLAYERS_FOR_GAME) {
                     // init real players here aka Ghost
+                    log.debug("Initialising ghost");
+                    square = new Square(MapObjectType.FLOOR,  x, z);
+                    //square = new Square(MapObjectType.FLOOR, 0 , 0);
+                    ghost = new Ghost(square, this, GameConfig.GHOST_SPEED , GameConfig.GHOST_RADIUS);
+                    // ghost = new Ghost(this.getSquareAtIndexXZ(0,0) , this , GameConfig.GHOST_SPEED, GameConfig.GHOST_RADIUS);
+                    FrontendGhostMessageEvent message = new FrontendGhostMessageEvent( EventType.GHOST , ChangeType.CREATE , ghost);
+
+                    frontendMessageService.sendGhostEvent(message);
+                    System.out.println("message: " + message);
                 } else {
                     log.debug("Initialising scriptGhost");
                     square = new Square(MapObjectType.FLOOR, x, z);
@@ -179,10 +189,10 @@ public class MapService {
     }
 
     /**
-     * @param currentPosition  the square the scriptGhost is standing on top of
+     * @param currentPosition  the square the chicken is standing on top of
      * @param lookingDirection
      * @return a list of 8 square which are around the current square + the
-     * direction the scriptGhost is looking in the order:
+     * direction the chicken is looking in the order:
      * northwest_square, north_square, northeast_square, east_square,
      * southeast_square, south_square, southwest_square, west_square,
      * direction
@@ -260,5 +270,8 @@ public class MapService {
 
     public SnackMan getSnackMan() {
         return snackman;
+    }
+    public Ghost getGhost(){
+        return ghost;
     }
 }

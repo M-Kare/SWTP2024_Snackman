@@ -3,6 +3,8 @@ package de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs;
 import de.hsrm.mi.swt.snackman.configuration.GameConfig;
 import de.hsrm.mi.swt.snackman.entities.map.Square;
 import de.hsrm.mi.swt.snackman.entities.mapObject.snack.Snack;
+import de.hsrm.mi.swt.snackman.entities.mobileObjects.Ghost;
+import de.hsrm.mi.swt.snackman.entities.mobileObjects.Mob;
 import de.hsrm.mi.swt.snackman.services.MapService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,8 +34,8 @@ public class SnackMan extends EatingMob {
 
     @Override
     public void loseKcal() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'loseKcal'");
+        // Calorsies reduced by 300 if Ghost hit
+        setKcal(getKcal()-GameConfig.GHOST_DAMAGE);
     }
 
     //JUMPING
@@ -87,8 +89,10 @@ public class SnackMan extends EatingMob {
 
     @Override
     public void move(double x, double y, double z) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'move'");
+        super.move(x, y, z);
+        for (Mob mob : getCurrentSquare().getMobs()){
+            if(mob instanceof Ghost)loseKcal();
+        }
     }
 
     public int getCurrentCalories() {

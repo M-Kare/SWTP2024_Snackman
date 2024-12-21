@@ -2,6 +2,7 @@ package de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs;
 
 import de.hsrm.mi.swt.snackman.entities.map.Square;
 import de.hsrm.mi.swt.snackman.entities.mapObject.snack.Snack;
+import de.hsrm.mi.swt.snackman.entities.mobileObjects.Ghost;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.Mob;
 import de.hsrm.mi.swt.snackman.services.MapService;
 
@@ -49,6 +50,13 @@ public abstract class EatingMob extends Mob {
 
         if (getCurrentSquare().getSnack() != null)
             consumeSnackOnSquare(getCurrentSquare());
+
+        //Colision with Ghost:
+        for ( Mob mob : getCurrentSquare().getMobs() ){
+            if (mob instanceof Ghost){
+
+            }
+        }
     }
 
     /**

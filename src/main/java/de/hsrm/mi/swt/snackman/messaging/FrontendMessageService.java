@@ -36,4 +36,10 @@ public class FrontendMessageService {
 
         messagingTemplate.convertAndSend("/topic/ghost", ev);
     }
+
+    public void sendGhostEvent(FrontendGhostMessageEvent ev){
+        log.info("Send Event: eventType {}, changeTyp {}, ghost {}", ev.eventType(), ev.changeType(), ev.ghost().toString());
+
+        messagingTemplate.convertAndSend("/topic/ghost" , ev);
+    }
 }
