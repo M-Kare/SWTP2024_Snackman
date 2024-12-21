@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 
@@ -35,6 +36,7 @@ public class ScriptGhost extends Mob implements Runnable {
     // python
     private PythonInterpreter pythonInterpreter = null;
     private final Properties pythonProps = new Properties();
+    private ScriptGhostDifficulty difficulty = ScriptGhostDifficulty.EASY;
 
     public ScriptGhost() {
         super(null);
@@ -49,6 +51,23 @@ public class ScriptGhost extends Mob implements Runnable {
 
         this.isWalking = true;
         this.lookingDirection = Direction.NORTH;
+    }
+
+    public ScriptGhost(ScriptGhostDifficulty difficulty) {
+        super(null);
+        this.difficulty = difficulty;
+    }
+
+    public ScriptGhost(MapService mapService, Square initialPosition, ScriptGhostDifficulty difficulty) {
+        super(mapService);
+        id = generateId();
+        this.ghostPosX = initialPosition.getIndexX();
+        this.ghostPosZ = initialPosition.getIndexZ();
+        initialPosition.addMob(this);
+
+        this.isWalking = true;
+        this.lookingDirection = Direction.NORTH;
+        this.difficulty = difficulty;
     }
 
     public void addPropertyChangeListener(PropertyChangeListener listener) {
@@ -78,7 +97,12 @@ public class ScriptGhost extends Mob implements Runnable {
 
             log.debug("Current position is x {} z {}", this.ghostPosX, this.ghostPosZ);
 
-            List<String> newMove = executeMovementSkript(squares);
+            int newMove = executeMovementSkript(squares);
+            if(difficulty == ScriptGhostDifficulty.EASY) {
+                pythonInterpreter.exec("from GhostMovementSkript import choose_next_square");
+            } else {
+                pythonInterpreter.exec("from SmartGhostMovementSkript import choose_next_square");
+            }
 
             // set new square to move to
             setNewPosition(newMove);
@@ -93,24 +117,30 @@ public class ScriptGhost extends Mob implements Runnable {
      * @param squares a list of squares visible from the ghost's current position.
      * @return a list of moves resulting from the Python script's execution.
      */
-    public List<String> executeMovementSkript(List<String> squares) {
+    public int executeMovementSkript(List<String> squares) {
         try {
             log.debug("Running python ghost script with: {}", squares.toString());
-            PyObject func = pythonInterpreter.get("choose_next_square");
-            PyObject result = func.__call__(new PyList(squares));
 
-            if (result instanceof PyList) {
-                PyList pyList = (PyList) result;
-                log.debug("Python ghost script return: {}", pyList);
-                return convertPythonList(pyList);
+            PyObject func = null;
+            PyObject result = null;
+            if(difficulty == ScriptGhostDifficulty.EASY) {
+                func = pythonInterpreter.get("choose_next_square");
+                result = func.__call__(new PyList(squares));
+            } else {
+                List<List<String>> pythonList = new ArrayList<>();
+                for (String[] row : mapService.getGameMap().getStringMap(this.id)) {
+                    pythonList.add(Arrays.asList(row));
+                }
+                func = pythonInterpreter.get("choose_next_move");
+                result = func.__call__(new PyList(pythonList));
             }
 
-            throw new Exception("Python ghost script did not load.");
+            return Integer.parseInt(result.toString());
         } catch (Exception ex) {
             log.error("Error while executing ghost python script: ", ex);
             ex.printStackTrace();
         }
-        return squares;
+        return 0;
     }
 
     /**
@@ -137,7 +167,11 @@ public class ScriptGhost extends Mob implements Runnable {
         PythonInterpreter.initialize(System.getProperties(), pythonProps, new String[0]);
         log.debug("Initialised jython for ghost movement");
         this.pythonInterpreter = new PythonInterpreter();
-        pythonInterpreter.exec("from GhostMovementSkript import choose_next_square");
+        if(difficulty == ScriptGhostDifficulty.EASY) {
+            pythonInterpreter.exec("from GhostMovementSkript import choose_next_square");
+        } else {
+            pythonInterpreter.exec("from SmartGhostMovementSkript import choose_next_square");
+        }
     }
 
     /**
@@ -146,9 +180,9 @@ public class ScriptGhost extends Mob implements Runnable {
      *
      * @param newMove a list representing the next move for the ghost.
      */
-    private void setNewPosition(List<String> newMove) {
+    private void setNewPosition(int newMove) {
         //get positions
-        Direction walkingDirection = Direction.getDirection(newMove.getLast());
+        Direction walkingDirection = Direction.getDirection(newMove);
         log.debug("Walking direction is: {}", walkingDirection);
 
         this.lookingDirection = walkingDirection;

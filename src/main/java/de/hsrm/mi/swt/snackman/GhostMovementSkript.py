@@ -67,7 +67,6 @@ def choose_next_square(squares_liste):
     else:
         return add_walking_direction(choose_target_square(solution_liste, EMPTY, direction))
 
-
 # --- Utility Functions ---
 
 def eliminate_walls(squares):
@@ -123,5 +122,4 @@ def add_walking_direction(liste):
     """
     new_liste = [liste[0]] + liste[1:]
     first_empty_index = next((i for i, x in enumerate(new_liste) if x == " "), None)
-    result = new_liste + [first_empty_index]
-    return result
+    return first_empty_index
