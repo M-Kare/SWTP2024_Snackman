@@ -9,6 +9,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -23,12 +26,13 @@ import de.hsrm.mi.swt.snackman.services.MapService;
 @SpringBootTest
 public class LobbyManagerServiceTest {
 
-      @Autowired
+      @Mock
       private MapService mapService;
+
       private LobbyManagerService lobbyManagerService;
 
       @BeforeEach
-      public void setup(){
+      public void setup() {
             lobbyManagerService = new LobbyManagerService(mapService);
       }
 
