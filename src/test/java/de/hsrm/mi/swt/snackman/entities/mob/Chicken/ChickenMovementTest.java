@@ -23,17 +23,13 @@ public class ChickenMovementTest {
 
         List<String> visibleEnvironment = List.of("W", "L", "W", "L", "W", "L", "W", "L", "0");
 
-        List<String> result = chicken.executeMovementSkript(visibleEnvironment);
+       int result = chicken.executeMovementSkript(visibleEnvironment);
 
-        // The chicken should move to an empty space (" ").
-        int chosenDirectionIndex = Integer.parseInt(result.get(result.size() - 1));
-        assertEquals(" ", result.get(chosenDirectionIndex),
-                "The Chicken should move to the empty space (' ') matching its new direction.");
+        assertTrue(List.of(0,1,2,3).contains(result));
     }
 
     /**
      * Tests the scenario where the Chicken must avoid a ghost ('G') in one direction.
-     * The Chicken should choose a square that is not a ghost (' ').
      */
     @Test
     public void testChickenAvoidsGhost() {
@@ -42,12 +38,9 @@ public class ChickenMovementTest {
 
         List<String> visibleEnvironment = List.of("L", "G", "L", "L", "L", "L", "L", "L", "0");
 
-        List<String> result = chicken.executeMovementSkript(visibleEnvironment);
+        int result = chicken.executeMovementSkript(visibleEnvironment);
 
-        // The chicken should move to an empty space (' ').
-        int chosenDirectionIndex = Integer.parseInt(result.get(result.size() - 1));
-        assertEquals(" ", result.get(chosenDirectionIndex),
-                "The Chicken should avoid ghosts ('G') and move to a safe square (' ').");
+        assertTrue(List.of(1, 2, 3).contains(result));
     }
 
     /**
@@ -61,16 +54,14 @@ public class ChickenMovementTest {
 
         List<String> visibleEnvironment = List.of("L", "S", "L", "L", "L", "L", "L", "L", "0");
 
-        List<String> result = chicken.executeMovementSkript(visibleEnvironment);
+        int result = chicken.executeMovementSkript(visibleEnvironment);
 
-        int chosenDirectionIndex = Integer.parseInt(result.get(result.size() - 1));
-        assertEquals(" ", result.get(chosenDirectionIndex),
-                "The Chicken should move to the snack ('S'), but the result should be the empty space (' ').");
+        assertEquals(0, result,
+                "The Chicken should move to the snack ('S').");
     }
 
     /**
-     * Ensures the chicken correctly chooses between multiple snacks ('S'),
-     * and still returns the empty square (' ').
+     * Ensures the chicken correctly chooses between multiple snacks ('S')
      */
     @Test
     public void testChickenChoosesBetweenMultipleSnacks() {
@@ -79,17 +70,15 @@ public class ChickenMovementTest {
 
         List<String> visibleEnvironment = List.of("S", "L", "L", "S", "L", "L", "L", "L", "0");
 
-        List<String> result = chicken.executeMovementSkript(visibleEnvironment);
+        int result = chicken.executeMovementSkript(visibleEnvironment);
 
-        // The chicken should choose the empty space (' ') for the selected snack ('S').
-        int chosenDirectionIndex = Integer.parseInt(result.get(result.size() - 1));
-        assertEquals(" ", result.get(chosenDirectionIndex),
-                "The Chicken should choose one of the snacks ('S') but the result should be ' '.");
+        assertEquals(1, result,
+                "The Chicken should choose one of the snacks ('S').");
     }
 
     /**
      * Tests a complex scenario with snacks, ghosts, and walls to ensure correct prioritization.
-     * The chicken should return the empty space (' ') while avoiding ghosts and prioritizing snacks.
+     * The chicken should return the index with an empty space while avoiding ghosts and prioritizing snacks.
      */
     @Test
     public void testChickenInComplexEnvironment() {
@@ -98,11 +87,10 @@ public class ChickenMovementTest {
 
         List<String> visibleEnvironment = List.of("G", "L", "S", "L", "W", "S", "G", "W", "0");
 
-        List<String> result = chicken.executeMovementSkript(visibleEnvironment);
+        int result = chicken.executeMovementSkript(visibleEnvironment);
 
-        int chosenDirectionIndex = Integer.parseInt(result.get(result.size() - 1));
-        assertEquals(" ", result.get(chosenDirectionIndex),
-                "The Chicken should avoid ghosts, prioritize snacks, and move to an empty square (' ').");
+        assertEquals(2, result,
+                "The Chicken should avoid ghosts, prioritize snacks.");
     }
 
     /**
@@ -115,10 +103,8 @@ public class ChickenMovementTest {
 
         List<String> visibleEnvironment = List.of("L", "L", "L", "L", "L", "L", "L", "L", "0");
 
-        List<String> result = chicken.executeMovementSkript(visibleEnvironment);
+        int result = chicken.executeMovementSkript(visibleEnvironment);
 
-        int chosenDirectionIndex = Integer.parseInt(result.get(result.size() - 1));
-        assertEquals(" ", result.get(chosenDirectionIndex),
-                "The Chicken should choose a random empty space (' ') when all squares are empty.");
+        assertTrue(List.of(0, 1, 2, 3).contains(result));
     }
 }

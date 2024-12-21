@@ -3,6 +3,7 @@ package de.hsrm.mi.swt.snackman.entities.mob.Ghost;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.Ghost;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.ScriptGhost;
 import org.junit.jupiter.api.Test;
+import org.python.core.PyObject;
 import org.python.util.PythonInterpreter;
 
 import java.util.ArrayList;
@@ -38,12 +39,10 @@ public class GhostIntegrationTest {
         visibleEnvironment.add("S");
         visibleEnvironment.add("1");
 
-        List<String> result = ghost.executeMovementSkript(visibleEnvironment);
+        int result = ghost.executeMovementSkript(visibleEnvironment);
 
-        int chosenDirectionIndex = Integer.parseInt(result.get(result.size() - 1));
-
-        assertEquals(" ", result.get(chosenDirectionIndex),
-                "The Gost should move to the correct empty square (' ') based on its direction.");
+        assertEquals(2, result,
+                "The Gost should move towards the chicken.");
     }
 
     /**
@@ -59,9 +58,9 @@ public class GhostIntegrationTest {
             pyInterp.exec("from GhostMovementSkript import choose_next_square");
             pyInterp.exec("result = choose_next_square(['W', 'W', 'W', 'L', 'W', 'C', 'W', 'L', 0])");
 
-            String result = pyInterp.get("result").toString();
+            int result = Integer.parseInt(String.valueOf(pyInterp.get("result")));
             
-            String expectedResult = "['X', 'L', ' ', 'L', 2]";
+            int expectedResult = 2;
             assertEquals(expectedResult, result,
                     "The Python script should correctly determine the next move (' ').");
         }

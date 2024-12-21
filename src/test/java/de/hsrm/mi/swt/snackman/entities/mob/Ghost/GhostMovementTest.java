@@ -22,12 +22,9 @@ public class GhostMovementTest {
 
         List<String> visibleEnvironment = List.of("L", "W", "L", "W", "L", "L", "L", "L", "0");
 
-        List<String> result = ghost.executeMovementSkript(visibleEnvironment);
-        System.out.println(result);
+        int result = ghost.executeMovementSkript(visibleEnvironment);
 
-        int chosenDirectionIndex = Integer.parseInt(result.get(result.size() - 1));
-        assertEquals(" ", result.get(chosenDirectionIndex),
-                "The Ghost should move to an empty square (' ').");
+        assertTrue(List.of(2, 3).contains(result));
     }
 
     /**
@@ -40,9 +37,9 @@ public class GhostMovementTest {
         ghost.initJython();
 
         List<String> visibleEnvironment = List.of("L", "L", "L", "M", "L", "L", "L", "L", "0");
-        List<String> result = ghost.executeMovementSkript(visibleEnvironment);
+        int result = ghost.executeMovementSkript(visibleEnvironment);
 
-        assertEquals(1, Integer.parseInt(result.get(result.size() - 1)));
+        assertEquals(1, result);
     }
 
     /**
@@ -56,9 +53,9 @@ public class GhostMovementTest {
         ghost.initJython();
 
         List<String> visibleEnvironment = List.of("L", "C", "L", "W", "L", "L", "W", "L", "0");
-        List<String> result = ghost.executeMovementSkript(visibleEnvironment);
+        int result = ghost.executeMovementSkript(visibleEnvironment);
 
-        assertEquals(0, Integer.parseInt(result.get(result.size() - 1)));
+        assertEquals(0, result);
     }
 
     /**
@@ -72,9 +69,9 @@ public class GhostMovementTest {
         ghost.initJython();
 
         List<String> visibleEnvironment = List.of("L", "L", "L", "W", "L", "L", "W", "L", "3");
-        List<String> result = ghost.executeMovementSkript(visibleEnvironment);
+        int result = ghost.executeMovementSkript(visibleEnvironment);
 
-        assertEquals(3, Integer.parseInt(result.get(result.size() - 1)));
+        assertEquals(3, result);
     }
 
     /**
@@ -87,9 +84,9 @@ public class GhostMovementTest {
         ghost.initJython();
 
         List<String> visibleEnvironment = List.of("L", "L", "L", "W", "L", "L", "W", "L", "1");
-        List<String> result = ghost.executeMovementSkript(visibleEnvironment);
+        int result = ghost.executeMovementSkript(visibleEnvironment);
 
-        assertTrue(List.of(0, 2, 3).contains(Integer.parseInt(result.get(result.size() - 1))));
+        assertTrue(List.of(0, 2, 3).contains(result));
     }
 
 }
