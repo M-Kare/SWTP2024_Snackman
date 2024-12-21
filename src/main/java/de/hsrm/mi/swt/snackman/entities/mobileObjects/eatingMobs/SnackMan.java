@@ -1,11 +1,12 @@
 package de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import de.hsrm.mi.swt.snackman.configuration.GameConfig;
 import de.hsrm.mi.swt.snackman.entities.map.GameMap;
 import de.hsrm.mi.swt.snackman.entities.map.Square;
 import de.hsrm.mi.swt.snackman.entities.mapObject.snack.Snack;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class SnackMan extends EatingMob {
     private final Logger log = LoggerFactory.getLogger(SnackMan.class);
@@ -15,6 +16,10 @@ public class SnackMan extends EatingMob {
     public SnackMan(GameMap gameMap) {
         //TODO add Snackman id to match client
         this(gameMap, GameConfig.SNACKMAN_SPEED, GameConfig.SNACKMAN_RADIUS);
+    }
+
+    public SnackMan(GameMap gameMap, double posX, double posY, double posZ) {
+        this(gameMap, GameConfig.SNACKMAN_SPEED, GameConfig.SNACKMAN_RADIUS, posX, posY, posZ);
     }
 
     public SnackMan(GameMap gameMap, int speed, double radius) {

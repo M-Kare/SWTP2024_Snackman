@@ -1,29 +1,32 @@
 package de.hsrm.mi.swt.snackman.services;
 
 import java.beans.PropertyChangeEvent;
-
-import de.hsrm.mi.swt.snackman.controller.Square.ChickenDTO;
-import de.hsrm.mi.swt.snackman.entities.map.Spawnpoint;
-import de.hsrm.mi.swt.snackman.entities.map.SpawnpointMobType;
-import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken.Chicken;
-import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.SnackMan;
-
+import java.util.ArrayList;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import de.hsrm.mi.swt.snackman.configuration.GameConfig;
+import de.hsrm.mi.swt.snackman.controller.Square.ChickenDTO;
+import de.hsrm.mi.swt.snackman.entities.lobby.Lobby;
+import de.hsrm.mi.swt.snackman.entities.lobby.PlayerClient;
 import de.hsrm.mi.swt.snackman.entities.map.GameMap;
+import de.hsrm.mi.swt.snackman.entities.map.Spawnpoint;
+import de.hsrm.mi.swt.snackman.entities.map.SpawnpointMobType;
 import de.hsrm.mi.swt.snackman.entities.map.Square;
 import de.hsrm.mi.swt.snackman.entities.mapObject.MapObjectType;
 import de.hsrm.mi.swt.snackman.entities.mapObject.snack.Snack;
 import de.hsrm.mi.swt.snackman.entities.mapObject.snack.SnackType;
+import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken.Chicken;
+import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.SnackMan;
 import de.hsrm.mi.swt.snackman.messaging.ChangeType;
 import de.hsrm.mi.swt.snackman.messaging.EventType;
-import de.hsrm.mi.swt.snackman.messaging.FrontendMessageEvent;
+import de.hsrm.mi.swt.snackman.messaging.FrontendChickenMessageEvent;
 import de.hsrm.mi.swt.snackman.messaging.FrontendLobbyMessageService;
-
-import de.hsrm.mi.swt.snackman.messaging.*;
-import org.springframework.stereotype.Service;
+import de.hsrm.mi.swt.snackman.messaging.FrontendMessageEvent;
 
 /**
  * Service class for managing the game map
@@ -37,8 +40,7 @@ public class MapService {
     private final FrontendLobbyMessageService frontendLobbyMessageService;
 
     Logger log = LoggerFactory.getLogger(MapService.class);
-    private SnackMan snackman;
-    //TODO Should be a HashMap of Ghosts
+    // TODO Should be a HashMap of Ghosts
 
     /**
      * Constructs a new MapService
@@ -49,9 +51,10 @@ public class MapService {
         this.readMazeService = readMazeService;
         this.frontendLobbyMessageService = frontendLobbyMessageService;
 
-        //TODO create Snackmans in lobby
-        //snackman = new SnackMan(this, GameConfig.SNACKMAN_SPEED, GameConfig.SNACKMAN_RADIUS);
-        //snackmans = new HashMap<>();
+        // TODO create Snackmans in lobby
+        // snackman = new SnackMan(this, GameConfig.SNACKMAN_SPEED,
+        // GameConfig.SNACKMAN_RADIUS);
+        // snackmans = new HashMap<>();
     }
 
     public GameMap createNewGameMap(String lobbyId, String filePath) {
@@ -70,7 +73,7 @@ public class MapService {
      * @param mazeData the char array representing the maze
      */
     private GameMap convertMazeDataGameMap(String lobbyId,
-                                           char[][] mazeData) {
+            char[][] mazeData) {
         Square[][] squaresBuildingMap = new Square[mazeData.length][mazeData[0].length];
 
         for (int x = 0; x < mazeData.length; x++) {
@@ -88,7 +91,8 @@ public class MapService {
         return new GameMap(squaresBuildingMap);
     }
 
-    //TODO Maze.py map größe als Argumente herein reichen statt in der python-file selbst zu hinterlegen
+    // TODO Maze.py map größe als Argumente herein reichen statt in der python-file
+    // selbst zu hinterlegen
 
     /**
      * Creates a Square by given indexes
@@ -145,7 +149,6 @@ public class MapService {
         return square;
     }
 
-
     /**
      * Adds a random generated snack inside a square of type FLOOR
      *
@@ -159,14 +162,16 @@ public class MapService {
         }
     }
 
-
     /**
      * Goes trough the map and checks if it's a spawnpoint and sets a Mob
      *
      * @param gameMap
      * @param lobbyId
      */
-    public void spawnMobs(GameMap gameMap, String lobbyId) {
+    public void spawnMobs(GameMap gameMap, Lobby lobby) {
+        List<Square> ghostSpawnSquares = new ArrayList<>();
+        List<Square> snackmanSpawnSquares = new ArrayList<>();
+
         for (int i = 0; i < gameMap.getGameMapSquares().length; i++) {
             for (int j = 0; j < gameMap.getGameMapSquares()[i].length; j++) {
                 Square currentSquare = gameMap.getGameMapSquares()[i][j];
@@ -183,8 +188,9 @@ public class MapService {
 
                             newChicken.addPropertyChangeListener((PropertyChangeEvent evt) -> {
                                 if (evt.getPropertyName().equals("chicken")) {
-                                    FrontendChickenMessageEvent messageEvent = new FrontendChickenMessageEvent(EventType.CHICKEN,
-                                            ChangeType.UPDATE, lobbyId,
+                                    FrontendChickenMessageEvent messageEvent = new FrontendChickenMessageEvent(
+                                            EventType.CHICKEN,
+                                            ChangeType.UPDATE, lobby.getLobbyId(),
                                             ChickenDTO.fromChicken((Chicken) evt.getNewValue()));
 
                                     frontendLobbyMessageService.sendChickenEvent(messageEvent);
@@ -192,10 +198,10 @@ public class MapService {
                             });
                             break;
                         case SpawnpointMobType.GHOST:
-                            //TODO Ghost spawn
+                            ghostSpawnSquares.add(currentSquare);
                             break;
                         case SpawnpointMobType.SNACKMAN:
-                            //new SnackMan(gameMap);
+                            snackmanSpawnSquares.add(currentSquare);
                             break;
                     }
 
@@ -203,5 +209,41 @@ public class MapService {
 
             }
         }
+
+        int ghostSpawnIndex = 0;
+        int snackmanSpawnIndex = 0;
+        Square temp;
+
+        for (PlayerClient client : lobby.getMembers()) {
+            switch (client.getRole()) {
+                // TODO change to spawn ghost instead of snackman
+                case GHOST:
+                    if (ghostSpawnIndex >= ghostSpawnSquares.size()) {
+                        ghostSpawnIndex = 0;
+                    }
+                    temp = ghostSpawnSquares.get(ghostSpawnIndex);
+                    lobby.getClientMobMap().put(client.getPlayerId(),
+                            new SnackMan(lobby.getGameMap(), calcCenterPositionFromMapIndex(temp.getIndexX()),
+                                    GameConfig.SNACKMAN_GROUND_LEVEL,
+                                    calcCenterPositionFromMapIndex(temp.getIndexZ())));
+                    ghostSpawnIndex++;
+                    break;
+                case SNACKMAN:
+                    if (snackmanSpawnIndex >= snackmanSpawnSquares.size()) {
+                        snackmanSpawnIndex = 0;
+                    }
+                    temp = snackmanSpawnSquares.get(snackmanSpawnIndex);
+                    lobby.getClientMobMap().put(client.getPlayerId(),
+                            new SnackMan(lobby.getGameMap(), calcCenterPositionFromMapIndex(temp.getIndexX()),
+                                    GameConfig.SNACKMAN_GROUND_LEVEL,
+                                    calcCenterPositionFromMapIndex(temp.getIndexZ())));
+                    snackmanSpawnIndex++;
+                    break;
+            }
+        }
+    }
+
+    public double calcCenterPositionFromMapIndex(int index) {
+        return (index * GameConfig.SQUARE_SIZE) + (GameConfig.SQUARE_SIZE / 2);
     }
 }

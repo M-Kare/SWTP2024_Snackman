@@ -1,15 +1,19 @@
 package de.hsrm.mi.swt.snackman.services;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.UUID;
 
-import de.hsrm.mi.swt.snackman.entities.map.GameMap;
-import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.SnackMan;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import de.hsrm.mi.swt.snackman.entities.lobby.Lobby;
 import de.hsrm.mi.swt.snackman.entities.lobby.PlayerClient;
 import de.hsrm.mi.swt.snackman.entities.lobby.ROLE;
+import de.hsrm.mi.swt.snackman.entities.map.GameMap;
 
 /**
  * Service for managing lobbies and clients in the application.
@@ -121,11 +125,8 @@ public class LobbyManagerService {
         if (lobby.getMembers().size() < 2) {
             throw new IllegalStateException("Not enough players to start the game");
         }
-        //TODO spieler zwischen Geistern und Snackman aufteilen
-        for(PlayerClient client : lobby.getMembers()){
-            lobby.getClientMobMap().put(client.getPlayerId(), new SnackMan(lobby.getGameMap()));
-        }
-        mapService.spawnMobs(lobby.getGameMap(), lobby.getLobbyId());
+
+        mapService.spawnMobs(lobby.getGameMap(), lobby);
         lobby.setGameStarted(true);
     }
 
