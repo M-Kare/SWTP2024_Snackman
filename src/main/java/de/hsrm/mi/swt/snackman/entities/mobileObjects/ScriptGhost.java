@@ -42,6 +42,16 @@ public class ScriptGhost extends Mob implements Runnable {
         super(null);
     }
 
+    public ScriptGhost(ScriptGhostDifficulty difficulty) {
+        this();
+        this.difficulty = difficulty;
+    }
+
+    public ScriptGhost(MapService mapService, Square initialPosition, ScriptGhostDifficulty difficulty) {
+        this(mapService, initialPosition);
+        this.difficulty = difficulty;
+    }
+
     public ScriptGhost(MapService mapService, Square initialPosition) {
         super(mapService);
         id = generateId();
@@ -51,23 +61,6 @@ public class ScriptGhost extends Mob implements Runnable {
 
         this.isWalking = true;
         this.lookingDirection = Direction.NORTH;
-    }
-
-    public ScriptGhost(ScriptGhostDifficulty difficulty) {
-        super(null);
-        this.difficulty = difficulty;
-    }
-
-    public ScriptGhost(MapService mapService, Square initialPosition, ScriptGhostDifficulty difficulty) {
-        super(mapService);
-        id = generateId();
-        this.ghostPosX = initialPosition.getIndexX();
-        this.ghostPosZ = initialPosition.getIndexZ();
-        initialPosition.addMob(this);
-
-        this.isWalking = true;
-        this.lookingDirection = Direction.NORTH;
-        this.difficulty = difficulty;
     }
 
     public void addPropertyChangeListener(PropertyChangeListener listener) {
@@ -98,7 +91,7 @@ public class ScriptGhost extends Mob implements Runnable {
             log.debug("Current position is x {} z {}", this.ghostPosX, this.ghostPosZ);
 
             int newMove = executeMovementSkript(squares);
-            if(difficulty == ScriptGhostDifficulty.EASY) {
+            if (difficulty == ScriptGhostDifficulty.EASY) {
                 pythonInterpreter.exec("from GhostMovementSkript import choose_next_square");
             } else {
                 pythonInterpreter.exec("from SmartGhostMovementSkript import choose_next_square");
@@ -123,7 +116,7 @@ public class ScriptGhost extends Mob implements Runnable {
 
             PyObject func = null;
             PyObject result = null;
-            if(difficulty == ScriptGhostDifficulty.EASY) {
+            if (difficulty == ScriptGhostDifficulty.EASY) {
                 func = pythonInterpreter.get("choose_next_square");
                 result = func.__call__(new PyList(squares));
             } else {
@@ -165,13 +158,10 @@ public class ScriptGhost extends Mob implements Runnable {
     public void initJython() {
         pythonProps.setProperty("python.path", "src/main/java/de/hsrm/mi/swt/snackman");
         PythonInterpreter.initialize(System.getProperties(), pythonProps, new String[0]);
-        log.debug("Initialised jython for ghost movement");
+        log.info("Initialising jython for ghost movement");
         this.pythonInterpreter = new PythonInterpreter();
-        if(difficulty == ScriptGhostDifficulty.EASY) {
-            pythonInterpreter.exec("from GhostMovementSkript import choose_next_square");
-        } else {
-            pythonInterpreter.exec("from SmartGhostMovementSkript import choose_next_square");
-        }
+        pythonInterpreter.exec("from GhostMovementSkript import choose_next_square");
+        pythonInterpreter.exec("from SmartGhostMovementSkript import choose_next_square");
     }
 
     /**

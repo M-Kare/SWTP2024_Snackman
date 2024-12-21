@@ -27,7 +27,7 @@
 #    returns: indexOfNextPosition
 import random
 import heapq  # This module provides an implementation of the heap queue algorithm
-from GhostMovementSkript import choose_next_square as choose_simple_next_step
+from GhostMovementSkript import choose_next_square
 
 WALL = 'W'
 EMPTY = 'L'
@@ -72,15 +72,14 @@ def choose_next_square_finding_snackman(labyrinth, ghostPosition, snackmanPositi
     path = find_path_to_snackman(labyrinth, ghostPosition, snackmanPosition)
     (a, b) = (path[1][0] - ghostPosition[0], path[1][1] - ghostPosition[1])
     direction = a + 2 * b
-    match direction:
-        case -1:
-            return 3
-        case 1:
-            return 1
-        case -2:
-            return 0
-        case 2:
-            return 2
+    if direction == -1:
+        return "3"
+    elif direction == 1:
+        return "1"
+    elif direction == -2:
+        return "0"
+    elif direction == 2:
+        return "2"
 
 
 def find_path_to_snackman(maze, ghostPosition, snackmanPosition):
@@ -174,4 +173,3 @@ def get_neighbors(maze, currentNode):
             result.append(neighbor)  # neighbor possible direction for the currentNode to use
     return result
 
-choose_next_square_finding_snackman(lab, (6, 7), (1, 1))

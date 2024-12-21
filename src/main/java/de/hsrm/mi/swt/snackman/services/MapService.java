@@ -4,6 +4,7 @@ import java.beans.PropertyChangeEvent;
 
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.ScriptGhost;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.Ghost;
+import de.hsrm.mi.swt.snackman.entities.mobileObjects.ScriptGhostDifficulty;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken.Chicken;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken.Direction;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.SnackMan;
@@ -151,13 +152,11 @@ public class MapService {
                 });
                 break;
             case 'G':
-                if (initialisedPlayers <= AMOUNT_PLAYERS_FOR_GAME) {
+                if (initialisedPlayers < AMOUNT_PLAYERS_FOR_GAME) {
                     // init real players here aka Ghost
                     log.debug("Initialising ghost");
                     square = new Square(MapObjectType.FLOOR, x, z);
-                    //square = new Square(MapObjectType.FLOOR, 0 , 0);
                     ghost = new Ghost(square, this, GameConfig.GHOST_SPEED, GameConfig.GHOST_RADIUS);
-                    // ghost = new Ghost(this.getSquareAtIndexXZ(0,0) , this , GameConfig.GHOST_SPEED, GameConfig.GHOST_RADIUS);
                     FrontendGhostMessageEvent message = new FrontendGhostMessageEvent(EventType.GHOST, ChangeType.CREATE, ghost);
 
                     frontendMessageService.sendGhostEvent(message);
@@ -166,7 +165,7 @@ public class MapService {
                 } else {
                     log.debug("Initialising scriptGhost");
                     square = new Square(MapObjectType.FLOOR, x, z);
-                    ScriptGhost newScriptGhost = new ScriptGhost(this, square);
+                    ScriptGhost newScriptGhost = new ScriptGhost(this, square, ScriptGhostDifficulty.EASY);
                     Thread ghostThread = new Thread(newScriptGhost);
                     ghostThread.start();
 

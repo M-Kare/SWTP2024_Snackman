@@ -121,6 +121,20 @@ public class Square {
         return "L";
     }
 
+    /**
+     *
+     * @return the dominant type of MapObject for the ghost with the high difficulty
+     */
+    public String getPrimaryTypeForGhostWithHighDifficulty(long ghostId) {
+        if (type == MapObjectType.WALL) {
+            return  "W";
+        } else if (type == MapObjectType.FLOOR) {
+            if(this.mobs.stream().anyMatch(mob -> mob instanceof SnackMan)) return "M";
+            if(this.mobs.stream().anyMatch(mob -> mob instanceof ScriptGhost && ((ScriptGhost) mob).getId() == ghostId)) return "G";
+        }
+        return "L";
+    }
+
     public List<Mob> getMobs() {
         return mobs;
     }
