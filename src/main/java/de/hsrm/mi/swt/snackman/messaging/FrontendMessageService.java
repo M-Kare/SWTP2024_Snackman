@@ -26,8 +26,14 @@ public class FrontendMessageService {
     }
 
     public void sendChickenEvent(FrontendChickenMessageEvent ev) {
-        log.info("Send Event: eventType {}, changeTyp {}, chicken {}", ev.eventType(), ev.changeType(), ev.chicken().toString());
+        log.info("Send Event: eventType {}, changeTyp {}, chicken {}", ev.eventType(), ev.changeType(), ev.chicken());
 
         messagingTemplate.convertAndSend("/topic/chicken", ev);
+    }
+
+    public void sendScriptGhostEvent(FrontendScriptGhostMessageEvent ev) {
+        log.info("Send Event: eventType {}, changeTyp {}, scriptGhost {}", ev.eventType(), ev.changeType(), ev.scriptGhost());
+
+        messagingTemplate.convertAndSend("/topic/scriptGhost", ev);
     }
 }
