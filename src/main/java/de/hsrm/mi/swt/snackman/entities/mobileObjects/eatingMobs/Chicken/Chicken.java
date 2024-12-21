@@ -65,7 +65,7 @@ public class Chicken extends EatingMob implements Runnable {
             pythonInterpreter.exec(interpreterCommand);
             PyObject func = pythonInterpreter.get("choose_next_square");
             PyObject result = func.__call__(new PyList(squares));
-            
+            System.out.println("das ist das Egebnis: " + result);
 
             if (result instanceof PyList) {
                 PyList pyList = (PyList) result;
@@ -105,7 +105,7 @@ public class Chicken extends EatingMob implements Runnable {
         //behavior = new DefaultChickenBehavior();
         this.fileName = "ChickenMovementSkript";
         this.isWalking = true;
-        this.lookingDirection = Direction.NORTH;
+        this.lookingDirection = Direction.ONE_NORTH;
         initJython();
         initTimer();
     }
@@ -118,7 +118,7 @@ public class Chicken extends EatingMob implements Runnable {
         initialPosition.addMob(this);
         this.fileName = fileName;
         this.isWalking = true;
-        this.lookingDirection = Direction.NORTH;
+        this.lookingDirection = Direction.ONE_NORTH;
         initJython();
         initTimer();
     }

@@ -5,28 +5,25 @@
 #     L = Leer
 #     S = Snack
 #     G = Geist
+#     SM = SnackMan
 #
-#     W W W -> northwest_square, north_square, northeast_square
-#     W   W -> west_square, east_square
-#     W W W -> southwest_square, south_square, southeast_square
-#
+#     W W W W W -> two_North_two_West_square, two_North_one_West_square, two_North_square, two_North_one_East_square, two_North_two_East_square
+#     W W W W W -> one_North_two_West_square, one_North_one_West_square, one_North_square, one_North_one_East_square, one_North_two_East_square = squares_liste
+#     W W   W W -> two_West_square, one_West_square, chickens_square, one_East_square, two_East_square = squares_liste
+#     W W W W W -> one_South_two_West_square, one_South_one_West_square, one_South_square, one_South_one_East_square, one_Soutn_two_East_square = squares_liste
+#     W W W W W -> two_South_two_West_square, two_South_one_West_square, two_South_square, two_South_one_East_square, two_Soutn_two_East_square = squares_liste
+
 #     direction: the direction index in which the chickens head is looking
 #     e.g. if the solution liste is [W,G, ,W,2] the chicken is walking in south direction and looking into south direction too
 #
-#    returns: [north_square, east_square, south_square, west_square, indexOfNextPosition]
+#    returns: [one_north_square, one_east_square, one_south_square, one_west_square, indexOfNextPosition]
 
 import random
 import time
-from ChickenMovementSkript import choose_next_square as defaultBehavior
-
-# todo: nimmt gerade immer die erste Option die es findet, kann man noch random machen
-#testingliste = ["W", "W", "G", "G", "W", "G", "G", "W", 1]
-#testingliste = ["W", "S", "G", "S", "W", "G", "G", "W", 1]
-#testingliste = ["W", "G", "G", "S", "W", "S", "G", "W", 1]
-#testingliste = ["W", "L", "G", "L", "W", "G", "G", "W", 1]
-#testingliste = ["W","S","W","L","W","L","W","L","1"]
 
 def choose_next_square(squares_liste):
+    """Checks if Snackman is in chickens field of view and returns solution list, with next step in direction to Snackman"""
+
     squares_liste = list(squares_liste)
 
     two_North_two_West_square, two_North_one_West_square, two_North_square, two_North_one_East_square, two_North_two_East_square = squares_liste[:5]
@@ -36,121 +33,101 @@ def choose_next_square(squares_liste):
     two_South_two_West_square, two_South_one_West_square, two_South_square, two_South_one_East_square, two_Soutn_two_East_square = squares_liste[20:25]
 
     solution_liste = [one_North_square, one_East_square, one_South_square, one_West_square]
-
-    #northwest_square, north_square, northeast_square, east_square, southeast_square, south_square, southwest_square, west_square, direction = squares_liste
-    #solution_liste = [north_square, east_square, south_square, west_square]
-
-    # make sure you cannot walk into a wall
-    solution_liste = eliminate_walls_as_options(solution_liste)
-
-    if(one_fiels_has_SnackMan(solution_liste)):
-        if(len(squares_liste) > 9):
-            print("--------------------------")
-            return choose_next_square_to_get_to_SnackMan()
-        liste_without_SM = replace_SM(solution_liste)
-        return add_direction(liste_without_SM)
-    
-    defaultBehavior(squares_liste)
-
-def choose_next_square_to_get_to_SnackMan(squares_liste):
-    """Checks if Snackman is in chickens field of view and returns solution list, with next step in direction to Snackman"""
     #generates solutionList with Indexes next to Chicken(because Chicken just can go one step
-    solution_liste = [squares_liste[7], squares_liste[11], squares_liste[13], squares_liste[17]]
+
     if "SM" in squares_liste:
         solution_liste =  findWayToSM(solution_liste, squares_liste)
         return solution_liste
-        #print(solution_liste)
     else:
         return add_direction(choose_random_square(solution_liste))
 
 def findWayToSM(solution, liste):
     """Finds Way to Snackman and returns solution_list with next step in direction to Snackman"""
-    Chickenindex = 12
+    chickenIndex = 12
     directionListe =  [-5, +5, -1, +1]
-    chickensStepisSet = False
+    chickensFirstStepisSet = False
     nextDirectionIndex = 12
     chickensStepBefore = 0
-    versuche = 0
-    stack = []
-    anzahlZurueckGesetzt = 0
+    resettedChickenPosition_Counter = 0
 
-    while liste[Chickenindex] != 'SM':
-        versuche += 1
-        stack.append(Chickenindex)
+    while liste[chickenIndex] != 'SM':
 
-        if(anzahlZurueckGesetzt >= 10): #falls Snackman nicht erreichbar ist
+        if(resettedChickenPosition_Counter >= 20):# when SnackMan not reachable
+            print("ich gebe auf!!!")
             return solution
 
-        #time.sleep(0.5)
+        randomDirectionIndex = random.randint(0, 3)
+        if(0 <= chickenIndex + directionListe[randomDirectionIndex] <= 24):
+            if (chickenIndex + directionListe[randomDirectionIndex] != chickensStepBefore):
+                if(randomDirectionIndex == 3): 
+                    if((chickenIndex + 1 )% 5 == 0): #when Chicken is at right side of visibleEnvironment, chicken could go +1 and is on the left side of visibleEnvironment
+                        continue
+                if(randomDirectionIndex == 2):
+                    if((chickenIndex + 1) % 5 == 1): #when Chicken is at right side of visibleEnvironment, chicken could go-#1 and is on the right side of visibleEnvironment
+                        continue
 
-        testliste = liste
-        for i in range(len(testliste)):
-            if testliste[i] == 'L':
-                testliste[i] = ' '
-
-        if(testliste[chickensStepBefore] != liste[chickensStepBefore]):
-            testliste[chickensStepBefore] == liste[chickensStepBefore]
-
-        testliste[Chickenindex] = 'O'
-        #for i in range(0, len(testliste), 9):
-         #   print(testliste[i:i+9])
-        #print()
-
-        zahl = random.randint(0, 3)
-        if(0 <= Chickenindex + zahl <= 24):
-            if 0 <= (Chickenindex + directionListe[zahl]) <= 24 and (Chickenindex + directionListe[zahl]) != chickensStepBefore: #neuer index muss innerhalb des Sichtfeldes(liste) liegen -- und darf nicht der letzte Indes sein
-                if liste[(Chickenindex + directionListe[zahl])] != 'W': #neuer index darf keine Wand sein
-                    Chickenindex += directionListe[zahl]
-                    if(not chickensStepisSet):
-                        nextDirectionIndex = Chickenindex
-                        chickensStepisSet = True
-                    if 0 > Chickenindex or Chickenindex > 24:
-                        Chickenindex = 12
-                        anzahlZurueckGesetzt += 1
+                if liste[(chickenIndex + directionListe[randomDirectionIndex])] != 'W': #check if next chickenIndex is a Wall
+                    chickensStepBefore = chickenIndex
+                    chickenIndex += directionListe[randomDirectionIndex]
+                    if(not chickensFirstStepisSet): #set the final destination Chicken will go (saves first step in every try to get so SM. Is reset when Chicken starts a new try(Index[12]))
+                        nextDirectionIndex = chickenIndex
+                        chickensFirstStepisSet = True
+                    if 0 > chickenIndex or chickenIndex > 24:#new try when Chicken goes out of Index(reset chickensIndex to 12)
+                        chickenIndex = 12
+                        resettedChickenPosition_Counter += 1
                         chickensStepBefore = 12
-                        chickensStepisSet = False
+                        chickensFirstStepisSet = False
                         continue
         else:
-            Chickenindex = 12
-            anzahlZurueckGesetzt += 1
+            nextDirectionIndex = 12
+            chickenIndex = 12
+            resettedChickenPosition_Counter += 1
             chickensStepBefore = 12
-            chickensStepisSet = False
+            chickensFirstStepisSet = False
     
-    print("Snackman ist hier???: Index ", Chickenindex)
-
-    #print("Snackman gefunden!!! auf Feld: ",  Chickenindex, "Nächster Schritt: ", nextDirectionIndex)
-    print("Verscuhe: ",  versuche, "Gegangene Schritte: ", [int for int in stack])
-    print("Anz zurueckgesetzt: ", anzahlZurueckGesetzt)
-
-    print("NewDirectionIndex ", nextDirectionIndex)
-    if Chickenindex == 7:#31
+    if chickenIndex == 7:
         if(solution[0] == 'SM'):
             solution = replace_Element_with_whiteSpace_and_append_ElementIndex(solution, 0)
-    if Chickenindex == 11:#39
-        if(solution[1] == 'SM'):
-            solution = replace_Element_with_whiteSpace_and_append_ElementIndex(solution, 1)
-    if Chickenindex == 13:#41
-        if(solution[2] == 'SM'):
-            solution = replace_Element_with_whiteSpace_and_append_ElementIndex(solution, 2)
-    if Chickenindex == 17:#49
+    if chickenIndex == 11:
         if(solution[3] == 'SM'):
             solution = replace_Element_with_whiteSpace_and_append_ElementIndex(solution, 3)
+    if chickenIndex == 13:
+        if(solution[1] == 'SM'):
+            solution = replace_Element_with_whiteSpace_and_append_ElementIndex(solution, 1)
+    if chickenIndex == 17:
+        if(solution[2] == 'SM'):
+            solution = replace_Element_with_whiteSpace_and_append_ElementIndex(solution, 2)
 
     if nextDirectionIndex == 7:
         solution = replace_Element_with_whiteSpace_and_append_ElementIndex(solution, 0)
         return solution
     if nextDirectionIndex == 11:
-        solution = replace_Element_with_whiteSpace_and_append_ElementIndex(solution, 1)
-        #solution[1] = ''
+        solution = replace_Element_with_whiteSpace_and_append_ElementIndex(solution, 3)
         return solution
     if nextDirectionIndex == 13:
-        solution = replace_Element_with_whiteSpace_and_append_ElementIndex(solution, 2)
-        #solution[2] = ''
+        solution = replace_Element_with_whiteSpace_and_append_ElementIndex(solution, 1)
         return solution
     if nextDirectionIndex == 17:
-        solution = replace_Element_with_whiteSpace_and_append_ElementIndex(solution, 3)
-        #solution[3] = ''
+        solution = replace_Element_with_whiteSpace_and_append_ElementIndex(solution, 2)
         return solution
+
+
+def printMovement(chickensStepBefore, chickenIndex, liste):
+    time.sleep(0.5)
+
+    testliste = liste
+    for i in range(len(testliste)):
+        if testliste[i] == 'L':
+            testliste[i] = ' '
+
+    if(testliste[chickensStepBefore] != liste[chickensStepBefore]):
+        testliste[chickensStepBefore] == liste[chickensStepBefore]
+
+    testliste[chickenIndex] = 'O'
+    testliste[chickensStepBefore] = ' '
+    for i in range(0, len(testliste), 5):
+        print(testliste[i:i+5])
+    print()
 
 def replace_Element_with_whiteSpace_and_append_ElementIndex(solution, index):
     solution[index] = ''
@@ -242,44 +219,29 @@ def choose_square_without_snack_away_from_ghost(north_square, east_square, south
 def choose_random_square(original_liste):
     return replace_first_element(original_liste, "L")
 
-#print(choose_next_square(testingliste))
-#print(choose_next_square(["W", "L", "W", "L", "W", "L", "W", "L", "L"]))
-#print(choose_next_square(["W", "SM", "W", "L", "W", "L", "W", "L", "0"]));
-
-liste = ["W", "W", "W", "W", "L", "W", "W", "W", "W",
-"W", "SM", "L", "L", "W", "L", "W", "L", "W",
-"W", "W", "L", "W", "W", "L", "L", "L", "W",
-"L", "L", "L", "L", "W", "L", "W", "W", "W",
-"W", "L", "W", "SM", "H", "L", "W", "L", "W",
-"W", "L", "W", "L", "W", "L", "W", "L", "L",
-"W", "L", "W", "L", "W", "W", "W", "L", "W",
-"W", "W", "W", "L", "L", "W", "W", "W", "W",
-"W", "W", "W", "W", "L", "W", "W", "W", "W"]
-
-liste2 = ["W", "W", "W", "W", "W", "W", "W", "W", "W",
-         "W", "SM", "L", "L", "W", "L", "L", "L", "W",
-         "W", "W", "W", "L", "W", "L", "W", "L", "W",
-         "W", "L", "W", "L", "W", "L", "W", "W", "W",
-         "W", "L", "W", "L", "H", "L", "L", "L", "L",
-         "W", "L", "W", "L", "W", "L", "W", "L", "L",
-         "W", "L", "W", "L", "W", "L", "W", "L", "W",
-         "W", "L", "W", "L", "L", "L", "W", "L", "W",
-         "W", "L", "W", "L", "W", "W", "W", "L", "W"]
-
-liste3 = ["W", "W", "W", "W", "W", "W", "W", "W", "W",
-          "W", "SM", "W", "L", "W", "L", "L", "L", "W",
-          "W", "W", "W", "L", "W", "L", "W", "L", "W",
-          "W", "L", "W", "L", "W", "L", "W", "W", "W",
-          "W", "L", "W", "L", "H", "L", "L", "L", "L",
-          "W", "L", "W", "L", "W", "L", "W", "L", "L",
-          "W", "L", "W", "L", "W", "L", "W", "L", "W",
-          "W", "L", "W", "L", "L", "L", "W", "L", "W",
-          "W", "L", "W", "L", "W", "W", "W", "L", "W"]
-
-liste4 = ["W", "W", "W", "L", "W",
+liste = ["W", "W", "W", "L", "W",
                     "SM", "L", "L", "L", "L",
                     "L", "W", "H", "W", "L",
                     "L", "W", "L", "W", "L",
                     "L", "W", "L", "W", "L"]
 
-print("Ergebnis: ", choose_next_square_to_get_to_SnackMan(liste4))
+liste1 = ["W", "W", "W", "L", "W",
+                    "SM", "L", "W", "L", "L",
+                    "L", "L", "H", "W", "L",
+                    "L", "W", "L", "W", "L",
+                    "L", "W", "L", "W", "L"]
+
+liste2 = ["W", "W", "L", "L", "W", #darf nichts zurückgeben, weil es keinen weg gibt
+                    "SM", "L", "W", "L", "L",
+                    "L", "W", "H", "L", "L",
+                    "L", "W", "L", "W", "L",
+                    "L", "W", "L", "W", "L"]
+
+liste3 = ["W", "W", "L", "L", "W",
+                    "SM", "L", "W", "L", "W",
+                    "L", "L", "H", "L", "L",
+                    "L", "W", "L", "W", "L",
+                    "L", "W", "L", "W", "L"]
+
+
+print("Ergebnis: ", choose_next_square(liste3))

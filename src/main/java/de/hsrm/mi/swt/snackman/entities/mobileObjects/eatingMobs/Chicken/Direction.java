@@ -32,7 +32,7 @@ import org.slf4j.LoggerFactory;
  * --------------------------------------------------------------
  */
 public enum Direction {
-    NORTH_WEST("", -1, -1), NORTH("0", -1, 0), NORTH_EAST("", -1, 1), EAST("1", 0, 1), SOUTH_EAST("", 1, 1), SOUTH("2", 1, 0), SOUTH_WEST("", 1, -1), WEST("3", 0, -1),
+    //NORTH_WEST("", -1, -1), NORTH("0", -1, 0), NORTH_EAST("", -1, 1), EAST("1", 0, 1), SOUTH_EAST("", 1, 1), SOUTH("2", 1, 0), SOUTH_WEST("", 1, -1), WEST("3", 0, -1),
     
     TWO_NORTH_TWO_WEST("", -2, -2), TWO_NORTH_ONE_WEST("", -2, -1), TWO_NORTH("", -2, 0), TWO_NORTH_ONE_EAST("", -2, 1), TWO_NORTH_TWO_EAST("", -2, 2),
     ONE_NORTH_TWO_WEST("", -1, -2), ONE_NORTH_ONE_WEST("", -1, -1), ONE_NORTH("", -1, 0), ONE_NORTH_ONE_EAST("", -1, 1), ONE_NORTH_TWO_EAST("", -1, 2),
@@ -60,10 +60,10 @@ public enum Direction {
     public static Direction getDirection(String indexOfList) {
         log.debug("Index of List: {}", indexOfList);
         return switch (indexOfList) {
-            case "0" -> Direction.NORTH;
-            case "1" -> Direction.EAST;
-            case "2" -> Direction.SOUTH;
-            case "3" -> Direction.WEST;
+            case "0" -> Direction.ONE_NORTH;
+            case "1" -> Direction.ONE_EAST;
+            case "2" -> Direction.ONE_SOUTH;
+            case "3" -> Direction.ONE_WEST;
             case null, default -> throw new IndexOutOfBoundsException("Chicken is walking into a not defined direction.");
         };
     }
@@ -84,37 +84,125 @@ public enum Direction {
         );
     }
 
-    public Square getNorthSquare(MapService mapService, Square currentPosition) {
-        return mapService.getSquareAtIndexXZ(currentPosition.getIndexX() + NORTH.deltaX, currentPosition.getIndexZ() + NORTH.deltaZ);
+    public Square get_two_North_two_West_Square(MapService mapService, Square currentPosition) {
+        return mapService.getSquareAtIndexXZ(currentPosition.getIndexX() + TWO_NORTH_TWO_WEST.deltaX, currentPosition.getIndexZ() + TWO_NORTH_TWO_WEST.deltaZ);
     }
 
-    public Square getEastSquare(MapService mapService, Square currentPosition) {
-        return mapService.getSquareAtIndexXZ(currentPosition.getIndexX() + EAST.deltaX, currentPosition.getIndexZ() + EAST.deltaZ);
+    public Square get_two_North_one_West_Square(MapService mapService, Square currentPosition) {
+        return mapService.getSquareAtIndexXZ(currentPosition.getIndexX() + TWO_NORTH_ONE_WEST.deltaX, currentPosition.getIndexZ() + TWO_NORTH_ONE_WEST.deltaZ);
     }
 
-    public Square getSouthSquare(MapService mapService, Square currentPosition) {
-        return mapService.getSquareAtIndexXZ(currentPosition.getIndexX() + SOUTH.deltaX, currentPosition.getIndexZ() + SOUTH.deltaZ);
+    public Square get_two_North_Square(MapService mapService, Square currentPosition) {
+        return mapService.getSquareAtIndexXZ(currentPosition.getIndexX() + TWO_NORTH.deltaX, currentPosition.getIndexZ() + TWO_NORTH.deltaZ);
     }
 
-    public Square getWestSquare(MapService mapService, Square currentPosition) {
-        return mapService.getSquareAtIndexXZ(currentPosition.getIndexX() + WEST.deltaX, currentPosition.getIndexZ() + WEST.deltaZ);
+    public Square get_two_North_one_East_Square(MapService mapService, Square currentPosition) {
+        return mapService.getSquareAtIndexXZ(currentPosition.getIndexX() + TWO_NORTH_ONE_EAST.deltaX, currentPosition.getIndexZ() + TWO_NORTH_ONE_EAST.deltaZ);
     }
 
-    public Square getNorthWestSquare(MapService mapService, Square currentPosition) {
-        return mapService.getSquareAtIndexXZ(currentPosition.getIndexX() + NORTH_WEST.deltaX, currentPosition.getIndexZ() + NORTH_WEST.deltaZ);
+    public Square get_two_North_two_East_Square(MapService mapService, Square currentPosition) {
+        return mapService.getSquareAtIndexXZ(currentPosition.getIndexX() + TWO_NORTH_TWO_EAST.deltaX, currentPosition.getIndexZ() + TWO_NORTH_TWO_EAST.deltaZ);
     }
 
-    public Square getNorthEastSquare(MapService mapService, Square currentPosition) {
-        return mapService.getSquareAtIndexXZ(currentPosition.getIndexX() + NORTH_EAST.deltaX, currentPosition.getIndexZ() + NORTH_EAST.deltaZ);
+    public Square get_one_North_two_West_Square(MapService mapService, Square currentPosition) {
+        return mapService.getSquareAtIndexXZ(currentPosition.getIndexX() + ONE_NORTH_TWO_WEST.deltaX, currentPosition.getIndexZ() + ONE_NORTH_TWO_WEST.deltaZ);
     }
 
-    public Square getSouthEastSquare(MapService mapService, Square currentPosition) {
-        return mapService.getSquareAtIndexXZ(currentPosition.getIndexX() + SOUTH_EAST.deltaX, currentPosition.getIndexZ() + SOUTH_EAST.deltaZ);
+    public Square get_one_North_one_West_Square(MapService mapService, Square currentPosition) {
+        return mapService.getSquareAtIndexXZ(currentPosition.getIndexX() + ONE_NORTH_ONE_WEST.deltaX, currentPosition.getIndexZ() + ONE_NORTH_ONE_WEST.deltaZ);
     }
 
-    public Square getSouthWestSquare(MapService mapService, Square currentPosition) {
-        return mapService.getSquareAtIndexXZ(currentPosition.getIndexX() + SOUTH_WEST.deltaX, currentPosition.getIndexZ() + SOUTH_WEST.deltaZ);
+    public Square get_one_North_Square(MapService mapService, Square currentPosition) {
+        return mapService.getSquareAtIndexXZ(currentPosition.getIndexX() + ONE_NORTH.deltaX, currentPosition.getIndexZ() + ONE_NORTH.deltaZ);
     }
+
+    public Square get_one_North_one_East_Square(MapService mapService, Square currentPosition) {
+        return mapService.getSquareAtIndexXZ(currentPosition.getIndexX() + ONE_NORTH_ONE_EAST.deltaX, currentPosition.getIndexZ() + ONE_NORTH_ONE_EAST.deltaZ);
+    }
+
+    public Square get_one_North_two_East_Square(MapService mapService, Square currentPosition) {
+        return mapService.getSquareAtIndexXZ(currentPosition.getIndexX() + ONE_NORTH_TWO_EAST.deltaX, currentPosition.getIndexZ() + ONE_NORTH_TWO_EAST.deltaZ);
+    }
+
+    public Square get_two_West_Square(MapService mapService, Square currentPosition) {
+        return mapService.getSquareAtIndexXZ(currentPosition.getIndexX() + TWO_WEST.deltaX, currentPosition.getIndexZ() + TWO_WEST.deltaZ);
+    }
+
+    public Square get_one_West_Square(MapService mapService, Square currentPosition) {
+        return mapService.getSquareAtIndexXZ(currentPosition.getIndexX() + ONE_WEST.deltaX, currentPosition.getIndexZ() + ONE_WEST.deltaZ);
+    }
+
+    public Square get_Chicken_Square(MapService mapService, Square currentPosition) {
+        return mapService.getSquareAtIndexXZ(currentPosition.getIndexX() + CHICKEN.deltaX, currentPosition.getIndexZ() + CHICKEN.deltaZ);
+    }
+
+    public Square get_one_East_Square(MapService mapService, Square currentPosition) {
+        return mapService.getSquareAtIndexXZ(currentPosition.getIndexX() + ONE_EAST.deltaX, currentPosition.getIndexZ() + ONE_EAST.deltaZ);
+    }
+
+    public Square get_two_East_Square(MapService mapService, Square currentPosition) {
+        return mapService.getSquareAtIndexXZ(currentPosition.getIndexX() + TWO_EAST.deltaX, currentPosition.getIndexZ() + TWO_EAST.deltaZ);
+    }
+
+    public Square get_one_South_two_West_Square(MapService mapService, Square currentPosition) {
+        return mapService.getSquareAtIndexXZ(currentPosition.getIndexX() + ONE_SOUTH_TWO_WEST.deltaX, currentPosition.getIndexZ() + ONE_SOUTH_TWO_WEST.deltaZ);
+    }
+
+    public Square get_one_South_one_West_Square(MapService mapService, Square currentPosition) {
+        return mapService.getSquareAtIndexXZ(currentPosition.getIndexX() + ONE_SOUTH_ONE_WEST.deltaX, currentPosition.getIndexZ() + ONE_SOUTH_ONE_WEST.deltaZ);
+    }
+
+    public Square get_one_South_Square(MapService mapService, Square currentPosition) {
+        return mapService.getSquareAtIndexXZ(currentPosition.getIndexX() + ONE_SOUTH.deltaX, currentPosition.getIndexZ() + ONE_SOUTH.deltaZ);
+    }
+
+    public Square get_one_South_one_East_Square(MapService mapService, Square currentPosition) {
+        return mapService.getSquareAtIndexXZ(currentPosition.getIndexX() + ONE_SOUTH_ONE_EAST.deltaX, currentPosition.getIndexZ() + ONE_SOUTH_ONE_EAST.deltaZ);
+    }
+
+    public Square get_one_South_two_East_Square(MapService mapService, Square currentPosition) {
+        return mapService.getSquareAtIndexXZ(currentPosition.getIndexX() + ONE_SOUTH_TWO_EAST.deltaX, currentPosition.getIndexZ() + ONE_SOUTH_TWO_EAST.deltaZ);
+    }
+
+    public Square get_two_South_two_West_Square(MapService mapService, Square currentPosition) {
+        return mapService.getSquareAtIndexXZ(currentPosition.getIndexX() + TWO_SOUTH_TWO_WEST.deltaX, currentPosition.getIndexZ() + TWO_SOUTH_TWO_WEST.deltaZ);
+    }
+
+    public Square get_two_South_one_West_Square(MapService mapService, Square currentPosition) {
+        return mapService.getSquareAtIndexXZ(currentPosition.getIndexX() + TWO_SOUTH_ONE_WEST.deltaX, currentPosition.getIndexZ() + TWO_SOUTH_ONE_WEST.deltaZ);
+    }
+
+    public Square get_two_South_Square(MapService mapService, Square currentPosition) {
+        return mapService.getSquareAtIndexXZ(currentPosition.getIndexX() + TWO_SOUTH.deltaX, currentPosition.getIndexZ() + TWO_SOUTH.deltaZ);
+    }
+
+    public Square get_two_South_one_East_Square(MapService mapService, Square currentPosition) {
+        return mapService.getSquareAtIndexXZ(currentPosition.getIndexX() + TWO_SOUTH_ONE_EAST.deltaX, currentPosition.getIndexZ() + TWO_SOUTH_ONE_EAST.deltaZ);
+    }
+
+    public Square get_two_South_two_East_Square(MapService mapService, Square currentPosition) {
+        return mapService.getSquareAtIndexXZ(currentPosition.getIndexX() + TWO_SOUTH_TWO_EAST.deltaX, currentPosition.getIndexZ() + TWO_SOUTH_TWO_EAST.deltaZ);
+    }
+
+    // public Square getWestSquare(MapService mapService, Square currentPosition) {
+    //     return mapService.getSquareAtIndexXZ(currentPosition.getIndexX() + ONE_WEST.deltaX, currentPosition.getIndexZ() + ONE_WEST.deltaZ);
+    // }
+
+    // public Square getNorthWestSquare(MapService mapService, Square currentPosition) {
+    //     return mapService.getSquareAtIndexXZ(currentPosition.getIndexX() + ONE_NORTH_ONE_WEST.deltaX, currentPosition.getIndexZ() + ONE_NORTH_ONE_WEST.deltaZ);
+    // }
+
+    // public Square getNorthEastSquare(MapService mapService, Square currentPosition) {
+    //     return mapService.getSquareAtIndexXZ(currentPosition.getIndexX() + ONE_NORTH_ONE_EAST.deltaX, currentPosition.getIndexZ() + ONE_NORTH_ONE_EAST.deltaZ);
+    // }
+
+    // public Square getSouthEastSquare(MapService mapService, Square currentPosition) {
+    //     return mapService.getSquareAtIndexXZ(currentPosition.getIndexX() + ONE_SOUTH_ONE_EAST.deltaX, currentPosition.getIndexZ() + ONE_SOUTH_ONE_EAST.deltaZ);
+    // }
+
+    // public Square getSouthWestSquare(MapService mapService, Square currentPosition) {
+    //     return mapService.getSquareAtIndexXZ(currentPosition.getIndexX() + ONE_SOUTH_ONE_WEST.deltaX, currentPosition.getIndexZ() + ONE_SOUTH_ONE_WEST.deltaZ);
+    // }
 
     @Override
     public String toString() {

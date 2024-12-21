@@ -15,10 +15,7 @@ import de.hsrm.mi.swt.snackman.entities.map.Square;
 import de.hsrm.mi.swt.snackman.entities.mapObject.MapObjectType;
 import de.hsrm.mi.swt.snackman.entities.mapObject.snack.Snack;
 import de.hsrm.mi.swt.snackman.entities.mapObject.snack.SnackType;
-import de.hsrm.mi.swt.snackman.messaging.ChangeType;
-import de.hsrm.mi.swt.snackman.messaging.EventType;
-import de.hsrm.mi.swt.snackman.messaging.FrontendMessageEvent;
-import de.hsrm.mi.swt.snackman.messaging.FrontendMessageService;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -163,15 +160,42 @@ public class MapService {
      */
     public synchronized List<String> getSquaresVisibleForChicken(Square currentPosition, Direction lookingDirection) {
         List<String> squares = new ArrayList<>();
-        squares.add(Direction.NORTH_WEST.getNorthWestSquare(this, currentPosition).getPrimaryType());
-        squares.add(Direction.NORTH.getNorthSquare(this, currentPosition).getPrimaryType());
-        squares.add(Direction.NORTH_EAST.getNorthEastSquare(this, currentPosition).getPrimaryType());
-        squares.add(Direction.EAST.getEastSquare(this, currentPosition).getPrimaryType());
-        squares.add(Direction.SOUTH_EAST.getSouthEastSquare(this, currentPosition).getPrimaryType());
-        squares.add(Direction.SOUTH.getSouthSquare(this, currentPosition).getPrimaryType());
-        squares.add(Direction.SOUTH_WEST.getSouthWestSquare(this, currentPosition).getPrimaryType());
-        squares.add(Direction.WEST.getWestSquare(this, currentPosition).getPrimaryType());
-        squares.add(lookingDirection.toString());
+
+        squares.add(Direction.TWO_NORTH_TWO_WEST.get_two_North_two_West_Square(this, currentPosition).getPrimaryType());
+        squares.add(Direction.TWO_NORTH_ONE_WEST.get_two_North_one_West_Square(this, currentPosition).getPrimaryType());
+        squares.add(Direction.TWO_NORTH.get_two_North_Square(this, currentPosition).getPrimaryType());
+        squares.add(Direction.TWO_NORTH_ONE_EAST.get_two_North_one_East_Square(this, currentPosition).getPrimaryType());
+        squares.add(Direction.TWO_NORTH_TWO_EAST.get_two_North_two_East_Square(this, currentPosition).getPrimaryType());
+        squares.add(Direction.ONE_NORTH_TWO_WEST.get_one_North_two_West_Square(this, currentPosition).getPrimaryType());
+        squares.add(Direction.ONE_NORTH_ONE_WEST.get_one_North_one_West_Square(this, currentPosition).getPrimaryType());
+        squares.add(Direction.ONE_NORTH.get_one_North_Square(this, currentPosition).getPrimaryType());
+        squares.add(Direction.ONE_NORTH_ONE_EAST.get_one_North_one_East_Square(this, currentPosition).getPrimaryType());
+        squares.add(Direction.ONE_NORTH_TWO_EAST.get_one_North_two_East_Square(this, currentPosition).getPrimaryType());
+        squares.add(Direction.TWO_WEST.get_two_West_Square(this, currentPosition).getPrimaryType());
+        squares.add(Direction.ONE_WEST.get_one_West_Square(this, currentPosition).getPrimaryType());
+        squares.add(Direction.CHICKEN.get_Chicken_Square(this, currentPosition).getPrimaryType());
+        squares.add(Direction.ONE_EAST.get_one_East_Square(this, currentPosition).getPrimaryType());
+        squares.add(Direction.TWO_EAST.get_two_East_Square(this, currentPosition).getPrimaryType());
+        squares.add(Direction.ONE_SOUTH_TWO_WEST.get_one_South_two_West_Square(this, currentPosition).getPrimaryType());
+        squares.add(Direction.ONE_SOUTH_ONE_WEST.get_one_South_one_West_Square(this, currentPosition).getPrimaryType());
+        squares.add(Direction.ONE_SOUTH.get_one_South_Square(this, currentPosition).getPrimaryType());
+        squares.add(Direction.ONE_SOUTH_ONE_EAST.get_one_South_one_East_Square(this, currentPosition).getPrimaryType());
+        squares.add(Direction.ONE_SOUTH_TWO_EAST.get_one_South_two_East_Square(this, currentPosition).getPrimaryType());
+        squares.add(Direction.TWO_SOUTH_TWO_WEST.get_two_South_two_West_Square(this, currentPosition).getPrimaryType());
+        squares.add(Direction.TWO_SOUTH_ONE_WEST.get_two_South_one_West_Square(this, currentPosition).getPrimaryType());
+        squares.add(Direction.TWO_SOUTH.get_two_South_Square(this, currentPosition).getPrimaryType());
+        squares.add(Direction.TWO_SOUTH_ONE_EAST.get_two_South_one_East_Square(this, currentPosition).getPrimaryType());
+        squares.add(Direction.TWO_SOUTH_TWO_EAST.get_two_South_two_East_Square(this, currentPosition).getPrimaryType());
+        
+        // squares.add(Direction.NORTH_WEST.getNorthWestSquare(this, currentPosition).getPrimaryType());
+        // squares.add(Direction.NORTH.getNorthSquare(this, currentPosition).getPrimaryType());
+        // squares.add(Direction.NORTH_EAST.getNorthEastSquare(this, currentPosition).getPrimaryType());
+        // squares.add(Direction.EAST.getEastSquare(this, currentPosition).getPrimaryType());
+        // squares.add(Direction.SOUTH_EAST.getSouthEastSquare(this, currentPosition).getPrimaryType());
+        // squares.add(Direction.SOUTH.getSouthSquare(this, currentPosition).getPrimaryType());
+        // squares.add(Direction.SOUTH_WEST.getSouthWestSquare(this, currentPosition).getPrimaryType());
+        // squares.add(Direction.WEST.getWestSquare(this, currentPosition).getPrimaryType());
+        // squares.add(lookingDirection.toString());
         return squares;
     }
 

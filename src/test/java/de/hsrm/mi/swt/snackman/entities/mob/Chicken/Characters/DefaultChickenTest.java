@@ -16,7 +16,7 @@ public class DefaultChickenTest {
         Chicken chicken = new Chicken();
 
         List<String> visibleEnvironment = List.of("W", "W", "W", "L", "W",
-                                                    "SM", "L", "L", "L", "L",
+                                                    "W", "L", "L", "L", "L",
                                                     "L", "W", "H", "W", "L",
                                                     "L", "W", "L", "W", "L",
                                                     "L", "W", "L", "W", "L");
