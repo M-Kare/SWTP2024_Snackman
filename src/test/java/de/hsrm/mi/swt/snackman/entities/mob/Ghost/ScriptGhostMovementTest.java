@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * Unit tests for the 'GhostMovementSkript.py' logic accessed by Jython.
  * This class validates specific movement scenarios for the ScriptGhost.
  */
-public class GhostMovementTest {
+public class ScriptGhostMovementTest {
 
     /**
      * Tests whether the ghost moves to an empty field (' ’) if one is available.

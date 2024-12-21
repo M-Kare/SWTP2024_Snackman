@@ -1,23 +1,18 @@
 package de.hsrm.mi.swt.snackman.entities.mob.Ghost;
 
-import de.hsrm.mi.swt.snackman.entities.mobileObjects.Ghost;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.ScriptGhost;
 import org.junit.jupiter.api.Test;
-import org.python.core.PyObject;
 import org.python.util.PythonInterpreter;
-
 import java.util.ArrayList;
 import java.util.List;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
-
 
 /**
  * Integration tests for Ghost movement logic with Jython and Java integration.
  * This class ensures that the 'Ghost' Java class correctly interacts with
  * the 'GhostMovementSkript.py' Python logic.
  */
-public class GhostIntegrationTest {
+public class ScriptGhostIntegrationTest {
 
     /**
      * Tests if the Ghost's 'executeMovementSkript' method correctly identifies
