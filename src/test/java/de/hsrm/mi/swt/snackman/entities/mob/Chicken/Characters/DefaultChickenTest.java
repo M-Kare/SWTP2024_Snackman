@@ -13,6 +13,8 @@ public class DefaultChickenTest {
 
     @Test
     public void chickenMovementTest_big(){
+
+        System.out.println();
         Chicken chicken = new Chicken();
 
         List<String> visibleEnvironment = List.of("W", "W", "W", "L", "W",
