@@ -69,9 +69,8 @@ let counter = 0;
 // only sends updates to backend at 30hz
 function animate() {
   fps = 1 / clock.getDelta()
-  //player.updatePlayer();
+  player.updatePlayer();
   if (counter >= fps / targetHz) {
-    // console.log(`${player.getCamera().position.x}  |  ${player.getCamera().position.z}`)
     const time = performance.now()
     const delta = (time - prevTime) / 1000
     try {

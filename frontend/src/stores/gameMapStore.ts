@@ -23,6 +23,7 @@ export const useGameMapStore = defineStore('gameMap', () => {
   let chickenStompclient: Client
   const scene = new THREE.Scene()
   const gameObjectRenderer = GameObjectRenderer()
+  const { lobbydata } = useLobbiesStore()
   const CHICKEN_MOVEMENT_SPEED = 0.1    // step size of the interpolation: between 0 and 1
 
   const mapData = reactive({
@@ -35,8 +36,7 @@ export const useGameMapStore = defineStore('gameMap', () => {
   async function initGameMap() {
     try {
 
-      const lobbyStore = useLobbiesStore()
-      const response: IGameMapDTD = await fetchGameMapDataFromBackend(lobbyStore.lobbydata.currentPlayer.joinedLobbyId!)
+      const response: IGameMapDTD = await fetchGameMapDataFromBackend(lobbydata.currentPlayer.joinedLobbyId!)
       mapData.DEFAULT_SQUARE_SIDE_LENGTH = response.DEFAULT_SQUARE_SIDE_LENGTH
       mapData.DEFAULT_WALL_HEIGHT = response.DEFAULT_WALL_HEIGHT
 
@@ -56,9 +56,8 @@ export const useGameMapStore = defineStore('gameMap', () => {
   async function startGameMapLiveUpdate() {
     const protocol = window.location.protocol.replace('http', 'ws')
     const wsurl = `${protocol}//${window.location.host}/stompbroker`
-    const DEST_SQUARE = '/topic/square'
-    const DEST_CHICKEN = '/topic/chicken'
-
+    const DEST_SQUARE = `/topic/lobbies/${lobbydata.currentPlayer.joinedLobbyId}/square`
+    const DEST_CHICKEN = `/topic/lobbies/${lobbydata.currentPlayer.joinedLobbyId}/chicken`
     if (!snackStompclient) {
       snackStompclient = new Client({brokerURL: wsurl})
 
@@ -169,7 +168,7 @@ export const useGameMapStore = defineStore('gameMap', () => {
     currentChicken.chickenPosX = chickenUpdate.chickenPosX
     currentChicken.chickenPosZ = chickenUpdate.chickenPosZ
 
-    //chickenMesh!.position.lerp(new THREE.Vector3(currentChicken.posX * DEFAULT_SIDE_LENGTH + OFFSET, 0, currentChicken.posZ * DEFAULT_SIDE_LENGTH + OFFSET), CHICKEN_MOVEMENT_SPEED)  // interpolates between original point and new point
+    // chickenMesh!.position.lerp(new THREE.Vector3(currentChicken.chickenPosX * DEFAULT_SIDE_LENGTH + OFFSET, 0, currentChicken.chickenPosZ * DEFAULT_SIDE_LENGTH + OFFSET), CHICKEN_MOVEMENT_SPEED)  // interpolates between original point and new point
     chickenMesh!.position.set(currentChicken.chickenPosX * DEFAULT_SIDE_LENGTH + OFFSET, 0, currentChicken.chickenPosZ * DEFAULT_SIDE_LENGTH + OFFSET)
   }
 
