@@ -1,6 +1,8 @@
 package de.hsrm.mi.swt.snackman.services;
 
 import java.beans.PropertyChangeEvent;
+
+import de.hsrm.mi.swt.snackman.entities.mobileObjects.ScriptGhost;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken.Chicken;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken.Direction;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.SnackMan;
@@ -19,9 +21,11 @@ import de.hsrm.mi.swt.snackman.messaging.ChangeType;
 import de.hsrm.mi.swt.snackman.messaging.EventType;
 import de.hsrm.mi.swt.snackman.messaging.FrontendMessageEvent;
 import de.hsrm.mi.swt.snackman.messaging.FrontendMessageService;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+
 import org.python.core.PyObject;
 import de.hsrm.mi.swt.snackman.messaging.*;
 
@@ -40,6 +44,8 @@ public class MapService {
     private PythonInterpreter pythonInterpreter = null;
     private Properties pythonProps = new Properties();
     private SnackMan snackman;
+    private int AMOUNT_PLAYERS_FOR_GAME = 0;
+    private int initialisedPlayers = 0;
 
     /**
      * Constructs a new MapService
@@ -107,7 +113,7 @@ public class MapService {
      * @return a created Square
      */
     private Square createSquare(char symbol, int x, int z) {
-        Square square;
+        Square square = null;
 
         switch (symbol) {
             case '#': {
@@ -129,20 +135,40 @@ public class MapService {
                 break;
             }
             case 'C':
-                log.debug("Initialising chicken");
+                log.debug("Initialising scriptGhost");
                 square = new Square(MapObjectType.FLOOR, x, z);
                 Chicken newChicken = new Chicken(square, this);
                 Thread chickenThread = new Thread(newChicken);
                 chickenThread.start();
 
                 newChicken.addPropertyChangeListener((PropertyChangeEvent evt) -> {
-                    if (evt.getPropertyName().equals("chicken")) {
+                    if (evt.getPropertyName().equals("scriptGhost")) {
                         FrontendChickenMessageEvent messageEvent = new FrontendChickenMessageEvent(EventType.CHICKEN,
                                 ChangeType.UPDATE, (Chicken) evt.getNewValue());
 
                         frontendMessageService.sendChickenEvent(messageEvent);
                     }
                 });
+                break;
+            case 'G':
+                if (initialisedPlayers <= AMOUNT_PLAYERS_FOR_GAME) {
+                    // init real players here aka Ghost
+                } else {
+                    log.debug("Initialising scriptGhost");
+                    square = new Square(MapObjectType.FLOOR, x, z);
+                    ScriptGhost newScriptGhost = new ScriptGhost(this, square);
+                    Thread ghostThread = new Thread(newScriptGhost);
+                    ghostThread.start();
+
+                    newScriptGhost.addPropertyChangeListener((PropertyChangeEvent evt) -> {
+                        if (evt.getPropertyName().equals("scriptGhost")) {
+                            FrontendScriptGhostMessageEvent messageEvent = new FrontendScriptGhostMessageEvent(EventType.SCRIPT_GHOST,
+                                    ChangeType.UPDATE, (ScriptGhost) evt.getNewValue());
+
+                            frontendMessageService.sendScriptGhostEvent(messageEvent);
+                        }
+                    });
+                }
                 break;
             default: {
                 square = new Square(MapObjectType.FLOOR, x, z);
@@ -153,10 +179,10 @@ public class MapService {
     }
 
     /**
-     * @param currentPosition  the square the chicken is standing on top of
+     * @param currentPosition  the square the scriptGhost is standing on top of
      * @param lookingDirection
      * @return a list of 8 square which are around the current square + the
-     * direction the chicken is looking in the order:
+     * direction the scriptGhost is looking in the order:
      * northwest_square, north_square, northeast_square, east_square,
      * southeast_square, south_square, southwest_square, west_square,
      * direction
