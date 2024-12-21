@@ -20,12 +20,9 @@ public class PlayerStompController {
     @Autowired
     private LobbyManagerService lobbyService;
 
-    // Erhalte Messages von /topic/player/update
-    //TODO: In MapService HashMap von <UUID, Mob> und dann entsprechende Figur holen zum verschicken
     @MessageMapping("/topic/lobbies/{lobbyId}/player/update")
     public void spreadPlayerUpdate(@DestinationVariable String lobbyId, PlayerToBackendDTO player) {
         Lobby currentLobby = lobbyService.findLobbyByLobbyId(lobbyId);
-        //TODO prüfen ob instanz von Snackman
         var playerMob = switch (currentLobby.getClientMobMap().get(player.playerId())) {
             case SnackMan snackman -> jumpUpdate(player, snackman);
             case Ghost ghost -> ghost;

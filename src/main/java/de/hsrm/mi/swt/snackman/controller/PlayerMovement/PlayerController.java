@@ -15,7 +15,6 @@ public class PlayerController {
     
     // Zum Registrieren eines neuen Spielers
 
-    //TODO Snackman erstellen
     @GetMapping("/lobbies/{lobbyId}/player/{playerId}")
     public ResponseEntity<PlayerToFrontendDTO> initSnackman(@PathVariable("lobbyId") String lobbyId, @PathVariable("playerId") String playerId) {
         var playerMob = lobbyService.findLobbyByLobbyId(lobbyId).getClientMobMap().get(playerId);
@@ -25,11 +24,4 @@ public class PlayerController {
                 playerMob.getRotationQuaternion().z, playerMob.getRotationQuaternion().w, playerMob.getRadius(),
                 playerMob.getSpeed(), playerId));
     }
-
-    // TODO: Ghost ertsellen
-    // @PostMapping("/ghost")
-    // public ResponseEntity<PlayerToFrontendDTO> initGhost(@RequestParam("uuid") String uuid){
-    //     SnackMan snackman = mapService.createSnackMan(uuid);
-    //     return ResponseEntity.ok(new PlayerToFrontendDTO(snackman.getPosX(), snackman.getPosY(), snackman.getPosZ(), snackman.getRadius(), GameConfig.SNACKMAN_SPEED, uuid));
-    // }
 }

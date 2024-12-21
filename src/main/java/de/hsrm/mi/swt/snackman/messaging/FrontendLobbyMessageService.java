@@ -11,7 +11,6 @@ public class FrontendLobbyMessageService {
 
     Logger log = LoggerFactory.getLogger(FrontendLobbyMessageService.class);
 
-    //TODO LobbyId to messages
     public FrontendLobbyMessageService(SimpMessagingTemplate messagingTemplate) {
         this.messagingTemplate = messagingTemplate;
     }

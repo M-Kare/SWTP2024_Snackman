@@ -40,7 +40,6 @@ public class MapService {
     private final FrontendLobbyMessageService frontendLobbyMessageService;
 
     Logger log = LoggerFactory.getLogger(MapService.class);
-    // TODO Should be a HashMap of Ghosts
 
     /**
      * Constructs a new MapService
@@ -50,11 +49,6 @@ public class MapService {
     public MapService(ReadMazeService readMazeService, FrontendLobbyMessageService frontendLobbyMessageService) {
         this.readMazeService = readMazeService;
         this.frontendLobbyMessageService = frontendLobbyMessageService;
-
-        // TODO create Snackmans in lobby
-        // snackman = new SnackMan(this, GameConfig.SNACKMAN_SPEED,
-        // GameConfig.SNACKMAN_RADIUS);
-        // snackmans = new HashMap<>();
     }
 
     public GameMap createNewGameMap(String lobbyId, String filePath) {
@@ -73,7 +67,7 @@ public class MapService {
      * @param mazeData the char array representing the maze
      */
     private GameMap convertMazeDataGameMap(String lobbyId,
-            char[][] mazeData) {
+                                           char[][] mazeData) {
         Square[][] squaresBuildingMap = new Square[mazeData.length][mazeData[0].length];
 
         for (int x = 0; x < mazeData.length; x++) {
@@ -90,9 +84,6 @@ public class MapService {
 
         return new GameMap(squaresBuildingMap);
     }
-
-    // TODO Maze.py map größe als Argumente herein reichen statt in der python-file
-    // selbst zu hinterlegen
 
     /**
      * Creates a Square by given indexes
@@ -165,8 +156,8 @@ public class MapService {
     /**
      * Goes trough the map and checks if it's a spawnpoint and sets a Mob
      *
-     * @param gameMap
-     * @param lobbyId
+     * @param gameMap where the mobs should spawn
+     * @param lobby of the mobs
      */
     public void spawnMobs(GameMap gameMap, Lobby lobby) {
         List<Square> ghostSpawnSquares = new ArrayList<>();
@@ -210,6 +201,16 @@ public class MapService {
             }
         }
 
+        placeMobsOnMap(lobby, ghostSpawnSquares, snackmanSpawnSquares);
+    }
+
+    /**
+     *
+     * @param lobby where the Mobs should spawn
+     * @param ghostSpawnSquares list of spawnpoints of ghosts
+     * @param snackmanSpawnSquares list of spawnpoints of snackmans
+     */
+    private void placeMobsOnMap(Lobby lobby, List<Square> ghostSpawnSquares, List<Square> snackmanSpawnSquares) {
         int ghostSpawnIndex = 0;
         int snackmanSpawnIndex = 0;
         Square temp;

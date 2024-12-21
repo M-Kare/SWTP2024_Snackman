@@ -197,8 +197,6 @@ public abstract class Mob {
         setCurrentSquareWithIndex(position.x, position.z);
     }
 
-    // TODO: SnackMan spawn in MapService benötigt
-
     /**
      * respawns the mob at his spawn-location
      */

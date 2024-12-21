@@ -91,12 +91,6 @@ public class SnackMan extends EatingMob {
 
     }
 
-    @Override
-    public void move(double x, double y, double z) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'move'");
-    }
-
     public int getCurrentCalories() {
         return super.getKcal();
     }
