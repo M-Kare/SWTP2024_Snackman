@@ -3,13 +3,18 @@ import {reactive, readonly} from "vue";
 import type {IGameMap, IGameMapDTD} from './IGameMapDTD';
 import {fetchGameMapDataFromBackend} from "../services/GameMapDataService.js";
 import {Client} from "@stomp/stompjs";
-import type {IFrontendChickenMessageEvent, IFrontendMessageEvent} from "@/services/IFrontendMessageEvent";
+import type {
+  IFrontendChickenMessageEvent,
+  IFrontendGhostMessageEvent,
+  IFrontendMessageEvent
+} from "@/services/IFrontendMessageEvent";
 import type {ISquare} from "@/stores/Square/ISquareDTD";
 import * as THREE from "three";
 import {Scene} from "three";
 import type {IChicken, IChickenDTD} from "@/stores/Chicken/IChickenDTD";
 import {Direction} from "@/stores/Chicken/IChickenDTD";
 import {GameObjectRenderer} from "@/renderer/GameObjectRenderer";
+import type {IGhost, IGhostDTD} from "@/stores/Ghost/IGhostDTD";
 
 /**
  * Defines the pinia store used for saving the map from
@@ -20,6 +25,7 @@ import {GameObjectRenderer} from "@/renderer/GameObjectRenderer";
 export const useGameMapStore = defineStore('gameMap', () => {
   let snackStompclient: Client
   let chickenStompclient: Client
+  let ghostStompclient: Client
   const scene = new THREE.Scene()
   const gameObjectRenderer = GameObjectRenderer()
   const CHICKEN_MOVEMENT_SPEED = 0.1    // step size of the interpolation: between 0 and 1
@@ -28,12 +34,12 @@ export const useGameMapStore = defineStore('gameMap', () => {
     DEFAULT_SQUARE_SIDE_LENGTH: 0,
     DEFAULT_WALL_HEIGHT: 0,
     gameMap: new Map<number, ISquare>(),
-    chickens: []
+    chickens: [],
+    ghosts: []
   } as IGameMap);
 
   async function initGameMap() {
     try {
-
       const response: IGameMapDTD = await fetchGameMapDataFromBackend()
       mapData.DEFAULT_SQUARE_SIDE_LENGTH = response.DEFAULT_SQUARE_SIDE_LENGTH
       mapData.DEFAULT_WALL_HEIGHT = response.DEFAULT_WALL_HEIGHT
@@ -46,6 +52,9 @@ export const useGameMapStore = defineStore('gameMap', () => {
         mapData.chickens.push(chicken as IChicken)
       }
 
+      for (const ghost of response.ghosts) {
+        mapData.ghosts.push(ghost as IGhost)
+      }
     } catch (reason) {
       throw reason //Throw again to pass to execution function
     }
@@ -56,6 +65,7 @@ export const useGameMapStore = defineStore('gameMap', () => {
     const wsurl = `${protocol}//${window.location.host}/stompbroker`
     const DEST_SQUARE = '/topic/square'
     const DEST_CHICKEN = '/topic/chicken'
+    const DEST_GHOST = '/topic/ghost'
 
     if (!snackStompclient) {
       snackStompclient = new Client({brokerURL: wsurl})
@@ -88,7 +98,6 @@ export const useGameMapStore = defineStore('gameMap', () => {
 
       snackStompclient.activate()
     }
-
 
     if (!chickenStompclient) {
       chickenStompclient = new Client({brokerURL: wsurl})
@@ -135,6 +144,47 @@ export const useGameMapStore = defineStore('gameMap', () => {
 
       chickenStompclient.activate()
     }
+
+    if (!ghostStompclient) {
+      ghostStompclient = new Client({brokerURL: wsurl})
+
+      ghostStompclient.onWebSocketError = (event) => {
+        throw new Error('Ghost Websocket with message: ' + event)
+      }
+
+      ghostStompclient.onStompError = (frameElement) => {
+        throw new Error('Ghost Stompclient with message: ' + frameElement)
+      }
+
+      ghostStompclient.onConnect = () => {
+        console.log('Stompclient for ghost connected')
+
+        ghostStompclient.subscribe(DEST_GHOST, async (message) => {
+          const change: IFrontendGhostMessageEvent = JSON.parse(message.body)
+          console.log("Received a ghost update: {}", change)
+
+          // todo only display ghosts which are not you -> fix when lobby ready
+
+          const ghostUpdate: IGhostDTD = change.ghost
+          const OFFSET = mapData.DEFAULT_SQUARE_SIDE_LENGTH / 2
+          const DEFAULT_SIDE_LENGTH = mapData.DEFAULT_SQUARE_SIDE_LENGTH
+          const currentGhost = mapData.ghosts.find(ghost => ghost.id == ghostUpdate.id)
+          console.log("ghost update {}", ghostUpdate)
+
+          if (currentGhost == undefined) {
+            console.error("A ghost is undefined in pinia")
+          } else {
+            updateGhost(currentGhost, ghostUpdate, DEFAULT_SIDE_LENGTH, OFFSET)
+          }
+        })
+      }
+
+      ghostStompclient.onDisconnect = () => {
+        console.log('Chicken Stompclient disconnected.')
+      }
+
+      ghostStompclient.activate()
+    }
   }
 
   function updateThickness(currentChicken: IChicken, chickenUpdate: IChickenDTD) {
@@ -161,7 +211,6 @@ export const useGameMapStore = defineStore('gameMap', () => {
   }
 
   function updateWalkingDirection(currentChicken: IChicken, chickenUpdate: IChickenDTD, DEFAULT_SIDE_LENGTH: number, OFFSET: number) {
-    console.log("Chicken moved")
     const chickenMesh = scene.getObjectById(currentChicken.meshId)
 
     currentChicken.chickenPosX = chickenUpdate.chickenPosX
@@ -169,6 +218,16 @@ export const useGameMapStore = defineStore('gameMap', () => {
 
     //chickenMesh!.position.lerp(new THREE.Vector3(currentChicken.posX * DEFAULT_SIDE_LENGTH + OFFSET, 0, currentChicken.posZ * DEFAULT_SIDE_LENGTH + OFFSET), CHICKEN_MOVEMENT_SPEED)  // interpolates between original point and new point
     chickenMesh!.position.set(currentChicken.chickenPosX * DEFAULT_SIDE_LENGTH + OFFSET, 0, currentChicken.chickenPosZ * DEFAULT_SIDE_LENGTH + OFFSET)
+  }
+
+  function updateGhost(currentGhost: IGhost, ghostUpdate: IGhostDTD, DEFAULT_SIDE_LENGTH: number, OFFSET: number) {
+    const ghostMesh = scene.getObjectById(currentGhost.meshId)
+
+    currentGhost.posX = ghostUpdate.posX
+    currentGhost.posZ = ghostUpdate.posZ
+    currentGhost.posY = ghostUpdate.posY
+
+    ghostMesh!.position.set(currentGhost.posX * DEFAULT_SIDE_LENGTH + OFFSET, currentGhost.posY, currentGhost.posZ * DEFAULT_SIDE_LENGTH + OFFSET)
   }
 
   function setSnackMeshId(squareId: number, meshId: number) {
@@ -181,6 +240,12 @@ export const useGameMapStore = defineStore('gameMap', () => {
     const chicken = mapData.chickens.find(chicken => chicken.id === chickenId);
     if (chicken != undefined)
       chicken.meshId = meshId
+  }
+
+  function setGhostMeshId(meshId: number, ghostId: number) {
+    const ghost = mapData.ghosts.find(ghost => ghost.id === ghostId);
+    if (ghost != undefined)
+      ghost.meshId = meshId
   }
 
   function removeMeshFromScene(scene: Scene, meshId: number) {
@@ -200,6 +265,7 @@ export const useGameMapStore = defineStore('gameMap', () => {
     startGameMapLiveUpdate,
     setSnackMeshId,
     setChickenMeshId,
+    setGhostMeshId,
     getScene
   };
 })

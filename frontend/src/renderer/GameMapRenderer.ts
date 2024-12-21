@@ -96,6 +96,20 @@ export const GameMapRenderer = () => {
 
       gameMapStore.setChickenMeshId(chickenToAdd.id, currentChicken.id)
     }
+
+    // add ghosts
+    // todo -> do not at ghost player is controlling
+    for (let currentGhost of mapData.ghosts) {
+      const ghostToAdd = gameObjectRenderer.createGhostOnFloor(
+        currentGhost.posX * DEFAULT_SIDE_LENGTH + OFFSET,
+        currentGhost.posZ * DEFAULT_SIDE_LENGTH + OFFSET,
+        currentGhost.posY,
+        DEFAULT_SIDE_LENGTH
+      )
+      scene.add(ghostToAdd)
+
+      gameMapStore.setGhostMeshId(ghostToAdd.id, currentGhost.id)
+    }
   }
 
   const getScene = () => {
