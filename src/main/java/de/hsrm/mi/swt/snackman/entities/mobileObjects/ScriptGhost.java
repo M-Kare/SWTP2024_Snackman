@@ -42,8 +42,8 @@ public class ScriptGhost extends Mob implements Runnable {
         super(null);
     }
 
-    public ScriptGhost(ScriptGhostDifficulty difficulty) {
-        this();
+    public ScriptGhost(MapService mapService, ScriptGhostDifficulty difficulty) {
+        super(mapService);
         this.difficulty = difficulty;
     }
 
@@ -90,7 +90,17 @@ public class ScriptGhost extends Mob implements Runnable {
 
             log.debug("Current position is x {} z {}", this.ghostPosX, this.ghostPosZ);
 
-            int newMove = executeMovementSkript(squares);
+            int newMove = 0;
+            if(this.difficulty == ScriptGhostDifficulty.EASY) {
+                newMove = executeMovementSkript(squares);
+            } else {
+                List<List<String>> pythonList = new ArrayList<>();
+                for (String[] row : mapService.getGameMap().getStringMap(this.id)) {
+                    pythonList.add(Arrays.asList(row));
+                }
+                newMove = executeMovementSkriptDifficult(pythonList);
+            }
+
             if (difficulty == ScriptGhostDifficulty.EASY) {
                 pythonInterpreter.exec("from GhostMovementSkript import choose_next_square");
             } else {
@@ -114,19 +124,8 @@ public class ScriptGhost extends Mob implements Runnable {
         try {
             log.debug("Running python ghost script with: {}", squares.toString());
 
-            PyObject func = null;
-            PyObject result = null;
-            if (difficulty == ScriptGhostDifficulty.EASY) {
-                func = pythonInterpreter.get("choose_next_square");
-                result = func.__call__(new PyList(squares));
-            } else {
-                List<List<String>> pythonList = new ArrayList<>();
-                for (String[] row : mapService.getGameMap().getStringMap(this.id)) {
-                    pythonList.add(Arrays.asList(row));
-                }
-                func = pythonInterpreter.get("choose_next_move");
-                result = func.__call__(new PyList(pythonList));
-            }
+            PyObject func = pythonInterpreter.get("choose_next_square");
+            PyObject result = func.__call__(new PyList(squares));
 
             return Integer.parseInt(result.toString());
         } catch (Exception ex) {
@@ -136,19 +135,19 @@ public class ScriptGhost extends Mob implements Runnable {
         return 0;
     }
 
-    /**
-     * Converts a Python list to a Java list.
-     *
-     * @param pyList the Python list to convert.
-     * @return the corresponding Java list.
-     */
-    private List<String> convertPythonList(PyList pyList) {
-        List<String> javaList = new ArrayList<>();
-        for (Object item : pyList) {
-            javaList.add(item.toString());
+    public int executeMovementSkriptDifficult(List<List<String>> pythonList) {
+        try {
+            log.debug("Running python ghost script with: {}", pythonList.toString());
+
+            PyObject func = pythonInterpreter.get("choose_next_move");
+            PyObject result = func.__call__(new PyList(pythonList));
+
+            return Integer.parseInt(result.toString());
+        } catch (Exception ex) {
+            log.error("Error while executing ghost python script: ", ex);
+            ex.printStackTrace();
         }
-        log.debug("Python script result is {}", javaList);
-        return javaList;
+        return 0;
     }
 
     /**
@@ -161,7 +160,7 @@ public class ScriptGhost extends Mob implements Runnable {
         log.info("Initialising jython for ghost movement");
         this.pythonInterpreter = new PythonInterpreter();
         pythonInterpreter.exec("from GhostMovementSkript import choose_next_square");
-        pythonInterpreter.exec("from SmartGhostMovementSkript import choose_next_square");
+        pythonInterpreter.exec("from SmartGhostMovementSkript import choose_next_move");
     }
 
     /**
