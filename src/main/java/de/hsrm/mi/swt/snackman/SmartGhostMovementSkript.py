@@ -71,7 +71,7 @@ def choose_next_square_finding_snackman(labyrinth, ghostPosition, snackmanPositi
     """
     path = find_path_to_snackman(labyrinth, ghostPosition, snackmanPosition)
     (a, b) = (path[1][0] - ghostPosition[0], path[1][1] - ghostPosition[1])
-    direction = a + 2 * b
+    direction = a * 2 + b
     if direction == -1:
         return "3"
     elif direction == 1:
