@@ -32,7 +32,7 @@ stompclient.onStompError = frame => {
 }
 stompclient.onConnect = frame => {
   // Callback: erfolgreicher Verbindugsaufbau zu Broker
-  stompclient.subscribe(`/topic/lobbies/${lobbydata.currentPlayer.joinedLobby?.lobbyId!}/player`, message => {
+  stompclient.subscribe(`/topic/lobbies/${lobbydata.currentPlayer.joinedLobbyId!}/player`, message => {
     // Callback: Nachricht auf DEST empfangen
     // empfangene Nutzdaten in message.body abrufbar,
     // ggf. mit JSON.parse(message.body) zu JS konvertieren
@@ -77,7 +77,7 @@ function animate() {
     try {
       //Sende and /topic/player/update
       stompclient.publish({
-        destination: `/topic/lobbies/${lobbydata.currentPlayer.joinedLobby?.lobbyId!}/player/update`, headers: {},
+        destination: `/topic/lobbies/${lobbydata.currentPlayer.joinedLobbyId!}/player/update`, headers: {},
         body: JSON.stringify(Object.assign({}, player.getInput(), {jump: player.getIsJumping()},
           {doubleJump: player.getIsDoubleJumping()}, {
             qX: player.getCamera().quaternion.x,
@@ -116,10 +116,10 @@ onMounted(async () => {
     console.error('Error when retrieving the gameMap:', error)
   }
 
-  clients = lobbydata.currentPlayer.joinedLobby?.members!
+  clients = lobbydata.lobbies.find((elem)=>elem.lobbyId===lobbydata.currentPlayer.joinedLobbyId)?.members!
   console.log(clients)
   const playerData = await
-    fetchSnackManFromBackend(lobbydata.currentPlayer.joinedLobby?.lobbyId!, lobbydata.currentPlayer.playerId);
+    fetchSnackManFromBackend(lobbydata.currentPlayer.joinedLobbyId!, lobbydata.currentPlayer.playerId);
   clients.forEach(it => {
     if(it.playerId === lobbydata.currentPlayer.playerId){
       player = new Player(renderer, playerData.posX, playerData.posY, playerData.posZ, playerData.radius, playerData.speed)

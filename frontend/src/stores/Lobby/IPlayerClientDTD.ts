@@ -4,5 +4,5 @@ export interface IPlayerClientDTD{
     playerId: string
     playerName: string
     role: string
-    joinedLobby?: ILobbyDTD
+    joinedLobbyId?: string
 }

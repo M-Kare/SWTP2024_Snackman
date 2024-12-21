@@ -36,7 +36,7 @@ export const useGameMapStore = defineStore('gameMap', () => {
     try {
 
       const lobbyStore = useLobbiesStore()
-      const response: IGameMapDTD = await fetchGameMapDataFromBackend(lobbyStore.lobbydata.currentPlayer.joinedLobby?.lobbyId!)
+      const response: IGameMapDTD = await fetchGameMapDataFromBackend(lobbyStore.lobbydata.currentPlayer.joinedLobbyId!)
       mapData.DEFAULT_SQUARE_SIDE_LENGTH = response.DEFAULT_SQUARE_SIDE_LENGTH
       mapData.DEFAULT_WALL_HEIGHT = response.DEFAULT_WALL_HEIGHT
 

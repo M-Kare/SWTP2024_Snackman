@@ -156,7 +156,7 @@ export const useLobbiesStore = defineStore('lobbiesstore', () =>{
 
             if(response.ok){
                 const lobby: ILobbyDTD = await response.json()
-                lobbydata.currentPlayer.joinedLobby = lobby
+                lobbydata.currentPlayer.joinedLobbyId = lobby.lobbyId
                 lobbydata.lobbies.push(lobby)
                 return lobby
             } else {
@@ -200,7 +200,7 @@ export const useLobbiesStore = defineStore('lobbiesstore', () =>{
 
             if(response.ok){
                 const lobby: ILobbyDTD = await response.json()
-                lobbydata.currentPlayer.joinedLobby = lobby
+                lobbydata.currentPlayer.joinedLobbyId = lobby.lobbyId
 
                 console.log('lobbiesStore joinLobby successful')
                 return lobby
