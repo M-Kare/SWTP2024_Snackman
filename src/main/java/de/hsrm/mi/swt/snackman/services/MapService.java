@@ -215,5 +215,6 @@ public class MapService {
 
     public String getFilePath(){
         return this.filePath;
+        //return null; //Just use for test
     }
 }

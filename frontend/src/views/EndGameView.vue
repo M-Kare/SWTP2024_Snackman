@@ -1,45 +1,63 @@
 <template>
-    <div class="start-page">
-      <div class="background"></div>
-      <div class="overlay"></div>
-      <h1 class="title">Game End!</h1>
-      <MainMenuButton class="map-exportieren-button" @click="downloadMap">Map exportieren</MainMenuButton>
+  <div class="start-page">
+    <div class="background"></div>
+    <div class="overlay"></div>
+    <h1 class="title">Game End!</h1>
+    <MainMenuButton class="map-exportieren-button" @click="downloadMap">Map exportieren</MainMenuButton>
+    <div v-if="feedbackMessage" :class="['feedback-message', feedbackClass]">
+      {{ feedbackMessage }}
     </div>
-  </template>
+  </div>
+</template>
 
-  <script setup lang="ts">
-    import MainMenuButton from '@/components/MainMenuButton.vue';
-    import { useRouter } from 'vue-router';
+<script setup lang="ts">
+  import MainMenuButton from '@/components/MainMenuButton.vue';
+  import { ref } from 'vue';
+  import { useRouter } from 'vue-router';
 
-    const router = useRouter();
+  const router = useRouter();
+  const feedbackMessage = ref('');
+  const feedbackClass = ref('');
+    
+  const downloadMap = async () => {
+    try{
+      const response = await fetch(`/api/download`);
 
-    const downloadMap = async () => {
-      try{
-        const response = await fetch(`/api/download`);
+      if(!response.ok) throw new Error('Failed to download map.');
 
-        if(!response.ok) throw new Error('Failed to download map.');
+      const blob = await response.blob();
+      const link = document.createElement('a');   // Create an anchor element to trigger the download
+      const url = URL.createObjectURL(blob);
+      link.href = url;
+      link.download = 'SnackManMap.txt';
+      document.body.appendChild(link);            // Append the link to the DOM
+      link.click();                               // Simulate a click to start the download        document.body.removeChild(link);            // Remove the link after the download
 
-        const blob = await response.blob();
-        const link = document.createElement('a');   // Create an anchor element to trigger the download
-        const url = URL.createObjectURL(blob);
-        link.href = url;
-        link.download = 'SnackManMap.txt';
-        document.body.appendChild(link);            // Append the link to the DOM
-        link.click();                               // Simulate a click to start the download
-        document.body.removeChild(link);            // Remove the link after the download
-
-        // Revoke the object URL to free up memory
-        URL.revokeObjectURL(url);
-  
+      // Revoke the object URL to free up memory
+      URL.revokeObjectURL(url);
+      
+      // Success feedback
+      feedbackMessage.value = 'Map saved';
+      feedbackClass.value = 'success';
             
-      } catch(error: any){
-        console.error('Error downloading file:', error);
-      }
+    } catch(error: any){
+      console.error('Error downloading file:', error);
+
+      // Failure feedback
+      feedbackMessage.value = 'Map not saved';
+      feedbackClass.value = 'error';
     }
 
-  </script>
+    // Clear feedback after 3 seconds
+    setTimeout(() => {
+      feedbackMessage.value = '';
+      feedbackClass.value = '';
+    }, 3000);
+  }
 
-  <style scoped>
+</script>
+
+<style scoped>
   .start-page {
     width: 100vw;
     height: 100vh;
@@ -88,4 +106,38 @@
     transform: translate(-50%, -50%);
     z-index: 3;
   }
-  </style>
+
+  .feedback-message {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 1.5rem;
+    font-weight: bold;
+    z-index: 3;
+    padding: 10px 20px;
+    border-radius: 5px;
+    text-align: center;
+    animation: fadeIn 0.5s;
+  }
+
+  .feedback-message.success {
+    color: #fff;
+    background-color: #50C878;
+  }
+
+  .feedback-message.error {
+    color: #fff;
+    background-color: #C70039;
+  }
+
+  /* Fade-in animation */
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+</style>
