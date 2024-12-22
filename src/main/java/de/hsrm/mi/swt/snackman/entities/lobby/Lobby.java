@@ -14,11 +14,11 @@ public class Lobby {
       private boolean isGameStarted;
       private List<PlayerClient> members;
 
-      public Lobby(String name, PlayerClient adminClient, boolean isGameStarted) {
+      public Lobby(String name, PlayerClient adminClient) {
             this.uuid = UUID.randomUUID().toString();
             this.name = name;
             this.adminClient = adminClient;
-            this.isGameStarted = isGameStarted;
+            this.isGameStarted = false;
             this.members = new ArrayList<>();
             this.members.add(adminClient);
       }

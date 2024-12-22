@@ -16,144 +16,144 @@ import de.hsrm.mi.swt.snackman.entities.lobby.ROLE;
  */
 @Service
 public class LobbyManagerService {
-      
-      private final List<Lobby> lobbies = new ArrayList<>();
-      private final List<PlayerClient> clients = new ArrayList<>();
 
-      
-      /**
-       * Create a new client
-       * 
-       * @param name the name of the client
-       * @return the client
-       */
-      public PlayerClient createNewClient(String name) {
-            String uuid = UUID.randomUUID().toString();
-            PlayerClient newClient = new PlayerClient(uuid, name);
-            this.clients.add(newClient);
+    private final List<Lobby> lobbies = new ArrayList<>();
+    private final List<PlayerClient> clients = new ArrayList<>();
 
-            return newClient;
-      }
 
-      /**
-       * Creates a new lobby and adds it to the list.
-       * 
-       * @param name    Name of the lobby
-       * @param adminID ID of the lobby creator
-       * @return The lobby created
-       * @throws LobbyAlreadyExistsException
-       */
-      public Lobby createLobby(String name, PlayerClient admin) throws LobbyAlreadyExistsException {
-            if (lobbies.stream().anyMatch(lobby -> lobby.getName().equals(name))) {
-                  throw new LobbyAlreadyExistsException("Lobby name already exists");
-            }
+    /**
+     * Create a new client
+     *
+     * @param name the name of the client
+     * @return the client
+     */
+    public PlayerClient createNewClient(String name) {
+        String uuid = UUID.randomUUID().toString();
+        PlayerClient newClient = new PlayerClient(uuid, name);
+        this.clients.add(newClient);
 
-            Lobby lobby = new Lobby(name, admin, false);
+        return newClient;
+    }
 
-            admin.setRole(ROLE.SNACKMAN);
+    /**
+     * Creates a new lobby and adds it to the list.
+     *
+     * @param name  Name of the lobby
+     * @param admin the lobby creator
+     * @return The lobby created
+     * @throws LobbyAlreadyExistsException
+     */
+    public Lobby createLobby(String name, PlayerClient admin) throws LobbyAlreadyExistsException {
+        if (lobbies.stream().anyMatch(lobby -> lobby.getName().equals(name))) {
+            throw new LobbyAlreadyExistsException("Lobby name already exists");
+        }
 
-            lobbies.add(lobby);
-            return lobby;
-      }
+        Lobby lobby = new Lobby(name, admin);
 
-      /**
-       * Returns the list of all lobbies.
-       * 
-       * @return list of lobbies
-       */
-      public List<Lobby> getAllLobbies() {
-            return this.lobbies.stream().filter(lobby -> !lobby.isGameStarted()).toList();
-      }
+        admin.setRole(ROLE.SNACKMAN);
 
-      /**
-       * Adds a player to a lobby.
-       * 
-       * @param lobbyId  ID of the lobby
-       * @param playerId ID of the player
-       * @return The updated lobby
-       * @throws GameAlreadyStartedException if the game has already been started
-       */
-      public Lobby joinLobby(String lobbyId, String playerId) throws GameAlreadyStartedException {
-            Lobby lobby = findLobbyByUUID(lobbyId);
+        lobbies.add(lobby);
+        return lobby;
+    }
 
-            if (lobby.isGameStarted()) {
-                  throw new GameAlreadyStartedException("Game already started");
-            }
+    /**
+     * Returns the list of all lobbies.
+     *
+     * @return list of lobbies
+     */
+    public List<Lobby> getAllLobbies() {
+        return this.lobbies.stream().filter(lobby -> !lobby.isGameStarted()).toList();
+    }
 
-            PlayerClient newJoiningClient = findClientByUUID(playerId);
-            newJoiningClient.setRole(ROLE.GHOST);
-            lobby.getMembers().add(newJoiningClient);
-            return lobby;
-      }
+    /**
+     * Adds a player to a lobby.
+     *
+     * @param lobbyId  ID of the lobby
+     * @param playerId ID of the player
+     * @return The updated lobby
+     * @throws GameAlreadyStartedException if the game has already been started
+     */
+    public Lobby joinLobby(String lobbyId, String playerId) throws GameAlreadyStartedException {
+        Lobby lobby = findLobbyByUUID(lobbyId);
 
-      /**
-       * Removes a player from a lobby.
-       * 
-       * @param lobbyId  ID of the lobby
-       * @param playerId ID of the player
-       */
-      public void leaveLobby(String lobbyId, String playerId) {
-            Lobby lobby = findLobbyByUUID(lobbyId);
-            lobby.getMembers().removeIf(client -> client.getPlayerId().equals(playerId));
+        if (lobby.isGameStarted()) {
+            throw new GameAlreadyStartedException("Game already started");
+        }
 
-            
-            if (lobby.getAdminClientId().equals(playerId) || lobby.getMembers().isEmpty()) {
-                  lobbies.remove(lobby);
-            }
-      }
+        PlayerClient newJoiningClient = findClientByUUID(playerId);
+        newJoiningClient.setRole(ROLE.GHOST);
+        lobby.getMembers().add(newJoiningClient);
+        return lobby;
+    }
 
-      /**
-       * Starts the game in the specified lobby.
-       * 
-       * @param lobbyId ID of the lobby
-       */
-      public void startGame(String lobbyId) {
-            Lobby lobby = findLobbyByUUID(lobbyId);
+    /**
+     * Removes a player from a lobby.
+     *
+     * @param lobbyId  ID of the lobby
+     * @param playerId ID of the player
+     */
+    public void leaveLobby(String lobbyId, String playerId) {
+        Lobby lobby = findLobbyByUUID(lobbyId);
+        lobby.getMembers().removeIf(client -> client.getPlayerId().equals(playerId));
 
-            if (lobby.getMembers().size() < 2) {
-                  throw new IllegalStateException("Not enough players to start the game");
-            }
 
-            lobby.setGameStarted(true);
-      }
+        if (lobby.getAdminClientId().equals(playerId) || lobby.getMembers().isEmpty()) {
+            lobbies.remove(lobby);
+        }
+    }
 
-      /**
-       * Searches the lobby for its UUID
-       * 
-       * @param lobbyID UUID of the lobby
-       * @return the lobby
-       */
-      public Lobby findLobbyByUUID(String lobbyID) {
-            return lobbies.stream()
-                        .filter(l -> l.getUuid().equals(lobbyID))
-                        .findFirst()
-                        .orElseThrow(() -> new NoSuchElementException("Lobby not found"));
-      }
+    /**
+     * Starts the game in the specified lobby.
+     *
+     * @param lobbyId ID of the lobby
+     */
+    public void startGame(String lobbyId) {
+        Lobby lobby = findLobbyByUUID(lobbyId);
 
-      /**
-       * Searches the client for their UUID
-       * 
-       * @param clientID UUID of the client
-       * @return the client
-       */
-      public PlayerClient findClientByUUID(String clientID) {
-            return clients.stream()
-                        .filter(l -> l.getPlayerId().equals(clientID))
-                        .findFirst()
-                        .orElseThrow(() -> new NoSuchElementException("Client not found"));
-      }
+        if (lobby.getMembers().size() < 2) {
+            throw new IllegalStateException("Not enough players to start the game");
+        }
 
-      /**
-       * Retrieves the active client or creates a new client
-       * 
-       * @param name     the name of the client
-       * @param clientID the uuid of the client
-       * @return the client
-       */
-      public PlayerClient getClient(String name, String clientID) {
-            return clients.stream()
-                        .filter(l -> l.getPlayerId().equals(clientID) && l.getPlayerName().equals(name))
-                        .findFirst()
-                        .orElse(createNewClient(name));
-      }
+        lobby.setGameStarted(true);
+    }
+
+    /**
+     * Searches the lobby for its UUID
+     *
+     * @param lobbyID UUID of the lobby
+     * @return the lobby
+     */
+    public Lobby findLobbyByUUID(String lobbyID) {
+        return lobbies.stream()
+                .filter(l -> l.getUuid().equals(lobbyID))
+                .findFirst()
+                .orElseThrow(() -> new NoSuchElementException("Lobby not found"));
+    }
+
+    /**
+     * Searches the client for their UUID
+     *
+     * @param clientID UUID of the client
+     * @return the client
+     */
+    public PlayerClient findClientByUUID(String clientID) {
+        return clients.stream()
+                .filter(l -> l.getPlayerId().equals(clientID))
+                .findFirst()
+                .orElseThrow(() -> new NoSuchElementException("Client not found"));
+    }
+
+    /**
+     * Retrieves the active client or creates a new client
+     *
+     * @param name     the name of the client
+     * @param clientID the uuid of the client
+     * @return the client
+     */
+    public PlayerClient getClient(String name, String clientID) {
+        return clients.stream()
+                .filter(l -> l.getPlayerId().equals(clientID) && l.getPlayerName().equals(name))
+                .findFirst()
+                .orElse(createNewClient(name));
+    }
 }
