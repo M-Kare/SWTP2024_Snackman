@@ -62,7 +62,7 @@ public class LobbyManagerService {
        * @return list of lobbies
        */
       public List<Lobby> getAllLobbies() {
-            return this.lobbies;
+            return this.lobbies.stream().filter(lobby -> !lobby.isGameStarted()).toList();
       }
 
       /**
