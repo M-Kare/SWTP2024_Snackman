@@ -126,7 +126,7 @@
     }
 
     onMounted(async () => {
-        lobbiesStore.fetchLobbyList();
+        await lobbiesStore.fetchLobbyList();
         console.log(lobbies)
 
         if (!lobbiesStore.lobbydata.currentPlayer || lobbiesStore.lobbydata.currentPlayer.playerId === '' || lobbiesStore.lobbydata.currentPlayer.playerName === '') {
