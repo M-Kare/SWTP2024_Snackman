@@ -47,7 +47,7 @@ public class LobbyController {
        * @return the newly created {@link Lobby}, or a 409 Conflict status if the
        *         lobby name already exists
        */
-      @PostMapping("/create")
+      @PostMapping("/create/lobby")
       public ResponseEntity<Lobby> createLobby(@RequestParam("name") String name, @RequestParam("creatorUuid") String creatorUuid) {
             if (name == null || creatorUuid == null) {
                   return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
@@ -66,6 +66,24 @@ public class LobbyController {
                   logger.error("Error occurred: ", e);
                   return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
             }
+      }
+
+      /**
+       * Create a new player client with a name
+       * 
+       * @param name  the player's name
+       * @return  the newly created {@link PlayerClient} object
+       */
+      @PostMapping("/create/player")
+      public ResponseEntity<PlayerClient> createPlayerClient(@RequestParam("name") String name){
+            if(name == null){
+                  return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+            }
+
+            PlayerClient newPlayerClient = lobbyManagerService.createNewClient(name);
+            logger.info("Creating new player with name: {} and playerUuid: {}", newPlayerClient.getPlayerName(), newPlayerClient.getPlayerId());
+            
+            return ResponseEntity.ok(newPlayerClient);
       }
 
       /**

@@ -33,7 +33,7 @@ export const useLobbiesStore = defineStore('lobbiesstore', () =>{
         }
 
         try{
-            const url = `/api/playerclients/create?name=${name}`
+            const url = `/api/lobbies/create/player?name=${name}`
             const response = await fetch(url, {
                 method: 'POST',
                 headers: {
@@ -139,7 +139,7 @@ export const useLobbiesStore = defineStore('lobbiesstore', () =>{
         }
 
         try{
-            const url = `/api/lobbies/create?name=${lobbyName}&creatorUuid=${adminClient.playerId}`
+            const url = `/api/lobbies/create/lobby?name=${lobbyName}&creatorUuid=${adminClient.playerId}`
             const response = await fetch(url, {
                 method: 'POST',
                 headers: {

@@ -22,7 +22,7 @@
         <div class="inner-box"> <!-- :key for order? -->
             <ul>
                 <li
-                    v-for="lobby in lobbies" :key="lobby.uuid"
+                    v-for="lobby in filteredLobbies" :key="lobby.uuid"
                     class="lobby-list-items"
                     @click="joinLobby(lobby)">
 
@@ -31,7 +31,7 @@
                     </div>
                     
                     <div class="playercount">
-                        {{ lobby.members.length }} / {{ maxPlayerCount }}
+                        {{ lobby.members.length }} / {{ MAX_PLAYER_COUNT }}
                     </div>
                 </li>
             </ul>
@@ -42,7 +42,7 @@
 
     <CreateLobbyForm
         v-if="showNewLobbyForm"
-        @cancelLobbyCreation = "cancelLobbyCreation">
+        @cancelLobbyCreation="cancelLobbyCreation">
     </CreateLobbyForm>
 
 </template>
@@ -64,7 +64,11 @@
     const lobbies = computed(() => lobbiesStore.lobbydata.lobbies);
     const currentPlayer = lobbiesStore.lobbydata.currentPlayer as IPlayerClientDTD;
     
-    const maxPlayerCount = 4;
+    const MAX_PLAYER_COUNT = 4;
+    
+    const filteredLobbies = computed(() => {
+        return lobbies.value.filter(lobby => !lobby.gameStarted);
+    });
 
     // lobby value tracking
     // watch(lobbies, (newVal) => {
@@ -98,7 +102,7 @@
      */
     const joinLobby = async (lobby: ILobbyDTD) => {
         
-        if(lobby.members.length >= maxPlayerCount){
+        if(lobby.members.length >= MAX_PLAYER_COUNT){
             alert(`Lobby "${lobby.name}" is full! Please select another one.`);
             return;
         }

@@ -32,10 +32,6 @@
                         {{ member.playerName }}
                     </div>
 
-                    <div class="player-name">
-                        {{ member.playerId }}
-                    </div>
-
                     <div class="player-character">
                         {{ member.role }}
                     </div>
