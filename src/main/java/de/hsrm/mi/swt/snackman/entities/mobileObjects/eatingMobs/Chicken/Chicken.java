@@ -34,6 +34,7 @@ public class Chicken extends EatingMob implements Runnable {
     private boolean isWalking;
     private static final int WAITING_TIME = 2000;  // in ms
     private static final int MAX_KALORIEN = 3000;
+    private static final Logger log = LoggerFactory.getLogger(Chicken.class);
     // python
     private PythonInterpreter pythonInterpreter;
 
@@ -54,6 +55,10 @@ public class Chicken extends EatingMob implements Runnable {
     }
 
     
+    /**
+     * Initializes Jython for executing the chicken's movement script.
+     * Sets up the required Python environment and interpreter.
+     */
     public void initJython() {
         this.pythonInterpreter = new PythonInterpreter();
 
@@ -182,19 +187,6 @@ public class Chicken extends EatingMob implements Runnable {
             currentSquare.setSnack(null);
         }
     }
-
-    /**
-     * Initializes Jython for executing the chicken's movement script.
-     * Sets up the required Python environment and interpreter.
-     */
-    public void initJython() {
-        pythonProps.setProperty("python.path", "src/main/java/de/hsrm/mi/swt/snackman");
-        PythonInterpreter.initialize(System.getProperties(), pythonProps, new String[0]);
-        //log.debug("Initialised jython for chicken movement");
-        this.pythonInterpreter = new PythonInterpreter();
-        pythonInterpreter.exec("from ChickenMovementSkript import choose_next_square");
-    }
-
     /**
      * Executes the chicken's movement script written in Python and determines the
      * next move.
