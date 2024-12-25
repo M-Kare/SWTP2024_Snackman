@@ -36,9 +36,64 @@ public class Chicken extends EatingMob implements Runnable {
     // python
     private PythonInterpreter pythonInterpreter = null;
     private Properties pythonProps = new Properties();
+    private String fileName;
+    private String interpreterCommand;
 
-    public Chicken() {
+    public Chicken() { //Nur zum testen????
         super(null);
+        this.fileName = "ChickenMovementSkript";
+        initJython();
+    }
+
+    public Chicken(String fileName){ //Nur zum testen????
+        super(null);
+        this.fileName = fileName;
+        initJython();
+    }
+
+    public List<String> act(List<String> squares){
+        initJython();
+        List<String> result = executeMovementSkript(squares);
+        return result;
+    }
+
+    public List<String> executeMovementSkript(List<String> squares) {
+        log.info("Python Path: {}", System.getProperty("python.path"));
+        try {
+            log.debug("Running python chicken script with: {}", squares.toString());
+            log.info("Chicken Sichtfeld: {}", squares);
+            pythonInterpreter.exec(interpreterCommand);
+            PyObject func = pythonInterpreter.get("choose_next_square");
+            PyObject result = func.__call__(new PyList(squares));
+            System.out.println("das ist das Egebnis: " + result);
+
+            if (result instanceof PyList) {
+                PyList pyList = (PyList) result;
+                log.debug("Python chicken script return: {}", pyList);
+                return convertPythonList(pyList);
+            }
+
+            throw new Exception("Python chicken script did not load.");
+        } catch (Exception ex) {
+            log.error("Error while executing chicken python script: ", ex);
+            ex.printStackTrace();
+        }
+        return squares;
+    }
+
+    /**
+     * Converts a Python list to a Java list.
+     *
+     * @param pyList the Python list to convert.
+     * @return the corresponding Java list.
+     */
+    private List<String> convertPythonList(PyList pyList) {
+        List<String> javaList = new ArrayList<>();
+        for (Object item : pyList) {
+            javaList.add(item.toString());
+        }
+        log.debug("Python script result is {}", javaList);
+        return javaList;
     }
 
     public Chicken(Square initialPosition, MapService mapService) {
@@ -47,9 +102,24 @@ public class Chicken extends EatingMob implements Runnable {
         this.chickenPosX = initialPosition.getIndexX();
         this.chickenPosZ = initialPosition.getIndexZ();
         initialPosition.addMob(this);
-
+        //behavior = new DefaultChickenBehavior();
+        this.fileName = "ChickenMovementSkript";
         this.isWalking = true;
-        this.lookingDirection = Direction.NORTH;
+        this.lookingDirection = Direction.ONE_NORTH;
+        initJython();
+        initTimer();
+    }
+
+    public Chicken(Square initialPosition, MapService mapService, String fileName) {
+        super(mapService);
+        id = generateId();
+        this.chickenPosX = initialPosition.getIndexX();
+        this.chickenPosZ = initialPosition.getIndexZ();
+        initialPosition.addMob(this);
+        this.fileName = fileName;
+        this.isWalking = true;
+        this.lookingDirection = Direction.ONE_NORTH;
+        initJython();
         initTimer();
     }
 
@@ -110,7 +180,7 @@ public class Chicken extends EatingMob implements Runnable {
      * updates its position and consumes any snacks found at its current location.
      */
     protected void move() {
-        initJython();
+        //initJython();
         while (isWalking) {
             // get 9 squares
             Square currentPosition = super.mapService.getSquareAtIndexXZ(this.chickenPosX, this.chickenPosZ);
@@ -119,7 +189,8 @@ public class Chicken extends EatingMob implements Runnable {
 
             log.debug("Current position is x {} z {}", this.chickenPosX, this.chickenPosZ);
             //super.mapService.printGameMap();
-            List<String> newMove = executeMovementSkript(squares);
+
+            List<String> newMove = act(squares);
 
             // set new square you move to
             setNewPosition(newMove);
@@ -157,53 +228,13 @@ public class Chicken extends EatingMob implements Runnable {
      * Sets up the required Python environment and interpreter.
      */
     public void initJython() {
-        pythonProps.setProperty("python.path", "src/main/java/de/hsrm/mi/swt/snackman");
+        pythonProps.setProperty("python.path", "./scripts");
+        // pythonProps.setProperty("python.path", "./Characters/MovementSkripts");
         PythonInterpreter.initialize(System.getProperties(), pythonProps, new String[0]);
         log.debug("Initialised jython for chicken movement");
         this.pythonInterpreter = new PythonInterpreter();
-        pythonInterpreter.exec("from ChickenMovementSkript import choose_next_square");
-    }
-
-    /**
-     * Executes the chicken's movement script written in Python and determines the
-     * next move.
-     *
-     * @param squares a list of squares visible from the chicken's current position.
-     * @return a list of moves resulting from the Python script's execution.
-     */
-    public List<String> executeMovementSkript(List<String> squares) {
-        try {
-            log.debug("Running python chicken script with: {}", squares.toString());
-            PyObject func = pythonInterpreter.get("choose_next_square");
-            PyObject result = func.__call__(new PyList(squares));
-
-            if (result instanceof PyList) {
-                PyList pyList = (PyList) result;
-                log.debug("Python chicken script return: {}", pyList);
-                return convertPythonList(pyList);
-            }
-
-            throw new Exception("Python chicken script did not load.");
-        } catch (Exception ex) {
-            log.error("Error while executing chicken python script: ", ex);
-            ex.printStackTrace();
-        }
-        return squares;
-    }
-
-    /**
-     * Converts a Python list to a Java list.
-     *
-     * @param pyList the Python list to convert.
-     * @return the corresponding Java list.
-     */
-    private List<String> convertPythonList(PyList pyList) {
-        List<String> javaList = new ArrayList<>();
-        for (Object item : pyList) {
-            javaList.add(item.toString());
-        }
-        log.debug("Python script result is {}", javaList);
-        return javaList;
+        this.interpreterCommand = String.format("from %s import choose_next_square", fileName);
+        pythonInterpreter.exec(interpreterCommand);
     }
 
     /**

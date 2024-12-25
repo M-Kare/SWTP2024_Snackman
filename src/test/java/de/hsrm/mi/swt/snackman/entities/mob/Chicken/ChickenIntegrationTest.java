@@ -24,8 +24,7 @@ public class ChickenIntegrationTest {
     @Test
     public void testExecuteMovementSkript() {
         Chicken chicken = new Chicken();
-        chicken.initJython();
-
+        
         List<String> visibleEnvironment = new ArrayList<>();
         visibleEnvironment.add("W");
         visibleEnvironment.add("S");
@@ -37,7 +36,7 @@ public class ChickenIntegrationTest {
         visibleEnvironment.add("L");
         visibleEnvironment.add("1");
 
-        List<String> result = chicken.executeMovementSkript(visibleEnvironment);
+        List<String> result = chicken.act(visibleEnvironment);
 
         int chosenDirectionIndex = Integer.parseInt(result.get(result.size() - 1));
 
@@ -53,7 +52,7 @@ public class ChickenIntegrationTest {
     public void testChickenMovement() {
         try (PythonInterpreter pyInterp = new PythonInterpreter()) {
             pyInterp.exec("import sys");
-            pyInterp.exec("sys.path.append('src/main/java/de/hsrm/mi/swt/snackman')");
+            pyInterp.exec("sys.path.append('./scripts')");
 
             pyInterp.exec("from ChickenMovementSkript import choose_next_square");
             pyInterp.exec("result = choose_next_square(['W', 'L', 'W', 'L', 'W', 'L', 'W', 'L', 0])");
