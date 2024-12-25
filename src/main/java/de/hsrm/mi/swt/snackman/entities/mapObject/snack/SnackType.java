@@ -6,7 +6,8 @@ public enum SnackType {
     CHERRY(100),
     STRAWBERRY(300),
     ORANGE(500),
-    APPLE(700);
+    APPLE(700),
+    EGG(100);
 
     private final int calories;
     SnackType(int calories) {
