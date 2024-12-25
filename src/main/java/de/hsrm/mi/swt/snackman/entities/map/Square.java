@@ -5,6 +5,7 @@ import de.hsrm.mi.swt.snackman.entities.mapObject.snack.Snack;
 import de.hsrm.mi.swt.snackman.entities.mapObject.snack.SnackType;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.Ghost;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.Mob;
+import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken.Chicken;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.SnackMan;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
@@ -96,7 +97,8 @@ public class Square {
             return  "W";
         } else if (type == MapObjectType.FLOOR) {
             if(this.mobs.stream().anyMatch(mob -> mob instanceof Ghost)) return "G";
-            else if(this.mobs.stream().anyMatch(mob -> mob instanceof Mob)) return "SM";
+            else if(this.mobs.stream().anyMatch(mob -> mob instanceof SnackMan)) return "SM";
+            else if(this.mobs.stream().anyMatch(mob -> mob instanceof Chicken)) return "C";
             else if(this.snack != null && !this.snack.getSnackType().equals(SnackType.EGG)) return "S";     // eats all snacks except for eggs
         }
         return "L";

@@ -5,6 +5,7 @@
 #     L = Leer 
 #     S = Snack 
 #     G = Geist
+#    SM = Snackman
 #
 #     W W W -> northwest_square, north_square, northeast_square
 #     W   W -> west_square, east_square
@@ -24,17 +25,19 @@ def choose_next_square(squares_liste):
     ##northwest_square, north_square, northeast_square, east_square, southeast_square, south_square, southwest_square, west_square, direction = squares_liste
     ##solution_liste = [north_square, east_square, south_square, west_square]
 
-    two_North_two_West_square, two_North_one_West_square, two_North_square, two_North_one_East_square, two_North_two_East_square = squares_liste[:5]
+    #two_North_two_West_square, two_North_one_West_square, two_North_square, two_North_one_East_square, two_North_two_East_square = squares_liste[:5]
     one_North_two_West_square, one_North_one_West_square, one_North_square, one_North_one_East_square, one_North_two_East_square = squares_liste[5:10]
     two_West_square, one_West_square, chickens_square, one_East_square, two_East_square = squares_liste[10:15]
     one_South_two_West_square, one_South_one_West_square, one_South_square, one_South_one_East_square, one_Soutn_two_East_square = squares_liste[15:20]
-    two_South_two_West_square, two_South_one_West_square, two_South_square, two_South_one_East_square, two_Soutn_two_East_square = squares_liste[20:25]
+    #two_South_two_West_square, two_South_one_West_square, two_South_square, two_South_one_East_square, two_Soutn_two_East_square = squares_liste[20:25]
 
     solution_liste = [one_North_square, one_East_square, one_South_square, one_West_square]
+    direction = squares_liste[len(squares_liste) - 1]
     direction = int(direction)
 
     # make sure you cannot walk into a wall
     solution_liste = eliminate_walls_as_options(solution_liste)
+    solution_liste = eliminate_snackman_as_options(solution_liste)
     # make sure you do not walk into a ghost
     if all_squares_have_ghosts(solution_liste):
         return add_walking_direction(choose_random_square(solution_liste, "G", direction))
@@ -55,6 +58,9 @@ def choose_next_square(squares_liste):
 
 def eliminate_walls_as_options(liste):
     return ['X' if item == 'W' else item for item in liste]
+
+def eliminate_snackman_as_options(liste):
+    return ['X' if item == 'SM' else item for item in liste]
 
 def all_squares_have_ghosts(liste):
     return all('G' == element or 'X' == element for element in liste)

@@ -58,14 +58,11 @@ public class Chicken extends EatingMob implements Runnable {
     }
 
     public List<String> executeMovementSkript(List<String> squares) {
-        log.info("Python Path: {}", System.getProperty("python.path"));
         try {
             log.debug("Running python chicken script with: {}", squares.toString());
-            log.info("Chicken Sichtfeld: {}", squares);
             pythonInterpreter.exec(interpreterCommand);
             PyObject func = pythonInterpreter.get("choose_next_square");
             PyObject result = func.__call__(new PyList(squares));
-            System.out.println("das ist das Egebnis: " + result);
 
             if (result instanceof PyList) {
                 PyList pyList = (PyList) result;
@@ -188,7 +185,8 @@ public class Chicken extends EatingMob implements Runnable {
             log.debug("Squares chicken is seeing: {}", squares);
 
             log.debug("Current position is x {} z {}", this.chickenPosX, this.chickenPosZ);
-            //super.mapService.printGameMap();
+            super.mapService.printGameMap();
+            System.out.println("---------------------------------");
 
             List<String> newMove = act(squares);
 

@@ -44,13 +44,13 @@ public class MapService {
      */
     @Autowired
     public MapService(FrontendMessageService frontendMessageService, ReadMazeService readMazeService) {
-        this(frontendMessageService, readMazeService, "Maze.txt");
+        this(frontendMessageService, readMazeService, "mini-maze.txt");
     }
 
     public MapService(FrontendMessageService frontendMessageService, ReadMazeService readMazeService,
                       String filePath) {
         this.frontendMessageService = frontendMessageService;
-        generateNewMaze();
+        //generateNewMaze();
         this.filePath = filePath;
         char[][] mazeData = readMazeService.readMazeFromFile(this.filePath);
         gameMap = convertMazeDataGameMap(mazeData);
@@ -186,16 +186,8 @@ public class MapService {
         squares.add(Direction.TWO_SOUTH.get_two_South_Square(this, currentPosition).getPrimaryType());
         squares.add(Direction.TWO_SOUTH_ONE_EAST.get_two_South_one_East_Square(this, currentPosition).getPrimaryType());
         squares.add(Direction.TWO_SOUTH_TWO_EAST.get_two_South_two_East_Square(this, currentPosition).getPrimaryType());
-        
-        // squares.add(Direction.NORTH_WEST.getNorthWestSquare(this, currentPosition).getPrimaryType());
-        // squares.add(Direction.NORTH.getNorthSquare(this, currentPosition).getPrimaryType());
-        // squares.add(Direction.NORTH_EAST.getNorthEastSquare(this, currentPosition).getPrimaryType());
-        // squares.add(Direction.EAST.getEastSquare(this, currentPosition).getPrimaryType());
-        // squares.add(Direction.SOUTH_EAST.getSouthEastSquare(this, currentPosition).getPrimaryType());
-        // squares.add(Direction.SOUTH.getSouthSquare(this, currentPosition).getPrimaryType());
-        // squares.add(Direction.SOUTH_WEST.getSouthWestSquare(this, currentPosition).getPrimaryType());
-        // squares.add(Direction.WEST.getWestSquare(this, currentPosition).getPrimaryType());
-        // squares.add(lookingDirection.toString());
+        squares.add(lookingDirection.toString());
+
         return squares;
     }
 

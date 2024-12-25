@@ -34,10 +34,10 @@ import org.slf4j.LoggerFactory;
 public enum Direction {
     //NORTH_WEST("", -1, -1), NORTH("0", -1, 0), NORTH_EAST("", -1, 1), EAST("1", 0, 1), SOUTH_EAST("", 1, 1), SOUTH("2", 1, 0), SOUTH_WEST("", 1, -1), WEST("3", 0, -1),
     
-    TWO_NORTH_TWO_WEST("", -2, -2), TWO_NORTH_ONE_WEST("", -2, -1), TWO_NORTH("", -2, 0), TWO_NORTH_ONE_EAST("", -2, 1), TWO_NORTH_TWO_EAST("", -2, 2),
-    ONE_NORTH_TWO_WEST("", -1, -2), ONE_NORTH_ONE_WEST("", -1, -1), ONE_NORTH("", -1, 0), ONE_NORTH_ONE_EAST("", -1, 1), ONE_NORTH_TWO_EAST("", -1, 2),
-    TWO_WEST("", 0, -2), ONE_WEST("", 0, -1), CHICKEN("", 0, 0), ONE_EAST("", 0, 1), TWO_EAST("", 0, 2),
-    ONE_SOUTH_TWO_WEST("", 1, -2), ONE_SOUTH_ONE_WEST("", 1, -1), ONE_SOUTH("", 1, 0), ONE_SOUTH_ONE_EAST("", 1, 1), ONE_SOUTH_TWO_EAST("", 1, 2),
+    TWO_NORTH_TWO_WEST("", -2, -2), TWO_NORTH_ONE_WEST("", -2, -1), TWO_NORTH("ß", -2, 0), TWO_NORTH_ONE_EAST("", -2, 1), TWO_NORTH_TWO_EAST("", -2, 2),
+    ONE_NORTH_TWO_WEST("", -1, -2), ONE_NORTH_ONE_WEST("", -1, -1), ONE_NORTH("0", -1, 0), ONE_NORTH_ONE_EAST("", -1, 1), ONE_NORTH_TWO_EAST("", -1, 2),
+    TWO_WEST("", 0, -2), ONE_WEST("3", 0, -1), CHICKEN("", 0, 0), ONE_EAST("1", 0, 1), TWO_EAST("", 0, 2),
+    ONE_SOUTH_TWO_WEST("", 1, -2), ONE_SOUTH_ONE_WEST("", 1, -1), ONE_SOUTH("2", 1, 0), ONE_SOUTH_ONE_EAST("", 1, 1), ONE_SOUTH_TWO_EAST("", 1, 2),
     TWO_SOUTH_TWO_WEST("", 2, -2), TWO_SOUTH_ONE_WEST("", 2, -1), TWO_SOUTH("", 2, 0), TWO_SOUTH_ONE_EAST("", 2, 1), TWO_SOUTH_TWO_EAST("", 2, 2);
 
     private final String indexOfList;
