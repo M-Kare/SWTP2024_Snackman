@@ -70,7 +70,6 @@
             return;
         }
 
-
         lobby.value = await lobbiesStore.fetchLobbyById(lobbyId);
 
         if(!lobby.value){
@@ -90,10 +89,10 @@
                 return;
             }
 
-            lobby.value = updatedLobby;
+            lobby.value = { ...updatedLobby };
 
             // If Game is started, Lobby-View of all Player change to Game-View
-            if (updatedLobby.gameStarted){
+            if (lobby.value.gameStarted){
                 console.log('Game has started! Redirecting to GameView...');
                 router.push({ name: 'GameView' });
             }

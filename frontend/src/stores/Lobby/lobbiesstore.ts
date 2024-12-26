@@ -33,13 +33,13 @@ export const useLobbiesStore = defineStore('lobbiesstore', () =>{
         }
 
         try{
-            const url = `/api/lobbies/create/player?name=${name}`
+            const url = `/api/lobbies/create/player`
             const response = await fetch(url, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(newPlayerClient)
+                body: JSON.stringify(name),
             })
 
             if(response.ok){
@@ -58,6 +58,9 @@ export const useLobbiesStore = defineStore('lobbiesstore', () =>{
         
     }
 
+    /**
+     * Fetch Lobby-List from Backend
+     */
     async function fetchLobbyList(){
         try{
             const url = `/api/lobbies`
@@ -129,23 +132,17 @@ export const useLobbiesStore = defineStore('lobbiesstore', () =>{
      * @param adminClient The player who will be the admin of the lobby.
      * @returns The created lobby object or null if failed.
      */
-    async function createLobby(lobbyName: string, adminClient: IPlayerClientDTD): Promise<ILobbyDTD | null> {
-        const newLobby: ILobbyDTD = {
-            uuid: '',
-            name: lobbyName,
-            adminClient: adminClient,
-            gameStarted: false, 
-            members: [adminClient]
-        }
+    async function createLobby(name: string, adminClient: IPlayerClientDTD): Promise<ILobbyDTD | null> {
+        const creatorUuid = adminClient.playerId
 
         try{
-            const url = `/api/lobbies/create/lobby?name=${lobbyName}&creatorUuid=${adminClient.playerId}`
+            const url = `/api/lobbies/create/lobby`
             const response = await fetch(url, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(newLobby)
+                body: JSON.stringify({ name, creatorUuid }),
             })
 
             if(response.ok){
@@ -178,12 +175,13 @@ export const useLobbiesStore = defineStore('lobbiesstore', () =>{
                 return null;
             }
 
-            const url = `/api/lobbies/${lobbyId}/join?playerId=${playerId}`
+            const url = `/api/lobbies/join`
             const response = await fetch(url, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
+                body: JSON.stringify({ lobbyId, playerId }),
             })
 
             if(response.status == 409){
@@ -213,12 +211,13 @@ export const useLobbiesStore = defineStore('lobbiesstore', () =>{
      */
     async function leaveLobby(lobbyId: string, playerId: string): Promise<void> {
         try{
-            const url = `/api/lobbies/${lobbyId}/leave?playerId=${playerId}`
+            const url = `/api/lobbies/leave`
             const response = await fetch(url, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
+                body: JSON.stringify({ lobbyId, playerId }),
             })
     
             if (!response.ok) {
@@ -236,12 +235,13 @@ export const useLobbiesStore = defineStore('lobbiesstore', () =>{
      */
     async function startGame(lobbyId: string): Promise<void> {
         try {
-            const url = `/api/lobbies/${lobbyId}/start`;
+            const url = `/api/lobbies/start`;
             const response = await fetch(url, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
+                body: JSON.stringify({ lobbyId }),
             });
 
             if (!response.ok) {

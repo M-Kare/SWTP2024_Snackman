@@ -130,7 +130,7 @@
         console.log(lobbies)
 
         if (!lobbiesStore.lobbydata.currentPlayer || lobbiesStore.lobbydata.currentPlayer.playerId === '' || lobbiesStore.lobbydata.currentPlayer.playerName === '') {
-            lobbiesStore.createPlayer('Player Test');
+            lobbiesStore.createPlayer("Player Test");
         }
 
         console.log("Current Player:", lobbiesStore.lobbydata.currentPlayer);
