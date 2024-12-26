@@ -89,7 +89,7 @@
                 return;
             }
 
-            lobby.value = { ...updatedLobby };
+            lobby.value = updatedLobby;
 
             // If Game is started, Lobby-View of all Player change to Game-View
             if (lobby.value.gameStarted){
