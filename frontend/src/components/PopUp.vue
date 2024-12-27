@@ -16,7 +16,7 @@ import SmallNavButton from '@/components/SmallNavButton.vue';
 
 <style scoped>
 #popup-box {
-    z-index: 2;
+    z-index: 10;
     position: absolute;
     top: 25%;
     left: 50%;

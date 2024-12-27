@@ -80,8 +80,13 @@
     });
 
     const darkenBackground = ref(false);
-    const showLobbyForm = ref(false);
     const showPopUp = ref(false);
+    const showLobbyForm = ref(false);
+
+    const hidePopUp = () => {
+        showPopUp.value = false;
+        darkenBackground.value = false;
+    }
 
     const backToMainMenu = () => {
         router.push({name: "MainMenu"});
@@ -94,11 +99,6 @@
 
     const cancelLobbyCreation = () => {
         showLobbyForm.value = false;
-        darkenBackground.value = false;
-    }
-
-    const hidePopUp = () => {
-        showPopUp.value = false;
         darkenBackground.value = false;
     }
 
@@ -218,17 +218,6 @@
     font-weight: bold;
 }
 
-#darken-background {
-    z-index: 1;
-    position: fixed;
-    top: 0;
-    width: 100vw;
-    height: 100vh;
-    background: rgba(0, 0, 0, 50%);
-
-    transition: background 0.3s ease;
-}
-
 #menu-back-button {
     left: 5%;
 }
@@ -250,4 +239,17 @@
     font-size: 1.8rem;
     padding: 1.2rem;
 }
+
+#darken-background {
+    z-index: 1;
+    position: fixed;
+    top: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 50%);
+
+    transition: background 0.3s ease;
+}
+
+
 </style>
