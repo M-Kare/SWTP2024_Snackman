@@ -136,7 +136,6 @@
         console.log("Current Player:", lobbiesStore.lobbydata.currentPlayer);
 
         lobbiesStore.startLobbyLiveUpdate();
-        console.log("Start Live Lobby Update");
     })
 
 </script>

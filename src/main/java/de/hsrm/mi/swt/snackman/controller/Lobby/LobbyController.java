@@ -174,6 +174,7 @@ public class LobbyController {
             }
 
             lobbyManagerService.startGame(lobbyId);
+            //messagingTemplate.convertAndSend("/topic/lobbies/" + lobbyId, lobbyManagerService.findLobbyByUUID(lobbyId));
             messagingTemplate.convertAndSend("/topic/lobbies", lobbyManagerService.getAllLobbies());
             return ResponseEntity.ok().build();
       }

@@ -49,7 +49,7 @@
     import SmallNavButton from '@/components/SmallNavButton.vue';
 
     import { useRoute, useRouter } from 'vue-router';
-    import { computed, onMounted, ref } from 'vue';
+    import { computed, onMounted, ref, watchEffect } from 'vue';
     import type { ILobbyDTD } from '@/stores/Lobby/ILobbyDTD';
     import { useLobbiesStore } from '@/stores/Lobby/lobbiesstore';
     import type { IPlayerClientDTD } from '@/stores/Lobby/IPlayerClientDTD';
@@ -58,19 +58,37 @@
     const route = useRoute();
     const lobbiesStore = useLobbiesStore();
 
-    const lobby = ref<ILobbyDTD | null>(null);
+    const lobby = computed(() => lobbiesStore.lobbydata.lobbies.find(l => l.uuid === route.params.lobbyId));
     const members = computed(() => lobby.value?.members || [] as Array<IPlayerClientDTD>);
     const playerCount = computed(() => members.value.length);
     const maxPlayerCount = ref(4);
     
-    onMounted(async () => {
-        const lobbyId = route.params.lobbyId as string;
-        if (!lobbyId) {
-            console.error('Lobby ID is missing!');
-            return;
-        }
+    watchEffect(() => {
+        if (lobbiesStore.lobbydata) {
+            const lobbyId = route.params.lobbyId as string;
+            
+            const updatedLobby = lobbiesStore.lobbydata.lobbies.find(l => l.uuid === lobbyId);
+            if (updatedLobby) { 
+                if (updatedLobby.gameStarted){
+                    console.log('Game has started! Redirecting to GameView...');
+                    router.push({ name: 'GameView' });
+                }
+            }else {
+                router.push({ name: 'LobbyListView' });
+            }
 
-        lobby.value = await lobbiesStore.fetchLobbyById(lobbyId);
+        }
+    });
+
+    onMounted(async () => {
+        // const lobbyId = route.params.lobbyId as string;
+        // if (!lobbyId) {
+        //     console.error('Lobby ID is missing!');
+        //     return;
+        // }
+
+        // lobby.value = await lobbiesStore.fetchLobbyById(lobbyId);
+        // console.log("Lobby-Value after fetch: ", lobby);
 
         if(!lobby.value){
             alert('Lobby not found or failed to load.');
@@ -79,24 +97,6 @@
 
         lobbiesStore.startLobbyLiveUpdate();
 
-        // Update lobby data reactively if STOMP updates arrive
-        lobbiesStore.$subscribe((mutation, state) => {
-            const updatedLobby = state.lobbydata.lobbies.find(l => l.uuid === lobbyId);
-        
-            // If Lobby doesn't exit, come back to LobbyListView-Seite
-            if (!updatedLobby) {
-                router.push({ name: 'LobbyListView' });
-                return;
-            }
-
-            lobby.value = updatedLobby;
-
-            // If Game is started, Lobby-View of all Player change to Game-View
-            if (lobby.value.gameStarted){
-                console.log('Game has started! Redirecting to GameView...');
-                router.push({ name: 'GameView' });
-            }
-        });
     })
 
     /**
