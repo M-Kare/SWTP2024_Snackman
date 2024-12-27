@@ -5,6 +5,12 @@
         <form id="form" @submit.prevent="createLobby">
             <label>Enter Name: </label>
             <input v-model.trim="lobbyName" type="text">
+            <p
+                id="error-message"
+                v-if="errorMessage"> 
+                
+                {{ errorMessage }}
+            </p>
         </form>
 
         <SmallNavButton
@@ -36,6 +42,7 @@
     const currentPlayer = lobbiesStore.lobbydata.currentPlayer as IPlayerClientDTD;
     
     const lobbyName = ref('');
+    const errorMessage = ref('');
 
     const emit = defineEmits<{
         (event: 'cancelLobbyCreation', value: boolean): void;
@@ -49,6 +56,7 @@
      * @returns {void}
      */
     const cancelLobbyCreation = () => {
+        errorMessage.value = "";
         emit('cancelLobbyCreation', false);
     }
 
@@ -73,7 +81,7 @@
         }
 
         if (!lobbyName.value.trim()) {
-            alert("Lobby name cannot be empty!");
+            errorMessage.value = "Lobby name can't be empty";
             return;
         }
 
@@ -82,7 +90,7 @@
         );
 
         if (isDuplicateName) {
-            alert("Lobby name already exists! Please choose another name.");
+            errorMessage.value = "Lobby name already exists! Please choose another name.";
             return;
         }
 
@@ -146,6 +154,13 @@
     padding: 1.2rem;
 }
 
+#error-message {
+    font-size: 1.1rem;
+    font-style: italic;
+    margin-top: -1.8rem;
+    color: red;
+}
+
 .small-nav-buttons {
     bottom: 7%;
     font-size: 0.9rem;
@@ -160,7 +175,6 @@
 
 #create-lobby-button {
     right: 5%;
-
 }
 #cancel-lobby-creation-button:hover, #create-lobby-button:hover {
   box-shadow: 0px 0px 35px 5px rgba(255, 255, 255, 0.5);
