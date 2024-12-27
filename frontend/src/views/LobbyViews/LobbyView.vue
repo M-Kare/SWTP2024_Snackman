@@ -50,7 +50,6 @@
 
     import { useRoute, useRouter } from 'vue-router';
     import { computed, onMounted, ref, watchEffect } from 'vue';
-    import type { ILobbyDTD } from '@/stores/Lobby/ILobbyDTD';
     import { useLobbiesStore } from '@/stores/Lobby/lobbiesstore';
     import type { IPlayerClientDTD } from '@/stores/Lobby/IPlayerClientDTD';
 
@@ -68,7 +67,10 @@
             const lobbyId = route.params.lobbyId as string;
             
             const updatedLobby = lobbiesStore.lobbydata.lobbies.find(l => l.uuid === lobbyId);
-            if (updatedLobby) { 
+            console.log("Updated Lobby in Lobby-View", updatedLobby)
+
+            if (updatedLobby) {
+                console.log("Gamestarted in Lobby-View", updatedLobby.gameStarted) 
                 if (updatedLobby.gameStarted){
                     console.log('Game has started! Redirecting to GameView...');
                     router.push({ name: 'GameView' });
@@ -81,15 +83,6 @@
     });
 
     onMounted(async () => {
-        // const lobbyId = route.params.lobbyId as string;
-        // if (!lobbyId) {
-        //     console.error('Lobby ID is missing!');
-        //     return;
-        // }
-
-        // lobby.value = await lobbiesStore.fetchLobbyById(lobbyId);
-        // console.log("Lobby-Value after fetch: ", lobby);
-
         if(!lobby.value){
             alert('Lobby not found or failed to load.');
             router.push({name: 'LobbyListView'});
