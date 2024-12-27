@@ -25,7 +25,7 @@
         <div class="inner-box">
             <ul>
                 <li
-                    v-for="member in members" :key="member.playerId"
+                    v-for="member in members"
                     class="player-list-items">
 
                     <div class="player-name">
