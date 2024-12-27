@@ -38,17 +38,18 @@
         </div>
     </div>
 
+    <div v-if="darkenBackground" id="darken-background"></div>
+
     <PopUp class="popup-box"
-        v-if="darkenBackground">
+        v-if="showPopUp"
+        @hidePopUp="hidePopUp">
+
         <p class="info-heading"> - Lobby full -  </p>
         <p class="info-text"> Please choose or create another one! </p>
     </PopUp>
 
-    <!-- add condition to darken bg if popup active -->
-    <div v-if="darkenBackground" id="darken-background"></div>
-
     <CreateLobbyForm
-        v-if="darkenBackground"
+        v-if="showLobbyForm"
         @cancelLobbyCreation="cancelLobbyCreation">
     </CreateLobbyForm>
 
@@ -78,22 +79,26 @@
         return lobbies.value.filter(lobby => !lobby.gameStarted);
     });
 
-    // lobby value tracking
-    // watch(lobbies, (newVal) => {
-    //     console.log("Updated lobbies:", newVal);
-    // });
-
     const darkenBackground = ref(false);
+    const showLobbyForm = ref(false);
+    const showPopUp = ref(false);
 
     const backToMainMenu = () => {
         router.push({name: "MainMenu"});
     }
 
     const showCreateLobbyForm = () => {
+        showLobbyForm.value = true;
         darkenBackground.value = true;
     }
 
     const cancelLobbyCreation = () => {
+        showLobbyForm.value = false;
+        darkenBackground.value = false;
+    }
+
+    const hidePopUp = () => {
+        showPopUp.value = false;
         darkenBackground.value = false;
     }
 
@@ -110,15 +115,9 @@
      */
     const joinLobby = async (lobby: ILobbyDTD) => {
         
-        // TODO TEST - replace with PopUp-boolean
         if(lobby.members.length >= MAX_PLAYER_COUNT){
-            alert(`Lobby "${lobby.name}" is full! Please select another one.`);
-            return;
-        }
-
-        // should be unnecessary, TODO Test
-        if(lobby.gameStarted){
-            alert(`Lobby "${lobby.name}" started game! Please select another one.`);
+            showPopUp.value = true;
+            darkenBackground.value = true;
             return;
         }
 
@@ -242,12 +241,6 @@
   box-shadow: 0px 0px 35px 5px rgba(255, 255, 255, 0.5);
 }
 
-.popup-box {
-    text-align: center;
-    color: #000000;
-    padding: 1rem;
-}
-
 .info-heading {
     font-size: 3rem;
     font-weight: bold;
@@ -255,6 +248,6 @@
 
 .info-text {
     font-size: 1.8rem;
-    padding: 1rem;
+    padding: 1.2rem;
 }
 </style>

@@ -14,7 +14,7 @@
     font-size: 1.2rem;
     width: auto;
     padding: 1rem;
-    height: 3.5rem;
+    height: auto;
     text-align: center;
     cursor: pointer;
     border: none;
