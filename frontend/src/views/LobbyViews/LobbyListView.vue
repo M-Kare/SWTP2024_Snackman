@@ -19,7 +19,7 @@
             Create new Lobby
         </SmallNavButton>
 
-        <div class="inner-box"> <!-- :key for order? -->
+        <div class="inner-box">
             <ul>
                 <li
                     v-for="lobby in filteredLobbies" :key="lobby.uuid"
@@ -38,10 +38,17 @@
         </div>
     </div>
 
-    <div v-if="showNewLobbyForm" id="darken-background"></div>
+    <PopUp class="popup-box"
+        v-if="darkenBackground">
+        <p class="info-heading"> - Lobby full -  </p>
+        <p class="info-text"> Please choose or create another one! </p>
+    </PopUp>
+
+    <!-- add condition to darken bg if popup active -->
+    <div v-if="darkenBackground" id="darken-background"></div>
 
     <CreateLobbyForm
-        v-if="showNewLobbyForm"
+        v-if="darkenBackground"
         @cancelLobbyCreation="cancelLobbyCreation">
     </CreateLobbyForm>
 
@@ -51,6 +58,7 @@
     import MenuBackground from '@/components/MenuBackground.vue';
     import SmallNavButton from '@/components/SmallNavButton.vue';
     import CreateLobbyForm from '@/components/CreateLobbyForm.vue';
+    import PopUp from '@/components/PopUp.vue';
 
     import { useRouter } from 'vue-router';
     import { computed, onMounted, ref, watch } from 'vue';
@@ -75,18 +83,18 @@
     //     console.log("Updated lobbies:", newVal);
     // });
 
-    const showNewLobbyForm = ref(false);
+    const darkenBackground = ref(false);
 
     const backToMainMenu = () => {
         router.push({name: "MainMenu"});
     }
 
     const showCreateLobbyForm = () => {
-        showNewLobbyForm.value = true;
+        darkenBackground.value = true;
     }
 
     const cancelLobbyCreation = () => {
-        showNewLobbyForm.value = false;
+        darkenBackground.value = false;
     }
 
     /**
@@ -102,11 +110,13 @@
      */
     const joinLobby = async (lobby: ILobbyDTD) => {
         
+        // TODO TEST - replace with PopUp-boolean
         if(lobby.members.length >= MAX_PLAYER_COUNT){
             alert(`Lobby "${lobby.name}" is full! Please select another one.`);
             return;
         }
 
+        // should be unnecessary, TODO Test
         if(lobby.gameStarted){
             alert(`Lobby "${lobby.name}" started game! Please select another one.`);
             return;
@@ -230,5 +240,21 @@
 
 #menu-back-button:hover, #show-lobby-creation-button:hover {
   box-shadow: 0px 0px 35px 5px rgba(255, 255, 255, 0.5);
+}
+
+.popup-box {
+    text-align: center;
+    color: #000000;
+    padding: 1rem;
+}
+
+.info-heading {
+    font-size: 3rem;
+    font-weight: bold;
+}
+
+.info-text {
+    font-size: 1.8rem;
+    padding: 1rem;
 }
 </style>
