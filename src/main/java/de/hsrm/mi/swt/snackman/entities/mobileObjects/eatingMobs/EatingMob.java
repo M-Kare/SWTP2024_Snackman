@@ -53,8 +53,12 @@ public abstract class EatingMob extends Mob {
         }
     }
 
-    public void loseKcal() {
-        // @todo
+    public void loseKcal(int loseKcal) throws Exception {
+        if ((this.kcal - loseKcal) >= 0) {
+            this.kcal -= loseKcal;
+        } else {
+            throw new Exception("Kcal cannot be below zero!");
+        }
     }
 
     @Override
