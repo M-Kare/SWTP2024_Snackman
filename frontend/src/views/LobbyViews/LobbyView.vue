@@ -42,11 +42,22 @@
         </div>
     </div>
 
+    <div v-if="darkenBackground" id="darken-background"></div>
+
+    <PopUp class="popup-box"
+        v-if="showPopUp"
+        @hidePopUp="hidePopUp">
+
+        <p class="info-heading"> - Can't start the game -  </p>
+        <p class="info-text"> {{ infoText }} </p>
+    </PopUp>
+
 </template>
 
 <script setup lang="ts">
     import MenuBackground from '@/components/MenuBackground.vue';
     import SmallNavButton from '@/components/SmallNavButton.vue';
+    import PopUp from '@/components/PopUp.vue';
 
     import { useRoute, useRouter } from 'vue-router';
     import { computed, onMounted, ref, watchEffect } from 'vue';
@@ -61,6 +72,15 @@
     const members = computed(() => lobby.value?.members || [] as Array<IPlayerClientDTD>);
     const playerCount = computed(() => members.value.length);
     const maxPlayerCount = ref(4);
+
+    const darkenBackground = ref(false);
+    const showPopUp = ref(false);
+    const infoText = ref();
+
+    const hidePopUp = () => {
+        showPopUp.value = false;
+        darkenBackground.value = false;
+    }
     
     watchEffect(() => {
         if (lobbiesStore.lobbydata) {
@@ -121,7 +141,7 @@
 
     /**
      * Starts the game if the player is the admin and there are enough members in the lobby.
-     * If the player is not the admin or there are not enough members, an alert will be shown.
+     * If the player is not the admin or there are not enough members, a popup will be shown.
      * 
      * @async
      * @function startGame
@@ -136,13 +156,17 @@
         }
 
         if(lobby.value.members.length < 2){
-            alert('Have not enough members to start game!');
+            showPopUp.value = true;
+            darkenBackground.value = true;
+            infoText.value = "Not enough players to start the game!"
         }
 
         if(playerId === lobby.value.adminClient.playerId){
             await lobbiesStore.startGame(lobby.value.uuid);
         } else {
-            alert('Just Admin Snackman can start the game!');
+            showPopUp.value = true;
+            darkenBackground.value = true;
+            infoText.value = "Only SnackMan can start the game!"
         }
     }
 
@@ -223,6 +247,16 @@
     font-weight: bold;
 }
 
+.info-heading {
+    font-size: 3rem;
+    font-weight: bold;
+}
+
+.info-text {
+    font-size: 1.8rem;
+    padding: 1.2rem;
+}
+
 #menu-back-button {
     left: 5%;
 }
@@ -233,6 +267,17 @@
 
 #menu-back-button:hover, #start-game-button:hover {
   box-shadow: 0px 0px 35px 5px rgba(255, 255, 255, 0.5);
+}
+
+#darken-background {
+    z-index: 1;
+    position: fixed;
+    top: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 50%);
+
+    transition: background 0.3s ease;
 }
 
 </style>
