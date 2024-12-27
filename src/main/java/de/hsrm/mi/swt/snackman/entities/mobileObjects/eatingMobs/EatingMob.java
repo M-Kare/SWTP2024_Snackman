@@ -11,11 +11,11 @@ import de.hsrm.mi.swt.snackman.services.MapService;
 public abstract class EatingMob extends Mob {
     private int kcal;
 
-    public EatingMob(MapService mapService, int speed, double radius) {
+    public EatingMob(MapService mapService, double speed, double radius) {
         super(mapService, speed, radius);
     }
 
-    public EatingMob(MapService mapService, int speed, double radius, double posX, double posY, double posZ) {
+    public EatingMob(MapService mapService, double speed, double radius, double posX, double posY, double posZ) {
         super(mapService, speed, radius, posX, posY, posZ);
     }
 
