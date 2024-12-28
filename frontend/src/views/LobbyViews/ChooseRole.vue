@@ -37,7 +37,7 @@
     import {useRouter} from "vue-router";
 
     const router = useRouter();
-    const characters = ref([
+    const characters = ref([      // TODO add as many as there are players
       { id: 1, name: 'Snackman', image: '/packman.png' },
       { id: 2, name: 'Ghost', image: '/ghost.jpg' },
       { id: 3, name: 'Ghost', image: '/ghost.jpg' },
