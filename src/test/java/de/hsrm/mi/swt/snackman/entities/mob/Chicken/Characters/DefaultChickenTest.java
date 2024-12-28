@@ -21,7 +21,7 @@ public class DefaultChickenTest {
                                                     "W", "L", "L", "L", "L",
                                                     "L", "W", "H", "W", "L",
                                                     "L", "W", "L", "W", "L",
-                                                    "L", "W", "L", "W", "L");
+                                                    "L", "W", "L", "W", "L", "0");
 
         List<String> result = chicken.act(visibleEnvironment);
 
@@ -40,7 +40,7 @@ public class DefaultChickenTest {
                                                     "SM", "L", "G", "L", "L",
                                                     "L", "L", "H", "L", "L",
                                                     "L", "L", "L", "L", "L",
-                                                    "L", "W", "L", "W", "L");
+                                                    "L", "W", "L", "W", "L", "0");
 
         List<String> result = chicken.act(visibleEnvironment);
 
@@ -61,7 +61,7 @@ public class DefaultChickenTest {
                                                     "SM", "L", "G", "SM", "L",
                                                     "L", "L", "H", "L", "L",
                                                     "L", "L", "L", "L", "L",
-                                                    "L", "W", "L", "W", "L");
+                                                    "L", "W", "L", "W", "L", "0");
 
         List<String> result = chicken.act(visibleEnvironment);
 
@@ -79,11 +79,12 @@ public class DefaultChickenTest {
                                                     "SM", "L", "S", "L", "L",
                                                     "L", "L", "H", "L", "L",
                                                     "L", "L", "L", "L", "L",
-                                                    "L", "W", "L", "W", "L");
+                                                    "L", "W", "L", "W", "L", "0");
 
         List<String> result = chicken.act(visibleEnvironment);
+        System.out.println("Rückgabe " + result);
 
-        int chosenDirectionIndex = Integer.parseInt(result.get(result.size() - 1));
+        int chosenDirectionIndex = Integer.parseInt(result.getLast());
 
         assertEquals(" ", result.get(chosenDirectionIndex),
                 "The Chicken should move to the empty space (' ') matching its new direction.");
@@ -97,7 +98,7 @@ public class DefaultChickenTest {
                                                     "SM", "S", "L", "L", "L",
                                                     "L", "L", "H", "S", "L",
                                                     "L", "L", "L", "L", "L",
-                                                    "L", "W", "L", "W", "L");
+                                                    "L", "W", "L", "W", "L", "0");
 
         List<String> result = chicken.act(visibleEnvironment);
 
@@ -115,7 +116,7 @@ public class DefaultChickenTest {
                                                     "SM", "G", "L", "S", "L",
                                                     "L", "W", "H", "S", "L",
                                                     "L", "G", "S", "W", "L",
-                                                    "L", "W", "L", "W", "L");
+                                                    "L", "W", "L", "W", "L", "0");
 
         List<String> result = chicken.act(visibleEnvironment);
 
@@ -133,7 +134,7 @@ public class DefaultChickenTest {
                                                     "SM", "L", "L", "L", "L",
                                                     "L", "L", "H", "L", "L",
                                                     "L", "L", "L", "L", "L",
-                                                    "L", "W", "L", "W", "L");
+                                                    "L", "W", "L", "W", "L", "0");
 
         List<String> result = chicken.act(visibleEnvironment);
 
