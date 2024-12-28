@@ -7,7 +7,7 @@
             id="menu-back-button"
             class="small-nav-buttons"
             @click="leaveLobby">
-            
+
             Leave Lobby
         </SmallNavButton>
         <SmallNavButton
@@ -81,19 +81,19 @@
         showPopUp.value = false;
         darkenBackground.value = false;
     }
-    
+
     watchEffect(() => {
         if (lobbiesStore.lobbydata) {
             const lobbyId = route.params.lobbyId as string;
-            
+
             const updatedLobby = lobbiesStore.lobbydata.lobbies.find(l => l.uuid === lobbyId);
             console.log("Updated Lobby in Lobby-View", updatedLobby)
 
             if (updatedLobby) {
-                console.log("Gamestarted in Lobby-View", updatedLobby.gameStarted) 
+                console.log("Gamestarted in Lobby-View", updatedLobby.gameStarted)
                 if (updatedLobby.gameStarted){
-                    console.log('Game has started! Redirecting to GameView...');
-                    router.push({ name: 'GameView' });
+                    console.log('Game has started! Redirecting to ChooseRole...');
+                    router.push({ name: 'ChooseRole' });
                 }
             }else {
                 router.push({ name: 'LobbyListView' });
@@ -115,7 +115,7 @@
     /**
      * Leaves the current lobby. If the player is the admin, it will remove other members from the lobby first.
      * After leaving the lobby, the user is redirected to the Lobby List View.
-     * 
+     *
      * @async
      * @function leaveLobby
      * @throws {Error} If the player or lobby is not found.
@@ -133,7 +133,7 @@
                     await lobbiesStore.leaveLobby(lobby.value.uuid, member.playerId);
                 }
             }
-        } 
+        }
 
         await lobbiesStore.leaveLobby(lobby.value.uuid, playerId);
         router.push({ name: 'LobbyListView' });
@@ -142,7 +142,7 @@
     /**
      * Starts the game if the player is the admin and there are enough members in the lobby.
      * If the player is not the admin or there are not enough members, a popup will be shown.
-     * 
+     *
      * @async
      * @function startGame
      * @throws {Error} If the player or lobby is not found.
@@ -163,6 +163,7 @@
 
         if(playerId === lobby.value.adminClient.playerId){
             await lobbiesStore.startGame(lobby.value.uuid);
+            router.push({ name: 'LobbyListView' });
         } else {
             showPopUp.value = true;
             darkenBackground.value = true;
