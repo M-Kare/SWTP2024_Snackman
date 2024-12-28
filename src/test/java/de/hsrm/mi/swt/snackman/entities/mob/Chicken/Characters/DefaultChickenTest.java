@@ -82,7 +82,6 @@ public class DefaultChickenTest {
                                                     "L", "W", "L", "W", "L", "0");
 
         List<String> result = chicken.act(visibleEnvironment);
-        System.out.println("Rückgabe " + result);
 
         int chosenDirectionIndex = Integer.parseInt(result.getLast());
 

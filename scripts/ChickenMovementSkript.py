@@ -49,8 +49,6 @@ def choose_next_square(squares_liste):
     solution_liste = eliminate_walls_as_options(solution_liste)
     solution_liste = eliminate_snackman_as_option(solution_liste)
 
-    print("Working with list {}".format(solution_liste))
-
     # make sure you do not walk into a ghost
     if all_squares_have(solution_liste, GHOST):
         return add_walking_direction(choose_random_square(solution_liste, GHOST, direction))
@@ -174,7 +172,6 @@ def add_walking_direction(original_liste):
     new_liste = [original_liste[0]] + original_liste[1:]
     first_empty_index = next((i for i, x in enumerate(new_liste) if x == " "), None)
     result = new_liste + [first_empty_index]
-    print("Result {}".format(result))
     return result
 
 
