@@ -22,18 +22,11 @@
 import random
 
 def choose_next_square(squares_liste):
-    ##northwest_square, north_square, northeast_square, east_square, southeast_square, south_square, southwest_square, west_square, direction = squares_liste
-    ##solution_liste = [north_square, east_square, south_square, west_square]
-
-    #two_North_two_West_square, two_North_one_West_square, two_North_square, two_North_one_East_square, two_North_two_East_square = squares_liste[:5]
     one_North_two_West_square, one_North_one_West_square, one_North_square, one_North_one_East_square, one_North_two_East_square = squares_liste[5:10]
     two_West_square, one_West_square, chickens_square, one_East_square, two_East_square = squares_liste[10:15]
     one_South_two_West_square, one_South_one_West_square, one_South_square, one_South_one_East_square, one_Soutn_two_East_square = squares_liste[15:20]
-    #two_South_two_West_square, two_South_one_West_square, two_South_square, two_South_one_East_square, two_Soutn_two_East_square = squares_liste[20:25]
-
     solution_liste = [one_North_square, one_East_square, one_South_square, one_West_square]
-    direction = squares_liste[len(squares_liste) - 1]
-    direction = int(direction)
+    direction = int(squares_liste[len(squares_liste) - 1])
 
     # make sure you cannot walk into a wall
     solution_liste = eliminate_walls_as_options(solution_liste)
