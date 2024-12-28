@@ -102,12 +102,12 @@ public class SnackMan extends EatingMob {
      */
     public void consumeSnackOnSquare(Square square) {
         Snack snackOnSquare = square.getSnack();
-        log.info("SNACKMAN - snackOnSquare: {} with calories: {}", snackOnSquare, snackOnSquare.getCalories());
+        log.debug("SNACKMAN - snackOnSquare: {} with calories: {}", snackOnSquare, snackOnSquare.getCalories());
 
         if (snackOnSquare != null) {
             try {
                 super.gainKcal(snackOnSquare.getCalories());
-                log.info("SNACKMAN - new kcal: {}", super.getKcal());
+                log.debug("SNACKMAN - new kcal: {}", super.getKcal());
             } catch (Exception e) {
                 log.error(e.getMessage());
             }

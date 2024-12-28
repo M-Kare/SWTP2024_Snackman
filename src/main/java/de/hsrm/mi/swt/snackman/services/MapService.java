@@ -195,14 +195,8 @@ public class MapService {
      * @param laidEgg The snack representing the egg that has been laid
      */
     public void addEggToSquare(Square square, Snack laidEgg) {
-        //Square squareCopy = new Square(square.getType(), square.getIndexX(), square.getIndexZ());
-        //squareCopy.setSnack(laidEgg);
         square.setSnack(laidEgg);
-
-        //log.info("{} kcal egg add to square {} and squareCopy {}", laidEgg.getCalories(), square.getId(), squareCopy.getId());
-        log.info("{} kcal egg add to square {} and square {}", laidEgg.getCalories(), square.getId(), square.getId());
-
-        //frontendMessageService.sendEvent(new FrontendMessageEvent(EventType.SNACK, ChangeType.CREATE, squareCopy));
+        log.debug("{} kcal egg add to square {} and square {}", laidEgg.getCalories(), square.getId(), square.getId());
         frontendMessageService.sendEvent(new FrontendMessageEvent(EventType.SNACK, ChangeType.CREATE, square));
     }
 

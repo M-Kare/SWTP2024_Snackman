@@ -80,9 +80,9 @@ public class Square {
         // Only add Snack when it's actually a floor
         if (type == MapObjectType.FLOOR) {
             if (this.snack != null && snack != null) {
-                log.info("Square id {} with snack set to {}", id, snack.getSnackType().name());
+                log.debug("Square id {} with snack set to {}", id, snack.getSnackType().name());
             } else if (this.snack != null && snack == null) {
-                log.info("Removing snack from square id {}", id);
+                log.debug("Removing snack from square id {}", id);
             }
             this.snack = snack;
             propertyChangeSupport.firePropertyChange("square", null, this);
