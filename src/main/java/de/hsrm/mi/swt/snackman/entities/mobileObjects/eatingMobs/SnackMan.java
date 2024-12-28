@@ -37,17 +37,6 @@ public class SnackMan extends EatingMob {
         super(mapService, speed, radius, posX, posY, posZ);
     }
 
-    public void gainKcal() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'gainKcal'");
-    }
-
-    @Override
-    public void loseKcal() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'loseKcal'");
-    }
-
     //JUMPING
     public void jump() {
         if (!isJumping) {
