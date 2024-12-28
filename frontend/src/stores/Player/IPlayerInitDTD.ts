@@ -4,4 +4,6 @@ export interface IPlayerInitDTD {
     posZ: number
     radius: number
     speed: number
+    baseSpeed: number
+    sprintMultiplier: number
   }

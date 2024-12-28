@@ -16,14 +16,14 @@ public abstract class EatingMob extends Mob {
     private final PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
 
 
-    public EatingMob(MapService mapService, int speed, double radius) {
+    public EatingMob(MapService mapService, double speed, double radius) {
         super(mapService, speed, radius);
         if ((this) instanceof SnackMan) {
             MAXKCAL = 3000;
         }
     }
 
-    public EatingMob(MapService mapService, int speed, double radius, double posX, double posY, double posZ) {
+    public EatingMob(MapService mapService, double speed, double radius, double posX, double posY, double posZ) {
         super(mapService, speed, radius, posX, posY, posZ);
     }
 

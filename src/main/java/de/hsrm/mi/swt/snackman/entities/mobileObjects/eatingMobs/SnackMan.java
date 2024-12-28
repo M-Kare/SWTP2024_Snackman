@@ -10,6 +10,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
 
 import de.hsrm.mi.swt.snackman.configuration.GameConfig;
+import de.hsrm.mi.swt.snackman.entities.mechanics.SprintHandler;
 import de.hsrm.mi.swt.snackman.services.MapService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,6 +21,9 @@ import java.beans.PropertyChangeEvent;
 public class SnackMan extends EatingMob {
     private boolean isJumping = false;
     private double velocityY = 0.0;
+    private boolean isSprinting = false;
+    
+    private SprintHandler sprintHandler = new SprintHandler();
 
     private FrontendMessageService frontendMessageService;
     private final Logger log = LoggerFactory.getLogger(SnackMan.class);
@@ -29,11 +33,11 @@ public class SnackMan extends EatingMob {
         this(mapService, GameConfig.SNACKMAN_SPEED, GameConfig.SNACKMAN_RADIUS);
     }
 
-    public SnackMan(MapService mapService, int speed, double radius) {
+    public SnackMan(MapService mapService, double speed, double radius) {
         super(mapService, speed, radius);
     }
 
-    public SnackMan(MapService mapService, int speed, double radius, double posX, double posY, double posZ) {
+    public SnackMan(MapService mapService, double speed, double radius, double posX, double posY, double posZ) {
         super(mapService, speed, radius, posX, posY, posZ);
     }
 
@@ -87,15 +91,51 @@ public class SnackMan extends EatingMob {
     }
 
     @Override
-    public void move(double x, double y, double z) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'move'");
+    public void move(boolean forward, boolean backward, boolean left, boolean right, double delta) {
+        if (isSprinting) {
+            if (sprintHandler.canSprint()) {
+                setSpeed(GameConfig.SNACKMAN_SPEED * GameConfig.SNACKMAN_SPRINT_MULTIPLIER);
+            } else {
+                sprintHandler.stopSprint();
+                setSpeed(GameConfig.SNACKMAN_SPEED);
+            }
+        } else {
+            sprintHandler.stopSprint();
+            setSpeed(GameConfig.SNACKMAN_SPEED);
+        }
+    
+        super.move(forward, backward, left, right, delta);
+    }
+    
+    public void setSprinting(boolean sprinting) {
+        this.isSprinting = sprinting;
+    
+        if (sprinting) {
+            if (sprintHandler.canSprint()) {
+                sprintHandler.startSprint();
+            } else {
+                this.isSprinting = false;
+            }
+        } else {
+            sprintHandler.stopSprint();
+        }
+    }
+
+    public int getSprintTimeLeft() {
+        return sprintHandler.getSprintTimeLeft();
+    }
+
+    public boolean isInCooldown() {
+        return sprintHandler.isInCooldown();
+    }
+
+    public boolean isSprinting() {
+        return isSprinting;
     }
 
     public int getCurrentCalories() {
         return super.getKcal();
     }
-
     /**
      * Collects the snack on the square if there is one.
      * If there is one that remove it from the square.

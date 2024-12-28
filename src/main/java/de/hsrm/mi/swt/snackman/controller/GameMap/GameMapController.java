@@ -25,18 +25,18 @@ public class GameMapController {
     @Autowired
     private MapService mapService;
 
-    Logger log = LoggerFactory.getLogger(MapService.class);
+    //Logger log = LoggerFactory.getLogger(MapService.class);
 
     @GetMapping("/game-map")
     public ResponseEntity<GameMapDTO> getGameMap() {
-        log.debug("Get GameMap");
+        //log.debug("Get GameMap");
         return ResponseEntity.ok(GameMapDTO.fromGameMap(mapService.getGameMap()));
     }
 
     @GetMapping("/snackman")
     public ResponseEntity<SnackManInitDTO> getSnackManPos(){
         SnackMan snackman = mapService.getSnackMan();
-        return ResponseEntity.ok(new SnackManInitDTO(snackman.getPosX(), snackman.getPosY(), snackman.getPosZ(), snackman.getRadius(), GameConfig.SNACKMAN_SPEED));
+        return ResponseEntity.ok(new SnackManInitDTO(snackman.getPosX(), snackman.getPosY(), snackman.getPosZ(), snackman.getRadius(), GameConfig.SNACKMAN_SPEED, GameConfig.SNACKMAN_SPRINT_MULTIPLIER));
     }
 
 }
