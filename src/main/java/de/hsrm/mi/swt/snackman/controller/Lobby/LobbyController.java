@@ -2,7 +2,11 @@ package de.hsrm.mi.swt.snackman.controller.Lobby;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
+import de.hsrm.mi.swt.snackman.entities.lobby.ROLE;
+import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken.Chicken;
+import de.hsrm.mi.swt.snackman.messaging.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +28,8 @@ import de.hsrm.mi.swt.snackman.services.GameAlreadyStartedException;
 import de.hsrm.mi.swt.snackman.services.LobbyAlreadyExistsException;
 import de.hsrm.mi.swt.snackman.services.LobbyManagerService;
 
+import javax.management.relation.Role;
+
 /**
  * The LobbyController handles HTTP requests related to managing game lobbies.
  * It provides endpoints for creating, joining, leaving, and starting lobbies,
@@ -34,144 +40,129 @@ import de.hsrm.mi.swt.snackman.services.LobbyManagerService;
 @RequestMapping("/api/lobbies")
 public class LobbyController {
 
-      @Autowired
-      private LobbyManagerService lobbyManagerService;
-      
-      @Autowired
-      private SimpMessagingTemplate messagingTemplate;
-      private final Logger logger = LoggerFactory.getLogger(LobbyController.class);
+    @Autowired
+    private LobbyManagerService lobbyManagerService;
 
-      /**
-       * Creates a new lobby with the specified name and creator UUID.
-       * 
-       * @param name        the name of the lobby to create
-       * @param creatorUuid the UUID of the client creating the lobby
-       * @return the newly created {@link Lobby}, or a 409 Conflict status if the
-       *         lobby name already exists
-       */
-      @PostMapping("/create/lobby")
-      public ResponseEntity<Lobby> createLobby(@RequestBody Map<String, String> requestBody) {
-            String name = requestBody.get("name");
-            String creatorUuid = requestBody.get("creatorUuid");
+    @Autowired
+    private FrontendMessageService frontendMessageService;
 
-            if (name == null || creatorUuid == null || name.isEmpty() || creatorUuid.isEmpty()) {
-                  return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-            }
+    private final Logger logger = LoggerFactory.getLogger(LobbyController.class);
 
-      
-            //PlayerClient client = lobbyManagerService.getClient("Player Test", creatorUuid);
-            PlayerClient client = lobbyManagerService.findClientByUUID(creatorUuid);
+    /**
+     * Creates a new lobby with the specified name and creator UUID.
+     *
+     * @param requestBody the UUID of the client creating the lobby and name of the lobby to create
+     * @return the newly created {@link Lobby}, or a 409 Conflict status if the
+     * lobby name already exists
+     */
+    @PostMapping("/create/lobby")
+    public ResponseEntity<Lobby> createLobby(@RequestBody Map<String, String> requestBody) {
+        String name = requestBody.get("name");
+        String creatorUuid = requestBody.get("creatorUuid");
 
-            try {
-                  Lobby newLobby = lobbyManagerService.createLobby(name, client);
-                  messagingTemplate.convertAndSend("/topic/lobbies", lobbyManagerService.getAllLobbies());
-                  logger.info("Creating lobby with name: {} and creatorUuid: {}", name, creatorUuid);
-                  
-                  return ResponseEntity.ok(newLobby);
-            } catch (LobbyAlreadyExistsException e) {
-                  logger.error("Error occurred: ", e);
-                  return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
-            }
-      }
+        if (name == null || creatorUuid == null || name.isEmpty() || creatorUuid.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
 
-      /**
-       * Create a new player client with a name
-       * 
-       * @param name  the player's name
-       * @return  the newly created {@link PlayerClient} object
-       */
-      @PostMapping("/create/player")
-      public ResponseEntity<PlayerClient> createPlayerClient(@RequestBody String name){
-            if(name == null){
-                  return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-            }
+        PlayerClient client = lobbyManagerService.findClientByUUID(creatorUuid);
 
-            PlayerClient newPlayerClient = lobbyManagerService.createNewClient(name);
-            logger.info("Creating new player with name: {} and playerUuid: {}", newPlayerClient.getPlayerName(), newPlayerClient.getPlayerId());
-            
-            return ResponseEntity.ok(newPlayerClient);
-      }
+        try {
+            Lobby newLobby = lobbyManagerService.createLobby(name, client);
 
-      /**
-       * Retrieves a list of all active lobbies.
-       * 
-       * @return a list of all {@link Lobby} objects
-       */
-      @GetMapping
-      @ResponseBody
-      public List <Lobby> getAllLobbies() {
-            List<Lobby> lobbies = lobbyManagerService.getAllLobbies();
-            return lobbies;
-      }
+            frontendMessageService.sendLobbyEvent(new FrontendLobbyMessageEvent(lobbyManagerService.getAllLobbies()));
+            logger.info("Creating lobby with name: {} and creatorUuid: {}", name, creatorUuid);
 
-      /**
-       * Find a Lobby with lobby UUID
-       * @param lobbyId Lobby UUID
-       * @return {@link lobby} object
-       */
-      @GetMapping("/lobby/{lobbyId}")
-      public ResponseEntity<Lobby> findLobbyById(@PathVariable("lobbyId") String lobbyId){
-            Lobby lobby = lobbyManagerService.findLobbyByUUID(lobbyId);
-            return ResponseEntity.ok(lobby);
-      }
+            return ResponseEntity.ok(newLobby);
+        } catch (LobbyAlreadyExistsException e) {
+            logger.error("Error occurred: ", e);
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+        }
+    }
 
-      /**
-       * Adds a player to an existing lobby.
-       * 
-       * @param lobbyId  the ID of the lobby to join
-       * @param playerId the UUID of the player joining the lobby
-       * @return the updated {@link Lobby}, or a 409 Conflict status if the game in
-       *         the lobby has already started
-       */
-      @PostMapping("/join")
-      public ResponseEntity<Lobby> joinLobby(@RequestBody Map<String, String> requestBody) {
-            String lobbyId = requestBody.get("lobbyId");
-            String playerId = requestBody.get("playerId");
+    /**
+     * Create a new player client with a name
+     *
+     * @param name the player's name
+     * @return the newly created {@link PlayerClient} object
+     */
+    @PostMapping("/create/player")
+    public ResponseEntity<PlayerClient> createPlayerClient(@RequestBody String name) {
+        if (name == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
 
-            try {
-                  Lobby joiningLobby = lobbyManagerService.joinLobby(lobbyId, playerId);
-                  messagingTemplate.convertAndSend("/topic/lobbies", lobbyManagerService.getAllLobbies());
-                  logger.info("Updated lobbies sent to /topic/lobbies: {}", lobbyManagerService.getAllLobbies());
+        PlayerClient newPlayerClient = lobbyManagerService.createNewClient(name);
+        logger.info("Creating new player with name: {} and playerUuid: {}", newPlayerClient.getPlayerName(), newPlayerClient.getPlayerId());
 
-                  return ResponseEntity.ok(joiningLobby);
-            } catch (GameAlreadyStartedException e) {
-                  logger.error("Error occurred: ", e);
-                  return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
-            }
-      }
+        return ResponseEntity.ok(newPlayerClient);
+    }
 
-      /**
-       * Removes a player from an existing lobby
-       * 
-       * @param lobbyId  the ID of the lobby to leave
-       * @param playerId the UUID of the player leaving the lobby
-       * @return a {@link ResponseEntity} with an HTTP 200 OK status
-       */
-      @PostMapping("/leave")
-      public ResponseEntity<Void> leaveLobby(@RequestBody Map<String, String> requestBody) {
-            String lobbyId = requestBody.get("lobbyId");
-            String playerId = requestBody.get("playerId");
+    /**
+     * Retrieves a list of all active lobbies.
+     *
+     * @return a list of all {@link Lobby} objects
+     */
+    @GetMapping
+    @ResponseBody
+    public List<Lobby> getAllLobbies() {
+        return lobbyManagerService.getAllLobbies();
+    }
 
-            lobbyManagerService.leaveLobby(lobbyId, playerId);
-            messagingTemplate.convertAndSend("/topic/lobbies", lobbyManagerService.getAllLobbies());
+    /**
+     * Adds a player to an existing lobby.
+     *
+     * @param requestBody the UUID of the player joining the lobby and ID of the lobby to join
+     * @return the updated {@link Lobby}, or a 409 Conflict status if the game in
+     * the lobby has already started
+     */
+    @PostMapping("/join")
+    public ResponseEntity<Lobby> joinLobby(@RequestBody Map<String, String> requestBody) {
+        String lobbyId = requestBody.get("lobbyId");
+        String playerId = requestBody.get("playerId");
+
+        try {
+            Lobby joiningLobby = lobbyManagerService.joinLobby(lobbyId, playerId);
+            frontendMessageService.sendLobbyEvent(new FrontendLobbyMessageEvent(lobbyManagerService.getAllLobbies()));
             logger.info("Updated lobbies sent to /topic/lobbies: {}", lobbyManagerService.getAllLobbies());
 
-            return ResponseEntity.ok().build();
-      }
+            return ResponseEntity.ok(joiningLobby);
+        } catch (GameAlreadyStartedException e) {
+            logger.error("Error occurred: ", e);
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+        }
+    }
 
-      /**
-       * Starts the game in the specified lobby.
-       * 
-       * @param lobbyId the ID of the lobby where the game is to be started
-       * @return a {@link ResponseEntity} with an HTTP 200 OK status
-       */
-      @PostMapping("/start")
-      public ResponseEntity<Void> startGame(@RequestBody Map<String, String> requestBody) {
-            String lobbyId = requestBody.get("lobbyId");
+    /**
+     * Removes a player from an existing lobby
+     *
+     * @param requestBody the UUID of the player leaving the lobby and ID of the lobby to leave
+     * @return a {@link ResponseEntity} with an HTTP 200 OK status
+     */
+    @PostMapping("/leave")
+    public ResponseEntity<Void> leaveLobby(@RequestBody Map<String, String> requestBody) {
+        String lobbyId = requestBody.get("lobbyId");
+        String playerId = requestBody.get("playerId");
 
-            if(lobbyId == null || lobbyId.isEmpty()){
-                  return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-            }
+        lobbyManagerService.leaveLobby(lobbyId, playerId);
+        frontendMessageService.sendLobbyEvent(new FrontendLobbyMessageEvent(lobbyManagerService.getAllLobbies()));
+        logger.info("Updated lobbies sent to /topic/lobbies: {}", lobbyManagerService.getAllLobbies());
+
+        return ResponseEntity.ok().build();
+    }
+
+    /**
+     * Starts the game in the specified lobby.
+     *
+     * @param requestBody contains the ID of the lobby where the game is to be started
+     * @return a {@link ResponseEntity} with an HTTP 200 OK status
+     */
+    @PostMapping("/start")
+    public ResponseEntity<Void> startGame(@RequestBody Map<String, String> requestBody) {
+        String lobbyId = requestBody.get("lobbyId");
+
+        if (lobbyId == null || lobbyId.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
 
             lobbyManagerService.startGame(lobbyId);
             //messagingTemplate.convertAndSend("/topic/lobbies/" + lobbyId, lobbyManagerService.findLobbyByUUID(lobbyId));
