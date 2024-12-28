@@ -30,4 +30,10 @@ public class FrontendMessageService {
 
         messagingTemplate.convertAndSend("/topic/chicken", ev);
     }
+
+    public void sendUpdateCaloriesEvent(FrontendMessageCaloriesEvent ev) {
+        log.info("Send Event: eventType {}, changeTyp {}", ev.eventType(), ev.changeType());
+
+        messagingTemplate.convertAndSend("/topic/calories", ev);
+    }
 }
