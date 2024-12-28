@@ -11,7 +11,9 @@
           @click="selectCharacter(character)"
           class="character-item"
           :class="{ 'selected': selectedCharacter === character }">
-          <img :src="character.image" :alt="character.name" class="character-image">
+          <div class="image-container">
+            <img :src="character.image" :alt="character.name" class="character-image">
+          </div>
           <p class="character-name">{{ character.name }}</p>
         </div>
       </div>
@@ -52,7 +54,7 @@
     /**
      * Route to gameview when characters have been selected
      */
-    const toGame = () => {      // TODO enable this when the snackman character has been chosen
+    const toGame = () => {      // TODO enable this when the snackman character has been chosen + currently not routing to gameview correctly
       console.log("Routing to game view")
       router.push({ name: 'LobbyListView' });
     }
@@ -102,19 +104,6 @@
   grid-gap: 15px;
 }
 
-.character-image {
-  background-size: cover;
-  background-position: center;
-  width: 100px;
-  height: 100px;
-  object-fit: cover;
-}
-
-.character-name {
-  font-weight: bold;
-  color: #000000;
-}
-
 #confirm-button {
   position: absolute;
   bottom: 1rem;
@@ -130,6 +119,9 @@
   background: rgba(255, 255, 255, 70%);
   text-align: center;
   cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 
 .character-item.selected {
@@ -140,5 +132,25 @@
 .character-item:hover {
   transform: scale(1.05);
 }
+
+.image-container {
+  flex-grow: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.character-image {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.character-name {
+  font-weight: bold;
+  color: #000000;
+}
+
 
 </style>
