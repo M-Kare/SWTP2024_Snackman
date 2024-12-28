@@ -5,21 +5,17 @@ import java.util.Map;
 import java.util.Optional;
 
 import de.hsrm.mi.swt.snackman.entities.lobby.ROLE;
-import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken.Chicken;
 import de.hsrm.mi.swt.snackman.messaging.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import de.hsrm.mi.swt.snackman.entities.lobby.PlayerClient;
@@ -27,8 +23,6 @@ import de.hsrm.mi.swt.snackman.entities.lobby.Lobby;
 import de.hsrm.mi.swt.snackman.services.GameAlreadyStartedException;
 import de.hsrm.mi.swt.snackman.services.LobbyAlreadyExistsException;
 import de.hsrm.mi.swt.snackman.services.LobbyManagerService;
-
-import javax.management.relation.Role;
 
 /**
  * The LobbyController handles HTTP requests related to managing game lobbies.
@@ -47,6 +41,11 @@ public class LobbyController {
     private FrontendMessageService frontendMessageService;
 
     private final Logger logger = LoggerFactory.getLogger(LobbyController.class);
+
+    public LobbyController(LobbyManagerService lobbyManagerService, FrontendMessageService frontendMessageService) {
+        this.lobbyManagerService = lobbyManagerService;
+        this.frontendMessageService = frontendMessageService;
+    }
 
     /**
      * Creates a new lobby with the specified name and creator UUID.
@@ -170,7 +169,7 @@ public class LobbyController {
     }
 
     @PostMapping("/lobby/choose/role")
-    public ResponseEntity<Void> getRole(@RequestBody Map<String, String> requestBody) {
+    public ResponseEntity<Void> setPlayerRole(@RequestBody Map<String, String> requestBody) {
         String lobbyId = requestBody.get("lobbyId");
         String playerId = requestBody.get("playerId");
         String role = requestBody.get("role");
