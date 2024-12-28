@@ -164,10 +164,44 @@ public class LobbyController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
 
-            lobbyManagerService.startGame(lobbyId);
-            //messagingTemplate.convertAndSend("/topic/lobbies/" + lobbyId, lobbyManagerService.findLobbyByUUID(lobbyId));
-            messagingTemplate.convertAndSend("/topic/lobbies", lobbyManagerService.getAllLobbies());
-            return ResponseEntity.ok().build();
-      }
+        lobbyManagerService.startGame(lobbyId);
+        frontendMessageService.sendLobbyEvent(new FrontendLobbyMessageEvent(lobbyManagerService.getAllLobbies()));
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/lobby/choose/role")
+    public ResponseEntity<Void> getRole(@RequestBody Map<String, String> requestBody) {
+        String lobbyId = requestBody.get("lobbyId");
+        String playerId = requestBody.get("playerId");
+        String role = requestBody.get("role");
+
+        Lobby currentLobby = lobbyManagerService.findLobbyByUUID(lobbyId);
+        Optional<PlayerClient> player = lobbyManagerService.getClient(playerId);
+
+        if(!currentLobby.isGameStarted()){
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+        }
+
+        switch (role) {
+            case "SNACKMAN":
+                if (!lobbyManagerService.snackmanAlreadySelected(currentLobby) && player.isPresent()) {
+                    player.get().setRole(ROLE.SNACKMAN);
+                    frontendMessageService.sendLobbyEvent(new FrontendLobbyMessageEvent(lobbyManagerService.getAllLobbies()));
+                    return ResponseEntity.ok().build();
+                } else {
+                    return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+                }
+            case "GHOST":
+                if(player.isPresent()) {
+                    player.get().setRole(ROLE.GHOST);
+                    frontendMessageService.sendLobbyEvent(new FrontendLobbyMessageEvent(lobbyManagerService.getAllLobbies()));
+                    return ResponseEntity.ok().build();
+                } else {
+                    return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+                }
+            default:
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+    }
 
 }

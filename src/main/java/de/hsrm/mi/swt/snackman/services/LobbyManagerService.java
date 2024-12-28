@@ -1,9 +1,6 @@
 package de.hsrm.mi.swt.snackman.services;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.UUID;
+import java.util.*;
 
 import org.springframework.stereotype.Service;
 
@@ -49,9 +46,6 @@ public class LobbyManagerService {
         }
 
         Lobby lobby = new Lobby(name, admin);
-
-        admin.setRole(ROLE.SNACKMAN);
-
         lobbies.add(lobby);
         return lobby;
     }
@@ -126,9 +120,18 @@ public class LobbyManagerService {
      */
     public Lobby findLobbyByUUID(String lobbyID) {
         return lobbies.stream()
-                .filter(l -> l.getUuid().equals(lobbyID))
+                .filter(lobby -> lobby.getUuid().equals(lobbyID))
                 .findFirst()
                 .orElseThrow(() -> new NoSuchElementException("Lobby not found"));
+    }
+
+    /**
+     * Checks weather the snackman-role has already been selected in the lobby
+     * @param lobby the lobby to search in
+     * @return true if the role snackman is already owned by someone
+     */
+    public boolean snackmanAlreadySelected(Lobby lobby){
+        return lobby.getMembers().stream().anyMatch(playerClient -> playerClient.getRole() == ROLE.SNACKMAN);
     }
 
     /**
@@ -157,4 +160,17 @@ public class LobbyManagerService {
                 .findFirst()
                 .orElse(createNewClient(name));
     }
+
+    /**
+     * Retrieves the active client or creates a new client
+     *
+     * @param clientID the uuid of the client
+     * @return the client
+     */
+    public Optional<PlayerClient> getClient(String clientID) {
+        return clients.stream()
+                .filter(l -> l.getPlayerId().equals(clientID))
+                .findFirst();
+    }
+
 }
