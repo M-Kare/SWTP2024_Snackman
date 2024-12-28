@@ -36,10 +36,10 @@
 
     const router = useRouter();
     const characters = ref([
-      { id: 1, name: 'Snackman', image: '@assets/packman.png' },
-      { id: 2, name: 'Ghost', image: '@/assets/ghost.jpg' },
-      { id: 3, name: 'Ghost', image: '@/assets/ghost.jpg' },
-      { id: 4, name: 'Ghost', image: '@/assets/ghost.jpg' }
+      { id: 1, name: 'Snackman', image: '/packman.png' },
+      { id: 2, name: 'Ghost', image: '/ghost.jpg' },
+      { id: 3, name: 'Ghost', image: '/ghost.jpg' },
+      { id: 4, name: 'Ghost', image: '/ghost.jpg' }
     ]);
 
     const selectedCharacter = ref(null);    // TODO make responsive
