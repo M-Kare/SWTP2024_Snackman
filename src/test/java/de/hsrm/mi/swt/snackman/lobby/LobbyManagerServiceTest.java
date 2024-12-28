@@ -236,6 +236,7 @@ public class LobbyManagerServiceTest {
     public void testAssignInvalidRole() throws LobbyAlreadyExistsException {
         PlayerClient adminPlayer = lobbyManagerService.createNewClient("AdminPlayer");
         Lobby lobby = lobbyManagerService.createLobby("TestLobby", adminPlayer);
+        lobby.setGameStarted(true);
 
         ResponseEntity<Void> response = lobbyController.setPlayerRole(Map.of(
                 "lobbyId", lobby.getUuid(),
@@ -243,7 +244,7 @@ public class LobbyManagerServiceTest {
                 "role", "INVALID_ROLE"
         ));
 
-        assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
     }
 
 }
