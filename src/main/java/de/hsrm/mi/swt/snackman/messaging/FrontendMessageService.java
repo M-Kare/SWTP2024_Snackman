@@ -12,7 +12,7 @@ public class FrontendMessageService {
     @Autowired
     private final SimpMessagingTemplate messagingTemplate;
 
-    //Logger log = LoggerFactory.getLogger(FrontendMessageService.class);
+    Logger log = LoggerFactory.getLogger(FrontendMessageService.class);
 
     public FrontendMessageService(SimpMessagingTemplate messagingTemplate) {
         this.messagingTemplate = messagingTemplate;
