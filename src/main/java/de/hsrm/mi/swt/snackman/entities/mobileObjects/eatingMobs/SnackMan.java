@@ -30,17 +30,6 @@ public class SnackMan extends EatingMob {
         super(gameMap, speed, radius, posX, posY, posZ);
     }
 
-    public void gainKcal() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'gainKcal'");
-    }
-
-    @Override
-    public void loseKcal() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'loseKcal'");
-    }
-
     //JUMPING
     public void jump() {
         if (!isJumping) {
@@ -74,22 +63,6 @@ public class SnackMan extends EatingMob {
         }
     }
 
-    private void jumpOverChicken() {
-
-    }
-
-    private void jumpToSeeMap() {
-
-    }
-
-    private void jumpOverWall() {
-
-    }
-
-    public void collectItems() {
-
-    }
-
     public int getCurrentCalories() {
         return super.getKcal();
     }
@@ -100,6 +73,7 @@ public class SnackMan extends EatingMob {
      *
      * @param square to eat the snack from
      */
+    @Override
     public void consumeSnackOnSquare(Square square) {
         Snack snackOnSquare = square.getSnack();
 

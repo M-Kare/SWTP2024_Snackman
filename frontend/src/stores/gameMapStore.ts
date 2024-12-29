@@ -11,6 +11,11 @@ import type {IChicken, IChickenDTD} from "@/stores/Chicken/IChickenDTD";
 import {Direction} from "@/stores/Chicken/IChickenDTD";
 import {GameObjectRenderer} from "@/renderer/GameObjectRenderer";
 import {useLobbiesStore} from "@/stores/Lobby/lobbiesstore";
+import { Player } from '@/components/Player';
+import { EventType, type IMessageDTD } from './messaging/IMessageDTD';
+import { MeshSSSNodeMaterial } from 'three/webgpu';
+import type { IMobUpdateDTD } from './messaging/IMobUpdateDTD';
+import type { ISquareUpdateDTD } from './messaging/ISquareUpdateDTD';
 
 /**
  * Defines the pinia store used for saving the map from
@@ -19,18 +24,22 @@ import {useLobbiesStore} from "@/stores/Lobby/lobbiesstore";
  * which the game is build up on.
  */
 export const useGameMapStore = defineStore('gameMap', () => {
-  let snackStompclient: Client
+  const protocol = window.location.protocol.replace('http', 'ws')
+  const wsurl = `${protocol}//${window.location.host}/stompbroker`
+  let stompclient = new Client({brokerURL: wsurl})
   let chickenStompclient: Client
   const scene = new THREE.Scene()
   const gameObjectRenderer = GameObjectRenderer()
   const { lobbydata } = useLobbiesStore()
   const CHICKEN_MOVEMENT_SPEED = 0.1    // step size of the interpolation: between 0 and 1
+  let player: Player
+  let otherPlayers: Map<String, THREE.Mesh>
 
   const mapData = reactive({
     DEFAULT_SQUARE_SIDE_LENGTH: 0,
     DEFAULT_WALL_HEIGHT: 0,
     gameMap: new Map<number, ISquare>(),
-    chickens: []
+    chickens: [],
   } as IGameMap);
 
   async function initGameMap() {
@@ -53,41 +62,65 @@ export const useGameMapStore = defineStore('gameMap', () => {
     }
   }
 
-  async function startGameMapLiveUpdate() {
-    const protocol = window.location.protocol.replace('http', 'ws')
-    const wsurl = `${protocol}//${window.location.host}/stompbroker`
-    const DEST_SQUARE = `/topic/lobbies/${lobbydata.currentPlayer.joinedLobbyId}/square`
-    const DEST_CHICKEN = `/topic/lobbies/${lobbydata.currentPlayer.joinedLobbyId}/chicken`
-    if (!snackStompclient) {
-      snackStompclient = new Client({brokerURL: wsurl})
+  function startGameMapLiveUpdate() {
 
-      snackStompclient.onWebSocketError = (event) => {
+    const DEST_UPDATES = `/topic/lobbies/${lobbydata.currentPlayer.joinedLobbyId}/update`
+    const DEST_CHICKEN = `/topic/lobbies/${lobbydata.currentPlayer.joinedLobbyId}/chicken`
+    if (!stompclient.active) {
+
+      stompclient.onWebSocketError = (event) => {
         throw new Error('Websocket wit message: ' + event)
       }
 
-      snackStompclient.onStompError = (frameElement) => {
+      stompclient.onStompError = (frameElement) => {
         throw new Error('Stompclient with message: ' + frameElement)
       }
 
-      snackStompclient.onConnect = (frameElement) => {
+      stompclient.onConnect = (frameElement) => {
         console.log('Stompclient connected')
 
-        snackStompclient.subscribe(DEST_SQUARE, async (message) => {
-          const change: IFrontendMessageEvent = JSON.parse(message.body)
+        stompclient.subscribe(DEST_UPDATES, message => {
+          const content: Array<IMessageDTD> = JSON.parse(message.body)
+          for(const mess of content){
+            switch(mess.event){
+              case EventType.MobUpdate:
+                const mobUpdate: IMobUpdateDTD = mess.message
+                if(mobUpdate.playerId === lobbydata.currentPlayer.playerId){
+                  if(player == undefined){
+                   continue; 
+                  }
+                  player.setPosition(mobUpdate.position);
+                } else {
+                  if(otherPlayers.size == 0){
+                    continue;
+                  }
+                  otherPlayers.get(mobUpdate.playerId)?.position.lerp(mobUpdate.position, 0.3)
+                  otherPlayers.get(mobUpdate.playerId)?.setRotationFromQuaternion(mobUpdate.rotation)
+                }
+                break;
+              case EventType.SquareUpdate:
+                const squareUpdate: ISquareUpdateDTD = mess.message
+                if(squareUpdate.square.snack == null){
+                  const savedMeshId = mapData.gameMap.get(squareUpdate.square.id)!.snack.meshId
+                  removeMeshFromScene(scene, savedMeshId)
+                  mapData.gameMap.set(squareUpdate.square.id, squareUpdate.square)
+                } else {
+                  //TODO: Wenn Square einen Snack besitz: den spezifischen Snack erstellen und in die Scene hinzufügen
+                }
+                break;
+              default: 
+                console.log(mess.message)
+            }
 
-          const savedMeshId = mapData.gameMap.get(change.square.id)!.snack.meshId
-
-          removeMeshFromScene(scene, savedMeshId)
-
-          mapData.gameMap.set(change.square.id, change.square as ISquare)
+          }
         })
       }
 
-      snackStompclient.onDisconnect = () => {
+      stompclient.onDisconnect = () => {
         console.log('Stompclient disconnected.')
       }
 
-      snackStompclient.activate()
+      stompclient.activate()
     }
 
 
@@ -136,6 +169,14 @@ export const useGameMapStore = defineStore('gameMap', () => {
 
       chickenStompclient.activate()
     }
+  }
+
+  function setPlayer(p: Player){
+    player = p
+  }
+
+  function setOtherPlayers(other: Map<String, THREE.Mesh>){
+    otherPlayers = other
   }
 
   function updateThickness(currentChicken: IChicken, chickenUpdate: IChickenDTD) {
@@ -201,6 +242,9 @@ export const useGameMapStore = defineStore('gameMap', () => {
     startGameMapLiveUpdate,
     setSnackMeshId,
     setChickenMeshId,
-    getScene
+    getScene,
+    setPlayer,
+    setOtherPlayers,
+    stompclient: stompclient
   };
 })

@@ -1,10 +1,12 @@
 package de.hsrm.mi.swt.snackman.entities.mobileObjects;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import de.hsrm.mi.swt.snackman.entities.map.GameMap;
 import org.joml.Quaterniond;
 import org.joml.Vector3d;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import de.hsrm.mi.swt.snackman.configuration.GameConfig;
+import de.hsrm.mi.swt.snackman.entities.map.GameMap;
 import de.hsrm.mi.swt.snackman.entities.map.Square;
 import de.hsrm.mi.swt.snackman.entities.mapObject.MapObjectType;
 
@@ -37,7 +39,6 @@ public abstract class Mob {
         spawn = new Vector3d((gameMap.getGameMapSquares()[0].length / 2.0) * GameConfig.SQUARE_SIZE, GameConfig.SNACKMAN_GROUND_LEVEL,
                 (gameMap.getGameMapSquares()[0].length / 2.0) * GameConfig.SQUARE_SIZE);
         position = new Vector3d(spawn);
-        radius = GameConfig.SNACKMAN_RADIUS;
         quat = new Quaterniond();
         setCurrentSquareWithIndex(position.x, position.z);
     }

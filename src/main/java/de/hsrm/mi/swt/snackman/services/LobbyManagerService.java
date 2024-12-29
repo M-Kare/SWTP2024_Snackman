@@ -161,7 +161,7 @@ public class LobbyManagerService {
     }
 
     public List<String> getAllClients() {
-        List<String> playerIds = new ArrayList();
+        List<String> playerIds = new ArrayList<>();
         for (PlayerClient client : clients.values()) {
             playerIds.add(client.getPlayerId());
         }

@@ -7,6 +7,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import de.hsrm.mi.swt.snackman.configuration.GameConfig;
@@ -25,8 +26,7 @@ import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.SnackMan;
 import de.hsrm.mi.swt.snackman.messaging.ChangeType;
 import de.hsrm.mi.swt.snackman.messaging.EventType;
 import de.hsrm.mi.swt.snackman.messaging.FrontendChickenMessageEvent;
-import de.hsrm.mi.swt.snackman.messaging.FrontendLobbyMessageService;
-import de.hsrm.mi.swt.snackman.messaging.FrontendMessageEvent;
+import de.hsrm.mi.swt.snackman.messaging.MessageLoop.MessageLoop;
 
 /**
  * Service class for managing the game map
@@ -37,7 +37,7 @@ import de.hsrm.mi.swt.snackman.messaging.FrontendMessageEvent;
 public class MapService {
 
     private final ReadMazeService readMazeService;
-    private final FrontendLobbyMessageService frontendLobbyMessageService;
+    private final MessageLoop messageLoop;
 
     Logger log = LoggerFactory.getLogger(MapService.class);
 
@@ -46,9 +46,9 @@ public class MapService {
      * Initializes the maze data by reading from a file and creates a Map object
      */
     @Autowired
-    public MapService(ReadMazeService readMazeService, FrontendLobbyMessageService frontendLobbyMessageService) {
+    public MapService(ReadMazeService readMazeService, @Lazy MessageLoop messageLoop) {
         this.readMazeService = readMazeService;
-        this.frontendLobbyMessageService = frontendLobbyMessageService;
+        this.messageLoop = messageLoop;
     }
 
     public GameMap createNewGameMap(String lobbyId, String filePath) {
@@ -107,11 +107,8 @@ public class MapService {
 
                 square.addPropertyChangeListener((PropertyChangeEvent evt) -> {
                     if (evt.getPropertyName().equals("square")) {
-                        FrontendMessageEvent messageEvent = new FrontendMessageEvent(EventType.SNACK,
-                                ChangeType.UPDATE, lobbyId,
-                                (Square) evt.getNewValue());
-
-                        frontendLobbyMessageService.sendEvent(messageEvent);
+                            messageLoop.addSquareToQueue((Square)evt.getNewValue(), lobbyId);
+                        // frontendLobbyMessageService.sendEvent(messageEvent);
                     }
                 });
                 break;
@@ -184,7 +181,7 @@ public class MapService {
                                             ChangeType.UPDATE, lobby.getLobbyId(),
                                             ChickenDTO.fromChicken((Chicken) evt.getNewValue()));
 
-                                    frontendLobbyMessageService.sendChickenEvent(messageEvent);
+                                    messageLoop.sendChickenEvent(messageEvent);
                                 }
                             });
                             break;

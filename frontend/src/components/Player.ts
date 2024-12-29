@@ -196,10 +196,10 @@ export class Player {
   /**
    * lerp is used to interpolate the two positions
    */
-  public setPosition(x: number, y: number, z: number) {
-    this.camera.position.lerp(new THREE.Vector3(x, y, z), 0.5);
+  public setPosition(pos: THREE.Vector3) {
+    this.camera.position.lerp(pos, 0.5);
 
-    if (y <= 2) {
+    if (pos.y <= 2) {
       this.isJumping = false
       this.doubleJump = false
     }

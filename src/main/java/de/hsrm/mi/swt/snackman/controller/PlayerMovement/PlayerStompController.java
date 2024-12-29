@@ -3,7 +3,6 @@ package de.hsrm.mi.swt.snackman.controller.PlayerMovement;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 
 import de.hsrm.mi.swt.snackman.entities.lobby.Lobby;
@@ -13,9 +12,6 @@ import de.hsrm.mi.swt.snackman.services.LobbyManagerService;
 
 @Controller
 public class PlayerStompController {
-
-    @Autowired
-    private SimpMessagingTemplate messagingTemplate;
 
     @Autowired
     private LobbyManagerService lobbyService;
@@ -29,24 +25,21 @@ public class PlayerStompController {
             default ->
                     throw new IllegalStateException("Unexpected value: " + currentLobby.getClientMobMap().get(player.playerId()));
         };
-        //SnackMan snackman = mapService.getSnackMan(player.uuid());
         playerMob.setQuaternion(player.qX(), player.qY(), player.qZ(), player.qW());
         playerMob.move(player.forward(), player.backward(), player.left(), player.right(), player.delta());
 
-        //JUMPING
-
-        messagingTemplate.convertAndSend("/topic/lobbies/" + lobbyId + "/player",
-                new PlayerToFrontendDTO(playerMob.getPosX(),
-                playerMob.getPosY(),
-                playerMob.getPosZ(), playerMob.getRotationQuaternion().x, playerMob.getRotationQuaternion().y,
-                playerMob.getRotationQuaternion().z, playerMob.getRotationQuaternion().w, playerMob.getRadius(),
-                playerMob.getSpeed(), player.playerId()));
+        // messagingTemplate.convertAndSend("/topic/lobbies/" + lobbyId + "/player",
+        //         new PlayerToFrontendDTO(playerMob.getPosX(),
+        //         playerMob.getPosY(),
+        //         playerMob.getPosZ(), playerMob.getRotationQuaternion().x, playerMob.getRotationQuaternion().y,
+        //         playerMob.getRotationQuaternion().z, playerMob.getRotationQuaternion().w, playerMob.getRadius(),
+        //         playerMob.getSpeed(), player.playerId()));
     }
 
     private SnackMan jumpUpdate(PlayerToBackendDTO player, SnackMan snackman) {
             if (player.jump()) {
                 if (player.doubleJump()) {
-                    snackman.doubleJump();
+                snackman.doubleJump();
                 } else {
                     snackman.jump();
                 }

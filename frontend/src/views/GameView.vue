@@ -16,39 +16,15 @@ import type { IPlayerDTD } from '@/stores/Player/IPlayerDTD';
 import type {IPlayerClientDTD} from "@/stores/Lobby/IPlayerClientDTD";
 
 const { lobbydata } = useLobbiesStore();
+const gameMapStore = useGameMapStore()
+gameMapStore.startGameMapLiveUpdate()
 
-const WSURL = `ws://${window.location.host}/stompbroker`
+
 const targetHz = 30
 let clients: Array<IPlayerClientDTD>;
 let playerHashMap = new Map<String, THREE.Mesh>()
 
-// stomp
-const stompclient = new Client({brokerURL: WSURL})
-stompclient.onWebSocketError = event => {
-  //console.log(event)
-}
-stompclient.onStompError = frame => {
-  //console.log(frame)
-}
-stompclient.onConnect = frame => {
-  // Callback: erfolgreicher Verbindugsaufbau zu Broker
-  stompclient.subscribe(`/topic/lobbies/${lobbydata.currentPlayer.joinedLobbyId!}/player`, message => {
-    // Callback: Nachricht auf DEST empfangen
-    // empfangene Nutzdaten in message.body abrufbar,
-    // ggf. mit JSON.parse(message.body) zu JS konvertieren
-    const event: IPlayerDTD = JSON.parse(message.body)
-
-    //To differ the player
-    if(event.playerId === lobbydata.currentPlayer.playerId){
-      player.setPosition(event.posX, event.posY, event.posZ);
-    } else {
-      playerHashMap.get(event.playerId)?.position.set(event.posX, event.posY, event.posZ)
-      playerHashMap.get(event.playerId)?.setRotationFromQuaternion(new THREE.Quaternion(event.qX, event.qY, event.qZ,
-        event.qW))
-    }
-  })
-}
-stompclient.activate()
+const stompclient = gameMapStore.stompclient
 
 const canvasRef = ref()
 let renderer: THREE.WebGLRenderer
@@ -104,34 +80,33 @@ onMounted(async () => {
   renderer = initRenderer(canvasRef.value)
   //Add gameMap
   try {
-    const gameMapStore = useGameMapStore()
     await gameMapStore.initGameMap()
-
     const mapContent = gameMapStore.mapContent
     createGameMap(mapContent as IGameMap)
 
-    await gameMapStore.startGameMapLiveUpdate()
   } catch (error) {
     console.error('Error when retrieving the gameMap:', error)
   }
-
-  clients = lobbydata.lobbies.find((elem)=>elem.lobbyId===lobbydata.currentPlayer.joinedLobbyId)?.members!
-  console.log(clients)
-  const playerData = await
+    
+    clients = lobbydata.lobbies.find((elem)=>elem.lobbyId===lobbydata.currentPlayer.joinedLobbyId)?.members!
+    console.log(clients)
+    const playerData = await
     fetchSnackManFromBackend(lobbydata.currentPlayer.joinedLobbyId!, lobbydata.currentPlayer.playerId);
-  clients.forEach(it => {
-    if(it.playerId === lobbydata.currentPlayer.playerId){
-      player = new Player(renderer, playerData.posX, playerData.posY, playerData.posZ, playerData.radius, playerData.speed)
-    } else {
-      let material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } )
-      material.color = new THREE.Color(Math.random(), Math.random(), Math.random());
-      let cube = new THREE.Mesh( new THREE.BoxGeometry( 1, 3, 1 ),  material);
-      cube.position.lerp(new THREE.Vector3(playerData.posX, playerData.posY, playerData.posZ), 0.5)
-      scene.add(cube);
-      playerHashMap.set(it.playerId, cube);
-    }
-  });
-
+    clients.forEach(it => {
+      if(it.playerId === lobbydata.currentPlayer.playerId){
+        player = new Player(renderer, playerData.posX, playerData.posY, playerData.posZ, playerData.radius, playerData.speed)
+      } else {
+        let material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } )
+        material.color = new THREE.Color(Math.random(), Math.random(), Math.random());
+        let cube = new THREE.Mesh( new THREE.BoxGeometry( 1, 3, 1 ),  material);
+        cube.position.lerp(new THREE.Vector3(playerData.posX, playerData.posY, playerData.posZ), 0.5)
+        scene.add(cube);
+        playerHashMap.set(it.playerId, cube);
+      }
+    });
+    
+    gameMapStore.setOtherPlayers(playerHashMap)
+    gameMapStore.setPlayer(player)
   camera = player.getCamera()
   scene.add(player.getControls().object)
 

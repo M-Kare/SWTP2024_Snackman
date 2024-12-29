@@ -5,10 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.SortedMap;
-
-import javax.management.relation.Role;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -22,7 +19,6 @@ import de.hsrm.mi.swt.snackman.entities.map.GameMap;
 import de.hsrm.mi.swt.snackman.entities.map.Spawnpoint;
 import de.hsrm.mi.swt.snackman.entities.map.SpawnpointMobType;
 import de.hsrm.mi.swt.snackman.entities.map.Square;
-import de.hsrm.mi.swt.snackman.entities.mapObject.MapObjectType;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.Mob;
 
 @SpringBootTest
@@ -37,8 +33,8 @@ public class MapServiceTest {
 
     @Test
 	void newMazeGeneratedWhenNewInstanceOfMapService(){
-		List<String> mazeBeforeMapService = new LinkedList<String>();
-		List<String> mazeAfterMapService = new LinkedList<String>();
+		List<String> mazeBeforeMapService = new LinkedList<>();
+		List<String> mazeAfterMapService = new LinkedList<>();
 
 		try {
 			mazeBeforeMapService = Files.readAllLines(Paths.get("./Maze.txt"));		
