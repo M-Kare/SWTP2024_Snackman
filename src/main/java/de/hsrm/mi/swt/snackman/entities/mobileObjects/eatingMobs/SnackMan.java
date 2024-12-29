@@ -1,38 +1,45 @@
 package de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs;
 
-import de.hsrm.mi.swt.snackman.configuration.GameConfig;
+import de.hsrm.mi.swt.snackman.controller.PlayerMovement.SnackManUpdateDTO;
 import de.hsrm.mi.swt.snackman.entities.map.Square;
 import de.hsrm.mi.swt.snackman.entities.mapObject.snack.Snack;
+import de.hsrm.mi.swt.snackman.entities.mechanics.SprintHandler;
+import de.hsrm.mi.swt.snackman.messaging.*;
+import jakarta.annotation.PostConstruct;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.stereotype.Component;
+
+import de.hsrm.mi.swt.snackman.configuration.GameConfig;
+import de.hsrm.mi.swt.snackman.entities.mechanics.SprintHandler;
 import de.hsrm.mi.swt.snackman.services.MapService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.beans.PropertyChangeEvent;
+
+@Component
 public class SnackMan extends EatingMob {
-    private final Logger log = LoggerFactory.getLogger(SnackMan.class);
     private boolean isJumping = false;
     private double velocityY = 0.0;
+    private boolean isSprinting = false;
 
-    public SnackMan(MapService mapService) {
+    private SprintHandler sprintHandler = new SprintHandler();
+
+    private FrontendMessageService frontendMessageService;
+    private final Logger log = LoggerFactory.getLogger(SnackMan.class);
+
+    @Autowired
+    public SnackMan(MapService mapService){
         this(mapService, GameConfig.SNACKMAN_SPEED, GameConfig.SNACKMAN_RADIUS);
     }
 
-    public SnackMan(MapService mapService, int speed, double radius) {
+    public SnackMan(MapService mapService, double speed, double radius) {
         super(mapService, speed, radius);
     }
 
-    public SnackMan(MapService mapService, int speed, double radius, double posX, double posY, double posZ) {
+    public SnackMan(MapService mapService, double speed, double radius, double posX, double posY, double posZ) {
         super(mapService, speed, radius, posX, posY, posZ);
-    }
-
-    public void gainKcal() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'gainKcal'");
-    }
-
-    @Override
-    public void loseKcal() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'loseKcal'");
     }
 
     //JUMPING
@@ -85,9 +92,46 @@ public class SnackMan extends EatingMob {
     }
 
     @Override
-    public void move(double x, double y, double z) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'move'");
+    public void move(boolean forward, boolean backward, boolean left, boolean right, double delta) {
+        if (isSprinting) {
+            if (sprintHandler.canSprint()) {
+                setSpeed(GameConfig.SNACKMAN_SPEED * GameConfig.SNACKMAN_SPRINT_MULTIPLIER);
+            } else {
+                sprintHandler.stopSprint();
+                setSpeed(GameConfig.SNACKMAN_SPEED);
+            }
+        } else {
+            sprintHandler.stopSprint();
+            setSpeed(GameConfig.SNACKMAN_SPEED);
+        }
+
+        super.move(forward, backward, left, right, delta);
+    }
+
+    public void setSprinting(boolean sprinting) {
+        this.isSprinting = sprinting;
+
+        if (sprinting) {
+            if (sprintHandler.canSprint()) {
+                sprintHandler.startSprint();
+            } else {
+                this.isSprinting = false;
+            }
+        } else {
+            sprintHandler.stopSprint();
+        }
+    }
+
+    public int getSprintTimeLeft() {
+        return sprintHandler.getSprintTimeLeft();
+    }
+
+    public boolean isInCooldown() {
+        return sprintHandler.isInCooldown();
+    }
+
+    public boolean isSprinting() {
+        return isSprinting;
     }
 
     public int getCurrentCalories() {
@@ -102,12 +146,12 @@ public class SnackMan extends EatingMob {
      */
     public void consumeSnackOnSquare(Square square) {
         Snack snackOnSquare = square.getSnack();
-        log.debug("SNACKMAN - snackOnSquare: {} with calories: {}", snackOnSquare, snackOnSquare.getCalories());
+        //log.debug("SNACKMAN - snackOnSquare: {} with calories: {}", snackOnSquare, snackOnSquare.getCalories());
 
         if (snackOnSquare != null) {
             try {
                 super.gainKcal(snackOnSquare.getCalories());
-                log.debug("SNACKMAN - new kcal: {}", super.getKcal());
+                //log.debug("SNACKMAN - new kcal: {}", super.getKcal());
             } catch (Exception e) {
                 log.error(e.getMessage());
             }
