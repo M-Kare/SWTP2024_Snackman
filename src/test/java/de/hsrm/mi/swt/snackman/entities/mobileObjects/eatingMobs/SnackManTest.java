@@ -7,6 +7,7 @@ import de.hsrm.mi.swt.snackman.entities.mapObject.snack.SnackType;
 import de.hsrm.mi.swt.snackman.messaging.FrontendMessageService;
 import de.hsrm.mi.swt.snackman.services.MapService;
 import de.hsrm.mi.swt.snackman.services.ReadMazeService;
+import net.bytebuddy.build.ToStringPlugin;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +31,7 @@ class SnackManTest {
     public void setUp() {
         MapService mapService = new MapService(frontendMessageService, readMazeService);
         snackMan = new SnackMan(mapService, GameConfig.SNACKMAN_SPEED, GameConfig.SNACKMAN_RADIUS);
+        snackMan.setKcal(0);
     }
 
     @Test
@@ -38,15 +40,40 @@ class SnackManTest {
         Square secondSquare = new Square(new Snack(SnackType.ORANGE), 0, 1);
 
         snackMan.consumeSnackOnSquare(firstSquare);
-        assertEquals(snackMan.getKcal(), SnackType.APPLE.getCalories(), "After consuming an Apple the " +
-                "calories of snackman should increase.");
-        assertNull(firstSquare.getSnack(), "After consuming an snack on the squarem the square should not have a" +
-                "snack anymore.");
+        assertEquals(snackMan.getKcal(), SnackType.APPLE.getCalories());
+        assertNull(firstSquare.getSnack());
 
         snackMan.consumeSnackOnSquare(secondSquare);
-        assertEquals(snackMan.getKcal(), SnackType.APPLE.getCalories() + SnackType.ORANGE.getCalories(), "After " +
-                "consuming an Apple and a Orange the calories of Snackman should be the sum of both snacks.");
-        assertNull(secondSquare.getSnack(), "After consuming an snack on the squarem the square should not have a" +
-                "snack anymore.");
+        assertEquals(snackMan.getKcal(), SnackType.APPLE.getCalories() + SnackType.ORANGE.getCalories());
+        assertNull(secondSquare.getSnack());
+    }
+
+    @Test
+    void testMaxCalories() {
+        Square square1  = new Square(new Snack(SnackType.APPLE), 0, 0);
+        Square square2 = new Square(new Snack(SnackType.APPLE), 0, 1);
+        Square square3 = new Square(new Snack(SnackType.APPLE), 0, 2);
+        Square square4  = new Square(new Snack(SnackType.APPLE), 0, 0);
+        Square square5 = new Square(new Snack(SnackType.APPLE), 0, 1);
+
+        snackMan.consumeSnackOnSquare(square1);
+        snackMan.consumeSnackOnSquare(square2);
+        snackMan.consumeSnackOnSquare(square3);
+        snackMan.consumeSnackOnSquare(square4);
+        snackMan.consumeSnackOnSquare(square5);
+
+        assertEquals(snackMan.getKcal(), snackMan.getMAXKCAL() );
+        assertNull(square1.getSnack());
+        assertNull(square2.getSnack());
+        assertNull(square3.getSnack());
+        assertNull(square4.getSnack());
+        assertNull(square5.getSnack());
+
+
+
+
+
+
+
     }
 }

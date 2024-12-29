@@ -1,5 +1,6 @@
 package de.hsrm.mi.swt.snackman.controller.GameMap;
 
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,4 +38,6 @@ public class GameMapController {
         SnackMan snackman = mapService.getSnackMan();
         return ResponseEntity.ok(new SnackManInitDTO(snackman.getPosX(), snackman.getPosY(), snackman.getPosZ(), snackman.getRadius(), GameConfig.SNACKMAN_SPEED, GameConfig.SNACKMAN_SPRINT_MULTIPLIER));
     }
+
 }
+
