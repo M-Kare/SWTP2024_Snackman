@@ -96,14 +96,12 @@ public class MapService {
         String mazeScriptPath = "./extensions/Maze/Maze.py";
         try (PythonInterpreter localPythonInterpreter = new PythonInterpreter()) {
             localPythonInterpreter.execfile(mazeScriptPath);
-            try{
-                localPythonInterpreter.exec("from Maze import main");
-                localPythonInterpreter.exec("main()");
-            } catch (Exception e) {
-                log.error("Failed to execute maze generation script: {}", e.getMessage());
-            }
+            localPythonInterpreter.exec("main()");
+        } catch (Exception e) {
+            log.error("Failed to execute maze generation script", e);
         }
     }
+    
 
     /**
      * Creates a Square by given indexes

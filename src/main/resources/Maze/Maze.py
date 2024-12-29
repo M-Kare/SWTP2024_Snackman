@@ -104,3 +104,6 @@ def main():
     width, height = 100, 100
     maze = generate_labyrinth(width, height)
     save_file(maze)
+    
+if __name__ == "__main__":
+    main()
