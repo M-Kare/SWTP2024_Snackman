@@ -160,6 +160,26 @@ public class Chicken extends EatingMob implements Runnable {
                 if (super.getKcal() >= this.MAX_CALORIES) {
                     //log.info("Chicken {} has reached {} kcal", this.id, super.getKcal());
                     layEgg();
+                }else{
+                    if((super.getKcal()) <= MAX_CALORIES/6){
+                        System.out.println("Thickness THIN");
+                        this.thickness = Thickness.THIN;
+                    }else if((super.getKcal()) <= 2*(MAX_CALORIES/6)){
+                        System.out.println("Thickness THIN");
+                        this.thickness = Thickness.THIN;
+                    }else if((super.getKcal()) <= 3*(MAX_CALORIES/6)){
+                        System.out.println("Thickness SLIGHTLY_THICK");
+                        this.thickness = Thickness.SLIGHTLY_THICK;
+                    }else if((super.getKcal()) <= 4*(MAX_CALORIES/6)){
+                        System.out.println("Thickness MEDIUM");
+                        this.thickness = Thickness.MEDIUM;
+                    }else if((super.getKcal()) <= 5*(MAX_CALORIES/6)){
+                        System.out.println("Thickness HEAVY");
+                        this.thickness = Thickness.HEAVY;
+                    }else if((super.getKcal()) <= 6*(MAX_CALORIES/6)){
+                        System.out.println("Thickness VERY_HEAVY");
+                        this.thickness = Thickness.VERY_HEAVY;
+                    }
                 }
             } catch (Exception e) {
                 e.printStackTrace();

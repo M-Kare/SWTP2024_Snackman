@@ -238,4 +238,8 @@ public class MapService {
     public SnackMan getSnackMan() {
         return snackman;
     }
+
+    public void setSquare(Square square, int x, int y){
+        gameMap.setGameMap(square, x, y);
+    }
 }

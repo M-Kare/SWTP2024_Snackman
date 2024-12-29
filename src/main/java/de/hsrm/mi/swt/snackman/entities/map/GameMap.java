@@ -37,4 +37,8 @@ public class GameMap {
     public Square getSquareAtIndexXZ(int x, int z) {
         return gameMap[x][z];
     }
+
+    public void setGameMap(Square square, int x, int y){
+        gameMap[x][y] = square;
+    }
 }
