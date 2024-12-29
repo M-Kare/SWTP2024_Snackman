@@ -103,6 +103,6 @@ def saveFile(maze, filename="Maze.txt"):
 
 
 def main():
-    width, height = 25, 25
+    width, height = 99, 99
     maze = generateLabyrinth(width, height)
     saveFile(maze)
