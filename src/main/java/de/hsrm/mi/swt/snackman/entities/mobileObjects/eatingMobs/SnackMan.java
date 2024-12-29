@@ -1,8 +1,6 @@
 package de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs;
 
 import de.hsrm.mi.swt.snackman.configuration.GameConfig;
-import de.hsrm.mi.swt.snackman.entities.map.Square;
-import de.hsrm.mi.swt.snackman.entities.mapObject.snack.Snack;
 import de.hsrm.mi.swt.snackman.entities.mechanics.SprintHandler;
 import de.hsrm.mi.swt.snackman.services.MapService;
 import org.slf4j.Logger;
@@ -125,28 +123,5 @@ public class SnackMan extends EatingMob {
 
     public int getCurrentCalories() {
         return super.getKcal();
-    }
-
-    /**
-     * Collects the snack on the square if there is one.
-     * If there is one that remove it from the square.
-     *
-     * @param square to eat the snack from
-     */
-    public void consumeSnackOnSquare(Square square) {
-        Snack snackOnSquare = square.getSnack();
-        //log.debug("SNACKMAN - snackOnSquare: {} with calories: {}", snackOnSquare, snackOnSquare.getCalories());
-
-        if (snackOnSquare != null) {
-            try {
-                super.gainKcal(snackOnSquare.getCalories());
-                //log.debug("SNACKMAN - new kcal: {}", super.getKcal());
-            } catch (Exception e) {
-                log.error(e.getMessage());
-            }
-
-            //set snack to null after consuming it
-            square.setSnack(null);
-        }
     }
 }
