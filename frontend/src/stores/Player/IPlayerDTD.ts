@@ -5,4 +5,6 @@ export interface IPlayerDTD {
   sprintTimeLeft: number;
   isSprinting: boolean;
   isInCooldown: boolean;
+  currentCalories?:number
+  message?:string
 }

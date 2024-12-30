@@ -12,7 +12,7 @@ public class FrontendMessageService {
     @Autowired
     private final SimpMessagingTemplate messagingTemplate;
 
-    //Logger log = LoggerFactory.getLogger(FrontendMessageService.class);
+    Logger log = LoggerFactory.getLogger(FrontendMessageService.class);
 
     public FrontendMessageService(SimpMessagingTemplate messagingTemplate) {
         this.messagingTemplate = messagingTemplate;
@@ -29,5 +29,11 @@ public class FrontendMessageService {
         //log.info("Send Event: eventType {}, changeTyp {}, chicken {}", ev.eventType(), ev.changeType(), ev.chicken().toString());
 
         messagingTemplate.convertAndSend("/topic/chicken", ev);
+    }
+
+    public void sendUpdateCaloriesEvent(FrontendMessageCaloriesEvent ev) {
+        log.info("Send Event: eventType {}, changeTyp {}", ev.eventType(), ev.changeType());
+
+        messagingTemplate.convertAndSend("/topic/calories", ev);
     }
 }

@@ -1,24 +1,52 @@
 <template>
+  <div class ="Main">
   <canvas ref="canvasRef"></canvas>
   <div class="sprint-bar">
     <div class="sprint-bar-inner" :style="sprintBarStyle"></div>
   </div>
+
+    <div class="Calories-Overlay" :style="getBackgroundStyle">
+      <div class="overlayContent">
+        <img src="@/assets/calories.svg" alt="calories" class="calories-icon" />
+        <p v-if="currentCalories<MAXCALORIES">{{ currentCalories }}kcal</p>
+        <p v-else>{{ caloriesMessage }}</p>
+      </div>
+    </div>
+  </div>
+
 </template>
 
 <script setup lang="ts">
 import {computed, onMounted, onUnmounted, reactive, ref} from 'vue'
 import * as THREE from 'three'
-import {Client} from '@stomp/stompjs'
-import {Player} from '@/components/Player';
-import type {IPlayerDTD} from '@/stores/Player/IPlayerDTD';
-import {fetchSnackManFromBackend} from '@/services/SnackManInitService';
-import {GameMapRenderer} from "@/renderer/GameMapRenderer";
-import {useGameMapStore} from '@/stores/gameMapStore'
-import type {IGameMap} from "@/stores/IGameMapDTD";
+import { Client } from '@stomp/stompjs'
+import { Player } from '@/components/Player';
+import type { IPlayerDTD } from '@/stores/Player/IPlayerDTD';
+import { fetchSnackManFromBackend } from '@/services/SnackManInitService';
+import { GameMapRenderer } from '@/renderer/GameMapRenderer';
+import { useGameMapStore } from '@/stores/gameMapStore';
+import type { IGameMap } from '@/stores/IGameMapDTD';
+import type {IFrontendCaloriesMessageEvent} from "@/services/IFrontendMessageEvent";
+import { GLTFLoader } from 'three/examples/jsm/Addons.js';
 
 const WSURL = `ws://${window.location.host}/stompbroker`
 const DEST = '/topic/player'
 const targetHz = 30
+
+const UPDATE = '/topic/calories'
+
+//Reaktive Calories Variable
+const MAXCALORIES = 3000;
+const currentCalories  = ref(0);
+const caloriesMessage = ref('');
+
+
+
+
+
+const SNACKMAN_TEXTURE: string = 'src/assets/kirby.glb';
+let snackManModel: THREE.Group<THREE.Object3DEventMap>;
+// other textures
 
 // stomp
 const stompclient = new Client({brokerURL: WSURL})
@@ -53,8 +81,47 @@ stompclient.onConnect = frame => {
     sprintData.isCooldown = event.isInCooldown;
 
     player.setPosition(event.posX, event.posY, event.posZ);
-  })
+
+
+
+  });
+
+  // Calories Verarbeitung
+  stompclient.subscribe(UPDATE, message => {
+    const event: IFrontendCaloriesMessageEvent = JSON.parse(message.body);
+
+
+    // Get Calories
+    if (event.calories !== undefined) {
+      currentCalories.value = event.calories;
+    }
+    if ( event.message) {
+      caloriesMessage.value = event.message;
+    }
+  });
+
 }
+
+
+// Kalorien-Overlay Fill berrechnen
+const getBackgroundStyle = computed(() => {
+  const maxCalories = 3000;
+  //Prozent berechnen
+  const percentage = Math.min(currentCalories.value / maxCalories, 1);
+
+  const color = `linear-gradient(to right, #EEC643 ${percentage * 100}%, #5E4A08 ${percentage * 100}%)`;
+
+  return {
+    background: color
+  };
+});
+
+
+
+
+
+
+
 stompclient.activate()
 
 const canvasRef = ref()
@@ -66,7 +133,6 @@ let prevTime = performance.now();
 // camera setup
 let camera: THREE.PerspectiveCamera;
 
-
 // used to calculate fps in animate()
 const clock = new THREE.Clock();
 let fps: number;
@@ -75,7 +141,7 @@ let counter = 0;
 // is called every frame, changes camera position and velocity
 // only sends updates to backend at 30hz
 function animate() {
-  fps = 1 / clock.getDelta()
+  fps = 1 / clock.getDelta();
   player.updatePlayer();
   if (counter >= fps / targetHz) {
     // console.log(`${player.getCamera().position.x}  |  ${player.getCamera().position.z}`)
@@ -93,14 +159,33 @@ function animate() {
         }, {delta: delta}, { jump: player.getIsJumping()}, { doubleJump: player.getIsDoubleJumping()}, {sprinting: player.isSprinting}))
       });
     } catch (fehler) {
-      console.log(fehler)
+      console.log(fehler);
     }
     prevTime = time;
-    counter = 0
+    counter = 0;
   }
   counter++;
-  renderer.render(scene, camera)
+
+  renderer.render(scene, camera);
 }
+
+// initially loads the playerModel & attaches playerModel to playerCamera
+function loadPlayerModel(texture: string) {
+      const loader = new GLTFLoader();
+      loader.load(
+        texture,
+        (gltf) => {
+            snackManModel = gltf.scene;
+
+            snackManModel.scale.set(1, 1, 1);
+            // rotation in radians (Bogenmaß), 180° doesnt work as intended
+            snackManModel.rotation.y = Math.PI;
+            // optional offset for thirdPersonView
+            // snackManModel.position.set(0, -1.55, -5);
+            player.getCamera().add(snackManModel);
+        }
+      )
+    }
 
 onMounted(async () => {
 // for rendering the scene, create gameMap in 3d and change window size
@@ -125,6 +210,8 @@ onMounted(async () => {
   player = new Player(renderer, playerData.posX, playerData.posY, playerData.posZ, playerData.radius, playerData.speed, playerData.baseSpeed, playerData.sprintMultiplier)
   camera = player.getCamera()
   scene.add(player.getControls().object)
+
+  loadPlayerModel(SNACKMAN_TEXTURE);
 
   renderer.render(scene, camera)
   renderer.setAnimationLoop(animate)
@@ -206,7 +293,34 @@ const sprintBarStyle = computed(() => {
 });
 </script>
 
+
 <style>
+.Calories-Overlay{
+  color: black;
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  padding: 10px;
+  border-radius: 5px;
+  z-index: 10;
+  font-size: 25px;
+  width: 400px;
+  height: 60px;
+  display: flex;
+  justify-content: left;
+}
+
+.overlayContent {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.calories-icon {
+  width: 30px;
+  height: 30px;
+}
+
 .sprint-bar {
   position: absolute;
   bottom: 3vh;
@@ -223,4 +337,5 @@ const sprintBarStyle = computed(() => {
   height: 100%;
   transition: width 0.1s ease-out, background-color 0.2s ease-out;
 }
+
 </style>
