@@ -3,12 +3,18 @@
       <div class="background"></div>
       <div class="overlay"></div>
       <h1 class="title">Snackman</h1>
+      <div class="custom-map">
+        <span>Custom Map</span>
+        <CustomMapButton v-model="toggleState"></CustomMapButton>
+      </div>
       <MainMenuButton class="start-button" @click="startGame">Spiel starten</MainMenuButton>
     </div>
   </template>
 
   <script setup lang="ts">
+    import CustomMapButton from '@/components/CustomMapButton.vue';
     import MainMenuButton from '@/components/MainMenuButton.vue';
+    import { ref } from 'vue';
     import { useRouter } from 'vue-router';
 
     const router = useRouter();
@@ -17,6 +23,7 @@
         router.push({name: 'GameStart'});
     }
 
+    const toggleState= ref(false);
   </script>
 
   <style scoped>
@@ -58,6 +65,19 @@
     font-weight: bold;
     color: #fff;
     text-align: center;
+    z-index: 3;
+  }
+
+  .custom-map{
+    position: absolute;
+    right: 20px;
+    top: 30px;
+    display: flex;
+    gap: 25px;
+    justify-content: center;
+    align-items: center;
+    font-size: 3rem;
+    color: #fff;
     z-index: 3;
   }
 
