@@ -32,7 +32,7 @@
 }
 
 .outside-toggle-switch.checked{
-    background-color: #80D9FF;
+    background-color: #003366;
 }
 
 .inside-toggle-switch {
@@ -41,6 +41,7 @@
     background-color: white;
     border-radius: 50%;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease-in-out;
 }
 
 .inside-toggle-switch.checked {
