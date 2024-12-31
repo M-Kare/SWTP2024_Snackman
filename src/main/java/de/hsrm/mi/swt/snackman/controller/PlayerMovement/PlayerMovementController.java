@@ -12,28 +12,30 @@ import de.hsrm.mi.swt.snackman.services.MapService;
 public class PlayerMovementController {
 
   @Autowired
-    private SimpMessagingTemplate messagingTemplate;
-    
-    @Autowired
-    private MapService mapService;
+  private SimpMessagingTemplate messagingTemplate;
 
-    // Erhalte Messages von /topic/player/update
-    @MessageMapping("/topic/player/update")
-    public void spreadPlayerUpdate(SnackManFrontendDTO player) {
+  @Autowired
+  private MapService mapService;
+
+  // Erhalte Messages von /topic/player/update
+  @MessageMapping("/topic/player/update")
+  public void spreadPlayerUpdate(SnackManFrontendDTO player) {
       SnackMan snackman = mapService.getSnackMan();
       snackman.setQuaternion(player.qX(), player.qY(), player.qZ(), player.qW());
+
+      snackman.setSprinting(player.sprinting());
       snackman.move(player.forward(), player.backward(), player.left(), player.right(), player.delta());
 
       //JUMPING
       if (player.jump()) {
-        if (player.doubleJump()) {
-          snackman.doubleJump();
-        } else {
-          snackman.jump();
-        }
-      } 
+          if (player.doubleJump()) {
+              snackman.doubleJump();
+          } else {
+              snackman.jump();
+          }
+      }
       snackman.updateJumpPosition(player.delta());
 
-      messagingTemplate.convertAndSend("/topic/player", new SnackManPositionDTO(snackman.getPosX(), snackman.getPosY(), snackman.getPosZ()));
-    }
+      messagingTemplate.convertAndSend("/topic/player", new SnackManPositionDTO(snackman.getPosX(), snackman.getPosY(), snackman.getPosZ(), snackman.isSprinting(), snackman.getSprintTimeLeft(), snackman.isInCooldown()));
+  }
 }

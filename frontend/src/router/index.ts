@@ -1,6 +1,8 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import MainMenuView from '@/views/MainMenuView.vue'
 import GameView from '@/views/GameView.vue'
+import LobbyListView from '@/views/LobbyViews/LobbyListView.vue'
+import LobbyView from '@/views/LobbyViews/LobbyView.vue'
 import EndGameView from '@/views/EndGameView.vue'
 
 
@@ -14,14 +16,8 @@ const router = createRouter({
         },
         {
             path: '/GameView',
-            name: 'GameStart',
+            name: 'GameView',
             component: GameView,
-            props: true
-        },
-        {
-            path: '/EndGameView',
-            name: 'EndGameView',
-            component: EndGameView,
             props: true
         }
     ]
