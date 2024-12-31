@@ -7,6 +7,7 @@
         <span>Custom Map</span>
         <CustomMapButton v-model="toggleState"></CustomMapButton>
       </div>
+      <MapButton v-if="toggleState" class="map-importiren-button">Map Importieren</MapButton>
       <MainMenuButton class="start-button" @click="startGame">Spiel starten</MainMenuButton>
     </div>
   </template>
@@ -14,6 +15,7 @@
   <script setup lang="ts">
     import CustomMapButton from '@/components/CustomMapButton.vue';
     import MainMenuButton from '@/components/MainMenuButton.vue';
+    import MapButton from '@/components/MapButton.vue';
     import { ref } from 'vue';
     import { useRouter } from 'vue-router';
 
@@ -78,6 +80,13 @@
     align-items: center;
     font-size: 3rem;
     color: #fff;
+    z-index: 3;
+  }
+
+  .map-importiren-button{
+    position: absolute;
+    right: 20px;
+    top: 30px;
     z-index: 3;
   }
 
