@@ -3,7 +3,7 @@
     <div class="background"></div>
     <div class="overlay"></div>
     <h1 class="title">Game End!</h1>
-    <MainMenuButton class="map-exportieren-button" @click="downloadMap">Map exportieren</MainMenuButton>
+    <MapButton class="map-exportieren-button" @click="downloadMap">Map exportieren</MapButton>
     <div v-if="feedbackMessage" :class="['feedback-message', feedbackClass]">
       {{ feedbackMessage }}
     </div>
@@ -11,7 +11,7 @@
 </template>
 
 <script setup lang="ts">
-  import MainMenuButton from '@/components/MainMenuButton.vue';
+  import MapButton from '@/components/MapButton.vue';
   import { ref } from 'vue';
   import { useRouter } from 'vue-router';
 

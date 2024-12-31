@@ -19,6 +19,24 @@ const router = createRouter({
             name: 'GameView',
             component: GameView,
             props: true
+        },
+        {
+            path: '/LobbyListView',
+            name: 'LobbyListView',
+            component: LobbyListView,
+            props: true
+        },
+        {
+            path: '/LobbyView/:lobbyId',
+            name: 'LobbyView',
+            component: LobbyView,
+            props: true
+        },
+        {
+            path: '/EndGameView',
+            name: 'EndGameView',
+            component: EndGameView,
+            props: true
         }
     ]
 })
