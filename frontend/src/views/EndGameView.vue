@@ -13,9 +13,7 @@
 <script setup lang="ts">
   import MapButton from '@/components/MapButton.vue';
   import { ref } from 'vue';
-  import { useRouter } from 'vue-router';
 
-  const router = useRouter();
   const feedbackMessage = ref('');
   const feedbackClass = ref('');
     
@@ -31,7 +29,8 @@
       link.href = url;
       link.download = 'SnackManMap.txt';
       document.body.appendChild(link);            // Append the link to the DOM
-      link.click();                               // Simulate a click to start the download        document.body.removeChild(link);            // Remove the link after the download
+      link.click();                               // Simulate a click to start the download        
+      document.body.removeChild(link);            // Remove the link after the download
 
       // Revoke the object URL to free up memory
       URL.revokeObjectURL(url);
@@ -109,10 +108,10 @@
 
   .feedback-message {
     position: absolute;
-    bottom: 20px;
     left: 50%;
-    transform: translateX(-50%);
-    font-size: 1.5rem;
+    top: 60%;
+    transform: translate(-50%, -40%);
+    font-size: 2rem;
     font-weight: bold;
     z-index: 3;
     padding: 10px 20px;
