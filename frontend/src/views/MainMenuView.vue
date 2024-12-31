@@ -7,7 +7,7 @@
         <span>Custom Map</span>
         <CustomMapButton v-model="toggleState"></CustomMapButton>
       </div>
-      <MapButton v-if="toggleState" class="map-importiren-button">Map Importieren</MapButton>
+      <MapButton v-if="toggleState" class="map-importiren-button" @click="importierenMap">Map Importieren</MapButton>
       <MainMenuButton class="start-button" @click="startGame">Spiel starten</MainMenuButton>
     </div>
   </template>
@@ -25,7 +25,11 @@
         router.push({name: 'GameStart'});
     }
 
-    const toggleState= ref(false);
+    const toggleState = ref(false);
+
+    const importierenMap = () => {
+
+    }
   </script>
 
   <style scoped>
@@ -85,8 +89,9 @@
 
   .map-importiren-button{
     position: absolute;
-    right: 20px;
-    top: 30px;
+    top: 30%;
+    left: 50%;
+    transform: translate(-50%, -50%);
     z-index: 3;
   }
 
