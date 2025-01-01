@@ -4,6 +4,7 @@ import de.hsrm.mi.swt.snackman.configuration.GameConfig;
 import de.hsrm.mi.swt.snackman.entities.map.Square;
 import de.hsrm.mi.swt.snackman.entities.mapObject.snack.Snack;
 import de.hsrm.mi.swt.snackman.entities.mapObject.snack.SnackType;
+import de.hsrm.mi.swt.snackman.entities.mechanics.SprintHandler;
 import de.hsrm.mi.swt.snackman.messaging.FrontendMessageService;
 import de.hsrm.mi.swt.snackman.services.MapService;
 import de.hsrm.mi.swt.snackman.services.ReadMazeService;
@@ -13,6 +14,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @SpringBootTest
 class SnackManTest {
@@ -22,7 +28,7 @@ class SnackManTest {
 
     @Autowired
     private ReadMazeService readMazeService;
-
+    private SprintHandler sprintHandler;
 
     private SnackMan snackMan;
 
@@ -31,7 +37,10 @@ class SnackManTest {
         MapService mapService = new MapService(frontendMessageService, readMazeService);
         snackMan = new SnackMan(mapService, GameConfig.SNACKMAN_SPEED, GameConfig.SNACKMAN_RADIUS);
         snackMan.setKcal(0);
-        snackMan.setPosY(GameConfig.SNACKMAN_GROUND_LEVEL); 
+        snackMan.setPosY(GameConfig.SNACKMAN_GROUND_LEVEL);
+        sprintHandler = mock(SprintHandler.class);
+        snackMan.setSprintHandler(sprintHandler);
+        snackMan.setSpeed(GameConfig.SNACKMAN_SPEED);
     }
 
     @Test
@@ -128,5 +137,69 @@ class SnackManTest {
         assertEquals(GameConfig.SNACKMAN_GROUND_LEVEL, snackMan.getPosY());
         assertFalse(snackMan.isJumping());
         assertEquals(0, snackMan.getVelocityY());
+    }
+
+
+    @Test
+    void testMoveWhileSprintingCanSprint() {
+        when(sprintHandler.canSprint()).thenReturn(true);
+        snackMan.setSprinting(true);
+
+        snackMan.move(true, false, false, false, 0.016);
+        verify(sprintHandler, times(1)).startSprint();
+        assertEquals(GameConfig.SNACKMAN_SPEED * GameConfig.SNACKMAN_SPRINT_MULTIPLIER, snackMan.getSpeed());
+    }
+
+    @Test
+    void testMoveWhileSprintingCannotSprint() {
+        when(sprintHandler.canSprint()).thenReturn(false);
+        snackMan.setSprinting(true);
+
+        snackMan.move(true, false, false, false, 0.016);
+        verify(sprintHandler, times(1)).stopSprint();
+        assertEquals(GameConfig.SNACKMAN_SPEED, snackMan.getSpeed());
+        assertFalse(snackMan.isSprinting());
+    }
+
+    @Test
+    void testMoveNotSprinting() {
+        snackMan.setSprinting(false);
+
+        snackMan.move(true, false, false, false, 0.016);
+        verify(sprintHandler, times(2)).stopSprint();
+        assertEquals(GameConfig.SNACKMAN_SPEED, snackMan.getSpeed());
+    }
+
+    @Test
+    void testSetSprintingCanSprint() {
+        when(sprintHandler.canSprint()).thenReturn(true);
+
+        snackMan.setSprinting(true);
+        verify(sprintHandler, times(1)).startSprint();
+        assertTrue(snackMan.isSprinting());
+    }
+
+    @Test
+    void testSetSprintingCannotSprint() {
+        when(sprintHandler.canSprint()).thenReturn(false);
+
+        snackMan.setSprinting(true);
+        verify(sprintHandler, never()).startSprint();
+        assertFalse(snackMan.isSprinting());
+    }
+
+    @Test
+    void testSetSprintingToFalse() {
+        snackMan.setSprinting(false);
+
+        verify(sprintHandler, times(1)).stopSprint();
+        assertFalse(snackMan.isSprinting());
+    }
+
+    @Test
+    void testMoveWithAllDirections() {
+        snackMan.move(true, true, true, true, 0.016);
+        assertEquals(GameConfig.SNACKMAN_SPEED, snackMan.getSpeed());
+        verify(sprintHandler, never()).startSprint();
     }
 }
