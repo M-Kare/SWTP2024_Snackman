@@ -11,6 +11,7 @@ import type {IChicken, IChickenDTD} from '@/stores/Chicken/IChickenDTD'
 import {Direction} from '@/stores/Chicken/IChickenDTD'
 import {GameObjectRenderer} from '@/renderer/GameObjectRenderer'
 
+import {ChickenThickness} from '@/stores/Chicken/IChickenDTD'
 /**
  * Defines the pinia store used for saving the map from
  * the backend. Updates of the snacks are saved here and
@@ -135,12 +136,14 @@ export const useGameMapStore = defineStore('gameMap', () => {
           const currentChicken = mapData.chickens.find(
             chicken => chicken.id == chickenUpdate.id,
           )
-          //console.log('chicken update {}', chickenUpdate)
+          console.log('----------chicken update {}', chickenUpdate)
+          console.log('----------chckenUpdate Thickness: ', chickenUpdate.thickness)
 
           if (currentChicken == undefined) {
             console.error('A chicken is undefined in pinia')
           } else {
             if (currentChicken.thickness != chickenUpdate.thickness) {
+              console.log("chickenUpdate.thickness 2: ", chickenUpdate.thickness);
               updateThickness(currentChicken, chickenUpdate)
             }
             if (
@@ -172,11 +175,43 @@ export const useGameMapStore = defineStore('gameMap', () => {
     currentChicken: IChicken,
     chickenUpdate: IChickenDTD,
   ) {
+    console.log("chickenUpdate.thickness 3: ", chickenUpdate.thickness);
     console.log('Chicken thickness updated')
     const chickenMesh = scene.getObjectById(currentChicken.meshId)
     currentChicken.thickness = chickenUpdate.thickness
 
-    // todo update chicken thickness with new geometry
+    if (!chickenMesh) {
+      console.warn('Chicken mesh not found in the scene.');
+      return;
+    }
+
+    console.log("chickenUpdate.thickness : ", chickenUpdate.thickness);
+
+    console.log('Typ: chickenUpdate.thickness :', typeof chickenUpdate.thickness, chickenUpdate.thickness)
+    console.log('Typ: chickenThickness.SLIGHTLY_THICK :', typeof ChickenThickness.SLIGHTLY_THICK, ChickenThickness.SLIGHTLY_THICK)
+    console.log('Typ: chickenThickness :', typeof ChickenThickness[chickenUpdate.thickness], ChickenThickness[chickenUpdate.thickness])
+
+    const thicknessValue = ChickenThickness[chickenUpdate.thickness as keyof typeof ChickenThickness];
+
+    switch (thicknessValue){
+      case ChickenThickness.THIN:
+        chickenMesh!.scale.set(1, 1, 1)
+        break
+      case ChickenThickness.SLIGHTLY_THICK:
+        chickenMesh!.scale.set(1.25, 1.25, 1.25)
+        break
+      case ChickenThickness.MEDIUM:
+        chickenMesh!.scale.set(1.5, 1.5, 1.5)
+        break
+      case ChickenThickness.HEAVY:
+        chickenMesh!.scale.set(1.75, 1.75, 1.75)
+        break
+        case ChickenThickness.VERY_HEAVY:
+          chickenMesh!.scale.set(2, 2, 2)
+          break
+      default:
+        console.log("ETWAS IST SCHIED GELAUFEN...")
+    }
   }
 
   function updateLookingDirection(

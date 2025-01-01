@@ -162,22 +162,22 @@ public class Chicken extends EatingMob implements Runnable {
                     layEgg();
                 }else{
                     if((super.getKcal()) <= MAX_CALORIES/6){
-                        System.out.println("Thickness THIN");
+                        //propertyChangeSupport.firePropertyChange("chickensThickness", null, this.thickness);
                         this.thickness = Thickness.THIN;
                     }else if((super.getKcal()) <= 2*(MAX_CALORIES/6)){
-                        System.out.println("Thickness THIN");
+                        //propertyChangeSupport.firePropertyChange("chickensThickness", null, this.thickness);
                         this.thickness = Thickness.THIN;
                     }else if((super.getKcal()) <= 3*(MAX_CALORIES/6)){
-                        System.out.println("Thickness SLIGHTLY_THICK");
+                        //propertyChangeSupport.firePropertyChange("chickensThickness", null, this.thickness);
                         this.thickness = Thickness.SLIGHTLY_THICK;
                     }else if((super.getKcal()) <= 4*(MAX_CALORIES/6)){
-                        System.out.println("Thickness MEDIUM");
+                        //propertyChangeSupport.firePropertyChange("chickensThickness", null, this.thickness);
                         this.thickness = Thickness.MEDIUM;
                     }else if((super.getKcal()) <= 5*(MAX_CALORIES/6)){
-                        System.out.println("Thickness HEAVY");
+                        //propertyChangeSupport.firePropertyChange("chickensThickness", null, this.thickness);
                         this.thickness = Thickness.HEAVY;
                     }else if((super.getKcal()) <= 6*(MAX_CALORIES/6)){
-                        System.out.println("Thickness VERY_HEAVY");
+                        //propertyChangeSupport.firePropertyChange("chickensThickness", null, this.thickness);
                         this.thickness = Thickness.VERY_HEAVY;
                     }
                 }

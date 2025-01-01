@@ -34,7 +34,6 @@ class ChickenTest {
 
     @Test
     void chickenGetsFatWhenComsumincSnacks(){
-        //MapService mapService1 = mock(MapService.class);
         Snack snack = new Snack(SnackType.STRAWBERRY);
         
         Square square = new Square(snack, 0, 0);
