@@ -44,22 +44,20 @@ public class SnackMan extends EatingMob {
 
     //JUMPING
     public void jump() {
-        if (!isJumping) {
-            if (getKcal() >= 100) {
+        if (!isJumping && getKcal() >= 100) {
                 this.velocityY = GameConfig.JUMP_STRENGTH;
                 this.isJumping = true;
                 setKcal(getKcal() - 100);
             }
-        }
+        
     }
 
     public void doubleJump() {
-        if (isJumping) {
-            if (getKcal() >= 100) {
+        if (isJumping && getKcal() >= 100) {
                 this.velocityY += GameConfig.DOUBLEJUMP_STRENGTH;
                 setKcal(getKcal() - 100);
             }
-        }
+        
     }
 
     public void updateJumpPosition(double deltaTime) {
@@ -157,5 +155,21 @@ public class SnackMan extends EatingMob {
             //set snack to null after consuming it
             square.setSnack(null);
         }
+    }
+
+    public boolean isJumping() {
+        return isJumping;
+    }
+
+    public void setJumping(boolean isJumping) {
+        this.isJumping = isJumping;
+    }
+
+    public double getVelocityY() {
+        return velocityY;
+    }
+
+    public void setVelocityY(double velocityY) {
+        this.velocityY = velocityY;
     }
 }

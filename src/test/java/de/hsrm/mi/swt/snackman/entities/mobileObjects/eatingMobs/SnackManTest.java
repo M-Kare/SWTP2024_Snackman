@@ -31,6 +31,7 @@ class SnackManTest {
         MapService mapService = new MapService(frontendMessageService, readMazeService);
         snackMan = new SnackMan(mapService, GameConfig.SNACKMAN_SPEED, GameConfig.SNACKMAN_RADIUS);
         snackMan.setKcal(0);
+        snackMan.setPosY(GameConfig.SNACKMAN_GROUND_LEVEL); 
     }
 
     @Test
@@ -69,12 +70,63 @@ class SnackManTest {
         assertNull(square3.getSnack());
         assertNull(square4.getSnack());
         assertNull(square5.getSnack());
+    }
 
+    @Test
+    void testJump() {
+        snackMan.setKcal(200);
+        snackMan.jump();
 
+        assertEquals(100, snackMan.getKcal());
+        assertEquals(GameConfig.JUMP_STRENGTH, snackMan.getVelocityY());
+        assertTrue(snackMan.isJumping());
+    }
 
+    @Test
+    void testJumpInsufficientKcal() {
+        snackMan.setKcal(50);
+        snackMan.jump();
+        assertEquals(50, snackMan.getKcal());
+        assertEquals(0, snackMan.getVelocityY());
+        assertFalse(snackMan.isJumping());
+    }
 
+    @Test
+    void testDoubleJump() {
+        snackMan.setKcal(300);
+        snackMan.jump();
+        snackMan.doubleJump();
 
+        assertEquals(100, snackMan.getKcal());
+        assertEquals(GameConfig.JUMP_STRENGTH + GameConfig.DOUBLEJUMP_STRENGTH, snackMan.getVelocityY());
+    }
 
+    @Test
+    void testDoubleJumpWithoutEnoughKcal() {
+        snackMan.setKcal(100);
+        snackMan.jump();
+        snackMan.doubleJump();
 
+        assertEquals(0, snackMan.getKcal());
+        assertEquals(GameConfig.JUMP_STRENGTH, snackMan.getVelocityY());
+    }
+
+    @Test
+    void testUpdateJumpPosition() {
+        snackMan.setKcal(100);
+        snackMan.jump();
+        double deltaTime = 0.016;
+
+        assertTrue(snackMan.isJumping());
+        assertTrue(snackMan.getVelocityY() > 0);
+        snackMan.updateJumpPosition(deltaTime);
+
+        while (snackMan.getPosY() > GameConfig.SNACKMAN_GROUND_LEVEL) {
+            snackMan.updateJumpPosition(deltaTime);
+        }
+
+        assertEquals(GameConfig.SNACKMAN_GROUND_LEVEL, snackMan.getPosY());
+        assertFalse(snackMan.isJumping());
+        assertEquals(0, snackMan.getVelocityY());
     }
 }
