@@ -1,6 +1,10 @@
 package de.hsrm.mi.swt.snackman.services;
 
+import de.hsrm.mi.swt.snackman.controller.leaderboard.LeaderboardEntryDTO;
 import de.hsrm.mi.swt.snackman.entities.leaderboard.LeaderboardEntry;
+import de.hsrm.mi.swt.snackman.messaging.ChangeType;
+import de.hsrm.mi.swt.snackman.messaging.EventType;
+import de.hsrm.mi.swt.snackman.messaging.FrontendLeaderboardMessageEvent;
 import de.hsrm.mi.swt.snackman.messaging.FrontendMessageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,8 +14,6 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -35,8 +37,6 @@ public class LeaderboardService {
         List<String> lines = readInLeaderboard();
         fillLeaderboard(lines);
         log.info("Leaderboard loaded: {}", leaderboard);
-        // test add new entry
-        addLeaderboardEntry(new LeaderboardEntry("Test", LocalTime.now(), LocalDate.now()));
     }
 
     private List<String> readInLeaderboard() {
@@ -65,7 +65,7 @@ public class LeaderboardService {
         Collections.sort(this.leaderboard);
     }
 
-    private void addLeaderboardEntry(LeaderboardEntry entry) {
+    public void addLeaderboardEntry(LeaderboardEntry entry) {
         // add to list
         this.leaderboard.add(entry);
         Collections.sort(this.leaderboard);
@@ -76,5 +76,14 @@ public class LeaderboardService {
         } catch (IOException e) {
             log.error("Failed to write a new entry to {} file.", this.filePath, e);
         }
+        // stomp
+        FrontendLeaderboardMessageEvent message = new FrontendLeaderboardMessageEvent(EventType.LEADERBOARD, ChangeType.UPDATE, getLeaderboardAsDTO());
+        this.frontendMessageService.sendLeaderboardEvent(message);
+    }
+
+    public List<LeaderboardEntryDTO> getLeaderboardAsDTO(){
+        return this.leaderboard.stream()
+                .map(LeaderboardEntryDTO::fromLeaderboardEntry)
+                .toList();
     }
 }
