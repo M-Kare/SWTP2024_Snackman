@@ -5,6 +5,8 @@ import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+
+import de.hsrm.mi.swt.snackman.configuration.GameConfig;
 import de.hsrm.mi.swt.snackman.entities.map.Square;
 import de.hsrm.mi.swt.snackman.entities.mapObject.snack.Snack;
 import de.hsrm.mi.swt.snackman.entities.mapObject.snack.SnackType;
@@ -31,8 +33,8 @@ public class Chicken extends EatingMob implements Runnable {
     private int chickenPosX, chickenPosZ;
     private Direction lookingDirection;
     private boolean isWalking;
-    private final int WAITING_TIME = 2000;  // in ms
-    private final int MAX_KALORIEN = 3000;
+    private final int WAITING_TIME = GameConfig.WAITING_TIME;  // in ms
+    private final int MAX_KALORIEN = GameConfig.MAX_KALORIEN;
     // python
     private PythonInterpreter pythonInterpreter = null;
     private Properties pythonProps = new Properties();
