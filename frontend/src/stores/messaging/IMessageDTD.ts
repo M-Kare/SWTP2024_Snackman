@@ -4,5 +4,5 @@ export interface IMessageDTD{
 }
 
 export enum EventType{
-    MobUpdate = "MobUpdate", SquareUpdate = "SquareUpdate" 
+    MobUpdate = "MobUpdate", SquareUpdate = "SquareUpdate", ChickenUpdate = "ChickenUpdate"
 }

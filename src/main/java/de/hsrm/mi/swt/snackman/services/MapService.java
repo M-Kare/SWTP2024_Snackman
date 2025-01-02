@@ -180,8 +180,8 @@ public class MapService {
                                             EventType.CHICKEN,
                                             ChangeType.UPDATE, lobby.getLobbyId(),
                                             ChickenDTO.fromChicken((Chicken) evt.getNewValue()));
-
-                                    messageLoop.sendChickenEvent(messageEvent);
+                                    messageLoop.addChickenToQueue(messageEvent);
+                                    //messageLoop.sendChickenEvent(messageEvent);
                                 }
                             });
                             break;
