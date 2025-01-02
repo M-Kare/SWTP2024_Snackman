@@ -188,6 +188,8 @@ export const useGameMapStore = defineStore('gameMap', () => {
     console.log("chickenUpdate.thickness : ", chickenUpdate.thickness);
 
     console.log('Typ: chickenUpdate.thickness :', typeof chickenUpdate.thickness, chickenUpdate.thickness)
+    console.log('Typ: currentChicken.thickness :', typeof currentChicken.thickness, currentChicken.thickness)
+    
     console.log('Typ: chickenThickness.SLIGHTLY_THICK :', typeof ChickenThickness.SLIGHTLY_THICK, ChickenThickness.SLIGHTLY_THICK)
     console.log('Typ: chickenThickness :', typeof ChickenThickness[chickenUpdate.thickness], ChickenThickness[chickenUpdate.thickness])
 
