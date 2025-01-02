@@ -41,20 +41,33 @@ public class Chicken extends EatingMob implements Runnable {
     private String fileName;
     private String interpreterCommand;
 
-    public Chicken() { //Nur zum testen????
+    public Chicken() {
         super(null);
         this.fileName = "ChickenMovementSkript";
         initJython();
     }
 
-    public Chicken(String fileName){ //Nur zum testen????
+    public Chicken(String fileName){
         super(null);
         this.fileName = fileName;
         initJython();
     }
 
-    public List<String> act(List<String> squares){
+    public Chicken(Square initialPosition, MapService mapService) {
+        super(mapService);
+        id = generateId();
+        this.chickenPosX = initialPosition.getIndexX();
+        this.chickenPosZ = initialPosition.getIndexZ();
+        initialPosition.addMob(this);
+        this.fileName = "ChickenMovementSkript";
+        this.isWalking = true;
+        this.lookingDirection = Direction.getRandomDirection();
+        log.info("Chicken looking direction is {}", lookingDirection);
         initJython();
+        initTimer();
+    }
+
+    public List<String> act(List<String> squares){
         List<String> result = executeMovementSkript(squares);
         return result;
     }
@@ -93,33 +106,6 @@ public class Chicken extends EatingMob implements Runnable {
         }
         log.debug("Python script result is {}", javaList);
         return javaList;
-    }
-
-    public Chicken(Square initialPosition, MapService mapService) {
-        super(mapService);
-        id = generateId();
-        this.chickenPosX = initialPosition.getIndexX();
-        this.chickenPosZ = initialPosition.getIndexZ();
-        initialPosition.addMob(this);
-        //behavior = new DefaultChickenBehavior();
-        this.fileName = "ChickenMovementSkript";
-        this.isWalking = true;
-        this.lookingDirection = Direction.ONE_NORTH;
-        initJython();
-        initTimer();
-    }
-
-    public Chicken(Square initialPosition, MapService mapService, String fileName) {
-        super(mapService);
-        id = generateId();
-        this.chickenPosX = initialPosition.getIndexX();
-        this.chickenPosZ = initialPosition.getIndexZ();
-        initialPosition.addMob(this);
-        this.fileName = fileName;
-        this.isWalking = true;
-        this.lookingDirection = Direction.ONE_NORTH;
-        initJython();
-        initTimer();
     }
 
     public void addPropertyChangeListener(PropertyChangeListener listener) {
@@ -187,8 +173,8 @@ public class Chicken extends EatingMob implements Runnable {
             log.debug("Squares chicken is seeing: {}", squares);
 
             log.debug("Current position is x {} z {}", this.chickenPosX, this.chickenPosZ);
-            super.mapService.printGameMap();
-            System.out.println("---------------------------------");
+            //super.mapService.printGameMap();
+            //System.out.println("---------------------------------");
 
             List<String> newMove = act(squares);
 

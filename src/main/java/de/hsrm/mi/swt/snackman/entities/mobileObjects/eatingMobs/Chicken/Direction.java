@@ -1,9 +1,12 @@
 package de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken;
 
 import de.hsrm.mi.swt.snackman.entities.map.Square;
+import de.hsrm.mi.swt.snackman.entities.mapObject.snack.SnackType;
 import de.hsrm.mi.swt.snackman.services.MapService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Random;
 
 /**
  * The direction the chicken could move into
@@ -184,28 +187,19 @@ public enum Direction {
         return mapService.getSquareAtIndexXZ(currentPosition.getIndexX() + TWO_SOUTH_TWO_EAST.deltaX, currentPosition.getIndexZ() + TWO_SOUTH_TWO_EAST.deltaZ);
     }
 
-    // public Square getWestSquare(MapService mapService, Square currentPosition) {
-    //     return mapService.getSquareAtIndexXZ(currentPosition.getIndexX() + ONE_WEST.deltaX, currentPosition.getIndexZ() + ONE_WEST.deltaZ);
-    // }
-
-    // public Square getNorthWestSquare(MapService mapService, Square currentPosition) {
-    //     return mapService.getSquareAtIndexXZ(currentPosition.getIndexX() + ONE_NORTH_ONE_WEST.deltaX, currentPosition.getIndexZ() + ONE_NORTH_ONE_WEST.deltaZ);
-    // }
-
-    // public Square getNorthEastSquare(MapService mapService, Square currentPosition) {
-    //     return mapService.getSquareAtIndexXZ(currentPosition.getIndexX() + ONE_NORTH_ONE_EAST.deltaX, currentPosition.getIndexZ() + ONE_NORTH_ONE_EAST.deltaZ);
-    // }
-
-    // public Square getSouthEastSquare(MapService mapService, Square currentPosition) {
-    //     return mapService.getSquareAtIndexXZ(currentPosition.getIndexX() + ONE_SOUTH_ONE_EAST.deltaX, currentPosition.getIndexZ() + ONE_SOUTH_ONE_EAST.deltaZ);
-    // }
-
-    // public Square getSouthWestSquare(MapService mapService, Square currentPosition) {
-    //     return mapService.getSquareAtIndexXZ(currentPosition.getIndexX() + ONE_SOUTH_ONE_WEST.deltaX, currentPosition.getIndexZ() + ONE_SOUTH_ONE_WEST.deltaZ);
-    // }
-
     @Override
     public String toString() {
         return indexOfList;
+    }
+
+    /**
+     * Gets a random direction
+     * @return random direction
+     */
+    public static Direction getRandomDirection() {
+        Direction[] mainDirections = {ONE_NORTH, ONE_SOUTH, ONE_EAST, ONE_WEST};
+        Random random = new Random();
+        int randomIndex = random.nextInt(mainDirections.length);
+        return mainDirections[randomIndex];
     }
 }
