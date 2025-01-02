@@ -79,6 +79,8 @@ public class LeaderboardService {
         // stomp
         FrontendLeaderboardMessageEvent message = new FrontendLeaderboardMessageEvent(EventType.LEADERBOARD, ChangeType.UPDATE, getLeaderboardAsDTO());
         this.frontendMessageService.sendLeaderboardEvent(message);
+
+        log.info("Leaderboard was updated: {}", leaderboard);
     }
 
     public List<LeaderboardEntryDTO> getLeaderboardAsDTO(){
