@@ -39,8 +39,6 @@ public class TalaChickenTest {
 
         List<String> result = chicken.act(visibleEnvironment);
 
-        //int chosenIndex = Integer.parseInt(result.get(result.size() - 1));
-        //assertEquals("", result.get(chosenIndex), "Chicken didnt move to Snackman");
         boolean istFreierIndexVorhanden = result.contains(" ");
         assertEquals(true, istFreierIndexVorhanden, "Empty element, but Snackman is not reachable : "+ result);
 
