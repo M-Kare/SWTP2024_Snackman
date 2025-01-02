@@ -26,6 +26,9 @@ public enum SnackType {
         SnackType[] snacks = values();
         Random random = new Random();
         int randomIndex = random.nextInt(snacks.length);
+        while(snacks[randomIndex] == SnackType.EGG) {
+            randomIndex = random.nextInt(snacks.length);
+        }
         return snacks[randomIndex];
     }
 }
