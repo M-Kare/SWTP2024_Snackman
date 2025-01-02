@@ -1,5 +1,6 @@
 package de.hsrm.mi.swt.snackman.entities.leaderboard;
 
+import de.hsrm.mi.swt.snackman.services.LeaderboardService;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
@@ -22,7 +23,7 @@ public class LeaderboardEntry implements Comparable<LeaderboardEntry> {
     public LeaderboardEntry(String name, String duration, String releaseDate) {
         this.name = name;
         this.duration = LocalTime.parse(duration);
-        this.releaseDate = LocalDate.parse(releaseDate, DateTimeFormatter.ofPattern("dd-MM-yyyy"));
+        this.releaseDate = LocalDate.parse(releaseDate);
     }
 
     @Override
@@ -45,5 +46,9 @@ public class LeaderboardEntry implements Comparable<LeaderboardEntry> {
                 ", duration=" + duration +
                 ", releaseDate=" + releaseDate +
                 '}';
+    }
+
+    public String getEntryAsFileLine(){
+        return this.name + LeaderboardService.CSV_LINE_SPLITTER + this.duration.toString() + LeaderboardService.CSV_LINE_SPLITTER + this.releaseDate.toString() + "\n";
     }
 }

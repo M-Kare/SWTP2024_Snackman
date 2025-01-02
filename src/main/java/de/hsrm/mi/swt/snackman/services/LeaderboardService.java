@@ -6,12 +6,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -25,7 +26,7 @@ public class LeaderboardService {
     private FrontendMessageService frontendMessageService;
     private final String filePath;
     private final List<LeaderboardEntry> leaderboard = new ArrayList<>();
-    private final String CSV_LINE_SPLITTER = ";";
+    public static final String CSV_LINE_SPLITTER = ";";
 
     @Autowired
     public LeaderboardService(FrontendMessageService frontendMessageService) {
@@ -34,6 +35,8 @@ public class LeaderboardService {
         List<String> lines = readInLeaderboard();
         fillLeaderboard(lines);
         log.info("Leaderboard loaded: {}", leaderboard);
+        // test add new entry
+        addLeaderboardEntry(new LeaderboardEntry("Test", LocalTime.now(), LocalDate.now()));
     }
 
     private List<String> readInLeaderboard() {
@@ -57,12 +60,21 @@ public class LeaderboardService {
         for (String line : lines) {
             String[] parts = line.split(CSV_LINE_SPLITTER);
             if (parts.length != 3) throw new RuntimeException("Invalid CSV line: " + line + " at " + filePath + " file.");
-            addLeaderboardEntry(new LeaderboardEntry(parts[0], parts[1], parts[2]));
+            this.leaderboard.add(new LeaderboardEntry(parts[0], parts[1], parts[2]));
         }
+        Collections.sort(this.leaderboard);
     }
 
     private void addLeaderboardEntry(LeaderboardEntry entry) {
+        // add to list
         this.leaderboard.add(entry);
         Collections.sort(this.leaderboard);
+        // add to file
+        String newLine = entry.getEntryAsFileLine();
+        try (FileWriter fileWriter = new FileWriter(this.filePath, true)) {
+            fileWriter.write(newLine);
+        } catch (IOException e) {
+            log.error("Failed to write a new entry to {} file.", this.filePath, e);
+        }
     }
 }
