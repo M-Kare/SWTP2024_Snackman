@@ -44,13 +44,13 @@ public class MapService {
      */
     @Autowired
     public MapService(FrontendMessageService frontendMessageService, ReadMazeService readMazeService) {
-        this(frontendMessageService, readMazeService, "mini-maze.txt");
+        this(frontendMessageService, readMazeService, "Maze.txt");
     }
 
     public MapService(FrontendMessageService frontendMessageService, ReadMazeService readMazeService,
                       String filePath) {
         this.frontendMessageService = frontendMessageService;
-        //generateNewMaze();
+        generateNewMaze();
         this.filePath = filePath;
         char[][] mazeData = readMazeService.readMazeFromFile(this.filePath);
         gameMap = convertMazeDataGameMap(mazeData);
