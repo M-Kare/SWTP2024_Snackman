@@ -110,10 +110,33 @@ def choose_target_square(liste, toReplace, direction):
         if liste[i] == toReplace:
             indexes_to_choose_from.append(i)
 
+    last_step = get_last_step(direction)  # the last square as the sky direction on which the chicken stood
+    if len(indexes_to_choose_from) > 1 and last_step in indexes_to_choose_from:
+        indexes_to_choose_from.remove(last_step)  # delete the previous walking direction
+
     # replace random index
     zufall_index = random.choice(indexes_to_choose_from)
     liste[zufall_index] = " "
     return liste
+
+
+def get_last_step(direction):
+    """
+    For example, if it looks in the direction of 0 (north).
+    If it came from the south and should therefore not decide to run back to the south
+    Args:
+        direction: the direction in which the script ghost is looking
+    Returns:
+        the last step the script ghost took.
+    """
+    if direction == 0:
+        return 2
+    elif direction == 1:
+        return 3
+    elif direction == 2:
+        return 0
+    elif direction == 3:
+        return 1
 
 
 def add_walking_direction(liste):
