@@ -1,0 +1,12 @@
+package de.hsrm.mi.swt.snackman.controller.leaderboard;
+
+import de.hsrm.mi.swt.snackman.entities.leaderboard.LeaderboardEntry;
+
+public record LeaderboardEntryDTO(String name, String duration, String releaseDate) {
+    public static LeaderboardEntryDTO fromLeaderboardEntry(LeaderboardEntry leaderboardEntry){
+        return new LeaderboardEntryDTO(leaderboardEntry.getName(), leaderboardEntry.getDuration().toString(), leaderboardEntry.getReleaseDate().toString());
+    }
+    public static LeaderboardEntry toLeaderboardEntry(LeaderboardEntryDTO dto){
+        return new LeaderboardEntry(dto.name(), dto.duration(), dto.releaseDate());
+    }
+}

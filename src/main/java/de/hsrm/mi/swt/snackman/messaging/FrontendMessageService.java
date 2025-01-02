@@ -36,4 +36,10 @@ public class FrontendMessageService {
 
         messagingTemplate.convertAndSend("/topic/calories", ev);
     }
+
+    public void sendLeaderboardEvent(FrontendLeaderboardMessageEvent ev){
+        log.debug("Send Event: eventType {}, changeTyp {}, leaderboardEntries {}", ev.eventType(), ev.changeType(), ev.leaderboardEntries());
+
+        messagingTemplate.convertAndSend("/topic/leaderboard", ev);
+    }
 }
