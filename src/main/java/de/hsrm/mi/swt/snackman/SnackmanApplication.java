@@ -18,9 +18,9 @@ public class SnackmanApplication {
 
     private static void checkAndCopyResources() {
         Path workFolder = Paths.get("extensions").toAbsolutePath();
-        String[] foldersToCopy = {"Maze", "Ghost", "Chicken"};
-        String folderToCreate = "Map";
-        Path srcFolder = Paths.get("src", "main", "resources");
+        String[] foldersToCopy = {"maze", "ghost", "chicken"};
+        String folderToCreate = "map";
+        Path srcFolder = Paths.get("2024swtpro03", "src", "main", "resources");
 
         if (!Files.exists(workFolder)) {
             createWorkFolderAndCopyResources(workFolder, foldersToCopy, folderToCreate, srcFolder);
@@ -40,7 +40,8 @@ public class SnackmanApplication {
             Path mapFolderPath = workFolder.resolve(folderToCreate);
             Files.createDirectories(mapFolderPath);
         } catch (IOException e) {
-            log.severe("Failed to create extensions directory or copy folders: " + e.getMessage());
+            log.severe("Failed to create extensions directory or copy folders: " + e.getMessage()+ " Stacktrace: ");
+            e.printStackTrace();
         }
     }
 
@@ -60,7 +61,8 @@ public class SnackmanApplication {
             try {
                 Files.createDirectories(mapFolderPath);
             } catch (IOException e) {
-                log.severe("Failed to create Map directory: " + e.getMessage());
+                log.severe("Failed to create Map directory: " + e.getMessage()+ " Stacktrace: ");
+                e.printStackTrace();
             }
         }
     }
@@ -70,7 +72,8 @@ public class SnackmanApplication {
             Files.createDirectories(targetPath);
             copyFolder(srcPath, targetPath);
         } catch (IOException e) {
-            log.severe("Failed to create directory or copy files: " + e.getMessage());
+            log.severe("Failed to create directory or copy files: " + e.getMessage()+ " Stacktrace: ");
+            e.printStackTrace();
         }
     }
 
@@ -93,7 +96,7 @@ public class SnackmanApplication {
                 Path destination = dest.resolve(src.relativize(source));
                 Files.copy(source, destination, StandardCopyOption.REPLACE_EXISTING);
             } catch (IOException e) {
-                log.severe("Failed to copy file: " + e.getMessage());
+                log.severe("Failed to copy file from " + source + " to " + dest.resolve(src.relativize(source)) + ": " + e.getMessage());
             }
         });
     }
