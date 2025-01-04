@@ -38,7 +38,7 @@ public class FrontendMessageService {
     }
 
     public void sendLeaderboardEvent(FrontendLeaderboardMessageEvent ev){
-        log.debug("Send Event: eventType {}, changeTyp {}, leaderboardEntries {}", ev.eventType(), ev.changeType(), ev.leaderboardEntries());
+        log.debug("Send Event: eventType {}, changeTyp {}, leaderboardEntries {}", ev.eventType(), ev.changeType(), ev.leaderboardDTO());
 
         messagingTemplate.convertAndSend("/topic/leaderboard", ev);
     }

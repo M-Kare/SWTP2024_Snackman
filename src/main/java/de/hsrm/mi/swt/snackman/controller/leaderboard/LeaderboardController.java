@@ -23,7 +23,7 @@ public class LeaderboardController {
     private LeaderboardService leaderboardService;
 
     @GetMapping("")
-    public ResponseEntity<List<LeaderboardEntryDTO>> getLeaderboard() {
+    public ResponseEntity<LeaderboardDTO> getLeaderboard() {
         return ResponseEntity.ok(leaderboardService.getLeaderboardAsDTO());
     }
 
