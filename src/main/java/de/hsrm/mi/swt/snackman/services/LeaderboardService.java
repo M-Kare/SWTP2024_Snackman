@@ -4,10 +4,7 @@ import de.hsrm.mi.swt.snackman.controller.leaderboard.LeaderboardDTO;
 import de.hsrm.mi.swt.snackman.controller.leaderboard.LeaderboardEntryDTO;
 import de.hsrm.mi.swt.snackman.entities.leaderboard.Leaderboard;
 import de.hsrm.mi.swt.snackman.entities.leaderboard.LeaderboardEntry;
-import de.hsrm.mi.swt.snackman.messaging.ChangeType;
-import de.hsrm.mi.swt.snackman.messaging.EventType;
-import de.hsrm.mi.swt.snackman.messaging.FrontendLeaderboardMessageEvent;
-import de.hsrm.mi.swt.snackman.messaging.FrontendMessageService;
+import de.hsrm.mi.swt.snackman.messaging.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,20 +64,20 @@ public class LeaderboardService {
         Collections.sort(this.leaderboard.getLeaderboard());
     }
 
-    public void addLeaderboardEntry(LeaderboardEntry entry) {
+    public void addLeaderboardEntry(LeaderboardEntry leaderboardEntry) {
         // add to list
-        this.leaderboard.addEntry(entry);
+        this.leaderboard.addEntry(leaderboardEntry);
         Collections.sort(this.leaderboard.getLeaderboard());
         // add to file
-        String newLine = entry.getEntryAsFileLine();
+        String newLine = leaderboardEntry.getEntryAsFileLine();
         try (FileWriter fileWriter = new FileWriter(this.filePath, true)) {
             fileWriter.write(newLine);
         } catch (IOException e) {
             log.error("Failed to write a new entry to {} file.", this.filePath, e);
         }
         // stomp
-        FrontendLeaderboardMessageEvent message = new FrontendLeaderboardMessageEvent(EventType.LEADERBOARD, ChangeType.UPDATE, LeaderboardDTO.fromLeaderboardDTO(leaderboard));
-        this.frontendMessageService.sendLeaderboardEvent(message);
+        FrontendLeaderboardEntryMessageEvent message = new FrontendLeaderboardEntryMessageEvent(EventType.LEADERBOARD, ChangeType.UPDATE, LeaderboardEntryDTO.fromLeaderboardEntry(leaderboardEntry));
+        this.frontendMessageService.sendLeaderboardEntryEvent(message);
 
         log.info("Leaderboard was updated: {}", leaderboard);
     }

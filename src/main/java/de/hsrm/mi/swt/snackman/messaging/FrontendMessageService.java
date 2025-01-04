@@ -42,4 +42,10 @@ public class FrontendMessageService {
 
         messagingTemplate.convertAndSend("/topic/leaderboard", ev);
     }
+
+    public void sendLeaderboardEntryEvent(FrontendLeaderboardEntryMessageEvent ev){
+        log.debug("Send Event: eventType {}, changeTyp {}, leaderboardEntry {}", ev.eventType(), ev.changeType(), ev.leaderboardEntry());
+
+        messagingTemplate.convertAndSend("/topic/leaderboard", ev);
+    }
 }
