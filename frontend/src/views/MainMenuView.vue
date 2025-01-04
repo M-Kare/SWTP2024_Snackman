@@ -1,25 +1,47 @@
 <template>
-    <MenuBackground></MenuBackground>
+  <MenuBackground></MenuBackground>
 
-    <h1 class="title">Snackman</h1>
-    <!--
-    Buttons will be merged later on,
-    right now we need a fast entry into the game to test things (Singpleplayer-Button)
-     -->
-    <MainMenuButton class="menu-button" id="singleplayer-button">Singleplayer</MainMenuButton>
-    <MainMenuButton class="menu-button" id="multiplayer-button" @click="showLobbies">Multiplayer</MainMenuButton>
+  <h1 class="title">Snackman</h1>
+  <!--
+  Buttons will be merged later on,
+  right now we need a fast entry into the game to test things (Singpleplayer-Button)
+   -->
+  <MainMenuButton class="menu-button" id="singleplayer-button" @click="toGameView">Singleplayer</MainMenuButton>
+  <MainMenuButton class="menu-button" id="multiplayer-button" @click="showLobbies">Multiplayer</MainMenuButton>
+  <MainMenuButton class="menu-button" id="leaderboard-button" @click="showLeaderboard">Leaderboard</MainMenuButton>
+
+  <Leaderboard
+    v-if="showLeaderboardPopUp"
+    :show="showLeaderboardPopUp"
+    @close="hideLeaderboard"
+  />
 </template>
 
 <script setup lang="ts">
-  import MainMenuButton from '@/components/MainMenuButton.vue';
-  import MenuBackground from '@/components/MenuBackground.vue';
-  import { useRouter } from 'vue-router';
+import MainMenuButton from '@/components/MainMenuButton.vue';
+import MenuBackground from '@/components/MenuBackground.vue';
+import {useRouter} from 'vue-router';
+import {ref} from "vue";
+import Leaderboard from "@/components/Leaderboard.vue";
 
-  const router = useRouter();
+const router = useRouter();
+const showLeaderboardPopUp = ref(false);
 
-  const showLobbies = () => {
-      router.push({name: 'LobbyListView'});
-  }
+const toGameView = () => {
+  router.push({name: 'GameView'});
+};
+
+const showLobbies = () => {
+  router.push({name: 'LobbyListView'});
+}
+
+const showLeaderboard = () => {
+  showLeaderboardPopUp.value = true;
+}
+
+const hideLeaderboard = () => {
+  showLeaderboardPopUp.value = false;
+}
 
 </script>
 
@@ -42,10 +64,14 @@
 }
 
 #singleplayer-button {
-  top: 50%;
+  top: 45%;
 }
 
 #multiplayer-button {
-  top: 70%;
+  top: 65%;
+}
+
+#leaderboard-button {
+  top: 85%
 }
 </style>
