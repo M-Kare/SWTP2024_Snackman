@@ -1,10 +1,7 @@
 import {defineStore} from 'pinia';
 import {reactive, readonly} from "vue";
 import {Client} from "@stomp/stompjs";
-import type {
-  IFrontendLeaderboardEntryMessageEvent,
-  IFrontendLeaderboardMessageEvent
-} from "@/services/IFrontendMessageEvent";
+import type {IFrontendLeaderboardEntryMessageEvent} from "@/services/IFrontendMessageEvent";
 import type {Leaderboard, LeaderboardDTD} from "@/stores/Leaderboard/LeaderboardEntryDTD";
 import {fetchLeaderboardDataFromBackend} from "@/services/LeaderboardInitDataService";
 import type {LeaderboardEntry} from "@/stores/Leaderboard/LeaderboardDTD";
