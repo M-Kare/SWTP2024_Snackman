@@ -58,6 +58,7 @@ export const useLeaderboardStore = defineStore('leaderboard', () => {
         leaderboardStompClient.subscribe(DEST_SQUARE, async (message) => {
           const change: IFrontendLeaderboardEntryMessageEvent = JSON.parse(message.body)
           leaderboard.leaderboardEntries.push(change.leaderboardEntry as LeaderboardEntry)
+          sortLeaderboard()
         })
       }
 
@@ -67,6 +68,20 @@ export const useLeaderboardStore = defineStore('leaderboard', () => {
 
       leaderboardStompClient.activate()
     }
+  }
+
+  function sortLeaderboard() {
+    leaderboard.leaderboardEntries.sort((a, b) => {
+      const durationComparison = a.duration.localeCompare(b.duration);
+      if (durationComparison !== 0) {
+        return durationComparison;
+      }
+      const releaseComparison = a.releaseDate.localeCompare(b.releaseDate);
+      if (releaseComparison !== 0) {
+        return releaseComparison;
+      }
+      return a.name.localeCompare(b.name);
+    })
   }
 
   return {
