@@ -40,10 +40,12 @@ public class Chicken extends EatingMob implements Runnable {
 
     public Chicken() {
         super(null);
+        initJython();
     }
 
     public Chicken(Square initialPosition, MapService mapService) {
         super(mapService);
+        initJython();
         id = generateId();
         this.chickenPosX = initialPosition.getIndexX();
         this.chickenPosZ = initialPosition.getIndexZ();
@@ -143,7 +145,6 @@ public class Chicken extends EatingMob implements Runnable {
      * updates its position and consumes any snacks found at its current location.
      */
     protected void move() {
-        initJython();
         while (isWalking) {
             // get 9 squares
             Square currentPosition = super.mapService.getSquareAtIndexXZ(this.chickenPosX, this.chickenPosZ);

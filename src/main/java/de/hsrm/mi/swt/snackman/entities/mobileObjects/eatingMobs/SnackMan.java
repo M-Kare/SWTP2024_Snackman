@@ -1,22 +1,16 @@
 package de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs;
 
-import de.hsrm.mi.swt.snackman.controller.PlayerMovement.SnackManUpdateDTO;
 import de.hsrm.mi.swt.snackman.entities.map.Square;
 import de.hsrm.mi.swt.snackman.entities.mapObject.snack.Snack;
 import de.hsrm.mi.swt.snackman.entities.mechanics.SprintHandler;
 import de.hsrm.mi.swt.snackman.messaging.*;
-import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
 
 import de.hsrm.mi.swt.snackman.configuration.GameConfig;
-import de.hsrm.mi.swt.snackman.entities.mechanics.SprintHandler;
 import de.hsrm.mi.swt.snackman.services.MapService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.beans.PropertyChangeEvent;
 
 @Component
 public class SnackMan extends EatingMob {
@@ -44,22 +38,20 @@ public class SnackMan extends EatingMob {
 
     //JUMPING
     public void jump() {
-        if (!isJumping) {
-            if (getKcal() >= 100) {
+        if (!isJumping && getKcal() >= 100) {
                 this.velocityY = GameConfig.JUMP_STRENGTH;
                 this.isJumping = true;
                 setKcal(getKcal() - 100);
             }
-        }
+        
     }
 
     public void doubleJump() {
-        if (isJumping) {
-            if (getKcal() >= 100) {
+        if (isJumping && getKcal() >= 100) {
                 this.velocityY += GameConfig.DOUBLEJUMP_STRENGTH;
                 setKcal(getKcal() - 100);
             }
-        }
+        
     }
 
     public void updateJumpPosition(double deltaTime) {
@@ -157,5 +149,29 @@ public class SnackMan extends EatingMob {
             //set snack to null after consuming it
             square.setSnack(null);
         }
+    }
+
+    public boolean isJumping() {
+        return isJumping;
+    }
+
+    public void setJumping(boolean isJumping) {
+        this.isJumping = isJumping;
+    }
+
+    public double getVelocityY() {
+        return velocityY;
+    }
+
+    public void setVelocityY(double velocityY) {
+        this.velocityY = velocityY;
+    }
+
+    public SprintHandler getSprintHandler() {
+        return sprintHandler;
+    }
+
+    public void setSprintHandler(SprintHandler sprintHandler) {
+        this.sprintHandler = sprintHandler;
     }
 }
