@@ -9,12 +9,18 @@
   <MainMenuButton class="menu-button" id="singleplayer-button" @click="toGameView">Singleplayer</MainMenuButton>
   <MainMenuButton class="menu-button" id="multiplayer-button" @click="showLobbies">Multiplayer</MainMenuButton>
   <MainMenuButton class="menu-button" id="leaderboard-button" @click="showLeaderboard">Leaderboard</MainMenuButton>
+  <MainMenuButton class="menu-button" @click="showCreateNewLeaderboardEntryForm">Create new leaderboard entry</MainMenuButton>
 
   <Leaderboard
     v-if="showLeaderboardPopUp"
     :show="showLeaderboardPopUp"
     @close="hideLeaderboard"
   />
+
+  <CreateNewLeaderboardEntryForm
+    v-if="showCreateNewLeaderboardEntry"
+    @cancelNewLeaderboardEntryCreation="cancelNewLeaderboardEntryCreation">
+  </CreateNewLeaderboardEntryForm>
 </template>
 
 <script setup lang="ts">
@@ -23,9 +29,11 @@ import MenuBackground from '@/components/MenuBackground.vue';
 import {useRouter} from 'vue-router';
 import {ref} from "vue";
 import Leaderboard from "@/components/Leaderboard.vue";
+import CreateNewLeaderboardEntryForm from "@/components/CreateNewLeaderboardEntryForm.vue";
 
 const router = useRouter();
 const showLeaderboardPopUp = ref(false);
+const showCreateNewLeaderboardEntry = ref(false);
 
 const toGameView = () => {
   router.push({name: 'GameView'});
@@ -41,6 +49,16 @@ const showLeaderboard = () => {
 
 const hideLeaderboard = () => {
   showLeaderboardPopUp.value = false;
+}
+
+const cancelNewLeaderboardEntryCreation = () => {
+  showCreateNewLeaderboardEntry.value = false;
+  console.log(showCreateNewLeaderboardEntry.value)
+}
+
+const showCreateNewLeaderboardEntryForm = () => {
+  showCreateNewLeaderboardEntry.value = true;
+  console.log(showCreateNewLeaderboardEntry.value)
 }
 
 </script>
