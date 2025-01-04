@@ -78,10 +78,12 @@ const createNewLeaderboardEntry = async () => {
   top: 1rem;
   left: 50%;
   transform: translateX(-50%);
-  font-size: 2.3rem;
+  font-size: 2rem;
   font-weight: bold;
   color: #fff;
   text-align: center;
+  width: 90%;
+  overflow: hidden;
 }
 
 #form-box {
