@@ -24,6 +24,8 @@ public class LeaderboardController {
 
     @GetMapping("")
     public ResponseEntity<LeaderboardDTO> getLeaderboard() {
+        logger.info("Retrieving the leaderboard: {}", leaderboardService.getLeaderboardAsDTO());
+
         return ResponseEntity.ok(leaderboardService.getLeaderboardAsDTO());
     }
 
@@ -33,8 +35,9 @@ public class LeaderboardController {
         String duration = requestBody.get("duration");
         String releaseDate = requestBody.get("releaseDate");
 
-        LeaderboardEntry newEntry = new LeaderboardEntry(name, releaseDate, duration);
+        LeaderboardEntry newEntry = new LeaderboardEntry(name, duration, releaseDate);
         this.leaderboardService.addLeaderboardEntry(newEntry);
+        logger.info("Creating new a leaderboard entry: {}, leaderboard now {}", newEntry, leaderboardService.getLeaderboardAsDTO());
 
         return ResponseEntity.ok().build();
     }
