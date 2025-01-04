@@ -1,7 +1,8 @@
 import type {ISquareDTD} from "@/stores/Square/ISquareDTD";
 import type {IChickenDTD} from "@/stores/Chicken/IChickenDTD";
+import type {LeaderboardEntryDTD} from "@/stores/Leaderboard/LeaderboardDTD";
 
-type EventType = 'SNACK' | 'CHICKEN' | 'CALORIES'
+type EventType = 'SNACK' | 'CHICKEN' | 'CALORIES' | 'LEADERBOARD'
 type ChangeType = 'CREATE' | 'UPDATE' | 'DELETE'
 
 export interface IFrontendMessageEvent {
@@ -21,4 +22,10 @@ export interface IFrontendCaloriesMessageEvent {
   changeType: ChangeType,
   calories: number,
   message?: string
+}
+
+export interface IFrontendLeaderboardMessageEvent{
+  eventType: EventType,
+  changeType: ChangeType,
+  leaderboardEntries: LeaderboardEntryDTD[],
 }
