@@ -29,7 +29,7 @@ def generateSpawnGhost(maze):
     return maze
 
 def generateSpawnChicken(maze):
-    for i in range(3):
+    for i in range(10):
         randome1 = random.randint(1, len(maze) - 2)
         randome2 = random.randint(1, len(maze) - 2)
         if maze[randome1][randome2] != '#' or maze[randome1][randome2] != 'G' or maze[randome1][randome2] != 'S':
@@ -97,6 +97,6 @@ def saveFile(maze, filename="Maze.txt"):
             file.write("".join(row) + "\n")
 
 def main():
-    width, height = 30, 30
+    width, height = 20, 20
     maze = generateLabyrinth(width, height)
     saveFile(maze)
