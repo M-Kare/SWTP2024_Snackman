@@ -8,7 +8,6 @@
       <p
           id="error-message"
           v-if="errorMessage">
-
         {{ errorMessage }}
       </p>
     </form>
@@ -17,14 +16,12 @@
         id="cancel-createNewLeaderboardEntry-creation-button"
         class="small-nav-buttons"
         @click="cancelNewLeaderboardEntryCreation">
-
       Cancel
     </SmallNavButton>
     <SmallNavButton
         id="create-createNewLeaderboardEntry-button"
         class="small-nav-buttons"
         @click="createNewLeaderboardEntry">
-
       Create new leaderboard entry
     </SmallNavButton>
   </div>
@@ -33,9 +30,13 @@
 <script setup lang="ts">
 import SmallNavButton from '@/components/SmallNavButton.vue';
 import { ref } from 'vue';
+import {useLeaderboardStore} from "@/stores/Leaderboard/leaderboardStore";
+import type {LeaderboardEntry} from "@/stores/Leaderboard/LeaderboardDTD";
 
 const yourName = ref('');
 const errorMessage = ref('');
+
+const leaderboardStore = useLeaderboardStore()
 
 const emit = defineEmits<{
   (event: 'cancelNewLeaderboardEntryCreation', value: boolean): void;
@@ -53,8 +54,16 @@ const createNewLeaderboardEntry = async () => {
     return;
   }
 
+  // TODO replace default data here
+  const data: LeaderboardEntry = {
+    name: yourName.value,
+    duration: "00:00",
+    releaseDate: "2025-01-01"
+  }
+
   try{
-    //await lobbiesStore.createNewLeaderboardEntry(yourName.value.trim(), adminClient);
+    await leaderboardStore.addNewLeaderboardEntry(data)
+    cancelNewLeaderboardEntryCreation()
   } catch (error: any){
     console.error('Error:', error);
     alert("Error creating new leaderboard entry!");

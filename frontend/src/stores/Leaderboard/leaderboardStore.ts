@@ -68,7 +68,7 @@ export const useLeaderboardStore = defineStore('leaderboard', () => {
     }
 
     async function addNewLeaderboardEntry(data: LeaderboardEntry) {
-        const url = 'http://localhost:8080/new/entry'
+        const url = 'api/leaderboard/new/entry'
 
         const requestOptions: RequestInit = {
             method: 'POST',
@@ -81,8 +81,6 @@ export const useLeaderboardStore = defineStore('leaderboard', () => {
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
-            const result = await response.json();
-            console.log('Success:', result);
         } catch (error) {
             console.error('Error:', error);
         }
