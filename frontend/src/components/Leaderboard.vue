@@ -15,20 +15,10 @@
       </tr>
       </thead>
       <tbody>
-      <tr>
-        <td>Test</td>
-        <td>Test</td>
-        <td>Test</td>
-      </tr>
-      <tr>
-        <td>Test</td>
-        <td>Test</td>
-        <td>Test</td>
-      </tr>
-      <tr>
-        <td>Test</td>
-        <td>Test</td>
-        <td>Test</td>
+      <tr v-for="entry in leaderboardEntries">
+        <td>{{ entry.name }}</td>
+        <td>{{ entry.duration }}</td>
+        <td>{{ entry.releaseDate }}</td>
       </tr>
       </tbody>
     </table>
@@ -37,6 +27,17 @@
 
 <script setup lang="ts">
 import PopUp from "@/components/PopUp.vue";
+import {useLeaderboardStore} from "@/stores/Leaderboard/leaderboardStore";
+import {computed, onMounted} from "vue";
+
+const leaderboardStore = useLeaderboardStore()
+
+onMounted(async () => {
+  await leaderboardStore.initLeaderboardStore()
+  await leaderboardStore.startLeaderboardUpdate()
+})
+
+const leaderboardEntries = computed(() => leaderboardStore.leaderboard.leaderboardEntries);
 
 defineProps({
   show: {
