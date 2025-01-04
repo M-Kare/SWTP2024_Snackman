@@ -118,7 +118,7 @@ public class ScriptGhost extends Mob implements Runnable {
      * next move.
      *
      * @param squares a list of squares visible from the ghost's current position.
-     * @return a list of moves resulting from the Python script's execution.
+     * @return the index of the next move resulting from the Python script's execution.
      */
     public int executeMovementSkript(List<String> squares) {
         try {
