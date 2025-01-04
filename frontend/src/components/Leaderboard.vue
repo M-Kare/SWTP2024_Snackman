@@ -6,22 +6,24 @@
 
     <p class="info-heading"> Leaderboard </p>
     <p class="info-text"> This is the current leaderboard: </p>
-    <table>
-      <thead>
-      <tr>
-        <td>Name</td>
-        <td>Duration</td>
-        <td>Date</td>
-      </tr>
-      </thead>
-      <tbody>
-      <tr v-for="entry in leaderboardEntries">
-        <td>{{ entry.name }}</td>
-        <td>{{ entry.duration }}</td>
-        <td>{{ entry.releaseDate }}</td>
-      </tr>
-      </tbody>
-    </table>
+    <div class="table-container">
+      <table>
+        <thead>
+        <tr>
+          <td>Name</td>
+          <td>Duration</td>
+          <td>Date</td>
+        </tr>
+        </thead>
+        <tbody>
+        <tr v-for="entry in leaderboardEntries">
+          <td>{{ entry.name }}</td>
+          <td>{{ entry.duration }}</td>
+          <td>{{ entry.releaseDate }}</td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
   </PopUp>
 </template>
 
@@ -104,6 +106,11 @@ table {
 th,
 td {
   padding: 5px;
+}
+
+.table-container {
+  max-height: 400px;
+  overflow-y: auto;
 }
 
 </style>
