@@ -8,7 +8,6 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 
-@Getter
 public class LeaderboardEntry implements Comparable<LeaderboardEntry> {
     private String name;
     private LocalTime duration;
@@ -50,5 +49,17 @@ public class LeaderboardEntry implements Comparable<LeaderboardEntry> {
 
     public String getEntryAsFileLine(){
         return this.name + LeaderboardService.CSV_LINE_SPLITTER + this.duration.toString() + LeaderboardService.CSV_LINE_SPLITTER + this.releaseDate.toString() + "\n";
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public LocalTime getDuration() {
+        return duration;
+    }
+
+    public LocalDate getReleaseDate() {
+        return releaseDate;
     }
 }
