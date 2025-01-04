@@ -1,7 +1,10 @@
 import {defineStore} from 'pinia';
 import {reactive, readonly} from "vue";
 import {Client} from "@stomp/stompjs";
-import type {IFrontendLeaderboardMessageEvent} from "@/services/IFrontendMessageEvent";
+import type {
+  IFrontendLeaderboardEntryMessageEvent,
+  IFrontendLeaderboardMessageEvent
+} from "@/services/IFrontendMessageEvent";
 import type {Leaderboard, LeaderboardDTD} from "@/stores/Leaderboard/LeaderboardEntryDTD";
 import {fetchLeaderboardDataFromBackend} from "@/services/LeaderboardInitDataService";
 import type {LeaderboardEntry} from "@/stores/Leaderboard/LeaderboardDTD";
@@ -22,6 +25,7 @@ export const useLeaderboardStore = defineStore('leaderboard', () => {
     try {
       const response: LeaderboardDTD = await fetchLeaderboardDataFromBackend()
 
+      leaderboard.leaderboardEntries = []
       for (const entry of response.leaderboardEntries) {
         leaderboard.leaderboardEntries.push(entry as LeaderboardEntry)
       }
@@ -52,13 +56,8 @@ export const useLeaderboardStore = defineStore('leaderboard', () => {
         console.log('Stompclient connected')
 
         leaderboardStompClient.subscribe(DEST_SQUARE, async (message) => {
-          const change: IFrontendLeaderboardMessageEvent = JSON.parse(message.body)
-
-          leaderboard.leaderboardEntries = []
-
-          for (const entry of change.leaderboardEntries) {
-            leaderboard.leaderboardEntries.push(entry as LeaderboardEntry)
-          }
+          const change: IFrontendLeaderboardEntryMessageEvent = JSON.parse(message.body)
+          leaderboard.leaderboardEntries.push(change.leaderboardEntry as LeaderboardEntry)
         })
       }
 
