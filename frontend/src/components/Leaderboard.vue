@@ -104,7 +104,6 @@ table {
 th,
 td {
   padding: 5px;
-  white-space: nowrap;
 }
 
 </style>
