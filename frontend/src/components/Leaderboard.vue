@@ -20,6 +20,16 @@
         <td>Test</td>
         <td>Test</td>
       </tr>
+      <tr>
+        <td>Test</td>
+        <td>Test</td>
+        <td>Test</td>
+      </tr>
+      <tr>
+        <td>Test</td>
+        <td>Test</td>
+        <td>Test</td>
+      </tr>
       </tbody>
     </table>
   </PopUp>
@@ -68,18 +78,19 @@ defineEmits(['close'])
 
 #popup-box {
   z-index: 10;
-  position: absolute;
-  top: 25%;
+  position: fixed;
+  top: 50%;
   left: 50%;
-  transform: translateX(-50%);
-  width: 60%;
-  max-width: 600px;
-  height: 16rem;
-  background:#ffffff;
+  transform: translate(-50%, -50%);
+  background: #ffffff;
   border-radius: 0.3rem;
   text-align: center;
-  padding: 1rem;
+  padding: 2rem;
   color: #000000;
+  max-width: 90vw;
+  max-height: 90vh;
+  width: auto;
+  height: auto;
 }
 
 table {
@@ -89,21 +100,9 @@ table {
   overflow-x: auto;
 }
 
-thead th:nth-child(1) {
-  width: 30%;
-}
-
-thead th:nth-child(2) {
-  width: 20%;
-}
-
-thead th:nth-child(3) {
-  width: 15%;
-}
-
 th,
 td {
-  padding: 20px;
+  padding: 5px;
   white-space: nowrap;
 }
 
