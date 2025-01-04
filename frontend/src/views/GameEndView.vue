@@ -1,6 +1,6 @@
 <template>
   <div class="end-screen">
-      <h1 class="result-title">{{ gameResult }}</h1>
+      <h1 class="result-title">{{ gameResult || '–' }}</h1>
       <p class="end-reason">{{ gameReason }}</p>
       <MainMenuButton class="menu-button" id="main-menu-button" @click="backToMainMenu">Zurück zum Hauptmenü</MainMenuButton>
   </div>
@@ -8,13 +8,30 @@
 
 <script setup lang="ts">
 import MainMenuButton from '@/components/MainMenuButton.vue';
-import { ref } from 'vue';
-import { useRouter } from 'vue-router';
+import { computed } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 
+const route = useRoute();
 const router = useRouter();
 
-const gameResult = ref("WIN | LOSE");
-const gameReason = ref("Placeholder Reason");
+// Read player role and game result from query parameters (undefined if not provided)
+const playerRole = route.query.role;
+const gameResult = route.query.result;
+
+// Compute the game reason dynamically or display '-' if no data is available
+const gameReason = computed(() => {
+  if (!playerRole || !gameResult) {
+    return '–';
+  }
+
+  if (gameResult === 'Gewonnen') {
+    return playerRole === 'SnackMan' ? 'Snackman hat 3000kcal erreicht!' : 'Die Geister haben Snackman auf negative Kalorien gebracht!';
+  } else if (gameResult === 'Verloren') {
+    return playerRole === 'SnackMan' ? 'Die Geister haben Snackman auf negative Kalorien gebracht!' : 'Snackman hat 3000kcal erreicht!';
+  }
+
+  return '–';
+});
 
 const backToMainMenu = () => {
     router.push({ name: 'MainMenu' });

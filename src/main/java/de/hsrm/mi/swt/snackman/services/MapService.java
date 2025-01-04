@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import org.python.core.PyObject;
-import de.hsrm.mi.swt.snackman.messaging.*;
 
 /**
  * Service class for managing the game map
@@ -59,12 +58,23 @@ public class MapService {
         snackman.addPropertyChangeListener(event -> {
             if (event.getPropertyName().equals("currentCalories")) {
                 int newCalories = (int) event.getNewValue();
-                String message = newCalories == snackman.getMAXKCAL() ? "Maximum calories reached!" : "";
-                System.out.println("Listener initilized");
-
-                FrontendMessageCaloriesEvent messageEvent = new FrontendMessageCaloriesEvent(EventType.CALORIES, ChangeType.UPDATE, newCalories, message);
-
-                frontendMessageService.sendUpdateCaloriesEvent(messageEvent);
+        
+                if (newCalories >= 3000) {
+                    String message = newCalories == snackman.getMAXKCAL() ? "Maximum calories reached!" : "";
+                    FrontendMessageCaloriesEvent messageEvent = new FrontendMessageCaloriesEvent(
+                        EventType.CALORIES,
+                        ChangeType.UPDATE,
+                        newCalories,
+                        message
+                    );
+                    frontendMessageService.sendUpdateCaloriesEvent(messageEvent);
+                } else {
+                    // Normale Kalorienaktualisierung
+                    String message = "";
+                    FrontendMessageCaloriesEvent messageEvent = new FrontendMessageCaloriesEvent(EventType.CALORIES, ChangeType.UPDATE, newCalories, message);
+                    
+                    frontendMessageService.sendUpdateCaloriesEvent(messageEvent);
+                }
             }
         });
 
