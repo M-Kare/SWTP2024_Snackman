@@ -61,7 +61,7 @@ public class Chicken extends EatingMob implements Runnable {
      *
      * @return the next incremented id
      */
-    private synchronized static long generateId() {
+    protected synchronized static long generateId() {
         return idCounter++;
     }
 

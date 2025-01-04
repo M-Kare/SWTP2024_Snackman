@@ -3,6 +3,7 @@ package de.hsrm.mi.swt.snackman.services;
 import java.beans.PropertyChangeEvent;
 
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.Ghost;
+import de.hsrm.mi.swt.snackman.entities.mobileObjects.Mob;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken.Chicken;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken.Direction;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.SnackMan;
@@ -22,6 +23,7 @@ import de.hsrm.mi.swt.snackman.messaging.EventType;
 import de.hsrm.mi.swt.snackman.messaging.FrontendMessageEvent;
 import de.hsrm.mi.swt.snackman.messaging.FrontendMessageService;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 import org.python.core.PyObject;
@@ -42,7 +44,7 @@ public class MapService {
     private PythonInterpreter pythonInterpreter = null;
     private Properties pythonProps = new Properties();
     private SnackMan snackman;
-    private Ghost ghost;
+
 
     /**
      * Constructs a new MapService
@@ -50,13 +52,13 @@ public class MapService {
      */
     @Autowired
     public MapService(FrontendMessageService frontendMessageService, ReadMazeService readMazeService) {
-        this(frontendMessageService, readMazeService, "Maze.txt");
+        this(frontendMessageService, readMazeService, "mini-maze.txt");
     }
 
     public MapService(FrontendMessageService frontendMessageService, ReadMazeService readMazeService,
                       String filePath) {
         this.frontendMessageService = frontendMessageService;
-        generateNewMaze();
+        //generateNewMaze();
         this.filePath = filePath;
         char[][] mazeData = readMazeService.readMazeFromFile(this.filePath);
         gameMap = convertMazeDataGameMap(mazeData);
@@ -150,14 +152,24 @@ public class MapService {
                 break;
             case'G':
                 log.debug("Initialising ghost");
-                  square = new Square(MapObjectType.FLOOR,  x, z);
-                //square = new Square(MapObjectType.FLOOR, 0 , 0);
-                ghost = new Ghost(square, this, GameConfig.GHOST_SPEED , GameConfig.GHOST_RADIUS);
-                // ghost = new Ghost(this.getSquareAtIndexXZ(0,0) , this , GameConfig.GHOST_SPEED, GameConfig.GHOST_RADIUS);
-                FrontendGhostMessageEvent message = new FrontendGhostMessageEvent( EventType.GHOST , ChangeType.CREATE , ghost);
+                square = new Square(MapObjectType.FLOOR,  x, z);
+                System.out.println("DIESE Square " + square);
+                Ghost ghost = new Ghost(square, this, GameConfig.GHOST_SPEED , GameConfig.GHOST_RADIUS);
 
+                ghost.addPropertyChangeListener((PropertyChangeEvent evt ) ->{
+                    System.out.println("Hier massage ");
+                    System.out.println("Hier is massage Event " + evt.getNewValue());
+                    System.out.println("Da war das ");
+                    if ( evt.getPropertyName().equals("ghost")){
+                        FrontendGhostMessageEvent messageEvent = new FrontendGhostMessageEvent(EventType.GHOST, ChangeType.UPDATE, (Ghost) evt.getNewValue() );
+                        frontendMessageService.sendGhostEvent(messageEvent);
+                        System.out.println("----------Neue Mesage Event  " + messageEvent) ;
+                    }
+                });
+                FrontendGhostMessageEvent message = new FrontendGhostMessageEvent(EventType.GHOST, ChangeType.CREATE, ghost);
                 frontendMessageService.sendGhostEvent(message);
-                System.out.println("message: " + message);
+                System.out.println("message ghost : " + message);
+
 
                 break;
 
@@ -229,7 +241,19 @@ public class MapService {
     public SnackMan getSnackMan() {
         return snackman;
     }
-    public Ghost getGhost(){
-        return ghost;
+    public Ghost getGhost(long id) {
+        Square[][] squares = this.gameMap.getGameMap();
+        for (Square square[] : squares) {
+            for (Square square1 : square) {
+                for (Mob mob :  square1.getMobs()){
+                    if (mob.getId() == id  && mob instanceof  Ghost){
+                        return (Ghost) mob;
+                    }
+                }
+              //  return (Ghost) square1.getMobs().stream().filter(mob -> mob.getId() == id && mob instanceof Ghost); // kein filter sondern ein find hier sodass man den ersten geist zurück bekommt
+            }
+        }
+        return null;
     }
+
 }

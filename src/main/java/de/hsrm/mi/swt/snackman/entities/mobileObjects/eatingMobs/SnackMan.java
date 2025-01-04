@@ -90,7 +90,7 @@ public class SnackMan extends EatingMob {
     @Override
     public void move(double x, double y, double z) {
         super.move(x, y, z);
-        for (Mob mob : getCurrentSquare().getMobs()){
+        for (Mob mob : getCurrentSquareWithIndex(x, y).getMobs()){
             if(mob instanceof Ghost)loseKcal();
         }
     }

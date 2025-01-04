@@ -15,7 +15,7 @@ public record FrontendGhostMessageEvent(EventType eventType, ChangeType changeTy
 
     @Override
     public String toString(){
-        return "FrontendChickenMessageEvent{" +
+        return "FrontendGhostMessageEvent{" +
                 "eventType=" + eventType +
                 ", changeType=" + changeType +
                 ", ghost=" + ghost +

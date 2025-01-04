@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import de.hsrm.mi.swt.snackman.configuration.GameConfig;
@@ -40,8 +41,8 @@ public class GameMapController {
     }
 
     @GetMapping("/ghost")
-    public ResponseEntity<GhostDTO> getGhostPos(){
-        Ghost ghost = mapService.getGhost();
+    public ResponseEntity<GhostDTO> getGhostPos(@RequestParam long id){
+        Ghost ghost = mapService.getGhost(id);
         return ResponseEntity.ok(new GhostDTO(ghost.getId(), ghost.getPosX(), ghost.getPosY(), ghost.getPosZ(), ghost.getRadius(), GameConfig.GHOST_SPEED));
     }
 

@@ -359,4 +359,5 @@ export class Player {
   public getIsDoubleJumping() {
     return this.doubleJump;
   }
+
 }

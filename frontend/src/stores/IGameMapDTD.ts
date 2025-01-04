@@ -1,6 +1,7 @@
 import type {ISquare, ISquareDTD} from "@/stores/Square/ISquareDTD";
 import type {IChicken, IChickenDTD} from "@/stores/Chicken/IChickenDTD";
-import type {IGhost, IGhostDTD} from "@/stores/Ghost/IGhostDTD";
+import type {IGhostDTD, IGhost} from "@/stores/Ghost/IGhostDTD";
+
 
 export interface IGameMapDTD {
   DEFAULT_WALL_HEIGHT: number,

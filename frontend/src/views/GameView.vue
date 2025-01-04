@@ -12,9 +12,13 @@ import {fetchSnackManFromBackend} from '@/services/SnackManInitService';
 import {GameMapRenderer} from "@/renderer/GameMapRenderer";
 import {useGameMapStore} from '@/stores/gameMapStore'
 import type {IGameMap} from "@/stores/IGameMapDTD";
+import type {IGhostDTD} from "@/stores/Ghost/IGhostDTD";
+import {fetchGhostFromBackend} from "@/services/GhostInitService";
 
 const WSURL = `ws://${window.location.host}/stompbroker`
-const DEST = '/topic/player'
+//const DEST = '/topic/player'
+
+const GhostDEST = '/topic/player/ghost'
 const targetHz = 30
 
 // stomp
@@ -27,12 +31,13 @@ stompclient.onStompError = frame => {
 }
 stompclient.onConnect = frame => {
   // Callback: erfolgreicher Verbindugsaufbau zu Broker
-  stompclient.subscribe(DEST, message => {
+  stompclient.subscribe(GhostDEST, message => {
     // Callback: Nachricht auf DEST empfangen
     // empfangene Nutzdaten in message.body abrufbar,
     // ggf. mit JSON.parse(message.body) zu JS konvertieren
-    const event: IPlayerDTD = JSON.parse(message.body)
+    const event: IGhostDTD = JSON.parse(message.body)
     player.setPosition(event.posX, event.posY, event.posZ);
+    console.log("Backend Info kommt hier an !! " + event.posX+ " x "+ event.posZ + " z ");
   })
 }
 stompclient.activate()
@@ -64,7 +69,7 @@ function animate() {
     try {
       //Sende and /topic/player/update
       stompclient.publish({
-        destination: DEST + "/update", headers: {},
+        destination: GhostDEST + "/update", headers: {},
         body: JSON.stringify(Object.assign({}, player.getInput(), {
           qX: player.getCamera().quaternion.x,
           qY: player.getCamera().quaternion.y,
@@ -101,7 +106,7 @@ onMounted(async () => {
     console.error('Error when retrieving the gameMap:', error)
   }
 
-  const playerData = await fetchSnackManFromBackend();
+  const playerData = await fetchGhostFromBackend(0);
   player = new Player(renderer, playerData.posX, playerData.posY, playerData.posZ, playerData.radius, playerData.speed)
   camera = player.getCamera()
   scene.add(player.getControls().object)

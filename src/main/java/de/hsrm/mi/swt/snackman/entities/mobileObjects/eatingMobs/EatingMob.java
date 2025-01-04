@@ -48,11 +48,11 @@ public abstract class EatingMob extends Mob {
     public void move(boolean f, boolean b, boolean l, boolean r, double delta) {
         super.move(f, b, l, r, delta);
 
-        if (getCurrentSquare().getSnack() != null)
-            consumeSnackOnSquare(getCurrentSquare());
+        if (getCurrentSquareWithIndex(this.getPosX(), this.getPosZ()).getSnack() != null)
+            consumeSnackOnSquare(getCurrentSquareWithIndex(this.getPosX(), this.getPosZ()));
 
         //Colision with Ghost:
-        for ( Mob mob : getCurrentSquare().getMobs() ){
+        for ( Mob mob : getCurrentSquareWithIndex(this.getPosX(), this.getPosZ()).getMobs() ){
             if (mob instanceof Ghost){
 
             }

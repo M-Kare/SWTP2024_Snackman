@@ -15,6 +15,7 @@ import type {IChicken, IChickenDTD} from "@/stores/Chicken/IChickenDTD";
 import {Direction} from "@/stores/Chicken/IChickenDTD";
 import {GameObjectRenderer} from "@/renderer/GameObjectRenderer";
 import type {IGhost, IGhostDTD} from "@/stores/Ghost/IGhostDTD";
+import type { Player } from '@/components/Player';
 
 /**
  * Defines the pinia store used for saving the map from
@@ -53,6 +54,7 @@ export const useGameMapStore = defineStore('gameMap', () => {
       }
 
       for (const ghost of response.ghosts) {
+        console.log(ghost);
         mapData.ghosts.push(ghost as IGhost)
       }
     } catch (reason) {
@@ -65,7 +67,7 @@ export const useGameMapStore = defineStore('gameMap', () => {
     const wsurl = `${protocol}//${window.location.host}/stompbroker`
     const DEST_SQUARE = '/topic/square'
     const DEST_CHICKEN = '/topic/chicken'
-    const DEST_GHOST = '/topic/ghost'
+    const DEST_GHOST = '/topic/player/ghost'
 
     if (!snackStompclient) {
       snackStompclient = new Client({brokerURL: wsurl})
@@ -168,6 +170,7 @@ export const useGameMapStore = defineStore('gameMap', () => {
           const ghostUpdate: IGhostDTD = change.ghost
           const OFFSET = mapData.DEFAULT_SQUARE_SIDE_LENGTH / 2
           const DEFAULT_SIDE_LENGTH = mapData.DEFAULT_SQUARE_SIDE_LENGTH
+          console.log(mapData.ghosts.toString())
           const currentGhost = mapData.ghosts.find(ghost => ghost.id == ghostUpdate.id)
           console.log("ghost update {}", ghostUpdate)
 

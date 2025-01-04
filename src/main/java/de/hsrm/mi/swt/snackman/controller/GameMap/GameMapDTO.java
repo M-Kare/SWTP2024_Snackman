@@ -37,7 +37,7 @@ public record GameMapDTO(int DEFAULT_SQUARE_SIDE_LENGTH, int DEFAULT_WALL_HEIGHT
                 .toList();
 
 
-        System.out.println( "Hier ist die Liste der GHOOOOOOSSSTTTTSSS"+ ghostDTOS);
+        System.out.println( "Hier ist die Liste der GHOOOOOOSSSTTTTSSS"+ ghostDTOS.toString());
         return new GameMapDTO(gameMap.getDEFAULT_SQUARE_SIDE_LENGTH(), gameMap.getDEFAULT_WALL_HEIGHT(), squareDTOs, chickenDTOs, ghostDTOS);
     }
 
