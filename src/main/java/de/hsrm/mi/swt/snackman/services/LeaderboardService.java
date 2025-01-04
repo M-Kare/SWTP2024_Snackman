@@ -1,6 +1,8 @@
 package de.hsrm.mi.swt.snackman.services;
 
+import de.hsrm.mi.swt.snackman.controller.leaderboard.LeaderboardDTO;
 import de.hsrm.mi.swt.snackman.controller.leaderboard.LeaderboardEntryDTO;
+import de.hsrm.mi.swt.snackman.entities.leaderboard.Leaderboard;
 import de.hsrm.mi.swt.snackman.entities.leaderboard.LeaderboardEntry;
 import de.hsrm.mi.swt.snackman.messaging.ChangeType;
 import de.hsrm.mi.swt.snackman.messaging.EventType;
@@ -27,7 +29,7 @@ public class LeaderboardService {
     Logger log = LoggerFactory.getLogger(MapService.class);
     private FrontendMessageService frontendMessageService;
     private final String filePath;
-    private final List<LeaderboardEntry> leaderboard = new ArrayList<>();
+    private final Leaderboard leaderboard = new Leaderboard();
     public static final String CSV_LINE_SPLITTER = ";";
 
     @Autowired
@@ -60,15 +62,15 @@ public class LeaderboardService {
         for (String line : lines) {
             String[] parts = line.split(CSV_LINE_SPLITTER);
             if (parts.length != 3) throw new RuntimeException("Invalid CSV line: " + line + " at " + filePath + " file.");
-            this.leaderboard.add(new LeaderboardEntry(parts[0], parts[1], parts[2]));
+            this.leaderboard.addEntry(new LeaderboardEntry(parts[0], parts[1], parts[2]));
         }
-        Collections.sort(this.leaderboard);
+        Collections.sort(this.leaderboard.getLeaderboard());
     }
 
     public void addLeaderboardEntry(LeaderboardEntry entry) {
         // add to list
-        this.leaderboard.add(entry);
-        Collections.sort(this.leaderboard);
+        this.leaderboard.addEntry(entry);
+        Collections.sort(this.leaderboard.getLeaderboard());
         // add to file
         String newLine = entry.getEntryAsFileLine();
         try (FileWriter fileWriter = new FileWriter(this.filePath, true)) {
@@ -77,15 +79,13 @@ public class LeaderboardService {
             log.error("Failed to write a new entry to {} file.", this.filePath, e);
         }
         // stomp
-        FrontendLeaderboardMessageEvent message = new FrontendLeaderboardMessageEvent(EventType.LEADERBOARD, ChangeType.UPDATE, getLeaderboardAsDTO());
+        FrontendLeaderboardMessageEvent message = new FrontendLeaderboardMessageEvent(EventType.LEADERBOARD, ChangeType.UPDATE, LeaderboardDTO.fromLeaderboardDTO(leaderboard));
         this.frontendMessageService.sendLeaderboardEvent(message);
 
         log.info("Leaderboard was updated: {}", leaderboard);
     }
 
-    public List<LeaderboardEntryDTO> getLeaderboardAsDTO(){
-        return this.leaderboard.stream()
-                .map(LeaderboardEntryDTO::fromLeaderboardEntry)
-                .toList();
+    public LeaderboardDTO getLeaderboardAsDTO() {
+        return LeaderboardDTO.fromLeaderboardDTO(leaderboard);
     }
 }
