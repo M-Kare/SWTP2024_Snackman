@@ -20,7 +20,7 @@ public class SnackmanApplication {
         Path workFolder = Paths.get("extensions").toAbsolutePath();
         String[] foldersToCopy = {"maze", "ghost", "chicken"};
         String folderToCreate = "map";
-        Path srcFolder = Paths.get("2024swtpro03", "src", "main", "resources");
+        Path srcFolder = Paths.get("src", "main", "resources");
 
         if (!Files.exists(workFolder)) {
             createWorkFolderAndCopyResources(workFolder, foldersToCopy, folderToCreate, srcFolder);
