@@ -127,7 +127,8 @@
                     const validPattern = /^[SGCo#\s]*$/;
 
                     if (validPattern.test(fileContent)){
-                        console.log('File Content:', fileContent);
+                        console.log('File Content:\n', fileContent);
+                        uploadFileToServer(file);
                     } else {
                         showPopUp.value = true;
                         darkenBackground.value = true;
@@ -139,6 +140,29 @@
                 alert('Please select a valid .txt file.');
             }
         }
+    }
+
+    const uploadFileToServer = (file: File) => {
+        const formData = new FormData();
+        formData.append('file', file);
+
+        fetch('/api/upload', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => {
+            if (response.ok) {
+                console.log('File uploaded successfully');
+                alert('File uploaded successfully!');
+            } else {
+                console.error('Error uploading file:', response.statusText);
+                alert('Error uploading file.');
+            }
+        })
+        .catch(error => {
+            console.error('Error uploading file:', error);
+            alert('Error uploading file.');
+        });
     }
 
     watchEffect(() => {
