@@ -16,8 +16,6 @@ import org.python.core.PyObject;
 import org.python.util.PythonInterpreter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
 import java.util.*;
 
 /**
@@ -35,10 +33,9 @@ public class Chicken extends EatingMob implements Runnable {
     private int chickenPosX, chickenPosZ;
     private Direction lookingDirection;
     private boolean isWalking;
-    private boolean blockingPath = false;
     private boolean isScared = false;
     private final int WAITING_TIME = GameConfig.WAITING_TIME;  // in ms
-    private final int MAX_KALORIEN = GameConfig.MAX_KALORIEN;
+    private final int MAX_CALORIES = GameConfig.MAX_KALORIEN;
     private Timer eggLayingTimer;
     // python
     private PythonInterpreter pythonInterpreter = null;
@@ -111,10 +108,6 @@ public class Chicken extends EatingMob implements Runnable {
         }
         log.debug("Python script result is {}", javaList);
         return javaList;
-    }
-
-    public void addPropertyChangeListener(PropertyChangeListener listener) {
-        this.propertyChangeSupport.addPropertyChangeListener(listener);
     }
 
     /**
@@ -195,7 +188,7 @@ public class Chicken extends EatingMob implements Runnable {
 
             // consume snack if present
             currentPosition = super.mapService.getSquareAtIndexXZ(this.chickenPosX, this.chickenPosZ);
-            if (currentPosition.getSnack() != null && super.getKcal() < MAX_KALORIEN && !currentPosition.getSnack().getSnackType().equals(SnackType.EGG)) {
+            if (currentPosition.getSnack() != null && super.getKcal() < MAX_CALORIES && !currentPosition.getSnack().getSnackType().equals(SnackType.EGG)) {
                 log.debug("Snack being eaten at x {} z {}", this.chickenPosX, this.chickenPosZ);
                 consumeSnackOnSquare();
             }
@@ -268,10 +261,6 @@ public class Chicken extends EatingMob implements Runnable {
 
     public boolean getBlockingPath() {
         return this.blockingPath;
-    }
-
-    public Thickness getThickness() {
-        return this.thickness;
     }
 
     public void setBlockingPath(boolean blockingPath) {
