@@ -44,7 +44,7 @@ public class MapService {
      */
     @Autowired
     public MapService(FrontendMessageService frontendMessageService, ReadMazeService readMazeService) {
-        this(frontendMessageService, readMazeService, "./extensions/Map/Maze.txt");
+        this(frontendMessageService, readMazeService, "./extensions/map/Maze.txt");
     }
 
     public MapService(FrontendMessageService frontendMessageService, ReadMazeService readMazeService,
@@ -107,7 +107,7 @@ public class MapService {
      * Generates a new Maze and saves it in a Maze.txt file
      */
     public void generateNewMaze() {
-        String mazeScriptPath = "./extensions/Maze/Maze.py";
+        String mazeScriptPath = "./extensions/maze/Maze.py";
         try (PythonInterpreter localPythonInterpreter = new PythonInterpreter()) {
             localPythonInterpreter.execfile(mazeScriptPath);
             localPythonInterpreter.exec("main()");
