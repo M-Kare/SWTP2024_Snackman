@@ -5,7 +5,6 @@ import org.joml.Vector3d;
 import de.hsrm.mi.swt.snackman.configuration.GameConfig;
 import de.hsrm.mi.swt.snackman.entities.map.Square;
 import de.hsrm.mi.swt.snackman.entities.mapObject.MapObjectType;
-import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.SnackMan;
 import de.hsrm.mi.swt.snackman.services.MapService;
 
 /**
@@ -123,13 +122,10 @@ public abstract class Mob {
      * @param posZ z-position
      */
     public void move(double posX, double posY, double posZ) {
-        
         this.setPosX(posX);
         this.setPosY(posY);
         this.setPosZ(posZ);
         this.setCurrentSquareWithIndex(this.position.x, this.position.z);
-
-        
     }
 
     /**
@@ -152,8 +148,6 @@ public abstract class Mob {
         int moveDirX = (r ? 1 : 0) - (l ? 1 : 0);
 
         Vector3d move = new Vector3d();
-
-        Square oldPosition = currentSquare;
 
         if (f || b) {
             move.z -= moveDirZ;
@@ -193,18 +187,6 @@ public abstract class Mob {
                 break;
         }
         setCurrentSquareWithIndex(position.x, position.z);
-        Square newPosition = currentSquare;
-        oldPosition.removeMob(this);
-        newPosition.addMob(this);
-        //System.out.println("HIER SOLL SNACKMAN SEIN: " + newPosition.toString());
-        for(Mob mob: newPosition.getMobs()){
-            if(mob instanceof SnackMan){
-                //System.out.println("Mobb: " + (SnackMan)mob);
-            }else{
-                //System.out.println("Es ist irgendwas anderes...");
-            }
-            
-        }
     }
 
     // TODO: SnackMan spawn in MapService benötigt
