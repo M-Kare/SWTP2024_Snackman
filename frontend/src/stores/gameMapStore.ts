@@ -107,6 +107,19 @@ export const useGameMapStore = defineStore('gameMap', () => {
                   mapData.gameMap.set(squareUpdate.square.id, squareUpdate.square)
                 } else {
                   //TODO: Wenn Square einen Snack besitz: den spezifischen Snack erstellen und in die Scene hinzufügen
+                    const savedMeshId = mapData.gameMap.get(squareUpdate.square.id)!.snack.meshId
+                    removeMeshFromScene(scene, savedMeshId)
+                    const OFFSET = mapData.DEFAULT_SQUARE_SIDE_LENGTH / 2
+                    const DEFAULT_SIDE_LENGTH = mapData.DEFAULT_SQUARE_SIDE_LENGTH
+                    const snackToAdd = gameObjectRenderer.createSnackOnFloor(
+                      squareUpdate.square.indexX * DEFAULT_SIDE_LENGTH + OFFSET,
+                      squareUpdate.square.indexZ * DEFAULT_SIDE_LENGTH + OFFSET,
+                      DEFAULT_SIDE_LENGTH,
+                      squareUpdate.square.snack?.snackType,
+                    )
+                    scene.add(snackToAdd)
+                    setSnackMeshId(squareUpdate.square.id, snackToAdd.id)
+                    mapData.gameMap.set(squareUpdate.square.id, squareUpdate.square)
                 }
                 break;
               case EventType.ChickenUpdate:
