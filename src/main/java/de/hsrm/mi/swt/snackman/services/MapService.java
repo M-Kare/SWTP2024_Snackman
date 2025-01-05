@@ -1,31 +1,31 @@
 package de.hsrm.mi.swt.snackman.services;
 
-import java.beans.PropertyChangeEvent;
-import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken.Chicken;
-import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken.Direction;
-import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.SnackMan;
-import de.hsrm.mi.swt.snackman.messaging.*;
-import org.python.util.PythonInterpreter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 import de.hsrm.mi.swt.snackman.configuration.GameConfig;
 import de.hsrm.mi.swt.snackman.entities.map.GameMap;
 import de.hsrm.mi.swt.snackman.entities.map.Square;
 import de.hsrm.mi.swt.snackman.entities.mapObject.MapObjectType;
 import de.hsrm.mi.swt.snackman.entities.mapObject.snack.Snack;
 import de.hsrm.mi.swt.snackman.entities.mapObject.snack.SnackType;
+import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken.Chicken;
+import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken.Direction;
+import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.SnackMan;
+import de.hsrm.mi.swt.snackman.messaging.*;
+
+import org.python.core.PyObject;
+import org.python.util.PythonInterpreter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.beans.PropertyChangeEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
-import org.python.core.PyObject;
-import de.hsrm.mi.swt.snackman.messaging.*;
 
 /**
  * Service class for managing the game map
- * This class is responsible for loading and providing access to the game map
- * data
+ * This class is responsible for loading and providing access to the game map data
  */
 @Service
 public class MapService {
@@ -120,11 +120,10 @@ public class MapService {
         Square square;
 
         switch (symbol) {
-            case '#': {
+            case '#':
                 square = new Square(MapObjectType.WALL, x, z);
                 break;
-            }
-            case ' ': {
+            case ' ':
                 square = new Square(MapObjectType.FLOOR, x, z);
                 addRandomSnackToSquare(square);
 
@@ -137,7 +136,6 @@ public class MapService {
                     }
                 });
                 break;
-            }
             case 'C':
                 log.debug("Initialising chicken");
                 square = new Square(MapObjectType.FLOOR, x, z);
@@ -151,14 +149,20 @@ public class MapService {
                                 ChangeType.UPDATE, (Chicken) evt.getNewValue());
 
                         frontendMessageService.sendChickenEvent(messageEvent);
+                    } else if (evt.getPropertyName().equals("egg")) {
+                        Square squareToAddEgg = (Square) evt.getNewValue();
+                        if (squareToAddEgg != null && squareToAddEgg.getSnack() != null && squareToAddEgg.getSnack().getSnackType() == SnackType.EGG) {
+                            FrontendMessageEvent messageEvent = new FrontendMessageEvent(EventType.SNACK, ChangeType.CREATE, squareToAddEgg);
+                            frontendMessageService.sendEvent(messageEvent);
+                            log.info("Sending FrontendMessageEvent: EventType={}, ChangeType={}, SquareId={}",
+                                    messageEvent.eventType().name(), messageEvent.changeType().name(), messageEvent.square().getId());
+                        }
                     }
                 });
                 break;
-            default: {
+            default:
                 square = new Square(MapObjectType.FLOOR, x, z);
-            }
         }
-
         return square;
     }
 
@@ -209,7 +213,7 @@ public class MapService {
      *
      * @param square to put snack in
      */
-    private void addRandomSnackToSquare(Square square) {
+    protected void addRandomSnackToSquare(Square square) {
         if (square.getType() == MapObjectType.FLOOR) {
             SnackType randomSnackType = SnackType.getRandomSnack();
 
@@ -217,12 +221,16 @@ public class MapService {
         }
     }
 
-    public GameMap getGameMap() {
-        return gameMap;
-    }
-
-    public Square getSquareAtIndexXZ(int x, int z) {
-        return gameMap.getSquareAtIndexXZ(x, z);
+    /**
+     * Adds a laid egg to a specified square on the map
+     *
+     * @param square  The square where the egg is to be added
+     * @param laidEgg The snack representing the egg that has been laid
+     */
+    public void addEggToSquare(Square square, Snack laidEgg) {
+        square.setSnack(laidEgg);
+        log.debug("{} kcal egg add to square {} and square {}", laidEgg.getCalories(), square.getId(), square.getId());
+        frontendMessageService.sendEvent(new FrontendMessageEvent(EventType.SNACK, ChangeType.CREATE, square));
     }
 
     public void printGameMap() {
@@ -236,6 +244,14 @@ public class MapService {
             }
             System.out.println("");
         }
+    }
+
+    public Square getSquareAtIndexXZ(int x, int z) {
+        return gameMap.getSquareAtIndexXZ(x, z);
+    }
+
+    public GameMap getGameMap() {
+        return gameMap;
     }
 
     public SnackMan getSnackMan() {

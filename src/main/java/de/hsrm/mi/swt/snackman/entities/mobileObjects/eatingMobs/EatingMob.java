@@ -8,6 +8,9 @@ import de.hsrm.mi.swt.snackman.services.MapService;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 
+/**
+ * A mob which can consume snacks
+ */
 public abstract class EatingMob extends Mob {
     private int kcal;
 
@@ -95,12 +98,10 @@ public abstract class EatingMob extends Mob {
                 System.out.println("Snackman fired calories");
             }
         }
-
     }
 
     // Listener hinzufügen
     public void addPropertyChangeListener(PropertyChangeListener listener) {
         propertyChangeSupport.addPropertyChangeListener(listener);
     }
-
 }
