@@ -10,10 +10,10 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
-@SpringBootTest(classes = mazeTest.class)
-class mazeTest {
+@SpringBootTest
+class MazeTest {
     
-    private static final String MAZE_FILE_PATH = "./extensions/Map/Maze.txt";
+    private static final String MAZE_FILE_PATH = "./extensions/map/Maze.txt";
 
     @Test
     void mazeExists() {
