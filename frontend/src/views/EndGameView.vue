@@ -38,7 +38,7 @@
       // Success feedback
       feedbackMessage.value = 'Map saved';
       feedbackClass.value = 'success';
-            
+      console.log('Download Map sucessful!');     
     } catch(error: any){
       console.error('Error downloading file:', error);
 
