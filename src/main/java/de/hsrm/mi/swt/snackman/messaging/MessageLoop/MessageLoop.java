@@ -45,21 +45,23 @@ public class MessageLoop {
                 continue;
             }
             List<Message> messages = new ArrayList<>();
+            List<Square> squareQueue = changedSquares.get(lobby.getLobbyId());
+            changedSquares.remove(lobby.getLobbyId());
+            List<Chicken> chickenQueue = changedChicken.get(lobby.getLobbyId());
+            changedChicken.remove(lobby.getLobbyId());
             for(String client : lobby.getClientMobMap().keySet()){
                 Mob mob = lobby.getClientMobMap().get(client);
                 messages.add(new Message<>(EventEnum.MobUpdate, new MobUpdateMessage(mob.getPosition(), mob.getQuat(), mob.getRadius(), mob.getSpeed(), client)));
             }
-            if(changedSquares.get(lobby.getLobbyId()) != null){
-                for(Square square : changedSquares.get(lobby.getLobbyId())){
+            if(squareQueue != null){
+                for(Square square : squareQueue){
                     messages.add(new Message<>(EventEnum.SquareUpdate, new SquareUpdateMessage(square)));
                 }
-                changedSquares.remove(lobby.getLobbyId());
             }
-            if(changedChicken.get(lobby.getLobbyId()) != null){
-                for(Chicken chicken : changedChicken.get(lobby.getLobbyId())){
+            if(chickenQueue != null){
+                for(Chicken chicken : chickenQueue){
                     messages.add(new Message<>(EventEnum.ChickenUpdate, ChickenUpdateMessage.fromChicken(chicken)));
                 }
-                changedChicken.remove(lobby.getLobbyId());
             }
             //TODO: Kollision Messages
 
