@@ -126,53 +126,6 @@ export const useGameMapStore = defineStore('gameMap', () => {
 
       stompclient.activate()
     }
-
-
-    // if (!chickenStompclient) {
-    //   chickenStompclient = new Client({brokerURL: wsurl})
-
-    //   chickenStompclient.onWebSocketError = (event) => {
-    //     throw new Error('Chicken Websocket with message: ' + event)
-    //   }
-
-    //   chickenStompclient.onStompError = (frameElement) => {
-    //     throw new Error('Chicken Stompclient with message: ' + frameElement)
-    //   }
-
-    //   chickenStompclient.onConnect = (frameElement) => {
-    //     console.log('Stompclient for chicken connected')
-
-    //     chickenStompclient.subscribe(DEST_CHICKEN, async (message) => {
-    //       const change: IFrontendChickenMessageEvent = JSON.parse(message.body)
-    //       console.log("Received a chicken update: {}", change)
-
-    //       const chickenUpdate: IChickenDTD = change.chicken
-    //       const OFFSET = mapData.DEFAULT_SQUARE_SIDE_LENGTH / 2
-    //       const DEFAULT_SIDE_LENGTH = mapData.DEFAULT_SQUARE_SIDE_LENGTH
-    //       const currentChicken = mapData.chickens.find(chicken => chicken.id == chickenUpdate.id)
-    //       console.log("chicken update {}", chickenUpdate)
-
-    //       if (currentChicken == undefined) {
-    //         console.error("A chicken is undefined in pinia")
-    //       } else {
-    //         if (currentChicken.thickness != chickenUpdate.thickness) {
-    //           updateThickness(currentChicken, chickenUpdate)
-    //         }
-    //         if (chickenUpdate.chickenPosX == currentChicken!.chickenPosX && chickenUpdate.chickenPosZ == currentChicken!.chickenPosZ) {
-    //           updateLookingDirection(currentChicken, chickenUpdate)
-    //         } else {
-    //           updateWalkingDirection(currentChicken, chickenUpdate, DEFAULT_SIDE_LENGTH, OFFSET)
-    //         }
-    //       }
-    //     })
-    //   }
-
-    //   chickenStompclient.onDisconnect = () => {
-    //     console.log('Chicken Stompclient disconnected.')
-    //   }
-
-    //   chickenStompclient.activate()
-    // }
   }
 
   function updateChicken(change: IChickenDTD){

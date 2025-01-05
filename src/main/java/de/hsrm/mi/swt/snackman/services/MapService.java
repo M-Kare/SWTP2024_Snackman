@@ -11,7 +11,6 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import de.hsrm.mi.swt.snackman.configuration.GameConfig;
-import de.hsrm.mi.swt.snackman.controller.Square.ChickenDTO;
 import de.hsrm.mi.swt.snackman.entities.lobby.Lobby;
 import de.hsrm.mi.swt.snackman.entities.lobby.PlayerClient;
 import de.hsrm.mi.swt.snackman.entities.map.GameMap;
@@ -23,9 +22,6 @@ import de.hsrm.mi.swt.snackman.entities.mapObject.snack.Snack;
 import de.hsrm.mi.swt.snackman.entities.mapObject.snack.SnackType;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken.Chicken;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.SnackMan;
-import de.hsrm.mi.swt.snackman.messaging.ChangeType;
-import de.hsrm.mi.swt.snackman.messaging.EventType;
-import de.hsrm.mi.swt.snackman.messaging.FrontendChickenMessageEvent;
 import de.hsrm.mi.swt.snackman.messaging.MessageLoop.MessageLoop;
 
 /**
@@ -176,12 +172,7 @@ public class MapService {
 
                             newChicken.addPropertyChangeListener((PropertyChangeEvent evt) -> {
                                 if (evt.getPropertyName().equals("chicken")) {
-                                    FrontendChickenMessageEvent messageEvent = new FrontendChickenMessageEvent(
-                                            EventType.CHICKEN,
-                                            ChangeType.UPDATE, lobby.getLobbyId(),
-                                            ChickenDTO.fromChicken((Chicken) evt.getNewValue()));
-                                    messageLoop.addChickenToQueue(messageEvent);
-                                    //messageLoop.sendChickenEvent(messageEvent);
+                                    messageLoop.addChickenToQueue((Chicken)evt.getNewValue(), lobby.getLobbyId());
                                 }
                             });
                             break;
