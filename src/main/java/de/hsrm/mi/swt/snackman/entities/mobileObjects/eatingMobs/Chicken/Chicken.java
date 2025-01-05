@@ -65,7 +65,7 @@ public class Chicken extends EatingMob implements Runnable {
         this.pythonInterpreter = new PythonInterpreter();
 
            try {
-            String scriptPath = Paths.get("extensions/Chicken/ChickenMovementSkript.py").normalize().toAbsolutePath().toString();
+            String scriptPath = Paths.get("extensions/chicken/ChickenMovementSkript.py").normalize().toAbsolutePath().toString();
             log.debug("Resolved script path: {}", scriptPath);
             
             // Get the directory of the script (without the .)
