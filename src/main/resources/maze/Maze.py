@@ -92,7 +92,7 @@ def generate_labyrinth(width, height):
     return maze
 
 def save_file(maze, filename="Maze.txt"):
-    directory = "extensions/Map"
+    directory = "extensions/map"
     if not os.path.exists(directory):
         os.makedirs(directory)
     filepath = os.path.join(directory, filename)
