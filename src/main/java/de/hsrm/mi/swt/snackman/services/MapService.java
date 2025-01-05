@@ -99,7 +99,12 @@ public class MapService {
             }
             case ' ': {
                 square = new Square(MapObjectType.FLOOR, x, z);
-                addRandomSnackToSquare(square);
+                double emptyOrNot = Math.random();
+                if (emptyOrNot <= 0.3) {
+                    addRandomSnackToSquare(square);
+                } else {
+                    square.setSnack(new Snack(SnackType.EMPTY));
+                }
 
                 square.addPropertyChangeListener((PropertyChangeEvent evt) -> {
                     if (evt.getPropertyName().equals("square")) {
@@ -141,7 +146,6 @@ public class MapService {
     private void addRandomSnackToSquare(Square square) {
         if (square.getType() == MapObjectType.FLOOR) {
             SnackType randomSnackType = SnackType.getRandomSnack();
-
             square.setSnack(new Snack(randomSnackType));
         }
     }
@@ -234,5 +238,23 @@ public class MapService {
 
     public double calcCenterPositionFromMapIndex(int index) {
         return (index * GameConfig.SQUARE_SIZE) + (GameConfig.SQUARE_SIZE / 2);
+    }
+
+    public void respawnSnacks(GameMap map) {
+        for (int i = 0; i < map.getGameMapSquares().length; i++) {
+            for (int j = 0; j < map.getGameMapSquares()[0].length; j++) {
+                Square square = map.getSquareAtIndexXZ(i, j);
+                if (square.getType() == MapObjectType.FLOOR) {
+                    double rand = Math.random();
+                    if (rand <= 0.3) {
+                        addRandomSnackToSquare(square);
+                    } else {
+                        square.setSnack(new Snack(SnackType.EMPTY));
+                    }
+                } else {
+                    continue;
+                }
+            }
+        }
     }
 }
