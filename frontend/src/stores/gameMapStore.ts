@@ -16,6 +16,7 @@ import { EventType, type IMessageDTD } from './messaging/IMessageDTD';
 import { MeshSSSNodeMaterial } from 'three/webgpu';
 import type { IMobUpdateDTD } from './messaging/IMobUpdateDTD';
 import type { ISquareUpdateDTD } from './messaging/ISquareUpdateDTD';
+import { SnackType } from './Snack/ISnackDTD';
 
 /**
  * Defines the pinia store used for saving the map from
@@ -100,7 +101,7 @@ export const useGameMapStore = defineStore('gameMap', () => {
                 break;
               case EventType.SquareUpdate:
                 const squareUpdate: ISquareUpdateDTD = mess.message
-                if(squareUpdate.square.snack == null){
+                if(squareUpdate.square.snack.snackType == SnackType.EMPTY){
                   const savedMeshId = mapData.gameMap.get(squareUpdate.square.id)!.snack.meshId
                   removeMeshFromScene(scene, savedMeshId)
                   mapData.gameMap.set(squareUpdate.square.id, squareUpdate.square)
@@ -191,7 +192,7 @@ export const useGameMapStore = defineStore('gameMap', () => {
 
   function setSnackMeshId(squareId: number, meshId: number) {
     const square = mapData.gameMap.get(squareId)
-    if (square != undefined && square.snack != null)
+    if (square != undefined && square.snack.snackType != SnackType.EMPTY)
       square.snack.meshId = meshId
   }
 

@@ -6,7 +6,8 @@ public enum SnackType {
     CHERRY(100),
     STRAWBERRY(300),
     ORANGE(500),
-    APPLE(700);
+    APPLE(700),
+    EMPTY(0);
 
     private final int calories;
     SnackType(int calories) {
@@ -22,7 +23,7 @@ public enum SnackType {
      * @return random snack
      */
     public static SnackType getRandomSnack() {
-        SnackType[] snacks = values();
+        SnackType[] snacks = {SnackType.CHERRY, SnackType.STRAWBERRY, SnackType.ORANGE, SnackType.APPLE};
         Random random = new Random();
         int randomIndex = random.nextInt(snacks.length);
         return snacks[randomIndex];

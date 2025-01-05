@@ -7,6 +7,7 @@ import de.hsrm.mi.swt.snackman.configuration.GameConfig;
 import de.hsrm.mi.swt.snackman.entities.map.GameMap;
 import de.hsrm.mi.swt.snackman.entities.map.Square;
 import de.hsrm.mi.swt.snackman.entities.mapObject.snack.Snack;
+import de.hsrm.mi.swt.snackman.entities.mapObject.snack.SnackType;
 
 public class SnackMan extends EatingMob {
     private final Logger log = LoggerFactory.getLogger(SnackMan.class);
@@ -77,7 +78,7 @@ public class SnackMan extends EatingMob {
     public void consumeSnackOnSquare(Square square) {
         Snack snackOnSquare = square.getSnack();
 
-        if (snackOnSquare != null) {
+        if (snackOnSquare.getSnackType() != SnackType.EMPTY) {
             try {
                 super.gainKcal(snackOnSquare.getCalories());
             } catch (Exception e) {
@@ -85,7 +86,7 @@ public class SnackMan extends EatingMob {
             }
 
             //set snack to null after consuming it
-            square.setSnack(null);
+            square.setSnack(new Snack(SnackType.EMPTY));
         }
     }
 }

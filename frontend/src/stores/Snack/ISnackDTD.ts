@@ -8,5 +8,5 @@ export interface ISnack{
 }
 
 export enum SnackType{
-  CHERRY = 'CHERRY', STRAWBERRY = 'STRAWBERRY', ORANGE = 'ORANGE', APPLE = 'APPLE'
+  CHERRY = 'CHERRY', STRAWBERRY = 'STRAWBERRY', ORANGE = 'ORANGE', APPLE = 'APPLE', EMPTY = 'EMPTY'
 }

@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import de.hsrm.mi.swt.snackman.entities.map.GameMap;
 import de.hsrm.mi.swt.snackman.entities.map.Square;
 import de.hsrm.mi.swt.snackman.entities.mapObject.snack.Snack;
+import de.hsrm.mi.swt.snackman.entities.mapObject.snack.SnackType;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.EatingMob;
 
 /**
@@ -145,7 +146,7 @@ public class Chicken extends EatingMob implements Runnable {
         Square currentSquare = super.getGameMap().getSquareAtIndexXZ(this.chickenPosX, this.chickenPosZ);
         Snack snackOnSquare = currentSquare.getSnack();
 
-        if (snackOnSquare != null) {
+        if (snackOnSquare.getSnackType() != SnackType.EMPTY) {
 
             try {
                 gainKcal(snackOnSquare.getCalories());
@@ -154,7 +155,7 @@ public class Chicken extends EatingMob implements Runnable {
             }
 
             //set snack to null after consuming it
-            currentSquare.setSnack(null);
+            currentSquare.setSnack(new Snack(SnackType.EMPTY));
         }
     }
 

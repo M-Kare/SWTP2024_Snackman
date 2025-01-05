@@ -3,6 +3,7 @@ package de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs;
 import de.hsrm.mi.swt.snackman.entities.map.GameMap;
 import de.hsrm.mi.swt.snackman.entities.map.Square;
 import de.hsrm.mi.swt.snackman.entities.mapObject.snack.Snack;
+import de.hsrm.mi.swt.snackman.entities.mapObject.snack.SnackType;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.Mob;
 
 /**
@@ -32,7 +33,7 @@ public abstract class EatingMob extends Mob {
     }
 
     protected void gainKcal(int addingKcal) throws Exception {
-        if ((this.kcal + addingKcal) > 0) {
+        if ((this.kcal + addingKcal) >= 0) {
             this.kcal += addingKcal;
         } else {
             throw new Exception("Kcal cannot be below zero!");
@@ -47,7 +48,7 @@ public abstract class EatingMob extends Mob {
     public void move(boolean f, boolean b, boolean l, boolean r, double delta) {
         super.move(f, b, l, r, delta);
 
-        if (getCurrentSquare().getSnack() != null)
+        if (getCurrentSquare().getSnack().getSnackType() != SnackType.EMPTY)
             consumeSnackOnSquare(getCurrentSquare());
     }
 
@@ -64,7 +65,7 @@ public abstract class EatingMob extends Mob {
             kcal += snackOnSquare.getCalories();
 
             //set snack to null after consuming it
-            square.setSnack(null);
+            square.setSnack(new Snack(SnackType.EMPTY));
         }
     }
 }

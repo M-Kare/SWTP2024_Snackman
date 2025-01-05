@@ -2,6 +2,7 @@ package de.hsrm.mi.swt.snackman.entities.map;
 
 import de.hsrm.mi.swt.snackman.entities.mapObject.MapObjectType;
 import de.hsrm.mi.swt.snackman.entities.mapObject.snack.Snack;
+import de.hsrm.mi.swt.snackman.entities.mapObject.snack.SnackType;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.Ghost;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.Mob;
 import java.beans.PropertyChangeListener;
@@ -33,15 +34,18 @@ public class Square {
         type = MapObjectType.FLOOR;
         this.indexX = indexX;
         this.indexZ = indexZ;
+        this.snack = new Snack(SnackType.EMPTY);
     }
 
     public Square(int indexX, int indexZ, Spawnpoint spawnpoint) {
         this(indexX, indexZ);
         this.spawnpoint = spawnpoint;
+        this.snack = new Snack(SnackType.EMPTY);
     }
     public Square(MapObjectType type, int indexX, int indexZ) {
         this(indexX, indexZ);
         this.type = type;
+        this.snack = new Snack(SnackType.EMPTY);
     }
 
     public Square(Snack snack, int indexX, int indexZ) {

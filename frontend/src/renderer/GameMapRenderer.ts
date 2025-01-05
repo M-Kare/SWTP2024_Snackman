@@ -2,6 +2,7 @@ import * as THREE from 'three'
 import { type IGameMap, MapObjectType } from '@/stores/IGameMapDTD'
 import { useGameMapStore } from '@/stores/gameMapStore'
 import { GameObjectRenderer } from '@/renderer/GameObjectRenderer'
+import { SnackType } from '@/stores/Snack/ISnackDTD'
 
 /**
  * for rendering the game map
@@ -72,7 +73,7 @@ export const GameMapRenderer = () => {
         )
         scene.add(squareToAdd)*/
 
-        if (square.snack != null) {
+        if (square.snack != null && square.snack.snackType != SnackType.EMPTY) {
           const snackToAdd = gameObjectRenderer.createSnackOnFloor(
             square.indexX * DEFAULT_SIDE_LENGTH + OFFSET,
             square.indexZ * DEFAULT_SIDE_LENGTH + OFFSET,
