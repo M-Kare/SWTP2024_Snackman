@@ -1,22 +1,19 @@
 <template>
-    <div class="outside-toggle-switch" @click="toggle" :class="{checked: modelValue}">
-        <div class="inside-toggle-switch" :class="{checked: modelValue}">
+    <div class="outside-toggle-switch" @click="toggle" :class="{checked: toggleState}">
+        <div class="inside-toggle-switch" :class="{checked: toggleState}">
         </div>
     </div>
 </template>
 
 <script setup lang="ts">
     const props = defineProps({
-        modelValue: {
-            required: true,
-            type: Boolean
-        }
+        toggleState: Boolean,
     })
 
-    const emit = defineEmits(['update:modelValue'])
+    const emit = defineEmits(['updateToggleState'])
 
     const toggle = () => {
-        emit('update:modelValue', !props.modelValue)
+        emit('updateToggleState', !props.toggleState)
     }
 </script>
 
