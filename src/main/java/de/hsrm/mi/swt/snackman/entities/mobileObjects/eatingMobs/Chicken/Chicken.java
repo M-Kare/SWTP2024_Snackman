@@ -360,7 +360,7 @@ public class Chicken extends EatingMob implements Runnable {
             Square currentSquare = this.mapService.getSquareAtIndexXZ(this.chickenPosX, this.chickenPosZ);
 
             chickenIsStuck = true;
-            Time.sleep(5);
+            Time.sleep(10);
             // new egg with current chicken-calories * 1.5
             int eggCalories = (int) (super.getKcal() * 1.5);
             Snack egg = new Snack(SnackType.EGG);
