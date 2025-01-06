@@ -55,7 +55,7 @@ public class GameMapController {
                 return ResponseEntity.badRequest().body("Invalid file type. Only .txt files are allowed.");
             }
 
-            Path uploadPath = Paths.get("./extensions/Map").toAbsolutePath();
+            Path uploadPath = Paths.get("./extensions/map").toAbsolutePath();
             
             Path filePath = uploadPath.resolve("SnackManMap.txt");
             Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);

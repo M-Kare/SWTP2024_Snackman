@@ -4,18 +4,21 @@
     <h1 class="title"> {{ lobby?.name || 'Lobby Name' }} </h1>
 
     <div v-if="playerId === adminClientId" class="custom-map">
-      <span>Custom Map</span>
-      <CustomMapButton :toggleState="toggleState" @updateToggleState="updateToggleState"></CustomMapButton>
+        <span>Custom Map</span>
+        <CustomMapButton :toggleState="toggleState" @updateToggleState="updateToggleState"></CustomMapButton>
     </div>
     
     <div v-if="toggleState" class="map-importiren">
-      <MapButton @click="triggerFileInput">Map Importieren</MapButton>
-      <input class="input-feld"
-          ref="fileInput" 
-          type="file" 
-          accept=".txt" 
-          @change="handleFileImport"
-      />
+        <MapButton @click="triggerFileInput">Map Importieren</MapButton>
+        <input class="input-feld"
+            ref="fileInput" 
+            type="file" 
+            accept=".txt" 
+            @change="handleFileImport"
+        />
+        <div v-if="feedbackMessage" :class="['feedback-message', feedbackClass]">
+            {{ feedbackMessage }}
+        </div>
     </div>
 
     <div class="outer-box">
@@ -103,6 +106,8 @@
         darkenBackground.value = false;
     }
 
+    const feedbackMessage = ref('');
+    const feedbackClass = ref('');
     const toggleState = ref(false);
 
     const updateToggleState = (state: boolean) => {
@@ -132,16 +137,24 @@
                     } else {
                         showPopUp.value = true;
                         darkenBackground.value = true;
-                        infoHeading.value = "- Map Data is not valid -"
+                        infoHeading.value = "- File Map is not valid -"
+                        infoText.value = "The map file is only allowed to contain the following characters: \nS, G, C, o, #, and spaces."
                     }
                 };
                 reader.readAsText(file);
             } else {
-                alert('Please select a valid .txt file.');
+                showPopUp.value = true;
+                darkenBackground.value = true;
+                infoHeading.value = "- File Map is not valid -"
+                infoText.value = "Please upload file .txt"
             }
         }
     }
 
+    /**
+     * Upload file to server
+     * @param file 
+     */
     const uploadFileToServer = (file: File) => {
         const formData = new FormData();
         formData.append('file', file);
@@ -153,16 +166,28 @@
         .then(response => {
             if (response.ok) {
                 console.log('File uploaded successfully');
-                alert('File uploaded successfully!');
+                // Success feedback
+                feedbackMessage.value = 'Map saved';
+                feedbackClass.value = 'success';
             } else {
                 console.error('Error uploading file:', response.statusText);
-                alert('Error uploading file.');
+                // Failure feedback
+                feedbackMessage.value = 'Map not saved';
+                feedbackClass.value = 'error';
             }
         })
         .catch(error => {
             console.error('Error uploading file:', error);
-            alert('Error uploading file.');
+            // Failure feedback
+            feedbackMessage.value = 'Map not saved';
+            feedbackClass.value = 'error';
         });
+
+        // Clear feedback after 3 seconds
+        setTimeout(() => {
+            feedbackMessage.value = '';
+            feedbackClass.value = '';
+        }, 3000);
     }
 
     watchEffect(() => {
@@ -384,5 +409,37 @@
 
 .input-feld{
   display: none;
+}
+
+.feedback-message {
+    position: absolute;
+    top: 125px;
+    font-size: 2rem;
+    font-weight: bold;
+    z-index: 3;
+    padding: 10px 20px;
+    border-radius: 5px;
+    text-align: center;
+    animation: fadeIn 0.5s;
+}
+
+.feedback-message.success {
+    color: #fff;
+    background-color: #50C878;
+}
+
+.feedback-message.error {
+    color: #fff;
+    background-color: #C70039;
+}
+
+/* Fade-in animation */
+@keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
 }
 </style>
