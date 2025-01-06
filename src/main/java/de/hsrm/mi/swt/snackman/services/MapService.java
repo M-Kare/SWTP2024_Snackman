@@ -100,7 +100,7 @@ public class MapService {
             case ' ': {
                 square = new Square(MapObjectType.FLOOR, x, z);
                 double emptyOrNot = Math.random();
-                if (emptyOrNot <= 0.3) {
+                if (emptyOrNot <= GameConfig.SNACK_SPAWN_RATE) {
                     addRandomSnackToSquare(square);
                 } else {
                     square.setSnack(new Snack(SnackType.EMPTY));
@@ -246,7 +246,7 @@ public class MapService {
                 Square square = map.getSquareAtIndexXZ(i, j);
                 if (square.getType() == MapObjectType.FLOOR) {
                     double rand = Math.random();
-                    if (rand <= 0.3) {
+                    if (rand <= GameConfig.SNACK_SPAWN_RATE) {
                         addRandomSnackToSquare(square);
                     } else {
                         square.setSnack(new Snack(SnackType.EMPTY));

@@ -18,4 +18,5 @@ public class GameConfig {
 
     //LOBBY
     public static final int TIME_FOR_SNACKS_TO_RESPAWN = 20000;
+    public static final double SNACK_SPAWN_RATE = 0.3;
 }
