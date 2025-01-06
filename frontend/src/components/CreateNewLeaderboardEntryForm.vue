@@ -43,11 +43,27 @@ const emit = defineEmits<{
   (event: 'createNewLeaderboardEntry', value: string): void;
 }>()
 
+/**
+ * Emits an event to cancel the new leaderboard entry creation process.
+ *
+ * @function cancelNewLeaderboardEntryCreation
+ * @returns {void}
+ */
 const cancelNewLeaderboardEntryCreation = () => {
   errorMessage.value = "";
   emit('cancelNewLeaderboardEntryCreation', false);
 }
 
+/**
+ * Creates a new leaderboard entry with the specified data (name, duration, releaseDate).
+ * Validates the new leaderboard entry name before attempting to create the new leaderboard entry.
+ * Alerts the user if there are any validation errors or if the new leaderboard entry creation fails.
+ *
+ * @async
+ * @function createLobby
+ * @throws {Error} Throws an alert if there is an error creating the new leaderboard entry.
+ * @returns {void}
+ */
 const createNewLeaderboardEntry = async () => {
   if (!yourName.value.trim()) {
     errorMessage.value = "Your name name cannot be empty";

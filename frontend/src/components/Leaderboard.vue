@@ -34,6 +34,9 @@ import {computed, onMounted} from "vue";
 
 const leaderboardStore = useLeaderboardStore()
 
+/**
+ * Load the leaderboard data and initialize stomp message updates.
+ */
 onMounted(async () => {
   await leaderboardStore.initLeaderboardStore()
   await leaderboardStore.startLeaderboardUpdate()
