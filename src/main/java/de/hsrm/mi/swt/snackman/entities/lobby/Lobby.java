@@ -19,6 +19,7 @@ public class Lobby {
     private List<PlayerClient> members;
     private GameMap gameMap;
     private SortedMap<String, Mob> clientMobMap;
+    private long timeSinceLastSnackSpawn;
 
 
     public Lobby(String lobbyId, String name, PlayerClient adminClient, boolean isGameStarted, GameMap gameMap) {
@@ -48,6 +49,9 @@ public class Lobby {
 
     public void setGameStarted(boolean isGameStarted) {
         this.isGameStarted = isGameStarted;
+        if (isGameStarted) {
+            setTimeSinceLastSnackSpawn(System.currentTimeMillis());
+        }
     }
 
     public List<PlayerClient> getMembers() {
@@ -64,5 +68,13 @@ public class Lobby {
 
     public String getLobbyId() {
         return lobbyId;
+    }
+
+    public long getTimeSinceLastSnackSpawn() {
+        return timeSinceLastSnackSpawn;
+    }
+
+    public void setTimeSinceLastSnackSpawn(long time) {
+        timeSinceLastSnackSpawn = time;
     }
 }

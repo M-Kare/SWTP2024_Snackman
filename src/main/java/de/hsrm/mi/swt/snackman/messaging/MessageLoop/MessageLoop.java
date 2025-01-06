@@ -12,6 +12,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import de.hsrm.mi.swt.snackman.configuration.GameConfig;
 import de.hsrm.mi.swt.snackman.entities.lobby.Lobby;
 import de.hsrm.mi.swt.snackman.entities.map.Square;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.Mob;
@@ -37,8 +38,6 @@ public class MessageLoop {
     // private Map<String, List<KollisionEvent>> kollisions;
 
     private Map<String, List<Chicken>> changedChicken = new HashMap<>();
-
-    private int lmao = 0;
 
     @Scheduled(fixedRate=50)
     public void messageLoop(){
@@ -75,11 +74,10 @@ public class MessageLoop {
                 return;
             }
             messagingTemplate.convertAndSend("/topic/lobbies/" + lobby.getLobbyId() + "/update", messages);
-            lmao++;
-            if (lmao > 100) {
+            long currentTime = System.currentTimeMillis();
+            if ((currentTime - lobby.getTimeSinceLastSnackSpawn()) > GameConfig.TIME_FOR_SNACKS_TO_RESPAWN) {
                 mapService.respawnSnacks(lobbyService.getGameMapByLobbyId(lobby.getLobbyId()));
-                lmao = 0;
-                System.out.println("The deed has been done");
+                lobby.setTimeSinceLastSnackSpawn(System.currentTimeMillis());
             }
         }
     }
