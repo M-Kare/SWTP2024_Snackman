@@ -16,7 +16,7 @@ import { EventType, type IMessageDTD } from './messaging/IMessageDTD';
 import { MeshSSSNodeMaterial } from 'three/webgpu';
 import type { IMobUpdateDTD } from './messaging/IMobUpdateDTD';
 import type { ISquareUpdateDTD } from './messaging/ISquareUpdateDTD';
-import { SnackType } from './Snack/ISnackDTD';
+import { SnackType, type ISnackDTD } from './Snack/ISnackDTD';
 
 /**
  * Defines the pinia store used for saving the map from
@@ -106,20 +106,7 @@ export const useGameMapStore = defineStore('gameMap', () => {
                   removeMeshFromScene(scene, savedMeshId)
                   mapData.gameMap.set(squareUpdate.square.id, squareUpdate.square)
                 } else {
-                  //TODO: Wenn Square einen Snack besitz: den spezifischen Snack erstellen und in die Scene hinzufügen
-                    const savedMeshId = mapData.gameMap.get(squareUpdate.square.id)!.snack.meshId
-                    removeMeshFromScene(scene, savedMeshId)
-                    const OFFSET = mapData.DEFAULT_SQUARE_SIDE_LENGTH / 2
-                    const DEFAULT_SIDE_LENGTH = mapData.DEFAULT_SQUARE_SIDE_LENGTH
-                    const snackToAdd = gameObjectRenderer.createSnackOnFloor(
-                      squareUpdate.square.indexX * DEFAULT_SIDE_LENGTH + OFFSET,
-                      squareUpdate.square.indexZ * DEFAULT_SIDE_LENGTH + OFFSET,
-                      DEFAULT_SIDE_LENGTH,
-                      squareUpdate.square.snack?.snackType,
-                    )
-                    scene.add(snackToAdd)
-                    setSnackMeshId(squareUpdate.square.id, snackToAdd.id)
-                    mapData.gameMap.set(squareUpdate.square.id, squareUpdate.square)
+                  spawnSnack(squareUpdate)
                 }
                 break;
               case EventType.ChickenUpdate:
@@ -159,6 +146,22 @@ export const useGameMapStore = defineStore('gameMap', () => {
         updateWalkingDirection(currentChicken, chickenUpdate, DEFAULT_SIDE_LENGTH, OFFSET)
       }
     }
+  }
+
+  function spawnSnack(squareUpdate: ISquareUpdateDTD) {
+    const savedMeshId = mapData.gameMap.get(squareUpdate.square.id)!.snack.meshId
+    removeMeshFromScene(scene, savedMeshId)
+    mapData.gameMap.set(squareUpdate.square.id, squareUpdate.square)
+    const OFFSET = mapData.DEFAULT_SQUARE_SIDE_LENGTH / 2
+    const DEFAULT_SIDE_LENGTH = mapData.DEFAULT_SQUARE_SIDE_LENGTH
+    const snackToAdd = gameObjectRenderer.createSnackOnFloor(
+      squareUpdate.square.indexX * DEFAULT_SIDE_LENGTH + OFFSET,
+      squareUpdate.square.indexZ * DEFAULT_SIDE_LENGTH + OFFSET,
+      DEFAULT_SIDE_LENGTH,
+      squareUpdate.square.snack?.snackType,
+    )
+    scene.add(snackToAdd)
+    setSnackMeshId(squareUpdate.square.id, snackToAdd.id)
   }
 
   function setPlayer(p: Player){
