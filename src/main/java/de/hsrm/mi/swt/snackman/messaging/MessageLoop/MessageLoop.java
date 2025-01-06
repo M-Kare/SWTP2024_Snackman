@@ -17,12 +17,16 @@ import de.hsrm.mi.swt.snackman.entities.map.Square;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.Mob;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken.Chicken;
 import de.hsrm.mi.swt.snackman.services.LobbyManagerService;
+import de.hsrm.mi.swt.snackman.services.MapService;
 
 @Service
 public class MessageLoop {
     
     @Autowired
     private LobbyManagerService lobbyService;
+
+    @Autowired
+    private MapService mapService;
 
     @Autowired
     private SimpMessagingTemplate messagingTemplate;
@@ -33,6 +37,8 @@ public class MessageLoop {
     // private Map<String, List<KollisionEvent>> kollisions;
 
     private Map<String, List<Chicken>> changedChicken = new HashMap<>();
+
+    private int lmao = 0;
 
     @Scheduled(fixedRate=50)
     public void messageLoop(){
@@ -69,6 +75,12 @@ public class MessageLoop {
                 return;
             }
             messagingTemplate.convertAndSend("/topic/lobbies/" + lobby.getLobbyId() + "/update", messages);
+            lmao++;
+            if (lmao > 100) {
+                mapService.respawnSnacks(lobbyService.getGameMapByLobbyId(lobby.getLobbyId()));
+                lmao = 0;
+                System.out.println("The deed has been done");
+            }
         }
     }
 
