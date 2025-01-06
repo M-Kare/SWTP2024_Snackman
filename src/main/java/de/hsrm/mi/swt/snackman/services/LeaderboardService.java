@@ -18,8 +18,11 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Service class for managing the leaderboard
- * This class is responsible for loading and providing access to the leaderboard data
+ * Service class for managing the leaderboard.
+ *
+ * This class is responsible for reading, updating, and providing access
+ * to leaderboard data stored in a CSV-formatted file. It also handles
+ * communication with the frontend via messaging
  */
 @Service
 public class LeaderboardService {
@@ -45,6 +48,12 @@ public class LeaderboardService {
         fillLeaderboard(lines);
     }
 
+    /**
+     * Reads leaderboard data from the file specified by the filePath.
+     *
+     * @return a list of strings representing the lines in the file
+     * @throws RuntimeException if the file cannot be read or is empty
+     */
     private List<String> readInLeaderboard() {
         List<String> lines = new ArrayList<>();
         String line;
@@ -62,6 +71,13 @@ public class LeaderboardService {
         return lines;
     }
 
+    /**
+     * Fills the in-memory leaderboard with data parsed from the provided lines.
+     * Each line is expected to be in CSV format: name;duration;releaseDate.
+     *
+     * @param lines the lines from the leaderboard file
+     * @throws RuntimeException if a line is invalid or does not conform to the expected format
+     */
     private void fillLeaderboard(List<String> lines) {
         for (String line : lines) {
             String[] parts = line.split(CSV_LINE_SPLITTER);
@@ -71,6 +87,14 @@ public class LeaderboardService {
         Collections.sort(this.leaderboard.getLeaderboard());
     }
 
+    /**
+     * Adds a new entry to the leaderboard and updates the file and frontend.
+     *
+     * The entry is added to the in-memory leaderboard, saved to the file, and a message
+     * is sent to the frontend to notify about the update.
+     *
+     * @param leaderboardEntry the new leaderboard entry to add
+     */
     public void addLeaderboardEntry(LeaderboardEntry leaderboardEntry) {
         // add to list
         this.leaderboard.addEntry(leaderboardEntry);
@@ -89,6 +113,11 @@ public class LeaderboardService {
         log.info("Leaderboard was updated: {}", leaderboard);
     }
 
+    /**
+     * Converts the in-memory leaderboard into a {@link LeaderboardDTO}.
+     *
+     * @return a {@link LeaderboardDTO} representing the current state of the leaderboard
+     */
     public LeaderboardDTO getLeaderboardAsDTO() {
         return LeaderboardDTO.fromLeaderboardDTO(leaderboard);
     }
