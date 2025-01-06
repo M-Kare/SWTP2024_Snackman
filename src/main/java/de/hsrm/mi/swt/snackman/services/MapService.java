@@ -231,6 +231,23 @@ public class MapService {
         return gameMap.getSquareAtIndexXZ(x, z);
     }
 
+    public boolean squareIsBetweenWalls(int x, int z){
+        Square squareAbove = this.gameMap.getSquareAtIndexXZ(x - 1, z);
+        Square squareBelow = this.gameMap.getSquareAtIndexXZ(x + 1, z);
+        Square squareRight = this.gameMap.getSquareAtIndexXZ(x, z + 1);
+        Square squareLeft = this.gameMap.getSquareAtIndexXZ(x, z - 1);
+
+        if((squareAbove.getType() == MapObjectType.WALL) && (squareBelow.getType() == MapObjectType.WALL)){
+            return true;
+        }
+
+        if((squareRight.getType() == MapObjectType.WALL) && (squareLeft.getType() == MapObjectType.WALL)){
+            return true;
+        }
+
+        return false;
+    }
+
     public GameMap getGameMap() {
         return gameMap;
     }

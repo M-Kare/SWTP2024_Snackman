@@ -23,8 +23,9 @@ import java.util.*;
 public class Chicken extends EatingMob implements Runnable {
 
     private static long idCounter = 0;
-    private final int WAITING_TIME = 2000;  // in ms
+    private final int WAITING_TIME = 200;  // in ms
     private final int MAX_CALORIES = 3000;
+    private final int CALORIES_PER_SIXTH = (MAX_CALORIES/6);
     private final PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
     private final Logger log = LoggerFactory.getLogger(Chicken.class);
     private long id;
@@ -35,7 +36,6 @@ public class Chicken extends EatingMob implements Runnable {
     private Direction lookingDirection;
     private Thickness thickness = Thickness.THIN;
     private Timer eggLayingTimer;
-    private boolean chickenIsStuck;
     // python
     private PythonInterpreter pythonInterpreter = null;
     private Properties pythonProps = new Properties();
@@ -126,7 +126,7 @@ public class Chicken extends EatingMob implements Runnable {
             //log.debug("Current position is x {} z {}", this.chickenPosX, this.chickenPosZ);
             //super.mapService.printGameMap();
 
-            if(!chickenIsStuck){
+            if(!blockingPath){
                 List<String> newMove = executeMovementSkript(squares);
                 // set new square you move to
                 setNewPosition(newMove);
@@ -162,30 +162,37 @@ public class Chicken extends EatingMob implements Runnable {
                 super.gainKcal(snackOnSquare.getCalories());
                 //set snack to null after consuming it
                 currentSquare.setSnack(null);
-                if (super.getKcal() >= this.MAX_CALORIES) {
+                if (super.getKcal() >= this.MAX_CALORIES) { 
                     this.thickness = Thickness.VERY_HEAVY;
                     log.info("Chicken {} has reached {} kcal and {}", this.id, super.getKcal(), this.thickness);
+                    
+                    if(mapService.squareIsBetweenWalls(this.chickenPosX, this.chickenPosZ)){
+                        new Thread(() -> {
+                            try {
+                                blockingPath = true;
+                                Thread.sleep(10000);
+                                blockingPath = false;
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                        }).start();
+                    }
                     layEgg();
                 }else{
-                    if((super.getKcal()) <= 2*MAX_CALORIES/6){
-                        //propertyChangeSupport.firePropertyChange("chickensThickness", null, this.thickness);
+                    if((super.getKcal()) <= 2*CALORIES_PER_SIXTH){
                         this.thickness = Thickness.THIN;
                         log.info("Chicken {} has reached {} kcal and {}", this.id, super.getKcal(), this.thickness);
-                    }else if((super.getKcal()) <= 3*(MAX_CALORIES/6)){
-                        //propertyChangeSupport.firePropertyChange("chickensThickness", null, this.thickness);
+                    }else if((super.getKcal()) <= 3*CALORIES_PER_SIXTH){
+                        this.thickness = Thickness.THIN;
+                        log.info("Chicken {} has reached {} kcal and {}", this.id, super.getKcal(), this.thickness);
+                    }else if((super.getKcal()) <= 4*CALORIES_PER_SIXTH){
                         this.thickness = Thickness.SLIGHTLY_THICK;
                         log.info("Chicken {} has reached {} kcal and {}", this.id, super.getKcal(), this.thickness);
-                    }else if((super.getKcal()) <= 4*(MAX_CALORIES/6)){
-                        //propertyChangeSupport.firePropertyChange("chickensThickness", null, this.thickness);
+                    }else if((super.getKcal()) <= 5*CALORIES_PER_SIXTH){
                         this.thickness = Thickness.MEDIUM;
                         log.info("Chicken {} has reached {} kcal and {}", this.id, super.getKcal(), this.thickness);
-                    }else if((super.getKcal()) <= 5*(MAX_CALORIES/6)){
-                        //propertyChangeSupport.firePropertyChange("chickensThickness", null, this.thickness);
+                    }else if((super.getKcal()) < this.MAX_CALORIES){
                         this.thickness = Thickness.HEAVY;
-                        log.info("Chicken {} has reached {} kcal and {}", this.id, super.getKcal(), this.thickness);
-                    }else if((super.getKcal()) <= 6*(MAX_CALORIES/6)){
-                        //propertyChangeSupport.firePropertyChange("chickensThickness", null, this.thickness);
-                        this.thickness = Thickness.VERY_HEAVY;
                         log.info("Chicken {} has reached {} kcal and {}", this.id, super.getKcal(), this.thickness);
                     }
                 }
@@ -359,8 +366,6 @@ public class Chicken extends EatingMob implements Runnable {
         if (super.getKcal() > 0) {
             Square currentSquare = this.mapService.getSquareAtIndexXZ(this.chickenPosX, this.chickenPosZ);
 
-            chickenIsStuck = true;
-            Time.sleep(10);
             // new egg with current chicken-calories * 1.5
             int eggCalories = (int) (super.getKcal() * 1.5);
             Snack egg = new Snack(SnackType.EGG);
@@ -371,7 +376,6 @@ public class Chicken extends EatingMob implements Runnable {
             // Chicken becomes thin again and has no calories after it has laid an egg
             this.setThickness(Thickness.THIN);
             super.setKcal(0);
-            chickenIsStuck = false;
             // log.debug("Chicken {} laid an egg -> thin again and {} kcal", this.id, super.getKcal());
             startNewTimer();
         } else {
