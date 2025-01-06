@@ -48,6 +48,11 @@ public class GameMapController {
         return ResponseEntity.ok(new SnackManInitDTO(snackman.getPosX(), snackman.getPosY(), snackman.getPosZ(), snackman.getRadius(), GameConfig.SNACKMAN_SPEED, GameConfig.SNACKMAN_SPRINT_MULTIPLIER));
     }
 
+    /**
+     * Upload custom map and save in folder "./extensions/map"
+     * @param file file .txt
+     * @return
+     */
     @PostMapping("/upload")
     public ResponseEntity<String> uploadMap(@RequestParam("file") MultipartFile file){
         try{
