@@ -38,6 +38,13 @@ public class LeaderboardService {
         log.info("Leaderboard loaded: {}", leaderboard);
     }
 
+    public LeaderboardService(FrontendMessageService frontendMessageService, String filePath) {
+        this.frontendMessageService = frontendMessageService;
+        this.filePath = filePath;
+        List<String> lines = readInLeaderboard();
+        fillLeaderboard(lines);
+    }
+
     private List<String> readInLeaderboard() {
         List<String> lines = new ArrayList<>();
         String line;
