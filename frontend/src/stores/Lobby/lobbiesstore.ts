@@ -188,7 +188,6 @@ export const useLobbiesStore = defineStore('lobbiesstore', () =>{
                 const adminPlayer = lobby.members.find((member) => member.playerId === adminClient.playerId)
                 if (adminPlayer) {
                     lobbydata.currentPlayer.role = adminPlayer.role
-                    console.log('Admin Role:', adminPlayer.role)
                 }
     
                 lobbydata.lobbies.push(lobby)
@@ -242,7 +241,6 @@ export const useLobbiesStore = defineStore('lobbiesstore', () =>{
                 const updatedPlayer = lobby.members.find((member) => member.playerId === playerId)
                 if (updatedPlayer) {
                     lobbydata.currentPlayer.role = updatedPlayer.role
-                    console.log('Updated Role for Current Player:', updatedPlayer.role)
                 }
     
                 return lobby

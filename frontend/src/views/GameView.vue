@@ -44,7 +44,6 @@ const MAXCALORIES = 3000;
 const currentCalories  = ref(0);
 const caloriesMessage = ref('');
 const playerRole = ref(route.query.role || ''); // Player role from the URL query
-console.log('Player Role in GameView:', route.query.role);
 
 const SNACKMAN_TEXTURE: string = 'src/assets/kirby.glb';
 let snackManModel: THREE.Group<THREE.Object3DEventMap>;
