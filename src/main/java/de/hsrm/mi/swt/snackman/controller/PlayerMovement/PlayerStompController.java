@@ -27,13 +27,6 @@ public class PlayerStompController {
         };
         playerMob.setQuaternion(player.qX(), player.qY(), player.qZ(), player.qW());
         playerMob.move(player.forward(), player.backward(), player.left(), player.right(), player.delta());
-
-        // messagingTemplate.convertAndSend("/topic/lobbies/" + lobbyId + "/player",
-        //         new PlayerToFrontendDTO(playerMob.getPosX(),
-        //         playerMob.getPosY(),
-        //         playerMob.getPosZ(), playerMob.getRotationQuaternion().x, playerMob.getRotationQuaternion().y,
-        //         playerMob.getRotationQuaternion().z, playerMob.getRotationQuaternion().w, playerMob.getRadius(),
-        //         playerMob.getSpeed(), player.playerId()));
     }
 
     private SnackMan jumpUpdate(PlayerToBackendDTO player, SnackMan snackman) {
