@@ -68,6 +68,18 @@ public class MapServiceTest {
     }
 
     @Test
+    void testAddEggToSquare_EggAddedToSquare_CaseEggIsNull() {
+        Square square = new Square(MapObjectType.FLOOR, 0, 0);
+        Snack egg = null;
+
+        Assertions.assertThrows(NullPointerException.class, () -> {
+            mapService.addEggToSquare(square, egg);
+        });
+
+        Assertions.assertNull(square.getSnack());
+    }
+
+    @Test
     void testAddEggToSquare_EventTypeCorrect() {
         Square square = new Square(MapObjectType.FLOOR, 0, 0);
         Snack egg = new Snack(SnackType.EGG);
