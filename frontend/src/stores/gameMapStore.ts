@@ -8,7 +8,7 @@ import type {ISquare} from '@/stores/Square/ISquareDTD'
 import * as THREE from 'three'
 import {Scene} from 'three'
 import type {IChicken, IChickenDTD} from '@/stores/Chicken/IChickenDTD'
-import {Direction} from '@/stores/Chicken/IChickenDTD'
+import {ChickenThickness, Direction} from '@/stores/Chicken/IChickenDTD'
 import {GameObjectRenderer} from '@/renderer/GameObjectRenderer'
 
 /**
@@ -127,15 +127,12 @@ export const useGameMapStore = defineStore('gameMap', () => {
 
         chickenStompclient.subscribe(DEST_CHICKEN, async message => {
           const change: IFrontendChickenMessageEvent = JSON.parse(message.body)
-          //console.log('Received a chicken update: {}', change)
-
           const chickenUpdate: IChickenDTD = change.chicken
           const OFFSET = mapData.DEFAULT_SQUARE_SIDE_LENGTH / 2
           const DEFAULT_SIDE_LENGTH = mapData.DEFAULT_SQUARE_SIDE_LENGTH
           const currentChicken = mapData.chickens.find(
             chicken => chicken.id == chickenUpdate.id,
           )
-          //console.log('chicken update {}', chickenUpdate)
 
           if (currentChicken == undefined) {
             console.error('A chicken is undefined in pinia')
@@ -172,18 +169,42 @@ export const useGameMapStore = defineStore('gameMap', () => {
     currentChicken: IChicken,
     chickenUpdate: IChickenDTD,
   ) {
-    console.log('Chicken thickness updated')
     const chickenMesh = scene.getObjectById(currentChicken.meshId)
     currentChicken.thickness = chickenUpdate.thickness
 
-    // todo update chicken thickness with new geometry
+    if (!chickenMesh) {
+      console.warn('Chicken mesh not found in the scene.')
+      return
+    }
+
+    const thicknessValue =
+      ChickenThickness[chickenUpdate.thickness as keyof typeof ChickenThickness]
+
+    switch (thicknessValue) {
+      case ChickenThickness.THIN:
+        chickenMesh!.scale.set(1, 1, 1)
+        break
+      case ChickenThickness.SLIGHTLY_THICK:
+        chickenMesh!.scale.set(1.25, 1.25, 1.25)
+        break
+      case ChickenThickness.MEDIUM:
+        chickenMesh!.scale.set(1.5, 1.5, 1.5)
+        break
+      case ChickenThickness.HEAVY:
+        chickenMesh!.scale.set(1.75, 1.75, 1.75)
+        break
+      case ChickenThickness.VERY_HEAVY:
+        chickenMesh!.scale.set(2, 2, 2)
+        break
+      default:
+        console.log('ETWAS IST SCHIED GELAUFEN...')
+    }
   }
 
   function updateLookingDirection(
     currentChicken: IChicken,
     chickenUpdate: IChickenDTD,
   ) {
-    //console.log('Chicken looking direction updated')
     const chickenMesh = scene.getObjectById(currentChicken.meshId)
 
     currentChicken.lookingDirection = chickenUpdate.lookingDirection
@@ -205,7 +226,6 @@ export const useGameMapStore = defineStore('gameMap', () => {
     DEFAULT_SIDE_LENGTH: number,
     OFFSET: number,
   ) {
-    //console.log('Chicken moved')
     const chickenMesh = scene.getObjectById(currentChicken.meshId)
 
     currentChicken.chickenPosX = chickenUpdate.chickenPosX

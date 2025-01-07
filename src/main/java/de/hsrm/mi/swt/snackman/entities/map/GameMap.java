@@ -42,4 +42,8 @@ public class GameMap {
         
         return gameMap[x][z];
     }
+
+    public void setGameMap(Square square, int x, int y){
+        gameMap[x][y] = square;
+    }
 }

@@ -34,7 +34,7 @@ public abstract class EatingMob extends Mob {
         super(mapService);
     }
 
-    protected void setKcal(int value) {
+    public void setKcal(int value) {
         int oldKcal = kcal;
         kcal = value;
         propertyChangeSupport.firePropertyChange("currentCalories", oldKcal, this.kcal);

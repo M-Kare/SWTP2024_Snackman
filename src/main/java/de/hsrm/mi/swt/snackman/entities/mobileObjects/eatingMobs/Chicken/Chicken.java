@@ -6,6 +6,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import de.hsrm.mi.swt.snackman.configuration.GameConfig;
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Properties;
 import de.hsrm.mi.swt.snackman.entities.map.Square;
 import de.hsrm.mi.swt.snackman.entities.mapObject.snack.Snack;
 import de.hsrm.mi.swt.snackman.entities.mapObject.snack.SnackType;
@@ -16,6 +22,8 @@ import org.python.core.PyObject;
 import org.python.util.PythonInterpreter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.util.*;
 
 /**
@@ -25,14 +33,14 @@ import java.util.*;
 public class Chicken extends EatingMob implements Runnable {
 
     private static long idCounter = 0;
-    private long id;
+    private final int CALORIES_PER_SIXTH = (MAX_CALORIES / 6);
     private final PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
     private final Logger log = LoggerFactory.getLogger(Chicken.class);
-    private boolean blockingPath = false;
-    private Thickness thickness = Thickness.THIN;
+    private long id;
     private int chickenPosX, chickenPosZ;
-    private Direction lookingDirection;
+    private boolean timerRestarted = false;
     private boolean isWalking;
+    private boolean blockingPath = false;
     private boolean isScared = false;
     private final int WAITING_TIME = GameConfig.WAITING_TIME;  // in ms
     private final int MAX_CALORIES = GameConfig.MAX_KALORIEN;
@@ -45,6 +53,7 @@ public class Chicken extends EatingMob implements Runnable {
 
     public Chicken() {
         super(null);
+        initJython();
         this.fileName = "ChickenMovementSkript";
         initJython();
     }
@@ -67,6 +76,35 @@ public class Chicken extends EatingMob implements Runnable {
         log.info("Chicken looking direction is {}", lookingDirection);
         initJython();
         initTimer();
+    }
+
+    /**
+     * Initializes Jython for executing the chicken's movement script.
+     * Sets up the required Python environment and interpreter.
+     */
+    public void initJython() {
+        this.pythonInterpreter = new PythonInterpreter();
+
+        try {
+            String scriptPath = Paths.get("extensions/chicken/ChickenMovementSkript.py").normalize().toAbsolutePath().toString();
+            log.debug("Resolved script path: {}", scriptPath);
+
+            // Get the directory of the script (without the .)
+            String scriptDir = Paths.get(scriptPath).getParent().toString();
+            this.pythonInterpreter.exec("import sys");
+            this.pythonInterpreter.exec(String.format("sys.path.append('%s')", scriptDir.replace("\\", "\\\\")));
+
+            // Log sys.path to ensure it's correct
+            this.pythonInterpreter.exec("import sys; print(sys.path)");
+
+            // Execute the Python script
+            this.pythonInterpreter.execfile(scriptPath);
+
+        } catch (Exception ex) {
+            log.error("Error initializing ChickenMovementSkript.py: ", ex);
+            ex.printStackTrace();
+        }
+        this.pythonInterpreter.exec("from ChickenMovementSkript import choose_next_square");
     }
 
     public List<String> act(List<String> squares){
@@ -152,6 +190,8 @@ public class Chicken extends EatingMob implements Runnable {
             Thread.sleep(WAITING_TIME);
         } catch (InterruptedException e) {
             log.error(e.getMessage());
+            log.error(e.getMessage());
+            Thread.currentThread().interrupt();
         }
 
         // set new position
@@ -176,15 +216,17 @@ public class Chicken extends EatingMob implements Runnable {
             List<String> squares = super.mapService.getSquaresVisibleForChicken(currentPosition, lookingDirection);
             log.debug("Squares chicken is seeing: {}", squares);
 
-            log.debug("Current position is x {} z {}", this.chickenPosX, this.chickenPosZ);
-            //super.mapService.printGameMap();
-            //System.out.println("---------------------------------");
+            if (!blockingPath) {
+                log.debug("Current position is x {} z {}", this.chickenPosX, this.chickenPosZ);
+                //super.mapService.printGameMap();
+                //System.out.println("---------------------------------");
 
-            List<String> newMove = act(squares);
+                List<String> newMove = act(squares);
 
-            // set new square you move to
-            setNewPosition(newMove);
-            log.debug("New position is x {} z {}", this.chickenPosX, this.chickenPosZ);
+                // set new square you move to
+                setNewPosition(newMove);
+                log.debug("New position is x {} z {}", this.chickenPosX, this.chickenPosZ);
+            }
 
             // consume snack if present
             currentPosition = super.mapService.getSquareAtIndexXZ(this.chickenPosX, this.chickenPosZ);
@@ -194,7 +236,6 @@ public class Chicken extends EatingMob implements Runnable {
             }
         }
     }
-
     /**
      * Collects the snack on the square if there is one.
      * If there is one that remove it from the square.
@@ -209,8 +250,32 @@ public class Chicken extends EatingMob implements Runnable {
                 //set snack to null after consuming it
                 currentSquare.setSnack(null);
                 if (super.getKcal() >= this.MAX_CALORIES) {
-                    //log.info("Chicken {} has reached {} kcal", this.id, super.getKcal());
+                    this.thickness = Thickness.VERY_HEAVY;
+
+                    if (mapService.squareIsBetweenWalls(this.chickenPosX, this.chickenPosZ)) {
+                        new Thread(() -> {
+                            try {
+                                blockingPath = true;
+                                Thread.sleep(10000);
+                                blockingPath = false;
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                        }).start();
+                    }
                     layEgg();
+                } else {
+                    if ((super.getKcal()) <= 2 * CALORIES_PER_SIXTH) {
+                        this.thickness = Thickness.THIN;
+                    } else if ((super.getKcal()) <= 3 * CALORIES_PER_SIXTH) {
+                        this.thickness = Thickness.THIN;
+                    } else if ((super.getKcal()) <= 4 * CALORIES_PER_SIXTH) {
+                        this.thickness = Thickness.SLIGHTLY_THICK;
+                    } else if ((super.getKcal()) <= 5 * CALORIES_PER_SIXTH) {
+                        this.thickness = Thickness.MEDIUM;
+                    } else if ((super.getKcal()) < this.MAX_CALORIES) {
+                        this.thickness = Thickness.HEAVY;
+                    }
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -231,6 +296,33 @@ public class Chicken extends EatingMob implements Runnable {
         this.pythonInterpreter = new PythonInterpreter();
         this.interpreterCommand = String.format("from %s import choose_next_square", fileName);
         pythonInterpreter.exec(interpreterCommand);
+    }
+
+    /**
+     * Executes the chicken's movement script written in Python and determines the
+     * next move.
+     *
+     * @param squares a list of squares visible from the chicken's current position.
+     * @return a list of moves resulting from the Python script's execution.
+     */
+    public List<String> executeMovementSkript(List<String> squares) {
+        try {
+            //log.debug("Running python chicken script with: {}", squares.toString());
+            PyObject func = this.pythonInterpreter.get("choose_next_square");
+            PyObject result = func.__call__(new PyList(squares));
+
+            if (result instanceof PyList) {
+                PyList pyList = (PyList) result;
+                log.debug("Python chicken script return: {}", pyList);
+                return convertPythonList(pyList);
+            }
+
+            throw new Exception("Python chicken script did not load.");
+        } catch (Exception ex) {
+            //log.error("Error while executing chicken python script: ", ex);
+            ex.printStackTrace();
+        }
+        return squares;
     }
 
     /**
@@ -284,6 +376,7 @@ public class Chicken extends EatingMob implements Runnable {
             Thread.sleep(WAITING_TIME);
             move();
         } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
             throw new RuntimeException(e);
         }
     }
@@ -312,7 +405,6 @@ public class Chicken extends EatingMob implements Runnable {
             eggLayingTimer.cancel();
         }
         eggLayingTimer = new Timer();
-        // log.debug("New timer for chicken {}", id);
 
         TimerTask task = new TimerTask() {
             public void run() {
@@ -325,12 +417,10 @@ public class Chicken extends EatingMob implements Runnable {
         long delayBecauseIsScared = 10000;
 
         if (this.isScared) {
-            // log.debug("Scared Chicken {} Timer + {} seconds", this.id, delayBecauseIsScared / 1000);
             eggLayingTimer.scheduleAtFixedRate(task, (randomIntervalForLayingANewEgg) + delayBecauseIsScared, randomIntervalForLayingANewEgg);
             this.isScared = false;
         } else {
             this.eggLayingTimer.scheduleAtFixedRate(task, randomIntervalForLayingANewEgg, randomIntervalForLayingANewEgg);
-            // log.debug("Chicken {} – new randomInterval: {}", id, randomIntervalForLayingANewEgg / 1000);
         }
     }
 
@@ -341,34 +431,39 @@ public class Chicken extends EatingMob implements Runnable {
      */
     protected void layEgg() {
         if (super.getKcal() > 0) {
+            timerRestarted = false;
             Square currentSquare = this.mapService.getSquareAtIndexXZ(this.chickenPosX, this.chickenPosZ);
 
             // new egg with current chicken-calories * 1.5
             int eggCalories = (int) (super.getKcal() * 1.5);
             Snack egg = new Snack(SnackType.EGG);
             egg.setCalories(eggCalories);
-
             // add egg to current square
             this.mapService.addEggToSquare(currentSquare, egg);
-            // log.debug("add egg to with {} kcal current square in Chicken {} -> {}", eggCalories, this.id, currentSquare.getId());
-
             // Chicken becomes thin again and has no calories after it has laid an egg
             this.setThickness(Thickness.THIN);
             super.setKcal(0);
-            // log.debug("Chicken {} laid an egg -> thin again and {} kcal", this.id, super.getKcal());
             startNewTimer();
         } else {
-            // log.debug("Chicken {} has no kcal left to lay an egg", this.id);
+            timerRestarted = true;
             startNewTimer();
         }
+    }
+
+    public boolean isScared() {
+        return isScared;
     }
 
     /**
      * Sets the chicken to be scared and restarts the timer with a delay
      */
-    public void getScared() {
-        this.isScared = true;
+    public void setScared(boolean scared) {
+        this.isScared = scared;
         startNewTimer();
+    }
+
+    public boolean wasTimerRestarted() {
+        return timerRestarted;
     }
 
     @Override

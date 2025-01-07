@@ -21,9 +21,9 @@ public class ChickenIntegrationTest {
      * and chooses the correct empty square (" ") to move to.
      */
     @Test
-    public void testExecuteMovementSkript() {
+    void testExecuteMovementSkript() {
         Chicken chicken = new Chicken();
-        
+
         List<String> visibleEnvironment = new ArrayList<>();
         visibleEnvironment.add("W");
         visibleEnvironment.add("S");
@@ -48,7 +48,7 @@ public class ChickenIntegrationTest {
      * using a Jython interpreter and chooses the correct empty square (" ").
      */
     @Test
-    public void testChickenMovement() {
+    void testChickenMovement() {
         try (PythonInterpreter pyInterp = new PythonInterpreter()) {
             pyInterp.exec("import sys");
             pyInterp.exec("sys.path.append('./scripts')");
