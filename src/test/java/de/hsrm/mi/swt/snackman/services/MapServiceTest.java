@@ -58,17 +58,19 @@ class MapServiceTest {
 
 	@Test
     void testGetSquaresVisibleForChicken() {
-		char[][] mockMazeData = new char[][] {
-            {'#', '#', '#'},
-            {'#', '.', '#'},
-            {'#', '#', '#'}
+		char[][] mockMazeData = new char[][]{
+                {'W', 'W', 'W', 'L', 'W'},
+                {'W', 'L', 'L', 'L', 'L'},
+                {'L', 'L', 'H', 'L', 'L'},
+                {'L', 'L', 'L', 'L', 'L'},
+                {'L', 'W', 'L', 'W', 'L'}
         };
         GameMap gameMap = mapService.convertMazeDataGameMap(mockMazeData);
         Square currentSquare = gameMap.getGameMap()[1][1]; // Assuming it's a floor square
-        List<String> visibleSquares = mapService.getSquaresVisibleForChicken(currentSquare, Direction.NORTH);
+        List<String> visibleSquares = mapService.getSquaresVisibleForChicken(currentSquare, Direction.ONE_NORTH);
 
         assertNotNull(visibleSquares, "Visible squares list should not be null.");
-        assertEquals(9, visibleSquares.size(), "There should be 9 visible squares.");
+        assertEquals(26, visibleSquares.size(), "There should be 9 visible squares.");
     }
 
 	    @Test

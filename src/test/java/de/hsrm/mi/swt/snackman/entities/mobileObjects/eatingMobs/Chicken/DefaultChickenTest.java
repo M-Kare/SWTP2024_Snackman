@@ -1,4 +1,4 @@
-package de.hsrm.mi.swt.snackman.entities.mob.Chicken.Characters;
+package de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -6,8 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
-
-import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken.Chicken;
 
 public class DefaultChickenTest {
 
