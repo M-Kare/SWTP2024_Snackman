@@ -18,7 +18,11 @@ class ChickenTest {
     void testLayEgg_ChickenThicknessAndKcalReset() {
         Square square = new Square(MapObjectType.FLOOR, 0, 0);
         Chicken chicken = new Chicken(square, mapService);
-        chicken.setKcal(3000);
+        try {
+            chicken.gainKcal(3000);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
         chicken.setThickness(Thickness.HEAVY);
 
         chicken.layEgg();
