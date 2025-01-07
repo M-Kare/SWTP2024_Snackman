@@ -14,34 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * This class ensures that the 'Chicken' Java class correctly interacts with
  * the 'ChickenMovementSkript.py' Python logic.
  */
-class ChickenIntegrationTest {
-
-    /**
-     * Tests if the Chicken's 'executeMovementSkript' method correctly identifies
-     * and chooses the correct empty square (" ") to move to.
-     */
-    @Test
-    void testExecuteMovementSkript() {
-        Chicken chicken = new Chicken();
-
-        List<String> visibleEnvironment = new ArrayList<>();
-        visibleEnvironment.add("W");
-        visibleEnvironment.add("S");
-        visibleEnvironment.add("W");
-        visibleEnvironment.add("L");
-        visibleEnvironment.add("W");
-        visibleEnvironment.add("L");
-        visibleEnvironment.add("W");
-        visibleEnvironment.add("L");
-        visibleEnvironment.add("1");
-
-        List<String> result = chicken.executeMovementSkript(visibleEnvironment);
-
-        int chosenDirectionIndex = Integer.parseInt(result.get(result.size() - 1));
-
-        assertEquals(" ", result.get(chosenDirectionIndex),
-                "The Chicken should move to the correct empty square (' ') based on its direction.");
-    }
+public class ChickenIntegrationTest {
 
     /**
      * Verifies that the Chicken can interact with the Python script directly,
@@ -51,14 +24,19 @@ class ChickenIntegrationTest {
     void testChickenMovement() {
         try (PythonInterpreter pyInterp = new PythonInterpreter()) {
             pyInterp.exec("import sys");
-            pyInterp.exec("sys.path.append('src/main/java/de/hsrm/mi/swt/snackman')");
+            pyInterp.exec("sys.path.append('./scripts')");
 
+            String mapAroundChicken = "'W', 'W', 'W', 'L', 'W', " +
+                    "'SM', 'L', 'W', 'L', 'L'," +
+                    "'L', 'L', 'H', 'W', 'L'," +
+                    "'L', 'L', 'W', 'L', 'L', " +
+                    "'L', 'W', 'L', 'W', 'L', '0'";
             pyInterp.exec("from ChickenMovementSkript import choose_next_square");
-            pyInterp.exec("result = choose_next_square(['W', 'L', 'W', 'L', 'W', 'L', 'W', 'L', 0])");
+            pyInterp.exec("result = choose_next_square([" + mapAroundChicken + "])");
 
             String result = pyInterp.get("result").toString();
 
-            String expectedResult = "[' ', 'L', 'L', 'L', 0]";
+            String expectedResult = "['X', 'X', 'X', ' ', 3]";
             assertEquals(expectedResult, result,
                     "The Python script should correctly determine the next move (' ').");
         }

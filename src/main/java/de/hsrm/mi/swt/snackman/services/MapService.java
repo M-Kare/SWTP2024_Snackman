@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import java.beans.PropertyChangeEvent;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 /**
  * Service class for managing the game map
@@ -30,11 +31,13 @@ public class MapService {
 
     Logger log = LoggerFactory.getLogger(MapService.class);
     private FrontendMessageService frontendMessageService;
-    private ReadMazeService readMazeService;
     private String filePath;
-    private char[][] mazeData;
     private GameMap gameMap;
+    private char[][] mazeData;
+    private PythonInterpreter pythonInterpreter = null;
+    private Properties pythonProps = new Properties();
     private SnackMan snackman;
+    private ReadMazeService readMazeService;
 
     /**
      * Constructs a new MapService
@@ -81,7 +84,6 @@ public class MapService {
      * @param mazeData the char array representing the maze
      */
     public GameMap convertMazeDataGameMap(char[][] mazeData) {
-
         Square[][] squaresBuildingMap = new Square[mazeData.length][mazeData[0].length];
 
         for (int x = 0; x < mazeData.length; x++) {
@@ -114,7 +116,6 @@ public class MapService {
         }
     }
 
-
     /**
      * Creates a Square by given indexes
      *
@@ -123,7 +124,7 @@ public class MapService {
      * @param z      index
      * @return a created Square
      */
-    public Square createSquare(char symbol, int x, int z) {
+    private Square createSquare(char symbol, int x, int z) {
         Square square;
 
         switch (symbol) {
@@ -184,15 +185,34 @@ public class MapService {
      */
     public synchronized List<String> getSquaresVisibleForChicken(Square currentPosition, Direction lookingDirection) {
         List<String> squares = new ArrayList<>();
-        squares.add(Direction.NORTH_WEST.getNorthWestSquare(this, currentPosition).getPrimaryType());
-        squares.add(Direction.NORTH.getNorthSquare(this, currentPosition).getPrimaryType());
-        squares.add(Direction.NORTH_EAST.getNorthEastSquare(this, currentPosition).getPrimaryType());
-        squares.add(Direction.EAST.getEastSquare(this, currentPosition).getPrimaryType());
-        squares.add(Direction.SOUTH_EAST.getSouthEastSquare(this, currentPosition).getPrimaryType());
-        squares.add(Direction.SOUTH.getSouthSquare(this, currentPosition).getPrimaryType());
-        squares.add(Direction.SOUTH_WEST.getSouthWestSquare(this, currentPosition).getPrimaryType());
-        squares.add(Direction.WEST.getWestSquare(this, currentPosition).getPrimaryType());
+
+        squares.add(Direction.TWO_NORTH_TWO_WEST.get_two_North_two_West_Square(this, currentPosition).getPrimaryType());
+        squares.add(Direction.TWO_NORTH_ONE_WEST.get_two_North_one_West_Square(this, currentPosition).getPrimaryType());
+        squares.add(Direction.TWO_NORTH.get_two_North_Square(this, currentPosition).getPrimaryType());
+        squares.add(Direction.TWO_NORTH_ONE_EAST.get_two_North_one_East_Square(this, currentPosition).getPrimaryType());
+        squares.add(Direction.TWO_NORTH_TWO_EAST.get_two_North_two_East_Square(this, currentPosition).getPrimaryType());
+        squares.add(Direction.ONE_NORTH_TWO_WEST.get_one_North_two_West_Square(this, currentPosition).getPrimaryType());
+        squares.add(Direction.ONE_NORTH_ONE_WEST.get_one_North_one_West_Square(this, currentPosition).getPrimaryType());
+        squares.add(Direction.ONE_NORTH.get_one_North_Square(this, currentPosition).getPrimaryType());
+        squares.add(Direction.ONE_NORTH_ONE_EAST.get_one_North_one_East_Square(this, currentPosition).getPrimaryType());
+        squares.add(Direction.ONE_NORTH_TWO_EAST.get_one_North_two_East_Square(this, currentPosition).getPrimaryType());
+        squares.add(Direction.TWO_WEST.get_two_West_Square(this, currentPosition).getPrimaryType());
+        squares.add(Direction.ONE_WEST.get_one_West_Square(this, currentPosition).getPrimaryType());
+        squares.add(Direction.CHICKEN.get_Chicken_Square(this, currentPosition).getPrimaryType());
+        squares.add(Direction.ONE_EAST.get_one_East_Square(this, currentPosition).getPrimaryType());
+        squares.add(Direction.TWO_EAST.get_two_East_Square(this, currentPosition).getPrimaryType());
+        squares.add(Direction.ONE_SOUTH_TWO_WEST.get_one_South_two_West_Square(this, currentPosition).getPrimaryType());
+        squares.add(Direction.ONE_SOUTH_ONE_WEST.get_one_South_one_West_Square(this, currentPosition).getPrimaryType());
+        squares.add(Direction.ONE_SOUTH.get_one_South_Square(this, currentPosition).getPrimaryType());
+        squares.add(Direction.ONE_SOUTH_ONE_EAST.get_one_South_one_East_Square(this, currentPosition).getPrimaryType());
+        squares.add(Direction.ONE_SOUTH_TWO_EAST.get_one_South_two_East_Square(this, currentPosition).getPrimaryType());
+        squares.add(Direction.TWO_SOUTH_TWO_WEST.get_two_South_two_West_Square(this, currentPosition).getPrimaryType());
+        squares.add(Direction.TWO_SOUTH_ONE_WEST.get_two_South_one_West_Square(this, currentPosition).getPrimaryType());
+        squares.add(Direction.TWO_SOUTH.get_two_South_Square(this, currentPosition).getPrimaryType());
+        squares.add(Direction.TWO_SOUTH_ONE_EAST.get_two_South_one_East_Square(this, currentPosition).getPrimaryType());
+        squares.add(Direction.TWO_SOUTH_TWO_EAST.get_two_South_two_East_Square(this, currentPosition).getPrimaryType());
         squares.add(lookingDirection.toString());
+
         return squares;
     }
 
