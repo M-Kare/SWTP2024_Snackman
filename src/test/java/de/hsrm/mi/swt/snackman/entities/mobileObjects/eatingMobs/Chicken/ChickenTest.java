@@ -35,6 +35,18 @@ class ChickenTest {
     }
 
     @Test
+    void testLayEgg_ChickenThicknessAndKcalReset_caseIfChickenHasNoKcal() {
+        Square square = new Square(MapObjectType.FLOOR, 0, 0);
+        Chicken chicken = new Chicken(square, mapService);
+
+        chicken.layEgg();
+
+        Assertions.assertEquals(Thickness.THIN, chicken.getThickness());
+        Assertions.assertEquals(0, chicken.getKcal());
+        Assertions.assertTrue(chicken.wasTimerRestarted());
+    }
+
+    @Test
     void testStartNewTimer_ReplacesExistingTimer() throws NoSuchFieldException, IllegalAccessException {
         Square square = new Square(MapObjectType.FLOOR, 0, 0);
         Chicken chicken = new Chicken(square, mapService);

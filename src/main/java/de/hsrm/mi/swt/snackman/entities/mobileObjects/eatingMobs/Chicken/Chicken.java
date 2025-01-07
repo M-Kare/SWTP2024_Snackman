@@ -29,6 +29,7 @@ public class Chicken extends EatingMob implements Runnable {
     private final Logger log = LoggerFactory.getLogger(Chicken.class);
     private long id;
     private int chickenPosX, chickenPosZ;
+    private boolean timerRestarted = false;
     private boolean isWalking;
     private boolean blockingPath = false;
     private boolean isScared = false;
@@ -338,6 +339,7 @@ public class Chicken extends EatingMob implements Runnable {
      */
     protected void layEgg() {
         if (super.getKcal() > 0) {
+            timerRestarted = false;
             Square currentSquare = this.mapService.getSquareAtIndexXZ(this.chickenPosX, this.chickenPosZ);
 
             // new egg with current chicken-calories * 1.5
@@ -351,6 +353,7 @@ public class Chicken extends EatingMob implements Runnable {
             super.setKcal(0);
             startNewTimer();
         } else {
+            timerRestarted = true;
             startNewTimer();
         }
     }
@@ -365,6 +368,10 @@ public class Chicken extends EatingMob implements Runnable {
     public void setScared(boolean scared) {
         this.isScared = scared;
         startNewTimer();
+    }
+
+    public boolean wasTimerRestarted() {
+        return timerRestarted;
     }
 
     @Override
