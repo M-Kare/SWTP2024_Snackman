@@ -69,32 +69,30 @@ public class Chicken extends EatingMob implements Runnable {
         initTimer();
     }
 
-    public int act(List<String> squares){
-        int result = executeMovementSkript(squares);
+    public List<String> act(List<String> squares){
+        List<String> result = executeMovementSkript(squares);
         return result;
     }
 
-    public int executeMovementSkript(List<String> squares) {
+    public List<String> executeMovementSkript(List<String> squares) {
         try {
             log.debug("Running python chicken script with: {}", squares.toString());
             pythonInterpreter.exec(interpreterCommand);
             PyObject func = pythonInterpreter.get("choose_next_square");
             PyObject result = func.__call__(new PyList(squares));
 
-            return result.asInt();
+            if (result instanceof PyList) {
+                PyList pyList = (PyList) result;
+                log.debug("Python chicken script return: {}", pyList);
+                return convertPythonList(pyList);
+            }
 
-            // if (result instanceof PyList) {
-            //     PyList pyList = (PyList) result;
-            //     log.debug("Python chicken script return: {}", pyList);
-            //     return convertPythonList(pyList);
-            // }
-
-            //throw new Exception("Python chicken script did not load.");
+            throw new Exception("Python chicken script did not load.");
         } catch (Exception ex) {
             log.error("Error while executing chicken python script: ", ex);
             ex.printStackTrace();
         }
-        return 4;//squares
+        return squares;
     }
 
     /**
@@ -139,9 +137,9 @@ public class Chicken extends EatingMob implements Runnable {
      *
      * @param newMove a list representing the next move for the chicken.
      */
-    private void setNewPosition(int newMove) {
+    private void setNewPosition(List<String> newMove) {
         //get positions
-        Direction walkingDirection = Direction.getDirection(newMove);
+        Direction walkingDirection = Direction.getDirection(newMove.getLast());
         log.debug("Walking direction is: {}", walkingDirection);
 
         this.lookingDirection = walkingDirection;
@@ -182,7 +180,7 @@ public class Chicken extends EatingMob implements Runnable {
             //super.mapService.printGameMap();
             //System.out.println("---------------------------------");
 
-            int newMove = act(squares);
+            List<String> newMove = act(squares);
 
             // set new square you move to
             setNewPosition(newMove);
