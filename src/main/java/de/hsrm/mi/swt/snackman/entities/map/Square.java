@@ -4,6 +4,9 @@ import de.hsrm.mi.swt.snackman.entities.mapObject.MapObjectType;
 import de.hsrm.mi.swt.snackman.entities.mapObject.snack.Snack;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.Ghost;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.Mob;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
@@ -15,6 +18,7 @@ import java.util.List;
 public class Square {
     //It's static because the idCounter is the same for all Squares.
     private static long idCounter = 0;
+    private final Logger log = LoggerFactory.getLogger(Square.class);
     private final PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
     private long id;
 
@@ -73,29 +77,33 @@ public class Square {
     }
 
     public void setSnack(Snack snack) {
-        //Only add Snack when it's actually a floor
+        // Only add Snack when it's actually a floor
         if (type == MapObjectType.FLOOR) {
-
+            if (this.snack != null && snack != null) {
+                log.debug("Square id {} with snack set to {}", id, snack.getSnackType().name());
+            } else if (this.snack != null && snack == null) {
+                log.debug("Removing snack from square id {}", id);
+            }
             this.snack = snack;
             propertyChangeSupport.firePropertyChange("square", null, this);
         }
     }
+
 
     public long getId() {
         return id;
     }
 
     /**
-     *
      * @return the dominant type of MapObject
      */
     public String getPrimaryType() {
         if (type == MapObjectType.WALL) {
-            return  "W";
+            return "W";
         } else if (type == MapObjectType.FLOOR) {
-            if(this.mobs.stream().anyMatch(mob -> mob instanceof Ghost)) return "G";
-            //if(this.mobs.stream().anyMatch(mob -> mob instanceof Chicken)) return "C";
-            else if(this.snack != null) return "S";
+            if (this.mobs.stream().anyMatch(mob -> mob instanceof Ghost)) return "G";
+                //if(this.mobs.stream().anyMatch(mob -> mob instanceof Chicken)) return "C";
+            else if (this.snack != null) return "S";
         }
         return "L";
     }

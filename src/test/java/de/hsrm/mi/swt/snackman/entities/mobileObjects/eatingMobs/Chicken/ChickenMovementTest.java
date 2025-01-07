@@ -1,10 +1,10 @@
-package de.hsrm.mi.swt.snackman.entities.mob.Chicken;
+package de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken;
 
-import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken.Chicken;
 import org.junit.jupiter.api.Test;
+
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Unit tests for the 'ChickenMovementSkript.py' logic accessed by Jython.
