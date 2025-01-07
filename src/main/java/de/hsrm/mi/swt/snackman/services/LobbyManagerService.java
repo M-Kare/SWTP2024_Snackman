@@ -82,8 +82,14 @@ public class LobbyManagerService {
         }
 
         PlayerClient newJoiningClient = findClientByUUID(playerId);
-        newJoiningClient.setRole(ROLE.GHOST);
+    
+        // Set role: Admin remains SNACKMAN, others become GHOST
+        if (!lobby.getAdminClientId().equals(playerId)) {
+            newJoiningClient.setRole(ROLE.GHOST);
+        }
+
         lobby.getMembers().add(newJoiningClient);
+    
         return lobby;
     }
 

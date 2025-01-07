@@ -28,13 +28,14 @@ import { useGameMapStore } from '@/stores/gameMapStore';
 import type { IGameMap } from '@/stores/IGameMapDTD';
 import type {IFrontendCaloriesMessageEvent} from "@/services/IFrontendMessageEvent";
 import { GLTFLoader } from 'three/examples/jsm/Addons.js';
-import { useRouter } from 'vue-router';
+import { useRouter, useRoute } from 'vue-router';
 
 const WSURL = `ws://${window.location.host}/stompbroker`
 const DEST = '/topic/player'
 const targetHz = 30
 
 const router = useRouter();
+const route = useRoute();
 
 const UPDATE = '/topic/calories'
 
@@ -42,7 +43,8 @@ const UPDATE = '/topic/calories'
 const MAXCALORIES = 3000;
 const currentCalories  = ref(0);
 const caloriesMessage = ref('');
-const playerRole = ref('SnackMan'); // Spielerrolle: 'SnackMan' oder 'Geist'
+const playerRole = ref(route.query.role || ''); // Player role from the URL query
+console.log('Player Role in GameView:', route.query.role);
 
 const SNACKMAN_TEXTURE: string = 'src/assets/kirby.glb';
 let snackManModel: THREE.Group<THREE.Object3DEventMap>;
@@ -101,7 +103,7 @@ stompclient.subscribe(UPDATE, message => {
       name: 'GameEnd',
       query: {
         role: playerRole.value,
-        result: 'Gewonnen'
+        result: playerRole.value === 'SNACKMAN' ? 'Gewonnen' : 'Verloren'
       }
     });
   } else if (event.calories < 0) {
@@ -110,7 +112,7 @@ stompclient.subscribe(UPDATE, message => {
       name: 'GameEnd',
       query: {
         role: playerRole.value,
-        result: 'Verloren'
+        result: playerRole.value === 'GHOST' ? 'Gewonnen' : 'Verloren'
       }
     });
   }

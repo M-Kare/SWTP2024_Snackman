@@ -15,22 +15,22 @@ const route = useRoute();
 const router = useRouter();
 
 // Read player role and game result from query parameters (undefined if not provided)
-const playerRole = route.query.role;
-const gameResult = route.query.result;
+const gameResult = route.query.result || '-';
+const playerRole = route.query.role || '-';
 
 // Compute the game reason dynamically or display '-' if no data is available
 const gameReason = computed(() => {
-  if (!playerRole || !gameResult) {
-    return '–';
-  }
 
   if (gameResult === 'Gewonnen') {
-    return playerRole === 'SnackMan' ? 'Snackman hat 3000kcal erreicht!' : 'Die Geister haben Snackman auf negative Kalorien gebracht!';
-  } else if (gameResult === 'Verloren') {
-    return playerRole === 'SnackMan' ? 'Die Geister haben Snackman auf negative Kalorien gebracht!' : 'Snackman hat 3000kcal erreicht!';
+    return playerRole === 'SNACKMAN'
+      ? 'SnackMan hat 3000kcal erreicht!'
+      : 'Die Geister haben SnackMan auf negative Kalorien gebracht!';
+  } else {
+    return playerRole === 'SNACKMAN'
+      ? 'Die Geister haben SnackMan auf negative Kalorien gebracht!'
+      : 'SnackMan hat 3000kcal erreicht!';
   }
 
-  return '–';
 });
 
 const backToMainMenu = () => {
