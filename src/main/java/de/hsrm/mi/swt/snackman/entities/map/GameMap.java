@@ -45,6 +45,6 @@ public class GameMap {
     }
 
     public void setGameMap(Square square, int x, int y){
-        gameMap[x][y] = square;
+        gameMapSquares[x][y] = square;
     }
 }

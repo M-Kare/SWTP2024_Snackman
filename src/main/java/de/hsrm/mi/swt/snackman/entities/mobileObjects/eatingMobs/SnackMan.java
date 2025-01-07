@@ -1,5 +1,6 @@
 package de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs;
 
+import de.hsrm.mi.swt.snackman.entities.mechanics.SprintHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,7 +30,7 @@ public class SnackMan extends EatingMob {
         super(gameMap, speed, radius);
     }
 
-    public SnackMan(GameMap gameMap, int speed, double radius, double posX, double posY, double posZ) {
+    public SnackMan(GameMap gameMap, double speed, double radius, double posX, double posY, double posZ) {
         super(gameMap, speed, radius, posX, posY, posZ);
     }
 

@@ -7,7 +7,10 @@ import java.util.List;
 import java.util.Properties;
 import de.hsrm.mi.swt.snackman.configuration.GameConfig;
 import java.nio.file.Paths;
+
+import de.hsrm.mi.swt.snackman.entities.map.GameMap;
 import de.hsrm.mi.swt.snackman.entities.map.Square;
+import de.hsrm.mi.swt.snackman.entities.mapObject.MapObjectType;
 import de.hsrm.mi.swt.snackman.entities.mapObject.snack.Snack;
 import de.hsrm.mi.swt.snackman.entities.mapObject.snack.SnackType;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.EatingMob;
@@ -157,13 +160,11 @@ public class Chicken extends EatingMob implements Runnable {
         while (isWalking) {
             // get 9 squares
             Square currentPosition = super.getGameMap().getSquareAtIndexXZ(this.chickenPosX, this.chickenPosZ);
-            List<String> squares = getSquaresVisibleForChicken(super.getGameMap(), currentPosition, lookingDirection);
+            List<String> squares = getSquaresVisibleForChicken(currentPosition, lookingDirection);
             log.debug("Squares chicken is seeing: {}", squares);
 
             if (!blockingPath) {
                 log.debug("Current position is x {} z {}", this.chickenPosX, this.chickenPosZ);
-                //super.mapService.printGameMap();
-                //System.out.println("---------------------------------");
 
                 List<String> newMove = act(squares);
 
@@ -196,7 +197,7 @@ public class Chicken extends EatingMob implements Runnable {
                 if (super.getKcal() >= this.MAX_CALORIES) {
                     this.thickness = Thickness.VERY_HEAVY;
 
-                    if (mapService.squareIsBetweenWalls(this.chickenPosX, this.chickenPosZ)) {
+                    if (squareIsBetweenWalls(this.chickenPosX, this.chickenPosZ)) {
                         new Thread(() -> {
                             try {
                                 blockingPath = true;
@@ -228,6 +229,23 @@ public class Chicken extends EatingMob implements Runnable {
 
             currentSquare.setSnack(new Snack(SnackType.EMPTY));
         }
+    }
+
+    public boolean squareIsBetweenWalls(int x, int z){
+        Square squareAbove = getGameMap().getSquareAtIndexXZ(x - 1, z);
+        Square squareBelow = getGameMap().getSquareAtIndexXZ(x + 1, z);
+        Square squareRight = getGameMap().getSquareAtIndexXZ(x, z + 1);
+        Square squareLeft = getGameMap().getSquareAtIndexXZ(x, z - 1);
+
+        if((squareAbove.getType() == MapObjectType.WALL) && (squareBelow.getType() == MapObjectType.WALL)){
+            return true;
+        }
+
+        if((squareRight.getType() == MapObjectType.WALL) && (squareLeft.getType() == MapObjectType.WALL)){
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -393,14 +411,14 @@ public class Chicken extends EatingMob implements Runnable {
     protected void layEgg() {
         if (super.getKcal() > 0) {
             timerRestarted = false;
-            Square currentSquare = this.mapService.getSquareAtIndexXZ(this.chickenPosX, this.chickenPosZ);
+            Square currentSquare = getGameMap().getSquareAtIndexXZ(this.chickenPosX, this.chickenPosZ);
 
             // new egg with current chicken-calories * 1.5
             int eggCalories = (int) (super.getKcal() * 1.5);
             Snack egg = new Snack(SnackType.EGG);
             egg.setCalories(eggCalories);
             // add egg to current square
-            this.mapService.addEggToSquare(currentSquare, egg);
+            addEggToSquare(currentSquare, egg);
             // Chicken becomes thin again and has no calories after it has laid an egg
             this.setThickness(Thickness.THIN);
             super.setKcal(0);
@@ -409,6 +427,19 @@ public class Chicken extends EatingMob implements Runnable {
             timerRestarted = true;
             startNewTimer();
         }
+    }
+
+    /**
+     * Adds a laid egg to a specified square on the map
+     *
+     * @param square  The square where the egg is to be added
+     * @param laidEgg The snack representing the egg that has been laid
+     */
+    public void addEggToSquare(Square square, Snack laidEgg) {
+        square.setSnack(laidEgg);
+        log.debug("{} kcal egg add to square {} and square {}", laidEgg.getCalories(), square.getId(), square.getId());
+        //TODO fix with message loop
+        //frontendMessageService.sendEvent(new FrontendMessageEvent(EventType.SNACK, ChangeType.CREATE, square));
     }
 
     public boolean isScared() {
@@ -438,7 +469,6 @@ public class Chicken extends EatingMob implements Runnable {
                 '}';
     }
 
-
     /**
      * @param currentPosition  the square the chicken is standing on top of
      * @param lookingDirection
@@ -448,19 +478,38 @@ public class Chicken extends EatingMob implements Runnable {
      * southeast_square, south_square, southwest_square, west_square,
      * direction
      */
-    public synchronized List<String> getSquaresVisibleForChicken(GameMap gameMap, Square currentPosition,
-                                                                 Direction lookingDirection) {
+    public synchronized List<String> getSquaresVisibleForChicken(Square currentPosition, Direction lookingDirection) {
         List<String> squares = new ArrayList<>();
-        squares.add(Direction.NORTH_WEST.getNorthWestSquare(gameMap, currentPosition).getPrimaryType());
-        squares.add(Direction.NORTH.getNorthSquare(gameMap, currentPosition).getPrimaryType());
-        squares.add(Direction.NORTH_EAST.getNorthEastSquare(gameMap, currentPosition).getPrimaryType());
-        squares.add(Direction.EAST.getEastSquare(gameMap, currentPosition).getPrimaryType());
-        squares.add(Direction.SOUTH_EAST.getSouthEastSquare(gameMap, currentPosition).getPrimaryType());
-        squares.add(Direction.SOUTH.getSouthSquare(gameMap, currentPosition).getPrimaryType());
-        squares.add(Direction.SOUTH_WEST.getSouthWestSquare(gameMap, currentPosition).getPrimaryType());
-        squares.add(Direction.WEST.getWestSquare(gameMap, currentPosition).getPrimaryType());
+        GameMap gameMap = getGameMap();
+
+        squares.add(Direction.TWO_NORTH_TWO_WEST.get_two_North_two_West_Square(gameMap, currentPosition).getPrimaryType());
+        squares.add(Direction.TWO_NORTH_ONE_WEST.get_two_North_one_West_Square(gameMap, currentPosition).getPrimaryType());
+        squares.add(Direction.TWO_NORTH.get_two_North_Square(gameMap, currentPosition).getPrimaryType());
+        squares.add(Direction.TWO_NORTH_ONE_EAST.get_two_North_one_East_Square(gameMap, currentPosition).getPrimaryType());
+        squares.add(Direction.TWO_NORTH_TWO_EAST.get_two_North_two_East_Square(gameMap, currentPosition).getPrimaryType());
+        squares.add(Direction.ONE_NORTH_TWO_WEST.get_one_North_two_West_Square(gameMap, currentPosition).getPrimaryType());
+        squares.add(Direction.ONE_NORTH_ONE_WEST.get_one_North_one_West_Square(gameMap, currentPosition).getPrimaryType());
+        squares.add(Direction.ONE_NORTH.get_one_North_Square(gameMap, currentPosition).getPrimaryType());
+        squares.add(Direction.ONE_NORTH_ONE_EAST.get_one_North_one_East_Square(gameMap, currentPosition).getPrimaryType());
+        squares.add(Direction.ONE_NORTH_TWO_EAST.get_one_North_two_East_Square(gameMap, currentPosition).getPrimaryType());
+        squares.add(Direction.TWO_WEST.get_two_West_Square(gameMap, currentPosition).getPrimaryType());
+        squares.add(Direction.ONE_WEST.get_one_West_Square(gameMap, currentPosition).getPrimaryType());
+        squares.add(Direction.CHICKEN.get_Chicken_Square(gameMap, currentPosition).getPrimaryType());
+        squares.add(Direction.ONE_EAST.get_one_East_Square(gameMap, currentPosition).getPrimaryType());
+        squares.add(Direction.TWO_EAST.get_two_East_Square(gameMap, currentPosition).getPrimaryType());
+        squares.add(Direction.ONE_SOUTH_TWO_WEST.get_one_South_two_West_Square(gameMap, currentPosition).getPrimaryType());
+        squares.add(Direction.ONE_SOUTH_ONE_WEST.get_one_South_one_West_Square(gameMap, currentPosition).getPrimaryType());
+        squares.add(Direction.ONE_SOUTH.get_one_South_Square(gameMap, currentPosition).getPrimaryType());
+        squares.add(Direction.ONE_SOUTH_ONE_EAST.get_one_South_one_East_Square(gameMap, currentPosition).getPrimaryType());
+        squares.add(Direction.ONE_SOUTH_TWO_EAST.get_one_South_two_East_Square(gameMap, currentPosition).getPrimaryType());
+        squares.add(Direction.TWO_SOUTH_TWO_WEST.get_two_South_two_West_Square(gameMap, currentPosition).getPrimaryType());
+        squares.add(Direction.TWO_SOUTH_ONE_WEST.get_two_South_one_West_Square(gameMap, currentPosition).getPrimaryType());
+        squares.add(Direction.TWO_SOUTH.get_two_South_Square(gameMap, currentPosition).getPrimaryType());
+        squares.add(Direction.TWO_SOUTH_ONE_EAST.get_two_South_one_East_Square(gameMap, currentPosition).getPrimaryType());
+        squares.add(Direction.TWO_SOUTH_TWO_EAST.get_two_South_two_East_Square(gameMap, currentPosition).getPrimaryType());
         squares.add(lookingDirection.toString());
 
         return squares;
     }
+
 }

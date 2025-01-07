@@ -1,10 +1,10 @@
 package de.hsrm.mi.swt.snackman.messaging;
 
 
-public record FrontendMessageCaloriesEvent(EventType eventType, ChangeType changeType, int calories, String message ) {
+public record FrontendMessageCaloriesEvent(int calories, String message ) {
 
-
-    @Override
+//TODO add to message loop
+ /*   @Override
     public EventType eventType() {
         return eventType;
     }
@@ -14,6 +14,8 @@ public record FrontendMessageCaloriesEvent(EventType eventType, ChangeType chang
         return changeType;
     }
 
+
+  */
     @Override
     public int calories() {
         return calories;

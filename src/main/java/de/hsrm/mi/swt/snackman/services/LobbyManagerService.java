@@ -60,7 +60,7 @@ public class LobbyManagerService {
         var uuid = UUID.randomUUID().toString();
         GameMap gameMap = mapService.createNewGameMap(uuid);
 
-        Lobby lobby = new Lobby(uuid, name, admin, false, gameMap);
+        Lobby lobby = new Lobby(uuid, name, admin, gameMap);
 
         admin.setRole(ROLE.SNACKMAN);
 
@@ -166,20 +166,6 @@ public class LobbyManagerService {
             playerIds.add(client.getPlayerId());
         }
         return playerIds;
-    }
-
-    /**
-     * Retrieves the active client or creates a new client
-     *
-     * @param name     the name of the client
-     * @param clientID the uuid of the client
-     * @return the client
-     */
-    public PlayerClient getClient(String name, String clientID) {
-        return clients.stream()
-                .filter(l -> l.getPlayerId().equals(clientID) && l.getPlayerName().equals(name))
-                .findFirst()
-                .orElse(createNewClient(name));
     }
 
     public GameMap getGameMapByLobbyId(String lobbyId) {

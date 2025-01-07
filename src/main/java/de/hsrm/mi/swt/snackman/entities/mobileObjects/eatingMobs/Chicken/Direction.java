@@ -2,7 +2,6 @@ package de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken;
 
 import de.hsrm.mi.swt.snackman.entities.map.GameMap;
 import de.hsrm.mi.swt.snackman.entities.map.Square;
-import de.hsrm.mi.swt.snackman.services.GameMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.util.Random;

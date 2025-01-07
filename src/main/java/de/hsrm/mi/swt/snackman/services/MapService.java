@@ -4,6 +4,7 @@ import java.beans.PropertyChangeEvent;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken.Direction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -127,7 +128,7 @@ public class MapService {
 
                 square.addPropertyChangeListener((PropertyChangeEvent evt) -> {
                     if (evt.getPropertyName().equals("square")) {
-                            messageLoop.addSquareToQueue((Square)evt.getNewValue(), lobbyId);
+                        messageLoop.addSquareToQueue((Square) evt.getNewValue(), lobbyId);
                         // frontendLobbyMessageService.sendEvent(messageEvent);
                     }
                 });
@@ -164,48 +165,6 @@ public class MapService {
                 square = new Square(MapObjectType.FLOOR, x, z);
         }
         return square;
-    }
-
-    /**
-     * @param currentPosition  the square the chicken is standing on top of
-     * @param lookingDirection
-     * @return a list of 8 square which are around the current square + the
-     * direction the chicken is looking in the order:
-     * northwest_square, north_square, northeast_square, east_square,
-     * southeast_square, south_square, southwest_square, west_square,
-     * direction
-     */
-    public synchronized List<String> getSquaresVisibleForChicken(Square currentPosition, Direction lookingDirection) {
-        List<String> squares = new ArrayList<>();
-
-        squares.add(Direction.TWO_NORTH_TWO_WEST.get_two_North_two_West_Square(this, currentPosition).getPrimaryType());
-        squares.add(Direction.TWO_NORTH_ONE_WEST.get_two_North_one_West_Square(this, currentPosition).getPrimaryType());
-        squares.add(Direction.TWO_NORTH.get_two_North_Square(this, currentPosition).getPrimaryType());
-        squares.add(Direction.TWO_NORTH_ONE_EAST.get_two_North_one_East_Square(this, currentPosition).getPrimaryType());
-        squares.add(Direction.TWO_NORTH_TWO_EAST.get_two_North_two_East_Square(this, currentPosition).getPrimaryType());
-        squares.add(Direction.ONE_NORTH_TWO_WEST.get_one_North_two_West_Square(this, currentPosition).getPrimaryType());
-        squares.add(Direction.ONE_NORTH_ONE_WEST.get_one_North_one_West_Square(this, currentPosition).getPrimaryType());
-        squares.add(Direction.ONE_NORTH.get_one_North_Square(this, currentPosition).getPrimaryType());
-        squares.add(Direction.ONE_NORTH_ONE_EAST.get_one_North_one_East_Square(this, currentPosition).getPrimaryType());
-        squares.add(Direction.ONE_NORTH_TWO_EAST.get_one_North_two_East_Square(this, currentPosition).getPrimaryType());
-        squares.add(Direction.TWO_WEST.get_two_West_Square(this, currentPosition).getPrimaryType());
-        squares.add(Direction.ONE_WEST.get_one_West_Square(this, currentPosition).getPrimaryType());
-        squares.add(Direction.CHICKEN.get_Chicken_Square(this, currentPosition).getPrimaryType());
-        squares.add(Direction.ONE_EAST.get_one_East_Square(this, currentPosition).getPrimaryType());
-        squares.add(Direction.TWO_EAST.get_two_East_Square(this, currentPosition).getPrimaryType());
-        squares.add(Direction.ONE_SOUTH_TWO_WEST.get_one_South_two_West_Square(this, currentPosition).getPrimaryType());
-        squares.add(Direction.ONE_SOUTH_ONE_WEST.get_one_South_one_West_Square(this, currentPosition).getPrimaryType());
-        squares.add(Direction.ONE_SOUTH.get_one_South_Square(this, currentPosition).getPrimaryType());
-        squares.add(Direction.ONE_SOUTH_ONE_EAST.get_one_South_one_East_Square(this, currentPosition).getPrimaryType());
-        squares.add(Direction.ONE_SOUTH_TWO_EAST.get_one_South_two_East_Square(this, currentPosition).getPrimaryType());
-        squares.add(Direction.TWO_SOUTH_TWO_WEST.get_two_South_two_West_Square(this, currentPosition).getPrimaryType());
-        squares.add(Direction.TWO_SOUTH_ONE_WEST.get_two_South_one_West_Square(this, currentPosition).getPrimaryType());
-        squares.add(Direction.TWO_SOUTH.get_two_South_Square(this, currentPosition).getPrimaryType());
-        squares.add(Direction.TWO_SOUTH_ONE_EAST.get_two_South_one_East_Square(this, currentPosition).getPrimaryType());
-        squares.add(Direction.TWO_SOUTH_TWO_EAST.get_two_South_two_East_Square(this, currentPosition).getPrimaryType());
-        squares.add(lookingDirection.toString());
-
-        return squares;
     }
 
     /**
@@ -246,7 +205,7 @@ public class MapService {
 
                             newChicken.addPropertyChangeListener((PropertyChangeEvent evt) -> {
                                 if (evt.getPropertyName().equals("chicken")) {
-                                    messageLoop.addChickenToQueue((Chicken)evt.getNewValue(), lobby.getLobbyId());
+                                    messageLoop.addChickenToQueue((Chicken) evt.getNewValue(), lobby.getLobbyId());
                                 }
                             });
                             break;
@@ -264,17 +223,6 @@ public class MapService {
         }
 
         placeMobsOnMap(lobby, ghostSpawnSquares, snackmanSpawnSquares);
-    }
-    /**
-     * Adds a laid egg to a specified square on the map
-     *
-     * @param square  The square where the egg is to be added
-     * @param laidEgg The snack representing the egg that has been laid
-     */
-    public void addEggToSquare(Square square, Snack laidEgg) {
-        square.setSnack(laidEgg);
-        log.debug("{} kcal egg add to square {} and square {}", laidEgg.getCalories(), square.getId(), square.getId());
-        frontendMessageService.sendEvent(new FrontendMessageEvent(EventType.SNACK, ChangeType.CREATE, square));
     }
 
     /**
@@ -317,31 +265,6 @@ public class MapService {
         }
     }
 
-    public Square getSquareAtIndexXZ(int x, int z) {
-        return gameMap.getSquareAtIndexXZ(x, z);
-    }
-
-    public boolean squareIsBetweenWalls(int x, int z){
-        Square squareAbove = this.gameMap.getSquareAtIndexXZ(x - 1, z);
-        Square squareBelow = this.gameMap.getSquareAtIndexXZ(x + 1, z);
-        Square squareRight = this.gameMap.getSquareAtIndexXZ(x, z + 1);
-        Square squareLeft = this.gameMap.getSquareAtIndexXZ(x, z - 1);
-
-        if((squareAbove.getType() == MapObjectType.WALL) && (squareBelow.getType() == MapObjectType.WALL)){
-            return true;
-        }
-
-        if((squareRight.getType() == MapObjectType.WALL) && (squareLeft.getType() == MapObjectType.WALL)){
-            return true;
-        }
-
-        return false;
-    }
-
-    public GameMap getGameMap() {
-        return gameMap;
-    }
-
     public double calcCenterPositionFromMapIndex(int index) {
         return (index * GameConfig.SQUARE_SIZE) + (GameConfig.SQUARE_SIZE / 2);
     }
@@ -362,9 +285,5 @@ public class MapService {
                 }
             }
         }
-    }
-
-    public void setSquare(Square square, int x, int y){
-        gameMap.setGameMap(square, x, y);
     }
 }

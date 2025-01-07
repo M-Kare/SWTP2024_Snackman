@@ -28,10 +28,4 @@ public class GameMapController {
         log.debug("Get GameMap");
         return ResponseEntity.ok(GameMapDTO.fromGameMap(lobbyManagerService.getGameMapByLobbyId(lobbyId)));
     }
-
-    @GetMapping("/snackman")
-    public ResponseEntity<SnackManInitDTO> getSnackManPos(){
-        SnackMan snackman = mapService.getSnackMan();
-        return ResponseEntity.ok(new SnackManInitDTO(snackman.getPosX(), snackman.getPosY(), snackman.getPosZ(), snackman.getRadius(), GameConfig.SNACKMAN_SPEED, GameConfig.SNACKMAN_SPRINT_MULTIPLIER));
-    }
 }
