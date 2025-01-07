@@ -123,4 +123,16 @@ public class SnackMan extends EatingMob {
     public int getCurrentCalories() {
         return super.getKcal();
     }
+
+    public boolean isJumping() {
+        return isJumping;
+    }
+
+    public double getVelocityY() {
+        return velocityY;
+    }
+
+    public void setSprintHandler(SprintHandler sprintHandler) {
+        this.sprintHandler = sprintHandler;
+    }
 }

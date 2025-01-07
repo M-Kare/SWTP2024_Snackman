@@ -11,17 +11,15 @@ import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken.Directi
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.SnackMan;
 import de.hsrm.mi.swt.snackman.messaging.*;
 
-import org.python.core.PyObject;
 import org.python.util.PythonInterpreter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.beans.PropertyChangeEvent;
 import java.util.ArrayList;
 import java.util.List;
-import de.hsrm.mi.swt.snackman.messaging.*;
-import java.util.Properties;
 
 /**
  * Service class for managing the game map
