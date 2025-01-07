@@ -10,16 +10,15 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * Unit tests for the 'ChickenMovementSkript.py' logic accessed by Jython.
  * This class validates specific movement scenarios for the Chicken.
  */
-public class ChickenMovementTest {
+class ChickenMovementTest {
 
     /**
      * Tests the basic functionality of the 'choose_next_square' function
      * when the Chicken is surrounded by open spaces and walls.
      */
     @Test
-    public void testChickenMovement() {
+    void testChickenMovement() {
         Chicken chicken = new Chicken();
-        chicken.initJython();
 
         List<String> visibleEnvironment = List.of("W", "L", "W", "L", "W", "L", "W", "L", "0");
 
@@ -36,9 +35,8 @@ public class ChickenMovementTest {
      * The Chicken should choose a square that is not a ghost (' ').
      */
     @Test
-    public void testChickenAvoidsGhost() {
+    void testChickenAvoidsGhost() {
         Chicken chicken = new Chicken();
-        chicken.initJython();
 
         List<String> visibleEnvironment = List.of("L", "G", "L", "L", "L", "L", "L", "L", "0");
 
@@ -55,9 +53,8 @@ public class ChickenMovementTest {
      * The Chicken should prioritize moving to the snack.
      */
     @Test
-    public void testChickenMovesToSnack() {
+    void testChickenMovesToSnack() {
         Chicken chicken = new Chicken();
-        chicken.initJython();
 
         List<String> visibleEnvironment = List.of("L", "S", "L", "L", "L", "L", "L", "L", "0");
 
@@ -73,9 +70,8 @@ public class ChickenMovementTest {
      * and still returns the empty square (' ').
      */
     @Test
-    public void testChickenChoosesBetweenMultipleSnacks() {
+    void testChickenChoosesBetweenMultipleSnacks() {
         Chicken chicken = new Chicken();
-        chicken.initJython();
 
         List<String> visibleEnvironment = List.of("S", "L", "L", "S", "L", "L", "L", "L", "0");
 
@@ -92,9 +88,8 @@ public class ChickenMovementTest {
      * The chicken should return the empty space (' ') while avoiding ghosts and prioritizing snacks.
      */
     @Test
-    public void testChickenInComplexEnvironment() {
+    void testChickenInComplexEnvironment() {
         Chicken chicken = new Chicken();
-        chicken.initJython();
 
         List<String> visibleEnvironment = List.of("G", "L", "S", "L", "W", "S", "G", "W", "0");
 
@@ -109,9 +104,8 @@ public class ChickenMovementTest {
      * Ensures that the chicken makes a random move when all spaces are empty ('L').
      */
     @Test
-    public void testChickenWithRandomSelection() {
+    void testChickenWithRandomSelection() {
         Chicken chicken = new Chicken();
-        chicken.initJython();
 
         List<String> visibleEnvironment = List.of("L", "L", "L", "L", "L", "L", "L", "L", "0");
 

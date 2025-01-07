@@ -1,12 +1,13 @@
 package de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs;
 
-import de.hsrm.mi.swt.snackman.configuration.GameConfig;
 import de.hsrm.mi.swt.snackman.entities.mechanics.SprintHandler;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import de.hsrm.mi.swt.snackman.configuration.GameConfig;
 import de.hsrm.mi.swt.snackman.services.MapService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 @Component
 public class SnackMan extends EatingMob {
@@ -31,22 +32,20 @@ public class SnackMan extends EatingMob {
 
     //JUMPING
     public void jump() {
-        if (!isJumping) {
-            if (getKcal() >= 100) {
+        if (!isJumping && getKcal() >= 100) {
                 this.velocityY = GameConfig.JUMP_STRENGTH;
                 this.isJumping = true;
                 setKcal(getKcal() - 100);
             }
-        }
+
     }
 
     public void doubleJump() {
-        if (isJumping) {
-            if (getKcal() >= 100) {
+        if (isJumping && getKcal() >= 100) {
                 this.velocityY += GameConfig.DOUBLEJUMP_STRENGTH;
                 setKcal(getKcal() - 100);
             }
-        }
+
     }
 
     public void updateJumpPosition(double deltaTime) {

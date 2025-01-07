@@ -42,3 +42,5 @@ src/main/java/de/hsrm/mi/swt/snackman/entities/mob/eatingMobs/Chicken/ChickenMov
 src/main/java/de/hsrm/mi/swt/snackman/ChickenMovementSkript$py.class
 src/main/java/de/hsrm/mi/swt/snackman/Maze$py.class
 Maze.txt
+extensions/
+*.dylib
