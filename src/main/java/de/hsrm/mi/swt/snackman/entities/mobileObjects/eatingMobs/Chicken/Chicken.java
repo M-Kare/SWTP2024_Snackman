@@ -54,7 +54,6 @@ public class Chicken extends EatingMob implements Runnable {
         this.fileName = fileName;
         initJython();
     }
-    
 
     public Chicken(Square initialPosition, MapService mapService) {
         super(mapService);
