@@ -6,12 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import de.hsrm.mi.swt.snackman.configuration.GameConfig;
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
 import de.hsrm.mi.swt.snackman.entities.map.Square;
 import de.hsrm.mi.swt.snackman.entities.mapObject.snack.Snack;
 import de.hsrm.mi.swt.snackman.entities.mapObject.snack.SnackType;
@@ -22,8 +17,6 @@ import org.python.core.PyObject;
 import org.python.util.PythonInterpreter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
 import java.util.*;
 
 /**
@@ -33,7 +26,6 @@ import java.util.*;
 public class Chicken extends EatingMob implements Runnable {
 
     private static long idCounter = 0;
-    private final int CALORIES_PER_SIXTH = (MAX_CALORIES / 6);
     private final PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
     private final Logger log = LoggerFactory.getLogger(Chicken.class);
     private long id;
@@ -44,18 +36,19 @@ public class Chicken extends EatingMob implements Runnable {
     private boolean isScared = false;
     private final int WAITING_TIME = GameConfig.WAITING_TIME;  // in ms
     private final int MAX_CALORIES = GameConfig.MAX_KALORIEN;
+    private final int CALORIES_PER_SIXTH = (MAX_CALORIES / 6);
     private Timer eggLayingTimer;
     // python
     private PythonInterpreter pythonInterpreter = null;
     private Properties pythonProps = new Properties();
     private String fileName;
-    private String interpreterCommand;
+    private Thickness thickness = Thickness.THIN;
+    private Direction lookingDirection;
 
     public Chicken() {
         super(null);
         initJython();
         this.fileName = "ChickenMovementSkript";
-        initJython();
     }
 
     public Chicken(String fileName){
@@ -78,60 +71,12 @@ public class Chicken extends EatingMob implements Runnable {
         initTimer();
     }
 
-    /**
-     * Initializes Jython for executing the chicken's movement script.
-     * Sets up the required Python environment and interpreter.
-     */
-    public void initJython() {
-        this.pythonInterpreter = new PythonInterpreter();
-
-        try {
-            String scriptPath = Paths.get("extensions/chicken/ChickenMovementSkript.py").normalize().toAbsolutePath().toString();
-            log.debug("Resolved script path: {}", scriptPath);
-
-            // Get the directory of the script (without the .)
-            String scriptDir = Paths.get(scriptPath).getParent().toString();
-            this.pythonInterpreter.exec("import sys");
-            this.pythonInterpreter.exec(String.format("sys.path.append('%s')", scriptDir.replace("\\", "\\\\")));
-
-            // Log sys.path to ensure it's correct
-            this.pythonInterpreter.exec("import sys; print(sys.path)");
-
-            // Execute the Python script
-            this.pythonInterpreter.execfile(scriptPath);
-
-        } catch (Exception ex) {
-            log.error("Error initializing ChickenMovementSkript.py: ", ex);
-            ex.printStackTrace();
-        }
-        this.pythonInterpreter.exec("from ChickenMovementSkript import choose_next_square");
-    }
-
     public List<String> act(List<String> squares){
         List<String> result = executeMovementSkript(squares);
         return result;
     }
 
-    public List<String> executeMovementSkript(List<String> squares) {
-        try {
-            log.debug("Running python chicken script with: {}", squares.toString());
-            pythonInterpreter.exec(interpreterCommand);
-            PyObject func = pythonInterpreter.get("choose_next_square");
-            PyObject result = func.__call__(new PyList(squares));
 
-            if (result instanceof PyList) {
-                PyList pyList = (PyList) result;
-                log.debug("Python chicken script return: {}", pyList);
-                return convertPythonList(pyList);
-            }
-
-            throw new Exception("Python chicken script did not load.");
-        } catch (Exception ex) {
-            log.error("Error while executing chicken python script: ", ex);
-            ex.printStackTrace();
-        }
-        return squares;
-    }
 
     /**
      * Converts a Python list to a Java list.
@@ -289,13 +234,28 @@ public class Chicken extends EatingMob implements Runnable {
      * Sets up the required Python environment and interpreter.
      */
     public void initJython() {
-        pythonProps.setProperty("python.path", "./scripts");
-        // pythonProps.setProperty("python.path", "./Characters/MovementSkripts");
-        PythonInterpreter.initialize(System.getProperties(), pythonProps, new String[0]);
-        log.debug("Initialised jython for chicken movement");
         this.pythonInterpreter = new PythonInterpreter();
-        this.interpreterCommand = String.format("from %s import choose_next_square", fileName);
-        pythonInterpreter.exec(interpreterCommand);
+
+        try {
+            String scriptPath = Paths.get("extensions/chicken/ChickenMovementSkript.py").normalize().toAbsolutePath().toString();
+            log.debug("Resolved script path: {}", scriptPath);
+
+            // Get the directory of the script (without the .)
+            String scriptDir = Paths.get(scriptPath).getParent().toString();
+            this.pythonInterpreter.exec("import sys");
+            this.pythonInterpreter.exec(String.format("sys.path.append('%s')", scriptDir.replace("\\", "\\\\")));
+
+            // Log sys.path to ensure it's correct
+            this.pythonInterpreter.exec("import sys; print(sys.path)");
+
+            // Execute the Python script
+            this.pythonInterpreter.execfile(scriptPath);
+
+        } catch (Exception ex) {
+            log.error("Error initializing ChickenMovementSkript.py: ", ex);
+            ex.printStackTrace();
+        }
+        this.pythonInterpreter.exec("from ChickenMovementSkript import choose_next_square");
     }
 
     /**
@@ -307,8 +267,8 @@ public class Chicken extends EatingMob implements Runnable {
      */
     public List<String> executeMovementSkript(List<String> squares) {
         try {
-            //log.debug("Running python chicken script with: {}", squares.toString());
-            PyObject func = this.pythonInterpreter.get("choose_next_square");
+            log.debug("Running python chicken script with: {}", squares.toString());
+            PyObject func = pythonInterpreter.get("choose_next_square");
             PyObject result = func.__call__(new PyList(squares));
 
             if (result instanceof PyList) {
@@ -319,7 +279,7 @@ public class Chicken extends EatingMob implements Runnable {
 
             throw new Exception("Python chicken script did not load.");
         } catch (Exception ex) {
-            //log.error("Error while executing chicken python script: ", ex);
+            log.error("Error while executing chicken python script: ", ex);
             ex.printStackTrace();
         }
         return squares;
@@ -400,7 +360,7 @@ public class Chicken extends EatingMob implements Runnable {
     /**
      * Starts a new timer for laying eggs. If the chicken is scared, it adds a delay before starting the timer
      */
-    private void startNewTimer() {
+    public void startNewTimer() {
         if (eggLayingTimer != null) {
             eggLayingTimer.cancel();
         }

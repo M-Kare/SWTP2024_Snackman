@@ -11,7 +11,6 @@ import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken.Directi
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.SnackMan;
 import de.hsrm.mi.swt.snackman.messaging.*;
 
-import org.python.core.PyObject;
 import org.python.util.PythonInterpreter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,6 +37,7 @@ public class MapService {
     private PythonInterpreter pythonInterpreter = null;
     private Properties pythonProps = new Properties();
     private SnackMan snackman;
+    private ReadMazeService readMazeService;
 
     /**
      * Constructs a new MapService
