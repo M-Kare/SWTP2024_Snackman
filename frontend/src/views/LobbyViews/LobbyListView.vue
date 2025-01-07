@@ -4,13 +4,6 @@
     <h1 class="title">Lobbies</h1>
     <div class="outer-box">
 
-        <!--This is used just for test, can delete later-->
-        <div class="player-info" v-if="currentPlayer">
-            <p>Player ID:   {{ currentPlayer.playerId }}</p>
-            <p>Player Name: {{ currentPlayer.playerName }}</p>
-        </div>
-        <!---->
-
         <SmallNavButton
             id="menu-back-button"
             class="small-nav-buttons"
@@ -26,10 +19,10 @@
             Create new Lobby
         </SmallNavButton>
 
-        <div class="inner-box"> <!-- :key for order? -->
+        <div class="inner-box">
             <ul>
                 <li
-                    v-for="lobby in lobbies" :key="lobby.lobbyId"
+                    v-for="lobby in filteredLobbies" :key="lobby.lobbyId"
                     class="lobby-list-items"
                     @click="joinLobby(lobby)">
 
@@ -38,18 +31,26 @@
                     </div>
 
                     <div class="playercount">
-                        {{ lobby.members.length }} / {{ maxPlayerCount }}
+                        {{ lobby.members.length }} / {{ MAX_PLAYER_COUNT }}
                     </div>
                 </li>
             </ul>
         </div>
     </div>
 
-    <div v-if="showNewLobbyForm" id="darken-background"></div>
+    <div v-if="darkenBackground" id="darken-background"></div>
+
+    <PopUp class="popup-box"
+        v-if="showPopUp"
+        @hidePopUp="hidePopUp">
+
+        <p class="info-heading"> - Lobby full -  </p>
+        <p class="info-text"> Please choose or create another one! </p>
+    </PopUp>
 
     <CreateLobbyForm
-        v-if="showNewLobbyForm"
-        @cancelLobbyCreation = "cancelLobbyCreation">
+        v-if="showLobbyForm"
+        @cancelLobbyCreation="cancelLobbyCreation">
     </CreateLobbyForm>
 
 </template>
@@ -58,6 +59,7 @@
     import MenuBackground from '@/components/MenuBackground.vue';
     import SmallNavButton from '@/components/SmallNavButton.vue';
     import CreateLobbyForm from '@/components/CreateLobbyForm.vue';
+    import PopUp from '@/components/PopUp.vue';
 
     import { useRouter } from 'vue-router';
     import { computed, onMounted, ref, watch } from 'vue';
@@ -71,25 +73,33 @@
     const lobbies = computed(() => lobbiesStore.lobbydata.lobbies);
     const currentPlayer = lobbiesStore.lobbydata.currentPlayer as IPlayerClientDTD;
 
-    const maxPlayerCount = 4;
+    const MAX_PLAYER_COUNT = 4;
 
-    // lobby value tracking
-    // watch(lobbies, (newVal) => {
-    //     console.log("Updated lobbies:", newVal);
-    // });
+    const filteredLobbies = computed(() => {
+        return lobbies.value.filter(lobby => !lobby.gameStarted);
+    });
 
-    const showNewLobbyForm = ref(false);
+    const darkenBackground = ref(false);
+    const showPopUp = ref(false);
+    const showLobbyForm = ref(false);
+
+    const hidePopUp = () => {
+        showPopUp.value = false;
+        darkenBackground.value = false;
+    }
 
     const backToMainMenu = () => {
         router.push({name: "MainMenu"});
     }
 
     const showCreateLobbyForm = () => {
-        showNewLobbyForm.value = true;
+        showLobbyForm.value = true;
+        darkenBackground.value = true;
     }
 
     const cancelLobbyCreation = () => {
-        showNewLobbyForm.value = false;
+        showLobbyForm.value = false;
+        darkenBackground.value = false;
     }
 
     /**
@@ -105,13 +115,9 @@
      */
     const joinLobby = async (lobby: ILobbyDTD) => {
 
-        if(lobby.members.length >= maxPlayerCount){
-            alert(`Lobby "${lobby.name}" is full! Please select another one.`);
-            return;
-        }
-
-        if(lobby.gameStarted){
-            alert(`Lobby "${lobby.name}" started game! Please select another one.`);
+        if(lobby.members.length >= MAX_PLAYER_COUNT){
+            showPopUp.value = true;
+            darkenBackground.value = true;
             return;
         }
 
@@ -129,34 +135,16 @@
     }
 
     onMounted(async () => {
-        // const savedPlayer = sessionStorage.getItem("currentPlayer");
-        // const savedLobbies = sessionStorage.getItem('currentLobby');
-
-        // if (savedPlayer) {
-        //     lobbiesStore.lobbydata.currentPlayer = JSON.parse(savedPlayer);
-        //     console.log("Restored player data:", savedLobbies);
-        // } else {
-        //     console.log("No player data found in sessionStorage.");
-        // }
-
-        // if (savedLobbies) {
-        //     lobbiesStore.lobbydata.lobbies = JSON.parse(savedLobbies);
-        //     console.log("Restored lobby data:", savedLobbies);
-        // } else {
-        //      lobbiesStore.startLobbyLiveUpdate();
-        //     console.log("No lobby data found in sessionStorage.");
-        // }
-        lobbiesStore.fetchLobbyList();
+        await lobbiesStore.fetchLobbyList();
         console.log(lobbies)
 
         if (!lobbiesStore.lobbydata.currentPlayer || lobbiesStore.lobbydata.currentPlayer.playerId === '' || lobbiesStore.lobbydata.currentPlayer.playerName === '') {
-            lobbiesStore.createPlayer('Player Test');
+            lobbiesStore.createPlayer("Player Test");
         }
 
         console.log("Current Player:", lobbiesStore.lobbydata.currentPlayer);
 
         lobbiesStore.startLobbyLiveUpdate();
-        console.log("Start Live Lobby Update");
     })
 
 </script>
@@ -216,6 +204,7 @@
     border: 0.5px solid black;
     border-radius: 0.2rem;
     font-size: 1.2rem;
+    color: #000000;
     padding: 0.5rem;
     margin: 1rem;
 }
@@ -229,17 +218,6 @@
     font-weight: bold;
 }
 
-#darken-background {
-    z-index: 1;
-    position: fixed;
-    top: 0;
-    width: 100vw;
-    height: 100vh;
-    background: rgba(0, 0, 0, 50%);
-
-    transition: background 0.3s ease;
-}
-
 #menu-back-button {
     left: 5%;
 }
@@ -251,4 +229,27 @@
 #menu-back-button:hover, #show-lobby-creation-button:hover {
   box-shadow: 0px 0px 35px 5px rgba(255, 255, 255, 0.5);
 }
+
+.info-heading {
+    font-size: 3rem;
+    font-weight: bold;
+}
+
+.info-text {
+    font-size: 1.8rem;
+    padding: 1.2rem;
+}
+
+#darken-background {
+    z-index: 1;
+    position: fixed;
+    top: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 50%);
+
+    transition: background 0.3s ease;
+}
+
+
 </style>

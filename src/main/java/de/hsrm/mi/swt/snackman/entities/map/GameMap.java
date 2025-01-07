@@ -1,6 +1,7 @@
 package de.hsrm.mi.swt.snackman.entities.map;
 
 import de.hsrm.mi.swt.snackman.configuration.GameConfig;
+import de.hsrm.mi.swt.snackman.entities.mapObject.MapObjectType;
 
 /**
  * Represents a game map
@@ -35,6 +36,15 @@ public class GameMap {
     }
 
     public Square getSquareAtIndexXZ(int x, int z) {
+        if((x < 0 | x >= gameMapSquares.length) | z < 0 | z >= gameMapSquares[0].length){
+            //TODO Really a new square?
+            return new Square(MapObjectType.WALL, 0, 0); //returns pseudo-Suare Wall, because its out of hameMap
+        }
+
         return gameMapSquares[x][z];
+    }
+
+    public void setGameMap(Square square, int x, int y){
+        gameMap[x][y] = square;
     }
 }

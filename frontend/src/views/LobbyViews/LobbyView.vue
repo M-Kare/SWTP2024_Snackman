@@ -1,6 +1,5 @@
 <template>
     <MenuBackground></MenuBackground>
-
     <h1 class="title"> {{ lobby?.name || 'Lobby Name' }} </h1>
     <div class="outer-box">
         <SmallNavButton
@@ -25,15 +24,11 @@
         <div class="inner-box">
             <ul>
                 <li
-                    v-for="member in members" :key="member.playerId"
+                    v-for="member in members"
                     class="player-list-items">
 
                     <div class="player-name">
                         {{ member.playerName }}
-                    </div>
-
-                    <div class="player-name">
-                        {{ member.playerId }}
                     </div>
 
                     <div class="player-character">
@@ -44,72 +39,160 @@
             </ul>
 
         </div>
+        <SmallNavButton
+            id="menu-back-button"
+            class="small-nav-buttons"
+            @click="leaveLobby">
+
+            Leave Lobby
+        </SmallNavButton>
+        <SmallNavButton
+            id="start-game-button"
+            class="small-nav-buttons"
+            @click="startGame">
+
+            Start Game
+        </SmallNavButton>
+        <SmallNavButton
+        id="copyToClip"
+        class="small-nav-buttons"
+        @click="copyToClip()">
+            Copy Link
+        </SmallNavButton>
     </div>
+
+    <div v-if="darkenBackground" id="darken-background"></div>
+
+    <PopUp class="popup-box"
+        v-if="errorBox"
+        @hidePopUp="hidePopUp"
+        @click="backToLobbyListView()"
+        >
+
+        <p class="info-heading"> - {{ infoHeading }} -  </p>
+        <p class="info-text"> {{ infoText }} </p>
+    </PopUp>
+
+    <PopUp class="popup-box"
+        v-if="showPopUp"
+        @hidePopUp="hidePopUp">
+
+        <p class="info-heading"> - Can't start the game -  </p>
+        <p class="info-text"> {{ infoText }} </p>
+    </PopUp>
+
+    <div id="infoBox" v-show="showInfo"> {{ infoText }}</div>
 
 </template>
 
 <script setup lang="ts">
     import MenuBackground from '@/components/MenuBackground.vue';
     import SmallNavButton from '@/components/SmallNavButton.vue';
+    import PopUp from '@/components/PopUp.vue';
 
     import { useRoute, useRouter } from 'vue-router';
-    import { computed, onMounted, ref } from 'vue';
-    import type { ILobbyDTD } from '@/stores/Lobby/ILobbyDTD';
+    import { computed, onMounted, ref, watchEffect } from 'vue';
     import { useLobbiesStore } from '@/stores/Lobby/lobbiesstore';
     import type { IPlayerClientDTD } from '@/stores/Lobby/IPlayerClientDTD';
+import type { ILobbyDTD } from '@/stores/Lobby/ILobbyDTD';
+import LobbyListView from './LobbyListView.vue';
 
     const router = useRouter();
     const route = useRoute();
     const lobbiesStore = useLobbiesStore();
 
-    const lobby = ref<ILobbyDTD | null>(null);
+    let lobby = computed(() => lobbiesStore.lobbydata.lobbies.find(l => l.lobbyId === route.params.lobbyId));
     const members = computed(() => lobby.value?.members || [] as Array<IPlayerClientDTD>);
     const playerCount = computed(() => members.value.length);
     const maxPlayerCount = ref(4);
 
-    onMounted(async () => {
-        const lobbyId = route.params.lobbyId as string;
-        if (!lobbyId) {
-            console.error('Lobby ID is missing!');
-            return;
+    const darkenBackground = ref(false);
+    const showPopUp = ref(false);
+    const  errorBox = ref(false);
+    const infoText = ref();
+    const infoHeading = ref();
+    const showInfo = ref(false);
+
+    const mouseX = ref(0);
+    const mouseY = ref(0)
+
+    const mouseInfoBox = ref(document.getElementById("infoBox"))
+
+
+    const MAX_PLAYER_COUNT = 4;
+
+    const TIP_TOP_DIST = 30;
+    const TIP_SIDE_DIST = 20;
+
+    const hidePopUp = () => {
+        showPopUp.value = false;
+        darkenBackground.value = false;
+    }
+
+    watchEffect(() => {
+        if (lobbiesStore.lobbydata) {
+            const lobbyId = route.params.lobbyId as string;
+
+            const updatedLobby = lobbiesStore.lobbydata.lobbies.find(l => l.lobbyId === lobbyId);
+            console.log("Updated Lobby in Lobby-View", updatedLobby)
+
+            if (updatedLobby) {
+                console.log("Gamestarted in Lobby-View", updatedLobby.gameStarted)
+                if (updatedLobby.gameStarted){
+                    console.log('Game has started! Redirecting to GameView...');
+                    router.push({ name: 'GameView' });
+                }
+            }
         }
+    });
 
-        // const savedLobby = sessionStorage.getItem(`lobby_${lobbyId}`);
-        // if (savedLobby) {
-        //     lobby.value = JSON.parse(savedLobby);
-        // } else {
-        //     lobby.value = await lobbiesStore.fetchLobbyById(lobbyId);
-        //     sessionStorage.setItem(`lobby_${lobbyId}`, JSON.stringify(lobby.value));
-        // }
-
-        lobby.value = await lobbiesStore.fetchLobbyById(lobbyId);
+    onMounted(async () => {
+        await lobbiesStore.fetchLobbyList()
 
         if(!lobby.value){
-            alert('Lobby not found or failed to load.');
-            router.push({name: 'LobbyListView'});
+            infoHeading.value = "Lobby does not exist"
+            infoText.value = "Please choose or create another one!"
+            errorBox.value = true;
+        }
+        await lobbiesStore.startLobbyLiveUpdate();
+        if (!lobbiesStore.lobbydata.currentPlayer || lobbiesStore.lobbydata.currentPlayer.playerId === '' || lobbiesStore.lobbydata.currentPlayer.playerName === '') {
+            if(lobby.value!.members.length >= MAX_PLAYER_COUNT){
+                infoHeading.value = "Lobby full"
+                infoText.value = "Please choose or create another one!"
+                errorBox.value = true
+                darkenBackground.value = true
+            } else {
+                await lobbiesStore.createPlayer("Mr. Late");
+                await joinLobby(lobby.value!)
+            }
         }
 
-        lobbiesStore.startLobbyLiveUpdate();
-
-        // Update lobby data reactively if STOMP updates arrive
-        lobbiesStore.$subscribe((mutation, state) => {
-            const updatedLobby = state.lobbydata.lobbies.find(l => l.lobbyId === lobbyId);
-
-            // If Lobby doesn't exit, come back to LobbyListView-Seite
-            if (!updatedLobby) {
-                router.push({ name: 'LobbyListView' });
-                return;
-            }
-
-            lobby.value = updatedLobby;
-
-            // If Game is started, Lobby-View of all Player change to Game-View
-            if (updatedLobby.gameStarted){
-                console.log('Game has started! Redirecting to GameView...');
-                router.push({ name: 'GameView' });
-            }
-        });
     })
+
+    const joinLobby = async (lobby: ILobbyDTD) => {
+
+        // if(lobby.members.length >= 4){
+        //     showPopUp.value = true;
+        //     darkenBackground.value = true;
+        //     return;
+        // }
+
+        try{
+            const joinedLobby = await lobbiesStore.joinLobby(lobby.lobbyId, lobbiesStore.lobbydata.currentPlayer.playerId);
+
+            if(joinedLobby) {
+                console.log('Successfully joined lobby', joinedLobby.name);
+                router.push({ name: "LobbyView", params: { lobbyId: lobby.lobbyId } });
+            }
+        } catch (error: any){
+            console.error('Error:', error);
+            alert("Error join Lobby!");
+        }
+    }
+
+    function backToLobbyListView(){
+        router.push({ name: "LobbyListView"})
+    }
 
     /**
      * Leaves the current lobby. If the player is the admin, it will remove other members from the lobby first.
@@ -140,7 +223,7 @@
 
     /**
      * Starts the game if the player is the admin and there are enough members in the lobby.
-     * If the player is not the admin or there are not enough members, an alert will be shown.
+     * If the player is not the admin or there are not enough members, a popup will be shown.
      *
      * @async
      * @function startGame
@@ -155,14 +238,44 @@
         }
 
         if(lobby.value.members.length < 2){
-            alert('Have not enough members to start game!');
+            showPopUp.value = true;
+            darkenBackground.value = true;
+            infoText.value = "Not enough players to start the game!"
         }
 
         if(playerId === lobby.value.adminClient.playerId){
             await lobbiesStore.startGame(lobby.value.lobbyId);
         } else {
-            alert('Just Admin Snackman can start the game!');
+            showPopUp.value = true;
+            darkenBackground.value = true;
+            infoText.value = "Only SnackMan can start the game!"
         }
+    }
+
+    function copyToClip(){
+        navigator.clipboard.writeText(document.URL);
+        infoText.value = "Link copied to clipboard"
+        showInfo.value = true;
+        mouseInfoBox.value = document.getElementById("infoBox")
+        moveToMouse(mouseInfoBox.value!)
+        setTimeout(()=>{
+            showInfo.value = false
+        },
+        1000)
+    }
+
+    window.onmousemove = function(e) {
+        mouseX.value = e.clientX
+        mouseY.value = e.clientY
+        if(showInfo.value){
+            moveToMouse(mouseInfoBox.value!)
+        }
+    }
+
+    function moveToMouse(element: HTMLElement){
+        const offset = mouseInfoBox.value!.parentElement!.getBoundingClientRect();
+        element.style.top = (mouseY.value - offset.top - TIP_TOP_DIST) + 'px';
+        element.style.left = (mouseX.value - offset.left + TIP_SIDE_DIST) + 'px';
     }
 
 </script>
@@ -192,6 +305,15 @@
     border-radius: 0.5rem;
 }
 
+#infoBox {
+    position: absolute;
+    border-radius: 0.5rem;
+    background: rgba(255, 255, 255, 60%);
+    color: #000000;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+}
+
 #player-count {
     top: 1%;
     left: 50%;
@@ -201,6 +323,10 @@
     font-weight: bold;
     color: #000000;
     padding: 1rem;
+}
+
+.hidden {
+    display: none;
 }
 
 .inner-box {
@@ -242,6 +368,25 @@
     font-weight: bold;
 }
 
+#copyToClip{
+    top: 3%;
+    right: 1.5%;
+    width: 8%;
+    height: 3rem;
+    font-size: 0.8rem;
+    padding: 0;
+}
+
+.info-heading {
+    font-size: 3rem;
+    font-weight: bold;
+}
+
+.info-text {
+    font-size: 1.8rem;
+    padding: 1.2rem;
+}
+
 #menu-back-button {
     left: 5%;
 }
@@ -252,6 +397,17 @@
 
 #menu-back-button:hover, #start-game-button:hover {
   box-shadow: 0px 0px 35px 5px rgba(255, 255, 255, 0.5);
+}
+
+#darken-background {
+    z-index: 1;
+    position: fixed;
+    top: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 50%);
+
+    transition: background 0.3s ease;
 }
 
 </style>

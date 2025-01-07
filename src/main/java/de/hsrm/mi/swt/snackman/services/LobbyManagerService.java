@@ -168,6 +168,20 @@ public class LobbyManagerService {
         return playerIds;
     }
 
+    /**
+     * Retrieves the active client or creates a new client
+     *
+     * @param name     the name of the client
+     * @param clientID the uuid of the client
+     * @return the client
+     */
+    public PlayerClient getClient(String name, String clientID) {
+        return clients.stream()
+                .filter(l -> l.getPlayerId().equals(clientID) && l.getPlayerName().equals(name))
+                .findFirst()
+                .orElse(createNewClient(name));
+    }
+
     public GameMap getGameMapByLobbyId(String lobbyId) {
         return lobbies.get(lobbyId).getGameMap();
     }

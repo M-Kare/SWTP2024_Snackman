@@ -59,7 +59,7 @@ chicken.castShadow = true
 chicken.receiveShadow = true
 scene.add(chicken)
 
-function updateChicken(e: IChickenDTD) {
+export function updateChicken(e: IChickenDTD) {
   console.log("Scaling");
   switch (e.thickness) {
     case ChickenThickness.THIN:

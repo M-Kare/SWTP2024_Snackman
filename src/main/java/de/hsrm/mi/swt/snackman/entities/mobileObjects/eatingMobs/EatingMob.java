@@ -6,17 +6,27 @@ import de.hsrm.mi.swt.snackman.entities.mapObject.snack.Snack;
 import de.hsrm.mi.swt.snackman.entities.mapObject.snack.SnackType;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.Mob;
 
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
+
 /**
  * A mob which can consume snacks
  */
 public abstract class EatingMob extends Mob {
     private int kcal;
 
-    public EatingMob(GameMap gameMap, int speed, double radius) {
+    private int MAXKCAL = 0;
+
+    private final PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
+
+    public EatingMob(GameMap gameMap, double speed, double radius) {
         super(gameMap, speed, radius);
+        if ((this) instanceof SnackMan) {
+            MAXKCAL = 3000;
+        }
     }
 
-    public EatingMob(GameMap gameMap, int speed, double radius, double posX, double posY, double posZ) {
+    public EatingMob(GameMap gameMap, double speed, double radius, double posX, double posY, double posZ) {
         super(gameMap, speed, radius, posX, posY, posZ);
     }
 
@@ -24,12 +34,18 @@ public abstract class EatingMob extends Mob {
         super(gameMap);
     }
 
-    protected void setKcal(int value) {
+    public void setKcal(int value) {
+        int oldKcal = kcal;
         kcal = value;
+        propertyChangeSupport.firePropertyChange("currentCalories", oldKcal, this.kcal);
     }
 
-    protected int getKcal() {
+    public int getKcal() {
         return kcal;
+    }
+
+    public int getMAXKCAL() {
+        return MAXKCAL;
     }
 
     protected void gainKcal(int addingKcal) throws Exception {
@@ -40,8 +56,12 @@ public abstract class EatingMob extends Mob {
         }
     }
 
-    protected void loseKcal() {
-        // @todo
+    public void loseKcal(int loseKcal) throws Exception {
+        if ((this.kcal - loseKcal) >= 0) {
+            this.kcal -= loseKcal;
+        } else {
+            throw new Exception("Kcal cannot be below zero!");
+        }
     }
 
     @Override
@@ -54,18 +74,33 @@ public abstract class EatingMob extends Mob {
 
     /**
      * Collects the snack on the square if there is one.
-     * If there is one that remove it from the square.
+     * If there is one than remove it from the square.
      *
      * @param square to eat the snack from
      */
     public void consumeSnackOnSquare(Square square) {
         Snack snackOnSquare = square.getSnack();
 
-        if (snackOnSquare != null) {
-            kcal += snackOnSquare.getCalories();
+        if (snackOnSquare.getSnackType() != SnackType.EMPTY) {
+            int oldCalories = this.kcal;
+
+            if ((kcal + snackOnSquare.getCalories()) >= MAXKCAL) {
+                setKcal(MAXKCAL);
+            } else {
+                setKcal( kcal += snackOnSquare.getCalories() );
+            }
 
             //set snack to null after consuming it
             square.setSnack(new Snack(SnackType.EMPTY));
+
+            if ((this) instanceof SnackMan) {
+                propertyChangeSupport.firePropertyChange("currentCalories", oldCalories, kcal);
+            }
         }
+    }
+
+    // Listener hinzufügen
+    public void addPropertyChangeListener(PropertyChangeListener listener) {
+        propertyChangeSupport.addPropertyChangeListener(listener);
     }
 }

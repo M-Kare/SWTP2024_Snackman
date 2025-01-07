@@ -22,12 +22,12 @@ public class Lobby {
     private long timeSinceLastSnackSpawn;
 
 
-    public Lobby(String lobbyId, String name, PlayerClient adminClient, boolean isGameStarted, GameMap gameMap) {
+    public Lobby(String lobbyId, String name, PlayerClient adminClient, GameMap gameMap) {
         this.lobbyId = lobbyId;
         this.gameMap = gameMap;
         this.name = name;
         this.adminClient = adminClient;
-        this.isGameStarted = isGameStarted;
+        this.isGameStarted = false;;
         this.members = new ArrayList<>();
         this.members.add(adminClient);
         this.clientMobMap = new TreeMap<>();

@@ -32,7 +32,7 @@ public abstract class Mob {
      * @param speed      speed of the mob
      * @param radius     size of the mob
      */
-    public Mob(GameMap gameMap, int speed, double radius) {
+    public Mob(GameMap gameMap, double speed, double radius) {
         this.gameMap = gameMap;
         this.speed = speed;
         this.radius = radius;
@@ -58,7 +58,7 @@ public abstract class Mob {
      * @param posY       y-spawn-positon
      * @param posZ       z-spawn-position
      */
-    public Mob(GameMap gameMap, int speed, double radius, double posX, double posY, double posZ) {
+    public Mob(GameMap gameMap, double speed, double radius, double posX, double posY, double posZ) {
         this(gameMap, speed, radius);
 
         spawn = new Vector3d(posX, posY, posZ);

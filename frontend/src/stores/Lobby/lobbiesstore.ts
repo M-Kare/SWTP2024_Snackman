@@ -19,12 +19,6 @@ export const useLobbiesStore = defineStore('lobbiesstore', () =>{
         } as IPlayerClientDTD //PlayerClient for each window, for check the sync
     })
 
-    // Function to set player
-    function setPlayer(player: IPlayerClientDTD) {
-        lobbydata.currentPlayer = { ...player }; // Cập nhật toàn bộ thông tin của player
-        console.log('Player has been set:', player);
-    }
-
     // For Test all Players have the same name 'Player Test'
     /**
      * Creates a new player client.
@@ -39,13 +33,13 @@ export const useLobbiesStore = defineStore('lobbiesstore', () =>{
         }
 
         try{
-            const url = `/api/playerclients/create?name=${name}`
+            const url = `/api/lobbies/create/player`
             const response = await fetch(url, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(newPlayerClient)
+                body: JSON.stringify(name),
             })
 
             if(response.ok){
@@ -64,6 +58,9 @@ export const useLobbiesStore = defineStore('lobbiesstore', () =>{
 
     }
 
+    /**
+     * Fetch Lobby-List from Backend
+     */
     async function fetchLobbyList(){
         try{
             const url = `/api/lobbies`
@@ -84,6 +81,34 @@ export const useLobbiesStore = defineStore('lobbiesstore', () =>{
         } catch (error: any){
             console.error('Error: ', error)
 
+        }
+    }
+
+    /**
+     * Fetches a specific lobby by its ID.
+     * @param lobbyId The ID of the lobby to fetch.
+     * @returns The lobby object or null if not found.
+     */
+    async function fetchLobbyById(lobbyId: string): Promise<ILobbyDTD | null> {
+        try{
+            const url = `/api/lobbies/lobby/${lobbyId}`
+            const response = await fetch(url, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+            })
+
+            if(!response.ok){
+                throw new Error(`HTTP error! status: ${response.status}`)
+            }
+
+            const lobby: ILobbyDTD = await response.json()
+            console.log('Fetched Lobby: ', lobby)
+            return lobby
+        } catch (error: any){
+            console.error('Error:', error)
+            return null
         }
     }
 
@@ -135,28 +160,22 @@ export const useLobbiesStore = defineStore('lobbiesstore', () =>{
      * @param adminClient The player who will be the admin of the lobby.
      * @returns The created lobby object or null if failed.
      */
-    async function createLobby(lobbyName: string, adminClient: IPlayerClientDTD): Promise<ILobbyDTD | null> {
-        const newLobby: ILobbyDTD = {
-            lobbyId: '',
-            name: lobbyName,
-            adminClient: adminClient,
-            gameStarted: false,
-            members: [adminClient]
-        }
+    async function createLobby(name: string, adminClient: IPlayerClientDTD): Promise<ILobbyDTD | null> {
+        const creatorUuid = adminClient.playerId
 
         try{
-            const url = `/api/lobbies/create?name=${lobbyName}&creatorUuid=${adminClient.playerId}`
+            const url = `/api/lobbies/create/lobby`
             const response = await fetch(url, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(newLobby)
+                body: JSON.stringify({ name, creatorUuid }),
             })
 
             if(response.ok){
                 const lobby: ILobbyDTD = await response.json()
-                lobbydata.currentPlayer.joinedLobbyId = lobby.lobbyId
+                //lobbydata.currentPlayer.joinedLobbyId = lobby.lobbyId
                 lobbydata.lobbies.push(lobby)
                 return lobby
             } else {
@@ -185,12 +204,13 @@ export const useLobbiesStore = defineStore('lobbiesstore', () =>{
                 return null;
             }
 
-            const url = `/api/lobbies/${lobbyId}/join?playerId=${playerId}`
+            const url = `/api/lobbies/join`
             const response = await fetch(url, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
+                body: JSON.stringify({ lobbyId, playerId }),
             })
 
             if(response.status == 409){
@@ -222,12 +242,13 @@ export const useLobbiesStore = defineStore('lobbiesstore', () =>{
      */
     async function leaveLobby(lobbyId: string, playerId: string): Promise<void> {
         try{
-            const url = `/api/lobbies/${lobbyId}/leave?playerId=${playerId}`
+            const url = `/api/lobbies/leave`
             const response = await fetch(url, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
+                body: JSON.stringify({ lobbyId, playerId }),
             })
 
             if (!response.ok) {
@@ -245,56 +266,32 @@ export const useLobbiesStore = defineStore('lobbiesstore', () =>{
      */
     async function startGame(lobbyId: string): Promise<void> {
         try {
-            const url = `/api/lobbies/${lobbyId}/start`;
+            const url = `/api/lobbies/start`;
             const response = await fetch(url, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-            });
-
-            if (!response.ok) {
-                throw new Error(`Failed to start game: ${response.statusText}`);
-            }
-
-            console.log(`Game started successfully in lobby: ${lobbyId}`);
-        } catch (error: any) {
-            console.error(`Error starting game in lobby ${lobbyId}:`, error);
-            throw new Error('Could not start the game. Please try again.');
-        }
-    }
-
-    /**
-     * Fetches a specific lobby by its ID.
-     * @param lobbyId The ID of the lobby to fetch.
-     * @returns The lobby object or null if not found.
-     */
-    async function fetchLobbyById(lobbyId: string): Promise<ILobbyDTD | null> {
-        try{
-            const url = `/api/lobbies/lobby/${lobbyId}`
-            const response = await fetch(url, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
+                body: JSON.stringify({ lobbyId }),
             })
 
-            if(!response.ok){
-                throw new Error(`HTTP error! status: ${response.status}`)
+            if (!response.ok) {
+                throw new Error(`Failed to start game: ${response.statusText}`)
             }
 
-            const lobby: ILobbyDTD = await response.json()
-            console.log('Fetched Lobby: ', lobby)
-            return lobby
-        } catch (error: any){
-            console.error('Error:', error)
-            return null
+            const lobby = lobbydata.lobbies.find(l => l.uuid === lobbyId)
+            if (lobby) {
+                lobby.gameStarted = true
+            }
+            console.log(`Game started successfully in lobby: ${lobbyId}`)
+        } catch (error: any) {
+            console.error(`Error starting game in lobby ${lobbyId}:`, error)
+            throw new Error('Could not start the game. Please try again.')
         }
     }
 
     return{
         lobbydata,
-        setPlayer,
         createPlayer,
         fetchLobbyList,
         startLobbyLiveUpdate,

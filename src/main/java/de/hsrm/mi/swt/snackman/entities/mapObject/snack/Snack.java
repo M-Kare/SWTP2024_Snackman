@@ -1,7 +1,7 @@
 package de.hsrm.mi.swt.snackman.entities.mapObject.snack;
 
 /**
- * Class that defines Snack, that can be eaten by Snackman
+ * Class that defines Snack, that can be eaten by EatingMob's
  */
 public class Snack {
     private SnackType snackType;
@@ -12,7 +12,7 @@ public class Snack {
     }
 
     public SnackType getSnackType() {
-        return snackType;
+        return this.snackType;
     }
 
     public void setSnackType(SnackType snackType) {
@@ -21,7 +21,11 @@ public class Snack {
     }
 
     public int getCalories() {
-        return calories;
+        return this.calories;
+    }
+
+    public void setCalories(int newCalories) {
+        this.calories = newCalories;
     }
 
     @Override

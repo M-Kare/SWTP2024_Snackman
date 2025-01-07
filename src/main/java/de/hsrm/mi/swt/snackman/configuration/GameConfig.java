@@ -9,7 +9,8 @@ public class GameConfig {
     // SNACKMAN
     public static final int SNACKMAN_GROUND_LEVEL = 2;
     public static final double SNACKMAN_RADIUS = 0.3;
-    public static final int SNACKMAN_SPEED = 10;
+    public static final double SNACKMAN_SPEED = 10.0;
+    public static final double SNACKMAN_SPRINT_MULTIPLIER = 1.5;
 
     //SNACKMAN JUMPING PARAM
     public static final double JUMP_STRENGTH = 8;
@@ -19,4 +20,8 @@ public class GameConfig {
     //LOBBY
     public static final int TIME_FOR_SNACKS_TO_RESPAWN = 20000;
     public static final double SNACK_SPAWN_RATE = 0.3;
+
+    //Chicken
+    public static final int WAITING_TIME = 2000;
+    public static final int MAX_KALORIEN = 3000;
 }
