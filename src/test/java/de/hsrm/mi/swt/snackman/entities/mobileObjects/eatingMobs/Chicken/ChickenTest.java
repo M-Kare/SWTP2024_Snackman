@@ -118,6 +118,10 @@ class ChickenTest {
 
         square.setSnack(snack);
         chicken.consumeSnackOnSquare();
+        Assertions.assertEquals(Thickness.THIN, chicken.getThickness());
+
+        square.setSnack(snack);
+        chicken.consumeSnackOnSquare();
         Assertions.assertEquals(Thickness.SLIGHTLY_THICK, chicken.getThickness());
 
         square.setSnack(snack);
@@ -127,10 +131,6 @@ class ChickenTest {
         square.setSnack(snack);
         chicken.consumeSnackOnSquare();
         Assertions.assertEquals(Thickness.HEAVY, chicken.getThickness());
-
-        square.setSnack(snack);
-        chicken.consumeSnackOnSquare();
-        Assertions.assertEquals(Thickness.VERY_HEAVY, chicken.getThickness());
 
 
     }

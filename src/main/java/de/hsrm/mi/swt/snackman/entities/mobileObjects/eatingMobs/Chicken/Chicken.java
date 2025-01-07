@@ -22,7 +22,7 @@ import java.util.*;
 public class Chicken extends EatingMob implements Runnable {
 
     private static long idCounter = 0;
-    private final int WAITING_TIME = 200;  // in ms
+    private final int WAITING_TIME = 2000;  // in ms
     private final int MAX_CALORIES = 3000;
     private final int CALORIES_PER_SIXTH = (MAX_CALORIES / 6);
     private final PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
