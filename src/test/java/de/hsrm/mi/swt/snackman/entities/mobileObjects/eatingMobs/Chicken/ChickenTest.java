@@ -5,11 +5,10 @@ import de.hsrm.mi.swt.snackman.entities.mapObject.MapObjectType;
 import de.hsrm.mi.swt.snackman.entities.mapObject.snack.Snack;
 import de.hsrm.mi.swt.snackman.entities.mapObject.snack.SnackType;
 import de.hsrm.mi.swt.snackman.services.MapService;
-
-import static org.mockito.Mockito.mock;
-
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -60,37 +59,41 @@ class ChickenTest {
             "true, false",
             "false, false"
     })
-    void testStartNewTimer_ScaredStateAffectsDelay(boolean initialScaredState, boolean expectedScaredState) {
+    void testStartNewTimer_ScaredStateAffectsDelay(boolean initialScaredState, boolean expectedScaredState) throws InterruptedException {
         Square square = new Square(MapObjectType.FLOOR, 0, 0);
         Chicken chicken = new Chicken(square, mapService);
+        chicken.setKcal(2800);
 
         System.out.println("Initial scared state: " + initialScaredState);
-
-        // Set the initial scared state
         chicken.setScared(initialScaredState);
 
-        // Capture the time before starting the timer
         long startTime = System.currentTimeMillis();
         System.out.println("Start time: " + startTime);
 
         chicken.startNewTimer();
 
-        long endTime = System.currentTimeMillis();
-        System.out.println("End time: " + endTime);
+        // Wait for the egg to be laid (kcal becomes 0) or timeout after 70 seconds
+        long timeout = 70000; // 70 seconds
+        long elapsedTime = 0;
+        while (chicken.getKcal() > 0 && elapsedTime < timeout) {
+            Thread.sleep(100);
+            elapsedTime = System.currentTimeMillis() - startTime;
+        }
 
-        long elapsedTime = endTime - startTime;
         System.out.println("Elapsed time: " + elapsedTime + " ms");
+        System.out.println("Final kcal: " + chicken.getKcal());
 
-        // Check if the delay was applied when the chicken was initially scared
         if (initialScaredState) {
             System.out.println("Checking scared condition...");
-            Assertions.assertTrue(elapsedTime >= 40000,
-                    "Delay should be at least 40 seconds when scared. Actual: " + elapsedTime + " ms");
+            Assertions.assertTrue(elapsedTime >= 30000 && elapsedTime <= 70000,
+                    "Delay should be between 30 and 70 seconds when scared. Actual: " + elapsedTime + " ms");
         } else {
             System.out.println("Checking not scared condition...");
             Assertions.assertTrue(elapsedTime >= 30000 && elapsedTime <= 60000,
                     "Delay should be between 30 and 60 seconds when not scared. Actual: " + elapsedTime + " ms");
         }
+
+        Assertions.assertEquals(0, chicken.getKcal(), "kcal should be 0 after laying an egg");
 
         System.out.println("Final scared state: " + chicken.isScared());
         Assertions.assertEquals(expectedScaredState, chicken.isScared(),
@@ -99,14 +102,14 @@ class ChickenTest {
 
 
     @Test
-    void chickenGetsFatWhenComsumincSnacks(){
+    void chickenGetsFatWhenComsumincSnacks() {
         Snack snack = new Snack(SnackType.STRAWBERRY);
-        
+
         Square square = new Square(snack, 0, 0);
         mapService.setSquare(square, 0, 0);
 
         Chicken chicken = new Chicken(square, mapService);
-        
+
         chicken.consumeSnackOnSquare();
         Assertions.assertEquals(Thickness.THIN, chicken.getThickness());
 

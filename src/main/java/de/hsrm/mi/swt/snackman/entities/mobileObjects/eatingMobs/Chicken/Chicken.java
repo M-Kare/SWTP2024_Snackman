@@ -307,7 +307,7 @@ public class Chicken extends EatingMob implements Runnable {
     /**
      * Starts a new timer for laying eggs. If the chicken is scared, it adds a delay before starting the timer
      */
-    private void startNewTimer() {
+    void startNewTimer() {
         if (eggLayingTimer != null) {
             eggLayingTimer.cancel();
         }
@@ -355,11 +355,15 @@ public class Chicken extends EatingMob implements Runnable {
         }
     }
 
+    public boolean isScared() {
+        return isScared;
+    }
+
     /**
      * Sets the chicken to be scared and restarts the timer with a delay
      */
-    public void getScared() {
-        this.isScared = true;
+    public void setScared(boolean scared) {
+        this.isScared = scared;
         startNewTimer();
     }
 
