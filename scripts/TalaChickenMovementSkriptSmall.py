@@ -87,30 +87,25 @@ def findWayToSM(solution, liste):
     
     if chickenIndex == 7:
         if(solution[0] == 'SM'):
-            solution = replace_Element_with_whiteSpace_and_append_ElementIndex(solution, 0)
+            return 0
     if chickenIndex == 11:
         if(solution[3] == 'SM'):
-            solution = replace_Element_with_whiteSpace_and_append_ElementIndex(solution, 3)
+            return 3
     if chickenIndex == 13:
         if(solution[1] == 'SM'):
-            solution = replace_Element_with_whiteSpace_and_append_ElementIndex(solution, 1)
+            return 1
     if chickenIndex == 17:
         if(solution[2] == 'SM'):
-            solution = replace_Element_with_whiteSpace_and_append_ElementIndex(solution, 2)
+            return 2
 
     if nextDirectionIndex == 7:
-        solution = replace_Element_with_whiteSpace_and_append_ElementIndex(solution, 0)
-        return solution
+        return 0
     if nextDirectionIndex == 11:
-        solution = replace_Element_with_whiteSpace_and_append_ElementIndex(solution, 3)
-        return solution
+        return 3
     if nextDirectionIndex == 13:
-        solution = replace_Element_with_whiteSpace_and_append_ElementIndex(solution, 1)
-        return solution
+        return 1
     if nextDirectionIndex == 17:
-        solution = replace_Element_with_whiteSpace_and_append_ElementIndex(solution, 2)
-        return solution
-
+        return 2
 
 def printMovement(chickensStepBefore, chickenIndex, liste):
     time.sleep(0.5)
@@ -128,11 +123,6 @@ def printMovement(chickensStepBefore, chickenIndex, liste):
     for i in range(0, len(testliste), 5):
         print(testliste[i:i+5])
     print()
-
-def replace_Element_with_whiteSpace_and_append_ElementIndex(solution, index):
-    solution[index] = ''
-    solution.append(index)
-    return solution
 
 def one_fiels_has_SnackMan(liste):
     return "SM" in liste

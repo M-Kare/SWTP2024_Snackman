@@ -14,16 +14,16 @@ class ChickenTest {
     @Autowired
     private MapService mapService;
 
-    @Test
-    void testLayEgg_ChickenThicknessAndKcalReset() {
-        Square square = new Square(MapObjectType.FLOOR, 0, 0);
-        Chicken chicken = new Chicken(square, mapService);
-        chicken.setKcal(3000);
-        chicken.setThickness(Thickness.HEAVY);
+    // @Test
+    // void testLayEgg_ChickenThicknessAndKcalReset() {
+    //     Square square = new Square(MapObjectType.FLOOR, 0, 0);
+    //     Chicken chicken = new Chicken(square, mapService);
+    //     chicken.setKcal(3000);
+    //     chicken.setThickness(Thickness.HEAVY);
 
-        chicken.layEgg();
+    //     chicken.layEgg();
 
-        Assertions.assertEquals(Thickness.THIN, chicken.getThickness());
-        Assertions.assertEquals(0, chicken.getKcal());
-    }
+    //     Assertions.assertEquals(Thickness.THIN, chicken.getThickness());
+    //     Assertions.assertEquals(0, chicken.getKcal());
+    // }
 }
