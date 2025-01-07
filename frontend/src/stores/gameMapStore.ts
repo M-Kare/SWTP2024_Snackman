@@ -3,7 +3,6 @@ import {reactive, readonly} from "vue";
 import type {IGameMap, IGameMapDTD} from './IGameMapDTD';
 import {fetchGameMapDataFromBackend} from "../services/GameMapDataService.js";
 import {Client} from "@stomp/stompjs";
-import type {IFrontendChickenMessageEvent, IFrontendMessageEvent} from "@/services/IFrontendMessageEvent";
 import type {ISquare} from "@/stores/Square/ISquareDTD";
 import * as THREE from "three";
 import {Scene} from "three";
@@ -11,12 +10,11 @@ import type {IChicken, IChickenDTD} from "@/stores/Chicken/IChickenDTD";
 import {Direction} from "@/stores/Chicken/IChickenDTD";
 import {GameObjectRenderer} from "@/renderer/GameObjectRenderer";
 import {useLobbiesStore} from "@/stores/Lobby/lobbiesstore";
-import { Player } from '@/components/Player';
-import { EventType, type IMessageDTD } from './messaging/IMessageDTD';
-import { MeshSSSNodeMaterial } from 'three/webgpu';
-import type { IMobUpdateDTD } from './messaging/IMobUpdateDTD';
-import type { ISquareUpdateDTD } from './messaging/ISquareUpdateDTD';
-import { SnackType, type ISnackDTD } from './Snack/ISnackDTD';
+import {Player} from '@/components/Player';
+import {EventType, type IMessageDTD} from './messaging/IMessageDTD';
+import type {IMobUpdateDTD} from './messaging/IMobUpdateDTD';
+import type {ISquareUpdateDTD} from './messaging/ISquareUpdateDTD';
+import {SnackType} from './Snack/ISnackDTD';
 
 /**
  * Defines the pinia store used for saving the map from
@@ -31,10 +29,13 @@ export const useGameMapStore = defineStore('gameMap', () => {
   let chickenStompclient: Client
   const scene = new THREE.Scene()
   const gameObjectRenderer = GameObjectRenderer()
-  const { lobbydata } = useLobbiesStore()
+  const {lobbydata} = useLobbiesStore()
   const CHICKEN_MOVEMENT_SPEED = 0.1    // step size of the interpolation: between 0 and 1
   let player: Player
   let otherPlayers: Map<String, THREE.Mesh>
+  let OFFSET: number
+  let DEFAULT_SIDE_LENGTH: number
+
 
   const mapData = reactive({
     DEFAULT_SQUARE_SIDE_LENGTH: 0,
@@ -49,6 +50,10 @@ export const useGameMapStore = defineStore('gameMap', () => {
       const response: IGameMapDTD = await fetchGameMapDataFromBackend(lobbydata.currentPlayer.joinedLobbyId!)
       mapData.DEFAULT_SQUARE_SIDE_LENGTH = response.DEFAULT_SQUARE_SIDE_LENGTH
       mapData.DEFAULT_WALL_HEIGHT = response.DEFAULT_WALL_HEIGHT
+
+      OFFSET = mapData.DEFAULT_SQUARE_SIDE_LENGTH / 2
+      DEFAULT_SIDE_LENGTH = mapData.DEFAULT_SQUARE_SIDE_LENGTH
+
 
       for (const square of response.gameMap) {
         mapData.gameMap.set(square.id, square as ISquare)
@@ -82,17 +87,17 @@ export const useGameMapStore = defineStore('gameMap', () => {
 
         stompclient.subscribe(DEST_UPDATES, message => {
           const content: Array<IMessageDTD> = JSON.parse(message.body)
-          for(const mess of content){
-            switch(mess.event){
+          for (const mess of content) {
+            switch (mess.event) {
               case EventType.MobUpdate:
                 const mobUpdate: IMobUpdateDTD = mess.message
-                if(mobUpdate.playerId === lobbydata.currentPlayer.playerId){
-                  if(player == undefined){
-                   continue; 
+                if (mobUpdate.playerId === lobbydata.currentPlayer.playerId) {
+                  if (player == undefined) {
+                    continue;
                   }
                   player.setPosition(mobUpdate.position);
                 } else {
-                  if(otherPlayers.size == 0){
+                  if (otherPlayers.size == 0) {
                     continue;
                   }
                   otherPlayers.get(mobUpdate.playerId)?.position.lerp(mobUpdate.position, 0.3)
@@ -101,7 +106,7 @@ export const useGameMapStore = defineStore('gameMap', () => {
                 break;
               case EventType.SquareUpdate:
                 const squareUpdate: ISquareUpdateDTD = mess.message
-                if(squareUpdate.square.snack.snackType == SnackType.EMPTY){
+                if (squareUpdate.square.snack.snackType == SnackType.EMPTY) {
                   const savedMeshId = mapData.gameMap.get(squareUpdate.square.id)!.snack.meshId
                   removeMeshFromScene(scene, savedMeshId)
                   mapData.gameMap.set(squareUpdate.square.id, squareUpdate.square)
@@ -114,7 +119,7 @@ export const useGameMapStore = defineStore('gameMap', () => {
                 const chickenUpdate: IChickenDTD = mess.message
                 updateChicken(chickenUpdate)
                 break;
-              default: 
+              default:
                 console.log(mess.message)
             }
           }
@@ -129,10 +134,8 @@ export const useGameMapStore = defineStore('gameMap', () => {
     }
   }
 
-  function updateChicken(change: IChickenDTD){
+  function updateChicken(change: IChickenDTD) {
     const chickenUpdate: IChickenDTD = change
-    const OFFSET = mapData.DEFAULT_SQUARE_SIDE_LENGTH / 2
-    const DEFAULT_SIDE_LENGTH = mapData.DEFAULT_SQUARE_SIDE_LENGTH
     const currentChicken = mapData.chickens.find(chicken => chicken.id == chickenUpdate.id)
     if (currentChicken == undefined) {
       console.error("A chicken is undefined in pinia")
@@ -152,8 +155,6 @@ export const useGameMapStore = defineStore('gameMap', () => {
     const savedMeshId = mapData.gameMap.get(squareUpdate.square.id)!.snack.meshId
     removeMeshFromScene(scene, savedMeshId)
     mapData.gameMap.set(squareUpdate.square.id, squareUpdate.square)
-    const OFFSET = mapData.DEFAULT_SQUARE_SIDE_LENGTH / 2
-    const DEFAULT_SIDE_LENGTH = mapData.DEFAULT_SQUARE_SIDE_LENGTH
     const snackToAdd = gameObjectRenderer.createSnackOnFloor(
       squareUpdate.square.indexX * DEFAULT_SIDE_LENGTH + OFFSET,
       squareUpdate.square.indexZ * DEFAULT_SIDE_LENGTH + OFFSET,
@@ -164,11 +165,11 @@ export const useGameMapStore = defineStore('gameMap', () => {
     setSnackMeshId(squareUpdate.square.id, snackToAdd.id)
   }
 
-  function setPlayer(p: Player){
+  function setPlayer(p: Player) {
     player = p
   }
 
-  function setOtherPlayers(other: Map<String, THREE.Mesh>){
+  function setOtherPlayers(other: Map<String, THREE.Mesh>) {
     otherPlayers = other
   }
 
