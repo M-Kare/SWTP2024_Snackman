@@ -128,6 +128,9 @@ import LobbyListView from './LobbyListView.vue';
                     router.push({ name: 'GameView' });
                 }
             }
+            else {
+                router.push({ name: 'LobbyListView' });
+            }
         }
     });
 
