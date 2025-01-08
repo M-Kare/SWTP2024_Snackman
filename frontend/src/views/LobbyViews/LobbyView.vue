@@ -79,8 +79,8 @@
     import { computed, onMounted, ref, watchEffect } from 'vue';
     import { useLobbiesStore } from '@/stores/Lobby/lobbiesstore';
     import type { IPlayerClientDTD } from '@/stores/Lobby/IPlayerClientDTD';
-import type { ILobbyDTD } from '@/stores/Lobby/ILobbyDTD';
-import LobbyListView from './LobbyListView.vue';
+    import type { ILobbyDTD } from '@/stores/Lobby/ILobbyDTD';
+    import LobbyListView from './LobbyListView.vue';
 
     const router = useRouter();
     const route = useRoute();
