@@ -4,7 +4,7 @@ import type {ISquare} from '@/stores/Square/ISquareDTD';
 import {type WebGLRenderer} from 'three'
 import * as THREE from 'three'
 import {PointerLockControls} from 'three/addons/controls/PointerLockControls.js'
-import {reactive, type UnwrapNestedRefs} from "vue";
+import {reactive, ref, type UnwrapNestedRefs} from "vue";
 
 export class Player {
   private prevTime: DOMHighResTimeStamp
@@ -32,6 +32,8 @@ export class Player {
   private spacePressed: boolean;
 
   private calories: number;
+
+  private _message = ref("")
 
   private _sprintData = reactive({
     sprintTimeLeft: 100, // percentage (0-100)
@@ -398,6 +400,10 @@ export class Player {
 
   get sprintData(): UnwrapNestedRefs<{ isSprinting: boolean; sprintTimeLeft: number; isCooldown: boolean }> & {} {
     return this._sprintData;
+  }
+
+  public get message(){
+    return this._message;
   }
 
   public getCalories(): number {

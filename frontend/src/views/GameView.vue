@@ -9,7 +9,7 @@
       <div class="overlayContent">
         <img alt="calories" class="calories-icon" src="@/assets/calories.svg" />
         <p v-if="currentCalories < MAXCALORIES">{{ currentCalories }}kcal</p>
-        <p v-else>{{ currentCalories }}kcal</p>
+        <p v-else>{{ caloriesMessage }}</p>
       </div>
     </div>
   </div>
@@ -42,7 +42,7 @@ const stompclient = gameMapStore.stompclient
 //Reaktive Calories Variable
 const MAXCALORIES = 3000
 let currentCalories = ref()
-const caloriesMessage = ref('')
+let caloriesMessage = ref('')
 
 const SNACKMAN_TEXTURE: string = 'src/assets/kirby.glb'
 let snackManModel: THREE.Group<THREE.Object3DEventMap>
@@ -152,6 +152,7 @@ onMounted(async () => {
     });
     gameMapStore.setOtherPlayers(playerHashMap)
     gameMapStore.setPlayer(player)
+    caloriesMessage = player.message
 
     watch(player.sprintData, (newSprintData) =>{
       sprintData.isSprinting = player.sprintData.isSprinting

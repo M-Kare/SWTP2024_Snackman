@@ -37,7 +37,6 @@ public class GameMap {
 
     public Square getSquareAtIndexXZ(int x, int z) {
         if((x < 0 | x >= gameMapSquares.length) | z < 0 | z >= gameMapSquares[0].length){
-            //TODO Really a new square?
             return new Square(MapObjectType.WALL, 0, 0); //returns pseudo-Suare Wall, because its out of hameMap
         }
 

@@ -10,4 +10,5 @@ export interface IMobUpdateDTD {
   sprintTimeLeft: number,
   isSprinting: boolean,
   isInCooldown: boolean,
+  message: string,
 }

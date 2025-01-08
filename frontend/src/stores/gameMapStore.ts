@@ -100,6 +100,10 @@ export const useGameMapStore = defineStore('gameMap', () => {
                   player.sprintData.isSprinting = mobUpdate.isSprinting
                   player.sprintData.isCooldown = mobUpdate.isInCooldown
 
+                  if(mobUpdate.message != null){
+                    player.message.value = mobUpdate.message
+                  }
+
                   player.setPosition(mobUpdate.position);
                 } else {
                   if (otherPlayers == undefined || otherPlayers.size == 0) {

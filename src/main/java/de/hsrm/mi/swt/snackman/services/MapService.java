@@ -56,22 +56,6 @@ public class MapService {
         return createNewGameMap(lobbyId, "./extensions/map/Maze.txt");
     }
 
-    //TODO add funtionality of max calories
-    /*
-          snackman.addPropertyChangeListener(event -> {
-            if (event.getPropertyName().equals("currentCalories")) {
-                int newCalories = (int) event.getNewValue();
-                String message = newCalories == snackman.getMAXKCAL() ? "Maximum calories reached!" : "";
-                System.out.println("Listener initilized");
-
-                FrontendMessageCaloriesEvent messageEvent = new FrontendMessageCaloriesEvent(EventType.CALORIES, ChangeType.UPDATE, newCalories, message);
-
-                frontendMessageService.sendUpdateCaloriesEvent(messageEvent);
-            }
-        });
-     */
-
-
     /**
      * Converts the char array maze data into MapObjects and populates the game map
      *
@@ -123,7 +107,6 @@ public class MapService {
                 square.addPropertyChangeListener((PropertyChangeEvent evt) -> {
                     if (evt.getPropertyName().equals("square")) {
                         messageLoop.addSquareToQueue((Square) evt.getNewValue(), lobbyId);
-                        // frontendLobbyMessageService.sendEvent(messageEvent);
                     }
                 });
                 break;
@@ -249,10 +232,8 @@ public class MapService {
                         snackmanSpawnIndex = 0;
                     }
                     temp = snackmanSpawnSquares.get(snackmanSpawnIndex);
-                    lobby.getClientMobMap().put(client.getPlayerId(),
-                            new SnackMan(lobby.getGameMap(), calcCenterPositionFromMapIndex(temp.getIndexX()),
-                                    GameConfig.SNACKMAN_GROUND_LEVEL,
-                                    calcCenterPositionFromMapIndex(temp.getIndexZ())));
+                    SnackMan snackMan = new SnackMan(lobby.getGameMap(), calcCenterPositionFromMapIndex(temp.getIndexX()), GameConfig.SNACKMAN_GROUND_LEVEL, calcCenterPositionFromMapIndex(temp.getIndexZ()));
+                    lobby.getClientMobMap().put(client.getPlayerId(), snackMan);
                     snackmanSpawnIndex++;
                     break;
             }

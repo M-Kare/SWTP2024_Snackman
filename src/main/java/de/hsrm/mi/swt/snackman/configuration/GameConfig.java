@@ -24,4 +24,5 @@ public class GameConfig {
     //Chicken
     public static final int WAITING_TIME = 2000;
     public static final int MAX_KALORIEN = 3000;
+    public static final String MAX_KALORIEN_MESSAGE = "Maximum calories reached!";
 }
