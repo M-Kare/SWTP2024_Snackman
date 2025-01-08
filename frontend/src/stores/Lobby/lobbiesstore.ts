@@ -175,7 +175,7 @@ export const useLobbiesStore = defineStore('lobbiesstore', () =>{
 
             if(response.ok){
                 const lobby: ILobbyDTD = await response.json()
-                //lobbydata.currentPlayer.joinedLobbyId = lobby.lobbyId
+                lobbydata.currentPlayer.joinedLobbyId = lobby.lobbyId
                 lobbydata.lobbies.push(lobby)
                 return lobby
             } else {
@@ -279,7 +279,7 @@ export const useLobbiesStore = defineStore('lobbiesstore', () =>{
                 throw new Error(`Failed to start game: ${response.statusText}`)
             }
 
-            const lobby = lobbydata.lobbies.find(l => l.uuid === lobbyId)
+            const lobby = lobbydata.lobbies.find(l => l.lobbyId === lobbyId)
             if (lobby) {
                 lobby.gameStarted = true
             }
