@@ -93,7 +93,7 @@ import LobbyListView from './LobbyListView.vue';
 
     const darkenBackground = ref(false);
     const showPopUp = ref(false);
-    const  errorBox = ref(false);
+    const errorBox = ref(false);
     const infoText = ref();
     const infoHeading = ref();
     const showInfo = ref(false);

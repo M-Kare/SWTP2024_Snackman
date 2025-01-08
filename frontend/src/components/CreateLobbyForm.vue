@@ -3,12 +3,15 @@
         <h1 id="title"> New Lobby </h1>
 
         <form id="form" @submit.prevent="createLobby">
-            <label>Enter Name: </label>
-            <input v-model.trim="lobbyName" type="text">
+            <label>
+
+                Enter Name:
+                <input v-model.trim="lobbyName" type="text">
+            </label>
             <p
                 id="error-message"
-                v-if="errorMessage"> 
-                
+                v-if="errorMessage">
+
                 {{ errorMessage }}
             </p>
         </form>
@@ -33,7 +36,7 @@
 <script setup lang="ts">
     import SmallNavButton from '@/components/SmallNavButton.vue';
     import { useRouter } from 'vue-router';
-    import { computed, onMounted, ref } from 'vue';
+    import { ref } from 'vue';
     import { useLobbiesStore } from '@/stores/Lobby/lobbiesstore';
     import type { IPlayerClientDTD } from '@/stores/Lobby/IPlayerClientDTD';
 
@@ -44,10 +47,8 @@
     const lobbyName = ref('');
     const errorMessage = ref('');
 
-    const emit = defineEmits<{
-        (event: 'cancelLobbyCreation', value: boolean): void;
-        (event: 'createLobby', value: string): void;
-    }>()
+    // defines event wich can be triggered by this component
+    const emit = defineEmits<(event: 'cancelLobbyCreation', value: boolean) => void>()
     
     /**
      * Emits an event to cancel the lobby creation process.
@@ -69,7 +70,7 @@
      * @async
      * @function createLobby
      * @throws {Error} Throws an alert if the admin client is invalid or the lobby name is empty or already taken.
-     * @throws {Error} Throws an alert if there is an error creating the lobby.
+     * @throws {Error} Shows a popup if there is an error creating the lobby.
      * @returns {void}
      */
     const createLobby = async () => {
