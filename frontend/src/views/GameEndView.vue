@@ -66,11 +66,8 @@ const downloadMap = async () => {
       
       // Success feedback
       feedbackMessage.value = 'Map saved';
-      feedbackClass.value = 'success';
-      console.log('Download Map sucessful!');     
+      feedbackClass.value = 'success';    
   } catch(error: any){
-      console.error('Error downloading file:', error);
-
       // Failure feedback
       feedbackMessage.value = 'Map not saved';
       feedbackClass.value = 'error';
