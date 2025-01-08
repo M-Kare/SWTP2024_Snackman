@@ -35,12 +35,12 @@ import type {LeaderboardEntry} from "@/stores/Leaderboard/LeaderboardDTD";
 
 const yourName = ref('');
 const errorMessage = ref('');
-
 const leaderboardStore = useLeaderboardStore()
 
 const emit = defineEmits<{
   (event: 'cancelNewLeaderboardEntryCreation', value: boolean): void;
   (event: 'createNewLeaderboardEntry', value: string): void;
+  (event: 'entryCreated'): void;
 }>()
 
 /**
@@ -71,13 +71,15 @@ const createNewLeaderboardEntry = async () => {
   }
 
   // TODO replace default data here
+  const today = new Date()
   const data: LeaderboardEntry = {
     name: yourName.value,
     duration: "00:00",
-    releaseDate: "2025-01-01"
+    releaseDate: today.toISOString().slice(0, 10)
   }
 
   try{
+    emit('entryCreated')
     await leaderboardStore.addNewLeaderboardEntry(data)
     cancelNewLeaderboardEntryCreation()
   } catch (error: any){
