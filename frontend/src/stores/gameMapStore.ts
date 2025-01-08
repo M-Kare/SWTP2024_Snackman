@@ -67,7 +67,7 @@ export const useGameMapStore = defineStore('gameMap', () => {
     const wsurl = `${protocol}//${window.location.host}/stompbroker`
     const DEST_SQUARE = '/topic/square'
     const DEST_CHICKEN = '/topic/chicken'
-    const DEST_GHOST = '/topic/player/ghost'
+    const DEST_GHOST = '/topic/ghost'
 
     if (!snackStompclient) {
       snackStompclient = new Client({brokerURL: wsurl})
@@ -230,7 +230,7 @@ export const useGameMapStore = defineStore('gameMap', () => {
     currentGhost.posZ = ghostUpdate.posZ
     currentGhost.posY = ghostUpdate.posY
 
-    ghostMesh!.position.set(currentGhost.posX * DEFAULT_SIDE_LENGTH + OFFSET, currentGhost.posY, currentGhost.posZ * DEFAULT_SIDE_LENGTH + OFFSET)
+    ghostMesh!.position.set(currentGhost.posX ,currentGhost.posY, currentGhost.posZ )
   }
 
   function setSnackMeshId(squareId: number, meshId: number) {
