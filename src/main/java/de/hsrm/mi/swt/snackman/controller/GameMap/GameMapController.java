@@ -54,15 +54,18 @@ public class GameMapController {
      * @return
      */
     @PostMapping("/upload")
-    public ResponseEntity<String> uploadMap(@RequestParam("file") MultipartFile file){
+    public ResponseEntity<String> uploadMap(@RequestParam("file") MultipartFile file, @RequestParam("lobbyId") String lobbyId){
         try{
             if (!file.getOriginalFilename().endsWith(".txt")) {
                 return ResponseEntity.badRequest().body("Invalid file type. Only .txt files are allowed.");
             }
 
             Path uploadPath = Paths.get("./extensions/map").toAbsolutePath();
-            
-            Path filePath = uploadPath.resolve("SnackManMap.txt");
+
+            String fileName = String.format("SnackManMap_%s.txt", lobbyId);
+
+            Path filePath = uploadPath.resolve(fileName);
+
             Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
             return ResponseEntity.ok("File uploaded successfully");
         } catch (Exception e){

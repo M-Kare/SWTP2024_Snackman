@@ -19,6 +19,13 @@
         <div v-if="feedbackMessage" :class="['feedback-message', feedbackClass]">
             {{ feedbackMessage }}
         </div>
+
+        <div class="map-list" v-for="map in mapList" :key="map.name">
+            <div class="map-list-item">
+                <input class="map-choose" type="radio" :value="map.name"/>
+                <span>{{ map.name }}</span>
+            </div>
+        </div>
     </div>
 
     <div class="outer-box">
@@ -90,6 +97,7 @@
     const lobbiesStore = useLobbiesStore();
 
     const playerId = lobbiesStore.lobbydata.currentPlayer.playerId;
+    const lobbyId = route.params.lobbyId as string;
     const lobby = computed(() => lobbiesStore.lobbydata.lobbies.find(l => l.uuid === route.params.lobbyId));
     const adminClientId = lobby.value?.adminClient.playerId;
     const members = computed(() => lobby.value?.members || [] as Array<IPlayerClientDTD>);
@@ -105,6 +113,10 @@
         showPopUp.value = false;
         darkenBackground.value = false;
     }
+
+    const mapList = ref<{ name: string }[]>([]);
+    const basicMap = { name: `Maze.txt` };
+    mapList.value.push(basicMap);
 
     const feedbackMessage = ref('');
     const feedbackClass = ref('');
@@ -133,7 +145,7 @@
 
                     if (validPattern.test(fileContent)){
                         console.log('File Content:\n', fileContent);
-                        uploadFileToServer(file);
+                        uploadFileToServer(file, lobbyId);
                     } else {
                         showPopUp.value = true;
                         darkenBackground.value = true;
@@ -155,9 +167,10 @@
      * Upload file to server
      * @param file 
      */
-    const uploadFileToServer = (file: File) => {
+    const uploadFileToServer = (file: File, lobbyId: string) => {
         const formData = new FormData();
         formData.append('file', file);
+        formData.append('lobbyId', lobbyId)
 
         fetch('/api/upload', {
             method: 'POST',
@@ -169,6 +182,9 @@
                 // Success feedback
                 feedbackMessage.value = 'Map saved';
                 feedbackClass.value = 'success';
+
+                const newMap = { name: `SnackManMap_${lobbyId}.txt` };
+                mapList.value.push(newMap);
             } else {
                 console.error('Error uploading file:', response.statusText);
                 // Failure feedback
@@ -405,6 +421,28 @@
   right: 20px;
   top: 150px;
   z-index: 3;
+}
+
+.map-list{
+    font-size: 2rem;
+    top: 30px;
+    gap: 25px;
+    justify-content: center;
+    align-items: center;
+    /* 
+    word-wrap: break-word; 
+    word-break: break-word; 
+    overflow-wrap: break-word;
+    width: inherit; 
+    max-width: 100%;
+    */
+}
+
+.map-choose{
+    width: 20px;
+    height: 20px;
+    transform: scale(1.5);
+    margin-right: 10px; 
 }
 
 .input-feld{
