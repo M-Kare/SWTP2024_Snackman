@@ -3,11 +3,17 @@
       <h1 class="result-title">{{ gameResult || '–' }}</h1>
       <p class="end-reason">{{ gameReason }}</p>
       <MainMenuButton class="menu-button" id="main-menu-button" @click="backToMainMenu">Zurück zum Hauptmenü</MainMenuButton>
+      <MapButton class="map-exportieren-button" @click="downloadMap">Map exportieren</MapButton>
+      <div v-if="feedbackMessage" :class="['feedback-message', feedbackClass]">
+        {{ feedbackMessage }}
+      </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import MainMenuButton from '@/components/MainMenuButton.vue';
+import MapButton from '@/components/MapButton.vue';
+import { ref } from 'vue';
 import { computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
@@ -36,6 +42,45 @@ const gameReason = computed(() => {
 const backToMainMenu = () => {
     router.push({ name: 'MainMenu' });
 };
+
+const feedbackMessage = ref('');
+const feedbackClass = ref('');
+    
+const downloadMap = async () => {
+  try{
+      const response = await fetch(`/api/download`);
+
+      if(!response.ok) throw new Error('Failed to download map.');
+
+      const blob = await response.blob();
+      const link = document.createElement('a');   // Create an anchor element to trigger the download
+      const url = URL.createObjectURL(blob);
+      link.href = url;
+      link.download = 'SnackManMap.txt';
+      document.body.appendChild(link);            // Append the link to the DOM
+      link.click();                               // Simulate a click to start the download        
+      document.body.removeChild(link);            // Remove the link after the download
+
+      // Revoke the object URL to free up memory
+      URL.revokeObjectURL(url);
+      
+      // Success feedback
+      feedbackMessage.value = 'Map saved';
+      feedbackClass.value = 'success';
+      console.log('Download Map sucessful!');     
+  } catch(error: any){
+      console.error('Error downloading file:', error);
+
+      // Failure feedback
+      feedbackMessage.value = 'Map not saved';
+      feedbackClass.value = 'error';
+  }
+  // Clear feedback after 3 seconds
+  setTimeout(() => {
+    feedbackMessage.value = '';
+    feedbackClass.value = '';
+  }, 3000);
+}
 </script>
 
 <style scoped>
@@ -64,5 +109,48 @@ const backToMainMenu = () => {
 .menu-button {
   font-size: 1.5rem;
   margin-top: 4rem;
+}
+
+.map-exportieren-button {
+  font-size: 1.5rem;
+  position: absolute;
+  top: 70%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 3;
+}
+
+.feedback-message {
+  position: absolute;
+  left: 50%;
+  top: 78%;
+  transform: translate(-50%, -50%);
+  font-size: 2rem;
+  font-weight: bold;
+  z-index: 3;
+  padding: 10px 20px;
+  border-radius: 5px;
+  text-align: center;
+  animation: fadeIn 0.5s;
+}
+
+.feedback-message.success {
+  color: #fff;
+  background-color: #50C878;
+}
+
+.feedback-message.error {
+  color: #fff;
+  background-color: #C70039;
+}
+
+/* Fade-in animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 </style>

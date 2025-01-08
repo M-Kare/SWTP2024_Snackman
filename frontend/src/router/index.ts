@@ -4,8 +4,6 @@ import GameView from '@/views/GameView.vue'
 import LobbyListView from '@/views/LobbyViews/LobbyListView.vue'
 import LobbyView from '@/views/LobbyViews/LobbyView.vue'
 import GameEndView from '@/views/GameEndView.vue'
-import EndGameView from '@/views/EndGameView.vue'
-
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
