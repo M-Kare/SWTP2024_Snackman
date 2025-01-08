@@ -71,11 +71,12 @@ function animate() {
       stompclient.publish({
         destination: GhostDEST + "/update", headers: {},
         body: JSON.stringify(Object.assign({}, player.getInput(), {
+          id: player.getId(),
           qX: player.getCamera().quaternion.x,
           qY: player.getCamera().quaternion.y,
           qZ: player.getCamera().quaternion.z,
           qW: player.getCamera().quaternion.w
-        }, {delta: delta}, { jump: player.getIsJumping()}, { doubleJump: player.getIsDoubleJumping()}))
+        }, {delta: delta}))
       });
     } catch (fehler) {
       console.log(fehler)
@@ -107,7 +108,7 @@ onMounted(async () => {
   }
 
   const playerData = await fetchGhostFromBackend(0);
-  player = new Player(renderer, playerData.posX, playerData.posY, playerData.posZ, playerData.radius, playerData.speed)
+  player = new Player(renderer,playerData.id,  playerData.posX, playerData.posY, playerData.posZ, playerData.radius, playerData.speed)
   camera = player.getCamera()
   scene.add(player.getControls().object)
 
