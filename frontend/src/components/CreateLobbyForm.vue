@@ -97,7 +97,6 @@
         try{
             const newLobby = await lobbiesStore.createLobby(lobbyName.value.trim(), adminClient);
             if (newLobby && newLobby.lobbyId) {
-                alert("Lobby created successfully!");
                 cancelLobbyCreation();
                 router.push({ name: "LobbyView", params: { lobbyId: newLobby.lobbyId } });
             } else {
