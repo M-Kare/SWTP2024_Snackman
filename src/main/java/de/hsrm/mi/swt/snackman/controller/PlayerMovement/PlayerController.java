@@ -1,5 +1,6 @@
 package de.hsrm.mi.swt.snackman.controller.PlayerMovement;
 
+import de.hsrm.mi.swt.snackman.configuration.GameConfig;
 import de.hsrm.mi.swt.snackman.services.LobbyManagerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +23,6 @@ public class PlayerController {
         return ResponseEntity.ok(new PlayerToFrontendDTO(playerMob.getPosX(), playerMob.getPosY(), playerMob.getPosZ(),
                 playerMob.getRotationQuaternion().x, playerMob.getRotationQuaternion().y,
                 playerMob.getRotationQuaternion().z, playerMob.getRotationQuaternion().w, playerMob.getRadius(),
-                playerMob.getSpeed(), playerId));
+                playerMob.getSpeed(), playerId, GameConfig.SNACKMAN_SPRINT_MULTIPLIER));
     }
 }

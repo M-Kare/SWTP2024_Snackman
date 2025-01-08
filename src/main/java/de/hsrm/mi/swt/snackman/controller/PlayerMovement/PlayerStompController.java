@@ -20,7 +20,7 @@ public class PlayerStompController {
     public void spreadPlayerUpdate(@DestinationVariable String lobbyId, PlayerToBackendDTO player) {
         Lobby currentLobby = lobbyService.findLobbyByLobbyId(lobbyId);
         var playerMob = switch (currentLobby.getClientMobMap().get(player.playerId())) {
-            case SnackMan snackman -> jumpUpdate(player, snackman);
+            case SnackMan snackman -> updateSnackman(player, snackman);
             case Ghost ghost -> ghost;
             default ->
                     throw new IllegalStateException("Unexpected value: " + currentLobby.getClientMobMap().get(player.playerId()));
@@ -29,15 +29,17 @@ public class PlayerStompController {
         playerMob.move(player.forward(), player.backward(), player.left(), player.right(), player.delta());
     }
 
-    private SnackMan jumpUpdate(PlayerToBackendDTO player, SnackMan snackman) {
-            if (player.jump()) {
-                if (player.doubleJump()) {
+    private SnackMan updateSnackman(PlayerToBackendDTO player, SnackMan snackman) {
+        if (player.jump()) {
+            if (player.doubleJump()) {
                 snackman.doubleJump();
-                } else {
-                    snackman.jump();
-                }
+            } else {
+                snackman.jump();
             }
-            snackman.updateJumpPosition(player.delta());
+        }
+        snackman.updateJumpPosition(player.delta());
+        snackman.setSprinting(player.sprinting());
+
         return snackman;
     }
 }

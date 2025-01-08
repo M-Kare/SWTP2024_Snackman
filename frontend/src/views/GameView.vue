@@ -63,21 +63,21 @@ stompclient.onConnect = frame => {
   stompclient.subscribe(DEST, message => {
     const event: IPlayerDTD = JSON.parse(message.body)
 
-    sprintData.sprintTimeLeft = (event.sprintTimeLeft / 5) * 100
-    sprintData.isSprinting = event.isSprinting
+    player.sprintData.sprintTimeLeft = (event.sprintTimeLeft / 5) * 100
+    player.sprintData.isSprinting = event.isSprinting
 
     // If the cooldown is active in the backend and the local state is not yet in cooldown
-    if (event.isInCooldown && !sprintData.isCooldown) {
+    if (event.isInCooldown && !player.sprintData.isCooldown) {
       const usedSprintTime = 5 - event.sprintTimeLeft
       startCooldownFill(usedSprintTime)
     }
 
     // When the backend cooldown has ended, but the local state is still in cooldown
-    if (!event.isInCooldown && sprintData.isCooldown) {
+    if (!event.isInCooldown && player.sprintData.isCooldown) {
       stopCooldownFill()
     }
 
-    sprintData.isCooldown = event.isInCooldown
+    player.sprintData.isCooldown = event.isInCooldown
 
     player.setPosition(event.posX, event.posY, event.posZ)
   })
@@ -196,8 +196,7 @@ onMounted(async () => {
     clients.forEach(it => {
       if(it.playerId === lobbydata.currentPlayer.playerId){
         player = new Player(renderer, playerData.posX, playerData.posY, playerData.posZ, playerData.radius,
-          playerData.speed, playerData.baseSpeed, playerData.sprintMultiplier,
-        )
+          playerData.speed, playerData.sprintMultiplier)
       } else {
         let material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } )
         material.color = new THREE.Color(Math.random(), Math.random(), Math.random());
@@ -239,10 +238,10 @@ function startCooldownFill(usedSprintTime: number) {
 
   const cooldownDuration = usedSprintTime * 2 * 1000 // Total cooldown duration in ms
   const startTime = performance.now()
-  const startValue = sprintData.sprintTimeLeft
+  const startValue = player.sprintData.sprintTimeLeft
   const fillAmount = 100 - startValue
 
-  sprintData.isCooldown = true
+  player.sprintData.isCooldown = true
 
   /**
    * Recursive function to animate the cooldown fill using requestAnimationFrame.
@@ -251,15 +250,15 @@ function startCooldownFill(usedSprintTime: number) {
     const now = performance.now()
     const elapsed = now - startTime
     const progress = Math.min(elapsed / cooldownDuration, 1)
-    sprintData.sprintTimeLeft = startValue + progress * fillAmount
+    player.sprintData.sprintTimeLeft = startValue + progress * fillAmount
 
     if (progress < 1) {
       // If the animation is not complete, request the next animation frame
       cooldownAnimationFrame = requestAnimationFrame(animateFill)
     } else {
       stopCooldownFill()
-      sprintData.isCooldown = false
-      sprintData.sprintTimeLeft = 100
+      player.sprintData.isCooldown = false
+      player.sprintData.sprintTimeLeft = 100
     }
   }
 
@@ -274,25 +273,22 @@ function stopCooldownFill() {
   }
 }
 
-const sprintData = reactive({
-  sprintTimeLeft: 100, // percentage (0-100)
-  isSprinting: false,
-  isCooldown: false,
-})
-
+/*
 const sprintBarStyle = computed(() => {
   let color = 'green'
-  if (sprintData.isSprinting) {
+  if (player.sprintData.isSprinting) {
     color = 'red'
-  } else if (sprintData.isCooldown) {
+  } else if (player.sprintData.isCooldown) {
     color = 'blue'
   }
 
+
   return {
-    width: `${sprintData.sprintTimeLeft}%`,
+    width: `${player.sprintData.sprintTimeLeft}%`,
     backgroundColor: color,
   }
 })
+*/
 </script>
 
 <style>

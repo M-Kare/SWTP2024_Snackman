@@ -94,6 +94,14 @@ export const useGameMapStore = defineStore('gameMap', () => {
                   if (player == undefined) {
                     continue;
                   }
+
+                  player.sprintData.sprintTimeLeft = (mobUpdate.sprintTimeLeft / 5) * 100
+                  player.sprintData.isSprinting = mobUpdate.isSprinting
+
+                  // If the cooldown is active in the backend and the local state is not yet in cooldown
+
+                  player.sprintData.isCooldown = mobUpdate.isInCooldown
+
                   player.setPosition(mobUpdate.position);
                 } else {
                   if (otherPlayers.size == 0) {

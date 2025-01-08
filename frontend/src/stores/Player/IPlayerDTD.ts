@@ -12,6 +12,7 @@ export interface IPlayerDTD {
   sprintTimeLeft: number
   isSprinting: boolean
   isInCooldown: boolean
+  sprintMultiplier: number
   currentCalories?: number
   message?: string
 }

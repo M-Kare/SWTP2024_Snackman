@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.SnackMan;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,7 +57,20 @@ public class MessageLoop {
             changedChicken.remove(lobby.getLobbyId());
             for(String client : lobby.getClientMobMap().keySet()){
                 Mob mob = lobby.getClientMobMap().get(client);
-                messages.add(new Message<>(EventEnum.MobUpdate, new MobUpdateMessage(mob.getPosition(), mob.getQuat(), mob.getRadius(), mob.getSpeed(), client)));
+
+                switch (mob) {
+                    case SnackMan snackMan -> {
+                        messages.add(new Message<>(EventEnum.MobUpdate, new MobUpdateMessage(mob.getPosition(),
+                                mob.getQuat(), mob.getRadius(), mob.getSpeed(), client, snackMan.getSprintTimeLeft(),
+                                snackMan.isSprinting(), snackMan.isInCooldown()
+                        )));
+                    }
+                    default -> {
+                        messages.add(new Message<>(EventEnum.MobUpdate, new MobUpdateMessage(mob.getPosition(),
+                                mob.getQuat(), mob.getRadius(), mob.getSpeed(), client, 0,
+                                false, false)));
+                    }
+                }
             }
             if(squareQueue != null){
                 for(Square square : squareQueue){

@@ -1,9 +1,10 @@
 import {useGameMapStore} from '@/stores/gameMapStore';
 import {MapObjectType, type IGameMap} from '@/stores/IGameMapDTD';
 import type {ISquare} from '@/stores/Square/ISquareDTD';
-import type {WebGLRenderer} from 'three'
+import  {type WebGLRenderer} from 'three'
 import * as THREE from 'three'
 import {PointerLockControls} from 'three/addons/controls/PointerLockControls.js'
+import {reactive, type UnwrapNestedRefs} from "vue";
 
 export class Player {
   private prevTime: DOMHighResTimeStamp
@@ -30,6 +31,12 @@ export class Player {
   private doubleJump: boolean;
   private spacePressed: boolean;
 
+  private _sprintData = reactive({
+    sprintTimeLeft: 100, // percentage (0-100)
+    isSprinting: false,
+    isCooldown: false,
+  })
+
   //TODO: ersetzten durch das maze im pinia store
   private squareSize: Readonly<number>;
   private gameMap: ISquare[][];
@@ -44,7 +51,7 @@ export class Player {
    * @param radius size of the player
    * @param speed speed-modifier of the player
    */
-  constructor(renderer: WebGLRenderer, posX: number, posY: number, posZ: number, radius: number, speed: number, baseSpeed: number, sprintMultiplier: number) {
+  constructor(renderer: WebGLRenderer, posX: number, posY: number, posZ: number, radius: number, speed: number, sprintMultiplier: number) {
     this.prevTime = performance.now();
     this.moveBackward = false;
     this.moveForward = false;
@@ -384,5 +391,9 @@ export class Player {
 
   public get isSprinting(): boolean {
     return this.sprinting;
+  }
+
+  get sprintData(): UnwrapNestedRefs<{ isSprinting: boolean; sprintTimeLeft: number; isCooldown: boolean }> & {} {
+    return this._sprintData;
   }
 }
