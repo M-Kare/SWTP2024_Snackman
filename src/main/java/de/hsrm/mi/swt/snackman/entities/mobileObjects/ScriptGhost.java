@@ -72,7 +72,7 @@ public class ScriptGhost extends Mob implements Runnable {
      *
      * @return the next incremented id
      */
-    private synchronized static long generateId() {
+    protected synchronized static long generateId() {
         return idCounter++;
     }
 

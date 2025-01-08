@@ -1,16 +1,13 @@
 package de.hsrm.mi.swt.snackman.controller.PlayerMovement;
 
-import de.hsrm.mi.swt.snackman.controller.GameMap.GhostDTO;
+import de.hsrm.mi.swt.snackman.controller.Ghost.GhostDTO;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.Ghost;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
-
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.SnackMan;
 import de.hsrm.mi.swt.snackman.services.MapService;
-
-import java.sql.SQLOutput;
 
 @Controller
 public class PlayerMovementController {
