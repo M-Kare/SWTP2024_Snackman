@@ -1,36 +1,24 @@
 package de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs;
 
-import de.hsrm.mi.swt.snackman.controller.PlayerMovement.SnackManUpdateDTO;
-import de.hsrm.mi.swt.snackman.entities.map.Square;
-import de.hsrm.mi.swt.snackman.entities.mapObject.snack.Snack;
 import de.hsrm.mi.swt.snackman.entities.mechanics.SprintHandler;
-import de.hsrm.mi.swt.snackman.messaging.*;
-import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
 
 import de.hsrm.mi.swt.snackman.configuration.GameConfig;
-import de.hsrm.mi.swt.snackman.entities.mechanics.SprintHandler;
 import de.hsrm.mi.swt.snackman.services.MapService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.beans.PropertyChangeEvent;
-
 @Component
 public class SnackMan extends EatingMob {
+    private final Logger log = LoggerFactory.getLogger(SnackMan.class);
     private boolean isJumping = false;
     private double velocityY = 0.0;
     private boolean isSprinting = false;
-    
     private SprintHandler sprintHandler = new SprintHandler();
 
-    private FrontendMessageService frontendMessageService;
-    private final Logger log = LoggerFactory.getLogger(SnackMan.class);
-
     @Autowired
-    public SnackMan(MapService mapService){
+    public SnackMan(MapService mapService) {
         this(mapService, GameConfig.SNACKMAN_SPEED, GameConfig.SNACKMAN_RADIUS);
     }
 
@@ -44,22 +32,20 @@ public class SnackMan extends EatingMob {
 
     //JUMPING
     public void jump() {
-        if (!isJumping) {
-            if (getKcal() >= 100) {
+        if (!isJumping && getKcal() >= 100) {
                 this.velocityY = GameConfig.JUMP_STRENGTH;
                 this.isJumping = true;
                 setKcal(getKcal() - 100);
             }
-        }
+
     }
 
     public void doubleJump() {
-        if (isJumping) {
-            if (getKcal() >= 100) {
+        if (isJumping && getKcal() >= 100) {
                 this.velocityY += GameConfig.DOUBLEJUMP_STRENGTH;
                 setKcal(getKcal() - 100);
             }
-        }
+
     }
 
     public void updateJumpPosition(double deltaTime) {
@@ -104,22 +90,8 @@ public class SnackMan extends EatingMob {
             sprintHandler.stopSprint();
             setSpeed(GameConfig.SNACKMAN_SPEED);
         }
-    
+
         super.move(forward, backward, left, right, delta);
-    }
-    
-    public void setSprinting(boolean sprinting) {
-        this.isSprinting = sprinting;
-    
-        if (sprinting) {
-            if (sprintHandler.canSprint()) {
-                sprintHandler.startSprint();
-            } else {
-                this.isSprinting = false;
-            }
-        } else {
-            sprintHandler.stopSprint();
-        }
     }
 
     public int getSprintTimeLeft() {
@@ -134,14 +106,33 @@ public class SnackMan extends EatingMob {
         return isSprinting;
     }
 
+    public void setSprinting(boolean sprinting) {
+        this.isSprinting = sprinting;
+
+        if (sprinting) {
+            if (sprintHandler.canSprint()) {
+                sprintHandler.startSprint();
+            } else {
+                this.isSprinting = false;
+            }
+        } else {
+            sprintHandler.stopSprint();
+        }
+    }
+
     public int getCurrentCalories() {
         return super.getKcal();
     }
-    /**
-     * Collects the snack on the square if there is one.
-     * If there is one that remove it from the square.
-     *
-     * @param square to eat the snack from
-     */
 
+    public boolean isJumping() {
+        return isJumping;
+    }
+
+    public double getVelocityY() {
+        return velocityY;
+    }
+
+    public void setSprintHandler(SprintHandler sprintHandler) {
+        this.sprintHandler = sprintHandler;
+    }
 }

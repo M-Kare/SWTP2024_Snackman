@@ -1,15 +1,15 @@
-import {defineStore} from 'pinia';
-import {reactive, readonly} from "vue";
-import type {IGameMap, IGameMapDTD} from './IGameMapDTD';
-import {fetchGameMapDataFromBackend} from "../services/GameMapDataService.js";
-import {Client} from "@stomp/stompjs";
-import type {IFrontendChickenMessageEvent, IFrontendMessageEvent} from "@/services/IFrontendMessageEvent";
-import type {ISquare} from "@/stores/Square/ISquareDTD";
-import * as THREE from "three";
-import {Scene} from "three";
-import type {IChicken, IChickenDTD} from "@/stores/Chicken/IChickenDTD";
-import {Direction} from "@/stores/Chicken/IChickenDTD";
-import {GameObjectRenderer} from "@/renderer/GameObjectRenderer";
+import {defineStore} from 'pinia'
+import {reactive, readonly} from 'vue'
+import type {IGameMap, IGameMapDTD} from './IGameMapDTD'
+import {fetchGameMapDataFromBackend} from '@/services/GameMapDataService'
+import {Client} from '@stomp/stompjs'
+import type {ChangeType, IFrontendChickenMessageEvent, IFrontendMessageEvent,} from '@/services/IFrontendMessageEvent'
+import type {ISquare} from '@/stores/Square/ISquareDTD'
+import * as THREE from 'three'
+import {Scene} from 'three'
+import type {IChicken, IChickenDTD} from '@/stores/Chicken/IChickenDTD'
+import {ChickenThickness, Direction} from '@/stores/Chicken/IChickenDTD'
+import {GameObjectRenderer} from '@/renderer/GameObjectRenderer'
 
 /**
  * Defines the pinia store used for saving the map from
@@ -22,18 +22,17 @@ export const useGameMapStore = defineStore('gameMap', () => {
   let chickenStompclient: Client
   const scene = new THREE.Scene()
   const gameObjectRenderer = GameObjectRenderer()
-  const CHICKEN_MOVEMENT_SPEED = 0.1    // step size of the interpolation: between 0 and 1
+  const CHICKEN_MOVEMENT_SPEED = 0.1 // step size of the interpolation: between 0 and 1
 
   const mapData = reactive({
     DEFAULT_SQUARE_SIDE_LENGTH: 0,
     DEFAULT_WALL_HEIGHT: 0,
     gameMap: new Map<number, ISquare>(),
-    chickens: []
-  } as IGameMap);
+    chickens: [],
+  } as IGameMap)
 
   async function initGameMap() {
     try {
-
       const response: IGameMapDTD = await fetchGameMapDataFromBackend()
       mapData.DEFAULT_SQUARE_SIDE_LENGTH = response.DEFAULT_SQUARE_SIDE_LENGTH
       mapData.DEFAULT_WALL_HEIGHT = response.DEFAULT_WALL_HEIGHT
@@ -45,7 +44,6 @@ export const useGameMapStore = defineStore('gameMap', () => {
       for (const chicken of response.chickens) {
         mapData.chickens.push(chicken as IChicken)
       }
-
     } catch (reason) {
       throw reason //Throw again to pass to execution function
     }
@@ -58,27 +56,51 @@ export const useGameMapStore = defineStore('gameMap', () => {
     const DEST_CHICKEN = '/topic/chicken'
 
     if (!snackStompclient) {
-      snackStompclient = new Client({brokerURL: wsurl})
+      snackStompclient = new Client({ brokerURL: wsurl })
 
-      snackStompclient.onWebSocketError = (event) => {
+      snackStompclient.onWebSocketError = event => {
         throw new Error('Websocket wit message: ' + event)
       }
 
-      snackStompclient.onStompError = (frameElement) => {
+      snackStompclient.onStompError = frameElement => {
         throw new Error('Stompclient with message: ' + frameElement)
       }
 
-      snackStompclient.onConnect = (frameElement) => {
+      snackStompclient.onConnect = frameElement => {
         console.log('Stompclient connected')
 
-        snackStompclient.subscribe(DEST_SQUARE, async (message) => {
+        snackStompclient.subscribe(DEST_SQUARE, async message => {
           const change: IFrontendMessageEvent = JSON.parse(message.body)
 
-          const savedMeshId = mapData.gameMap.get(change.square.id)!.snack.meshId
+          if (change.changeType == 'CREATE') {
+            const OFFSET = mapData.DEFAULT_SQUARE_SIDE_LENGTH / 2
+            const DEFAULT_SIDE_LENGTH = mapData.DEFAULT_SQUARE_SIDE_LENGTH
 
-          removeMeshFromScene(scene, savedMeshId)
+            const square = change.square as ISquare
+            const currentSquareInPinia = mapData.gameMap.get(square.id)
+            const eggToAdd = gameObjectRenderer.createSnackOnFloor(
+              square.indexX * DEFAULT_SIDE_LENGTH + OFFSET,
+              square.indexZ * DEFAULT_SIDE_LENGTH + OFFSET,
+              DEFAULT_SIDE_LENGTH,
+              square.snack?.snackType,
+            )
 
-          mapData.gameMap.set(change.square.id, change.square as ISquare)
+            currentSquareInPinia!.snack = square.snack
+            scene.add(eggToAdd)
+            setSnackMeshId(currentSquareInPinia!.id, eggToAdd.id)
+
+            mapData.gameMap.set(change.square.id, change.square as ISquare)
+          } else if (change.changeType == 'UPDATE') {
+            // TODO fix bug "Unhandled Promise Rejection: TypeError: null is not an object (evaluating 'mapData.gameMap.get(change.square.id).snack.meshId')"
+            if (mapData.gameMap.get(change.square.id)!.snack.meshId != null) {
+              const savedMeshId = mapData.gameMap.get(change.square.id)!.snack
+                .meshId
+
+              removeMeshFromScene(scene, savedMeshId)
+
+              mapData.gameMap.set(change.square.id, change.square as ISquare)
+            }
+          }
         })
       }
 
@@ -89,41 +111,47 @@ export const useGameMapStore = defineStore('gameMap', () => {
       snackStompclient.activate()
     }
 
-
     if (!chickenStompclient) {
-      chickenStompclient = new Client({brokerURL: wsurl})
+      chickenStompclient = new Client({ brokerURL: wsurl })
 
-      chickenStompclient.onWebSocketError = (event) => {
+      chickenStompclient.onWebSocketError = event => {
         throw new Error('Chicken Websocket with message: ' + event)
       }
 
-      chickenStompclient.onStompError = (frameElement) => {
+      chickenStompclient.onStompError = frameElement => {
         throw new Error('Chicken Stompclient with message: ' + frameElement)
       }
 
-      chickenStompclient.onConnect = (frameElement) => {
+      chickenStompclient.onConnect = frameElement => {
         console.log('Stompclient for chicken connected')
 
-        chickenStompclient.subscribe(DEST_CHICKEN, async (message) => {
+        chickenStompclient.subscribe(DEST_CHICKEN, async message => {
           const change: IFrontendChickenMessageEvent = JSON.parse(message.body)
-          console.log("Received a chicken update: {}", change)
-
           const chickenUpdate: IChickenDTD = change.chicken
           const OFFSET = mapData.DEFAULT_SQUARE_SIDE_LENGTH / 2
           const DEFAULT_SIDE_LENGTH = mapData.DEFAULT_SQUARE_SIDE_LENGTH
-          const currentChicken = mapData.chickens.find(chicken => chicken.id == chickenUpdate.id)
-          console.log("chicken update {}", chickenUpdate)
+          const currentChicken = mapData.chickens.find(
+            chicken => chicken.id == chickenUpdate.id,
+          )
 
           if (currentChicken == undefined) {
-            console.error("A chicken is undefined in pinia")
+            console.error('A chicken is undefined in pinia')
           } else {
             if (currentChicken.thickness != chickenUpdate.thickness) {
               updateThickness(currentChicken, chickenUpdate)
             }
-            if (chickenUpdate.chickenPosX == currentChicken!.chickenPosX && chickenUpdate.chickenPosZ == currentChicken!.chickenPosZ) {
+            if (
+              chickenUpdate.chickenPosX == currentChicken!.chickenPosX &&
+              chickenUpdate.chickenPosZ == currentChicken!.chickenPosZ
+            ) {
               updateLookingDirection(currentChicken, chickenUpdate)
             } else {
-              updateWalkingDirection(currentChicken, chickenUpdate, DEFAULT_SIDE_LENGTH, OFFSET)
+              updateWalkingDirection(
+                currentChicken,
+                chickenUpdate,
+                DEFAULT_SIDE_LENGTH,
+                OFFSET,
+              )
             }
           }
         })
@@ -137,38 +165,78 @@ export const useGameMapStore = defineStore('gameMap', () => {
     }
   }
 
-  function updateThickness(currentChicken: IChicken, chickenUpdate: IChickenDTD) {
-    console.log("Chicken thickness updated")
+  function updateThickness(
+    currentChicken: IChicken,
+    chickenUpdate: IChickenDTD,
+  ) {
     const chickenMesh = scene.getObjectById(currentChicken.meshId)
     currentChicken.thickness = chickenUpdate.thickness
 
-    // todo update chicken thickness with new geometry
-  }
+    if (!chickenMesh) {
+      console.warn('Chicken mesh not found in the scene.')
+      return
+    }
 
-  function updateLookingDirection(currentChicken: IChicken, chickenUpdate: IChickenDTD) {
-    console.log("Chicken looking direction updated")
-    const chickenMesh = scene.getObjectById(currentChicken.meshId)
+    const thicknessValue =
+      ChickenThickness[chickenUpdate.thickness as keyof typeof ChickenThickness]
 
-    currentChicken.lookingDirection = chickenUpdate.lookingDirection
-    switch (currentChicken.lookingDirection) {    // rotates the chicken depending on what its looking direction is
-      case Direction.NORTH || Direction.SOUTH:
-        chickenMesh!.setRotationFromEuler(new THREE.Euler(0))
-        break;
-      case Direction.EAST || Direction.WEST:
-        chickenMesh!.setRotationFromEuler(new THREE.Euler(Math.PI / 2))
-        break;
+    switch (thicknessValue) {
+      case ChickenThickness.THIN:
+        chickenMesh!.scale.set(1, 1, 1)
+        break
+      case ChickenThickness.SLIGHTLY_THICK:
+        chickenMesh!.scale.set(1.25, 1.25, 1.25)
+        break
+      case ChickenThickness.MEDIUM:
+        chickenMesh!.scale.set(1.5, 1.5, 1.5)
+        break
+      case ChickenThickness.HEAVY:
+        chickenMesh!.scale.set(1.75, 1.75, 1.75)
+        break
+      case ChickenThickness.VERY_HEAVY:
+        chickenMesh!.scale.set(2, 2, 2)
+        break
+      default:
+        console.log('ETWAS IST SCHIED GELAUFEN...')
     }
   }
 
-  function updateWalkingDirection(currentChicken: IChicken, chickenUpdate: IChickenDTD, DEFAULT_SIDE_LENGTH: number, OFFSET: number) {
-    console.log("Chicken moved")
+  function updateLookingDirection(
+    currentChicken: IChicken,
+    chickenUpdate: IChickenDTD,
+  ) {
+    const chickenMesh = scene.getObjectById(currentChicken.meshId)
+
+    currentChicken.lookingDirection = chickenUpdate.lookingDirection
+    switch (
+      currentChicken.lookingDirection // rotates the chicken depending on what its looking direction is
+    ) {
+      case Direction.NORTH || Direction.SOUTH:
+        chickenMesh!.setRotationFromEuler(new THREE.Euler(0))
+        break
+      case Direction.EAST || Direction.WEST:
+        chickenMesh!.setRotationFromEuler(new THREE.Euler(Math.PI / 2))
+        break
+    }
+  }
+
+  function updateWalkingDirection(
+    currentChicken: IChicken,
+    chickenUpdate: IChickenDTD,
+    DEFAULT_SIDE_LENGTH: number,
+    OFFSET: number,
+  ) {
     const chickenMesh = scene.getObjectById(currentChicken.meshId)
 
     currentChicken.chickenPosX = chickenUpdate.chickenPosX
     currentChicken.chickenPosZ = chickenUpdate.chickenPosZ
 
     //chickenMesh!.position.lerp(new THREE.Vector3(currentChicken.posX * DEFAULT_SIDE_LENGTH + OFFSET, 0, currentChicken.posZ * DEFAULT_SIDE_LENGTH + OFFSET), CHICKEN_MOVEMENT_SPEED)  // interpolates between original point and new point
-    chickenMesh!.position.set(currentChicken.chickenPosX * DEFAULT_SIDE_LENGTH + OFFSET, 0, currentChicken.chickenPosZ * DEFAULT_SIDE_LENGTH + OFFSET)
+    chickenMesh!.position.set(
+      currentChicken.chickenPosX * DEFAULT_SIDE_LENGTH + OFFSET,
+      0,
+      currentChicken.chickenPosZ * DEFAULT_SIDE_LENGTH + OFFSET,
+    )
   }
 
   function setSnackMeshId(squareId: number, meshId: number) {
@@ -178,9 +246,8 @@ export const useGameMapStore = defineStore('gameMap', () => {
   }
 
   function setChickenMeshId(meshId: number, chickenId: number) {
-    const chicken = mapData.chickens.find(chicken => chicken.id === chickenId);
-    if (chicken != undefined)
-      chicken.meshId = meshId
+    const chicken = mapData.chickens.find(chicken => chicken.id === chickenId)
+    if (chicken != undefined) chicken.meshId = meshId
   }
 
   function removeMeshFromScene(scene: Scene, meshId: number) {
@@ -200,6 +267,6 @@ export const useGameMapStore = defineStore('gameMap', () => {
     startGameMapLiveUpdate,
     setSnackMeshId,
     setChickenMeshId,
-    getScene
-  };
+    getScene,
+  }
 })

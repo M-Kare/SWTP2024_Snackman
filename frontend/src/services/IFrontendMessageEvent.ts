@@ -6,15 +6,15 @@ type EventType = 'SNACK' | 'CHICKEN' | 'CALORIES' | 'LEADERBOARD'
 type ChangeType = 'CREATE' | 'UPDATE' | 'DELETE'
 
 export interface IFrontendMessageEvent {
-  eventType: EventType,
-  changeType: ChangeType,
+  eventType: EventType
+  changeType: ChangeType
   square: ISquareDTD
 }
 
-export interface IFrontendChickenMessageEvent{
-  eventType: EventType,
-  changeType: ChangeType,
-  chicken: IChickenDTD,
+export interface IFrontendChickenMessageEvent {
+  eventType: EventType
+  changeType: ChangeType
+  chicken: IChickenDTD
 }
 
 export interface IFrontendCaloriesMessageEvent {
