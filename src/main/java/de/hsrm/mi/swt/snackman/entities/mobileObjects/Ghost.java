@@ -19,27 +19,11 @@ public class Ghost extends Mob {
 
     private final PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
 
-    public Ghost(Square currentSquare, MapService mapService, int speed, double radius) {
-        //super(mapService, speed, radius, currentSquare.getIndexX()*GameConfig.SQUARE_SIZE, GameConfig.GHOST_GROUND_LEVEL, currentSquare.getIndexZ()*GameConfig.SQUARE_SIZE );
-        //super(mapService, speed, radius, currentSquare.getIndexX(), GameConfig.GHOST_GROUND_LEVEL, currentSquare.getIndexZ());
-        super();
-        super.setQuat(new Quaterniond());
+    public Ghost(Square currentSquare, MapService mapService) {
+        super(mapService, GameConfig.GHOST_SPEED, GameConfig.GHOST_RADIUS, (currentSquare.getIndexX() * GameConfig.SQUARE_SIZE + 0.5 * GameConfig.SQUARE_SIZE), GameConfig.SNACKMAN_GROUND_LEVEL, (currentSquare.getIndexZ() * GameConfig.SQUARE_SIZE + 0.5 * GameConfig.SQUARE_SIZE));
 
-        super.mapService = mapService;
-        setSpawn(new Vector3d(currentSquare.getIndexX(), GameConfig.GHOST_GROUND_LEVEL, currentSquare.getIndexZ() ));
-        super.setPosition(super.getSpawn());
-        setPosY(GameConfig.GHOST_GROUND_LEVEL);
-        setPosX(currentSquare.getIndexX());
-        setPosZ(currentSquare.getIndexZ());
-        super.id = generateId();
-        super.setPosY(GameConfig.SNACKMAN_GROUND_LEVEL);
-        super.setPosX(currentSquare.getIndexX());
-        super.setPosZ(currentSquare.getIndexZ());
         currentSquare.addMob(this);
-
     }
-
-
 
     public void collectItems() {
 
@@ -62,23 +46,17 @@ public class Ghost extends Mob {
     }
 
     @Override
-    public void move(double posX, double posY, double posZ) {
-        Square oldSquare = mapService.getSquareAtIndexXZ(calcMapIndexOfCoordinate(posX), calcMapIndexOfCoordinate(posZ));
-        Square newSquare = mapService.getSquareAtIndexXZ((int) posX, (int) posZ);
-
+    public void move(boolean f, boolean b, boolean l, boolean r, double delta) {
+        Square oldSquare = mapService.getSquareAtIndexXZ(calcMapIndexOfCoordinate(super.getPosX()), calcMapIndexOfCoordinate(super.getPosZ()));
+        super.move(f , b , l , r, delta);
+        Square newSquare = mapService.getSquareAtIndexXZ( calcMapIndexOfCoordinate(super.getPosX()), calcMapIndexOfCoordinate( super.getPosZ() ));
+        propertyChangeSupport.firePropertyChange("ghost", null, this); // ghost ändern
+        scare(newSquare);
         if (!oldSquare.equals(newSquare)) {
             oldSquare.removeMob(this);
             newSquare.addMob(this);
-            propertyChangeSupport.firePropertyChange("ghost", null, this); // ghost ändern
         }
 
-        super.move(posX, posY, posZ);
-        this.setPosX(posX);                                 // --------------------oder muss hier super.
-        this.setPosZ(posZ);                                 // --------------------oder muss hier super.
-
-        super.setPositionWithIndexXZ(posX, posZ);
-
-        scare(newSquare);
     }
 
     @Override
