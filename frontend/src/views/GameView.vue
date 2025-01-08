@@ -39,7 +39,7 @@ const route = useRoute();
 const UPDATE = '/topic/calories'
 
 //Reaktive Calories Variable
-const MAXCALORIES = 3000;
+const MAXCALORIES = ref(0);
 const currentCalories  = ref(0);
 const caloriesMessage = ref('');
 const playerRole = ref(route.query.role || ''); // Player role from the URL query
@@ -92,13 +92,13 @@ stompclient.subscribe(UPDATE, message => {
   }
 
   // Check win/lose conditions for SnackMan or Ghosts
-  if (event.calories >= MAXCALORIES) {
+  if (event.calories >= MAXCALORIES.value) {
     // Navigate to GameEndView with "SnackMan Wins"
     router.push({
       name: 'GameEnd',
       query: {
         role: playerRole.value,
-        result: playerRole.value === 'SNACKMAN' ? 'Gewonnen' : 'Verloren'
+        result: playerRole.value === 'SNACKMAN' ? 'Gewonnen' : 'Verloren',
       }
     });
   } else if (event.calories < 0) {
@@ -107,7 +107,7 @@ stompclient.subscribe(UPDATE, message => {
       name: 'GameEnd',
       query: {
         role: playerRole.value,
-        result: playerRole.value === 'GHOST' ? 'Gewonnen' : 'Verloren'
+        result: playerRole.value === 'GHOST' ? 'Gewonnen' : 'Verloren',
       }
     });
   }
@@ -117,11 +117,8 @@ stompclient.subscribe(UPDATE, message => {
 
 // Kalorien-Overlay Fill berrechnen
 const getBackgroundStyle = computed(() => {
-  const maxCalories = 3000
-  //Prozent berechnen
-  const percentage = Math.min(currentCalories.value / maxCalories, 1)
-
-  const color = `linear-gradient(to right, #EEC643 ${percentage * 100}%, #5E4A08 ${percentage * 100}%)`
+  const percentage = Math.min(currentCalories.value / MAXCALORIES.value, 1);
+  const color = `linear-gradient(to right, #EEC643 ${percentage * 100}%, #5E4A08 ${percentage * 100}%)`;
 
   return {
     background: color,
@@ -232,6 +229,8 @@ onMounted(async () => {
   )
   camera = player.getCamera()
   scene.add(player.getControls().object)
+
+  MAXCALORIES.value = playerData.maxCalories;
 
   loadPlayerModel(SNACKMAN_TEXTURE)
 

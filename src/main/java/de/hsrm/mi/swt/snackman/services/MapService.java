@@ -68,7 +68,7 @@ public class MapService {
             if (event.getPropertyName().equals("currentCalories")) {
                 int newCalories = (int) event.getNewValue();
         
-                if (newCalories >= 3000) {
+                if (newCalories >= GameConfig.SNACKMAN_MAX_CALORIES) {
                     String message = newCalories == snackman.getMAXKCAL() ? "Maximum calories reached!" : "";
                     FrontendMessageCaloriesEvent messageEvent = new FrontendMessageCaloriesEvent(
                         EventType.CALORIES,
