@@ -17,7 +17,7 @@ public class PlayerStompController {
     private LobbyManagerService lobbyService;
 
     @MessageMapping("/topic/lobbies/{lobbyId}/player/update")
-    public void spreadPlayerUpdate(@DestinationVariable String lobbyId, PlayerToBackendDTO player) {
+    public void spreadPlayerUpdate(@DestinationVariable("lobbyId") String lobbyId, PlayerToBackendDTO player) {
         Lobby currentLobby = lobbyService.findLobbyByLobbyId(lobbyId);
         var playerMob = switch (currentLobby.getClientMobMap().get(player.playerId())) {
             case SnackMan snackman -> updateSnackman(player, snackman);

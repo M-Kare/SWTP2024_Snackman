@@ -16,7 +16,7 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, onMounted, onUnmounted, ref} from 'vue'
+import {computed, onMounted, onUnmounted, ref, watch} from 'vue'
 import * as THREE from 'three'
 import { Player } from '@/components/Player';
 import { fetchSnackManFromBackend } from '@/services/SnackManInitService';
@@ -37,7 +37,7 @@ let clients: Array<IPlayerClientDTD>;
 let playerHashMap = new Map<String, THREE.Mesh>()
 
 const stompclient = gameMapStore.stompclient
-const UPDATE = '/topic/calories'
+// stompclient.activate()
 
 //Reaktive Calories Variable
 const MAXCALORIES = 3000
@@ -46,54 +46,6 @@ const caloriesMessage = ref('')
 
 const SNACKMAN_TEXTURE: string = 'src/assets/kirby.glb'
 let snackManModel: THREE.Group<THREE.Object3DEventMap>
-// other textures
-
-// stomp
-//TODO Add to gameloop!!!
-/*
-const stompclient = new Client({ brokerURL: WSURL })
-stompclient.onWebSocketError = event => {
-}
-stompclient.onStompError = frame => {
-}
-stompclient.onConnect = frame => {
-  stompclient.subscribe(DEST, message => {
-    const event: IPlayerDTD = JSON.parse(message.body)
-
-    player.sprintData.sprintTimeLeft = (event.sprintTimeLeft / 5) * 100
-    player.sprintData.isSprinting = event.isSprinting
-
-    // If the cooldown is active in the backend and the local state is not yet in cooldown
-    if (event.isInCooldown && !player.sprintData.isCooldown) {
-      const usedSprintTime = 5 - event.sprintTimeLeft
-      startCooldownFill(usedSprintTime)
-    }
-
-    // When the backend cooldown has ended, but the local state is still in cooldown
-    if (!event.isInCooldown && player.sprintData.isCooldown) {
-      stopCooldownFill()
-    }
-
-    player.sprintData.isCooldown = event.isInCooldown
-
-    player.setPosition(event.posX, event.posY, event.posZ)
-  })
-*/
-
-// Kalorien-Overlay Fill berrechnen
-const getBackgroundStyle = computed(() => {
-  const maxCalories = 3000
-  //Prozent berechnen
-  const percentage = Math.min(currentCalories.value / maxCalories, 1)
-
-  const color = `linear-gradient(to right, #EEC643 ${percentage * 100}%, #5E4A08 ${percentage * 100}%)`
-
-  return {
-    background: color,
-  }
-})
-
-stompclient.activate()
 
 const canvasRef = ref()
 let renderer: THREE.WebGLRenderer
@@ -113,7 +65,6 @@ let counter = 0
 // only sends updates to backend at 30hz
 function animate() {
   currentCalories.value = player.getCalories()
-
   fps = 1 / clock.getDelta()
   player.updatePlayer()
   if (counter >= fps / targetHz) {
@@ -191,9 +142,22 @@ onMounted(async () => {
         playerHashMap.set(it.playerId, cube);
       }
     });
-
     gameMapStore.setOtherPlayers(playerHashMap)
     gameMapStore.setPlayer(player)
+
+    watch(player.sprintData, (newSprintData) =>{
+      console.debug("watching...")
+      if (player.sprintData.isCooldown) {
+      const usedSprintTime = 5 - player.sprintData.sprintTimeLeft
+      startCooldownFill(usedSprintTime)
+    }
+
+    // When the backend cooldown has ended, but the local state is still in cooldown
+    if (!player.sprintData.isCooldown) {
+      stopCooldownFill()
+    }
+    })
+
   camera = player.getCamera()
   scene.add(player.getControls().object)
 
@@ -258,22 +222,34 @@ function stopCooldownFill() {
   }
 }
 
-/*
-const sprintBarStyle = computed(() => {
-  let color = 'green'
-  if (player.sprintData.isSprinting) {
-    color = 'red'
-  } else if (player.sprintData.isCooldown) {
-    color = 'blue'
-  }
+// Kalorien-Overlay Fill berrechnen
+const getBackgroundStyle = computed(() => {
+  const maxCalories = 3000
+  //Prozent berechnen
+  const percentage = Math.min(currentCalories.value / maxCalories, 1)
 
+  const color = `linear-gradient(to right, #EEC643 ${percentage * 100}%, #5E4A08 ${percentage * 100}%)`
 
   return {
-    width: `${player.sprintData.sprintTimeLeft}%`,
-    backgroundColor: color,
+    background: color,
   }
 })
-*/
+
+const sprintBarStyle = computed(() => {
+  let color = 'green'
+  if(player != undefined){
+
+    if (player.sprintData.isSprinting) {
+      color = 'red'
+    } else if (player.sprintData.isCooldown) {
+      color = 'blue'
+    }
+    return {
+      width: `${player.sprintData.sprintTimeLeft}%`,
+      backgroundColor: color,
+    }
+  }
+})
 </script>
 
 <style>

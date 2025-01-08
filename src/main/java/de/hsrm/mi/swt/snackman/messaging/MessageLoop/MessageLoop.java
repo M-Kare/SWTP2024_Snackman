@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.SnackMan;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +17,7 @@ import de.hsrm.mi.swt.snackman.entities.lobby.Lobby;
 import de.hsrm.mi.swt.snackman.entities.map.Square;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.Mob;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken.Chicken;
+import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.SnackMan;
 import de.hsrm.mi.swt.snackman.services.LobbyManagerService;
 import de.hsrm.mi.swt.snackman.services.MapService;
 
@@ -60,8 +60,8 @@ public class MessageLoop {
 
                 switch (mob) {
                     case SnackMan snackMan -> {
-                        messages.add(new Message<>(EventEnum.MobUpdate, new MobUpdateMessage(mob.getPosition(),
-                                mob.getQuat(), mob.getRadius(), mob.getSpeed(), client, snackMan.getSprintTimeLeft(),
+                        messages.add(new Message<>(EventEnum.MobUpdate, new MobUpdateMessage(snackMan.getPosition(),
+                        snackMan.getQuat(), snackMan.getRadius(), snackMan.getSpeed(), client, snackMan.getSprintTimeLeft(),
                                 snackMan.isSprinting(), snackMan.isInCooldown(), snackMan.getCurrentCalories()
                         )));
                     }

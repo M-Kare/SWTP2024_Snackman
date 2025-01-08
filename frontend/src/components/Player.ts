@@ -253,7 +253,7 @@ export class Player {
     const delta = (time - this.prevTime) / 1000
     let result = 3;
 
-    const currentSpeed = this.sprinting ? this.speed * this.sprintMultiplier : this.speed;
+    const currentSpeed = this._sprintData.isSprinting ? this.speed * this.sprintMultiplier : this.speed;
     const adjustedDelta = Math.min(delta, 0.016) // max. 60 FPS, otherwise it lags while sprinting
 
     this.movementDirection.z = Number(this.moveForward) - Number(this.moveBackward)

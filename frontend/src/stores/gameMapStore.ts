@@ -7,7 +7,7 @@ import type {ISquare} from "@/stores/Square/ISquareDTD";
 import * as THREE from "three";
 import {Scene} from "three";
 import type {IChicken, IChickenDTD} from "@/stores/Chicken/IChickenDTD";
-import {Direction} from "@/stores/Chicken/IChickenDTD";
+import {ChickenThickness, Direction} from "@/stores/Chicken/IChickenDTD";
 import {GameObjectRenderer} from "@/renderer/GameObjectRenderer";
 import {useLobbiesStore} from "@/stores/Lobby/lobbiesstore";
 import {Player} from '@/components/Player';
@@ -70,7 +70,6 @@ export const useGameMapStore = defineStore('gameMap', () => {
   function startGameMapLiveUpdate() {
 
     const DEST_UPDATES = `/topic/lobbies/${lobbydata.currentPlayer.joinedLobbyId}/update`
-    const DEST_CHICKEN = `/topic/lobbies/${lobbydata.currentPlayer.joinedLobbyId}/chicken`
     if (!stompclient.active) {
 
       stompclient.onWebSocketError = (event) => {
@@ -98,37 +97,13 @@ export const useGameMapStore = defineStore('gameMap', () => {
                   player.setCalories(mobUpdate.calories)
 
                   //TODO fix sprinting
-                  /*
-                  player.sprintData.isCooldown = true
-                  console.log("mobUpdate.isInCooldown", mobUpdate.isInCooldown)
-                  console.log("!player.sprintData.isCooldown", !player.sprintData.isCooldown)
-                  if (mobUpdate.isInCooldown && !player.sprintData.isCooldown) {
-                    const usedSprintTime = 5 - mobUpdate.sprintTimeLeft;
-                    player.sprintData.isCooldown = mobUpdate.isInCooldown
-
-                    //startCooldownFill(usedSprintTime);
-                  }
-
-                  // When the backend cooldown has ended, but the local state is still in cooldown
-                  if (!mobUpdate.isInCooldown && player.sprintData.isCooldown) {
-                    //player.sprintData.isCooldown = mobUpdate.isInCooldown
-                    //stopCooldownFill();
-                  }
-
-
-
                   player.sprintData.sprintTimeLeft = (mobUpdate.sprintTimeLeft / 5) * 100
                   player.sprintData.isSprinting = mobUpdate.isSprinting
-
-                  // If the cooldown is active in the backend and the local state is not yet in cooldown
-
                   player.sprintData.isCooldown = mobUpdate.isInCooldown
-
-                   */
 
                   player.setPosition(mobUpdate.position);
                 } else {
-                  if (otherPlayers.size == 0) {
+                  if (otherPlayers == undefined || otherPlayers.size == 0) {
                     continue;
                   }
                   otherPlayers.get(mobUpdate.playerId)?.position.lerp(mobUpdate.position, 0.3)
@@ -146,7 +121,6 @@ export const useGameMapStore = defineStore('gameMap', () => {
                 }
                 break;
               case EventType.ChickenUpdate:
-                console.log(mess.message)
                 const chickenUpdate: IChickenDTD = mess.message
                 updateChicken(chickenUpdate)
                 break;
