@@ -5,7 +5,7 @@
     <MainMenuButton class="menu-button" @click="backToMainMenu">Zurück zum Hauptmenü
     </MainMenuButton>
     <MainMenuButton class="menu-button" @click="showLeaderboard">Leaderboard</MainMenuButton>
-    <MainMenuButton class="menu-button" @click="showCreateNewLeaderboardEntryForm">Create new leaderboard entry
+    <MainMenuButton class="menu-button" @click="showCreateNewLeaderboardEntryForm" v-if="!alreadyEntered">Create new leaderboard entry
     </MainMenuButton>
 
     <Leaderboard
@@ -33,6 +33,7 @@ const route = useRoute()
 const router = useRouter()
 const showCreateNewLeaderboardEntry = ref(false)
 const showLeaderboardPopUp = ref(false)
+const alreadyEntered = ref(false)
 
 // Read player role and game result from query parameters (undefined if not provided)
 const gameResult = route.query.result || '-'
@@ -71,6 +72,7 @@ const showCreateNewLeaderboardEntryForm = () => {
 
 const hideCreateNewLeaderboardEntryForm = () => {
   showCreateNewLeaderboardEntry.value = false
+  alreadyEntered.value = true
 }
 
 const backToMainMenu = () => {
