@@ -5,7 +5,7 @@
     <MainMenuButton class="menu-button" @click="backToMainMenu">Zurück zum Hauptmenü
     </MainMenuButton>
     <MainMenuButton class="menu-button" @click="showLeaderboard">Leaderboard</MainMenuButton>
-    <MainMenuButton class="menu-button" @click="showCreateNewLeaderboardEntryForm" v-if="!alreadyEntered">Create new leaderboard entry
+    <MainMenuButton class="menu-button" @click="showCreateNewLeaderboardEntryForm" v-if="!alreadyEntered && gameResult === 'Gewonnen'">Create new leaderboard entry
     </MainMenuButton>
 
     <Leaderboard
