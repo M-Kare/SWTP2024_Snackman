@@ -7,6 +7,7 @@ import {PointerLockControls} from 'three/addons/controls/PointerLockControls.js'
 
 export class Player {
   private prevTime: DOMHighResTimeStamp
+  private id : number ;
 
   // Booleans for checking movement-input
   private moveForward: boolean;
@@ -42,7 +43,8 @@ export class Player {
    * @param radius size of the player
    * @param speed speed-modifier of the player
    */
-  constructor(renderer: WebGLRenderer, posX: number, posY: number, posZ: number, radius: number, speed: number) {
+  constructor(renderer: WebGLRenderer, id : number , posX: number, posY: number, posZ: number, radius: number, speed: number ) {
+    this.id = id;
     this.prevTime = performance.now();
     this.moveBackward = false;
     this.moveForward = false;
@@ -69,6 +71,7 @@ export class Player {
     this.speed = speed;
 
     this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 60)
+    this.camera.lookAt(1,1,1)
     this.camera.position.set(posX, posY, posZ)
     this.controls = new PointerLockControls(this.camera, renderer.domElement)
     document.addEventListener('keydown', (event) => {
@@ -359,5 +362,26 @@ export class Player {
   public getIsDoubleJumping() {
     return this.doubleJump;
   }
+
+
+  getPosX(): number {
+    return this.currentSquare.indexX;
+  }
+  getPosZ(): number {
+    return this.currentSquare.indexZ;
+  }
+
+  getCameraPosition(): { x: number; y: number; z: number } {
+    return {
+      x: this.camera.position.x,
+      y: this.camera.position.y,
+      z: this.camera.position.z,
+    };
+  }
+
+  getId(): number{
+    return this.id;
+  }
+
 
 }
