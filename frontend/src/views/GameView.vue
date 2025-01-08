@@ -9,26 +9,23 @@
       <div class="overlayContent">
         <img alt="calories" class="calories-icon" src="@/assets/calories.svg" />
         <p v-if="currentCalories < MAXCALORIES">{{ currentCalories }}kcal</p>
-        <p v-else>{{ caloriesMessage }}</p>
+        <p v-else>{{ currentCalories }}kcal</p>
       </div>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { computed, onMounted, onUnmounted, reactive, ref } from 'vue'
+import {computed, onMounted, onUnmounted, ref} from 'vue'
 import * as THREE from 'three'
-import { Client } from '@stomp/stompjs'
 import { Player } from '@/components/Player';
 import { fetchSnackManFromBackend } from '@/services/SnackManInitService';
 import { GameMapRenderer } from '@/renderer/GameMapRenderer';
 import { useGameMapStore } from '@/stores/gameMapStore';
 import type { IGameMap } from '@/stores/IGameMapDTD';
 import { useLobbiesStore } from '@/stores/Lobby/lobbiesstore';
-import type { IPlayerDTD } from '@/stores/Player/IPlayerDTD';
 import type {IPlayerClientDTD} from "@/stores/Lobby/IPlayerClientDTD";
 import { GLTFLoader } from 'three/examples/jsm/Addons.js'
-import type { IFrontendCaloriesMessageEvent } from '@/services/IFrontendMessageEvent'
 
 const { lobbydata } = useLobbiesStore();
 const gameMapStore = useGameMapStore()
@@ -44,7 +41,7 @@ const UPDATE = '/topic/calories'
 
 //Reaktive Calories Variable
 const MAXCALORIES = 3000
-const currentCalories = ref(0)
+let currentCalories = ref()
 const caloriesMessage = ref('')
 
 const SNACKMAN_TEXTURE: string = 'src/assets/kirby.glb'
@@ -81,20 +78,6 @@ stompclient.onConnect = frame => {
 
     player.setPosition(event.posX, event.posY, event.posZ)
   })
-
-  // Calories Verarbeitung
-  stompclient.subscribe(UPDATE, message => {
-    const event: IFrontendCaloriesMessageEvent = JSON.parse(message.body)
-
-    // Get Calories
-    if (event.calories !== undefined) {
-      currentCalories.value = event.calories
-    }
-    if (event.message) {
-      caloriesMessage.value = event.message
-    }
-  })
-}
 */
 
 // Kalorien-Overlay Fill berrechnen
@@ -129,6 +112,8 @@ let counter = 0
 // is called every frame, changes camera position and velocity
 // only sends updates to backend at 30hz
 function animate() {
+  currentCalories.value = player.getCalories()
+
   fps = 1 / clock.getDelta()
   player.updatePlayer()
   if (counter >= fps / targetHz) {

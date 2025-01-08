@@ -95,6 +95,8 @@ export const useGameMapStore = defineStore('gameMap', () => {
                     continue;
                   }
 
+                  player.setCalories(mobUpdate.calories)
+
                   //TODO fix sprinting
                   /*
                   player.sprintData.isCooldown = true

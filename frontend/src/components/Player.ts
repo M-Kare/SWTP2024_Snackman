@@ -1,7 +1,7 @@
 import {useGameMapStore} from '@/stores/gameMapStore';
 import {MapObjectType, type IGameMap} from '@/stores/IGameMapDTD';
 import type {ISquare} from '@/stores/Square/ISquareDTD';
-import  {type WebGLRenderer} from 'three'
+import {type WebGLRenderer} from 'three'
 import * as THREE from 'three'
 import {PointerLockControls} from 'three/addons/controls/PointerLockControls.js'
 import {reactive, type UnwrapNestedRefs} from "vue";
@@ -30,6 +30,8 @@ export class Player {
   private lastJumpTime: number;
   private doubleJump: boolean;
   private spacePressed: boolean;
+
+  private calories: number;
 
   private _sprintData = reactive({
     sprintTimeLeft: 100, // percentage (0-100)
@@ -60,6 +62,7 @@ export class Player {
     this.canJump = true;
     this.sprinting = false;
     this.movementDirection = new THREE.Vector3();
+    this.calories = 0;
 
     this.isJumping = false;
     this.lastJumpTime = 0;
@@ -395,5 +398,13 @@ export class Player {
 
   get sprintData(): UnwrapNestedRefs<{ isSprinting: boolean; sprintTimeLeft: number; isCooldown: boolean }> & {} {
     return this._sprintData;
+  }
+
+  public getCalories(): number {
+    return this.calories;
+  }
+
+  public setCalories(cal: number): void {
+    this.calories = cal;
   }
 }
