@@ -61,19 +61,15 @@ public abstract class Mob {
      * @param posZ       z-spawn-position
      */
     public Mob(MapService mapService, int speed, double radius, double posX, double posY, double posZ) {
-        this(mapService, speed, radius);
-
+        this.speed = speed;
+        this.radius = radius;
+        this.mapService = mapService;
         spawn = new Vector3d(posX, posY, posZ);
         position = new Vector3d(spawn);
+        quat = new Quaterniond();
         setPositionWithIndexXZ(position.x, position.z);
         id = generateId();
     }
-    public Mob(){
-
-    }
-
-
-
 
     protected synchronized static long generateId() {
         return idCounter++;
