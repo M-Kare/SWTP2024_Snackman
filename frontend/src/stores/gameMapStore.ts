@@ -95,12 +95,34 @@ export const useGameMapStore = defineStore('gameMap', () => {
                     continue;
                   }
 
+                  //TODO fix sprinting
+                  /*
+                  player.sprintData.isCooldown = true
+                  console.log("mobUpdate.isInCooldown", mobUpdate.isInCooldown)
+                  console.log("!player.sprintData.isCooldown", !player.sprintData.isCooldown)
+                  if (mobUpdate.isInCooldown && !player.sprintData.isCooldown) {
+                    const usedSprintTime = 5 - mobUpdate.sprintTimeLeft;
+                    player.sprintData.isCooldown = mobUpdate.isInCooldown
+
+                    //startCooldownFill(usedSprintTime);
+                  }
+
+                  // When the backend cooldown has ended, but the local state is still in cooldown
+                  if (!mobUpdate.isInCooldown && player.sprintData.isCooldown) {
+                    //player.sprintData.isCooldown = mobUpdate.isInCooldown
+                    //stopCooldownFill();
+                  }
+
+
+
                   player.sprintData.sprintTimeLeft = (mobUpdate.sprintTimeLeft / 5) * 100
                   player.sprintData.isSprinting = mobUpdate.isSprinting
 
                   // If the cooldown is active in the backend and the local state is not yet in cooldown
 
                   player.sprintData.isCooldown = mobUpdate.isInCooldown
+
+                   */
 
                   player.setPosition(mobUpdate.position);
                 } else {
