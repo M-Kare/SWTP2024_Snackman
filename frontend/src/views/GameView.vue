@@ -28,10 +28,14 @@ import { useGameMapStore } from '@/stores/gameMapStore';
 import type { IGameMap } from '@/stores/IGameMapDTD';
 import type {IFrontendCaloriesMessageEvent} from "@/services/IFrontendMessageEvent";
 import { GLTFLoader } from 'three/examples/jsm/Addons.js';
+import { useRouter, useRoute } from 'vue-router';
 
 const WSURL = `ws://${window.location.host}/stompbroker`
 const DEST = '/topic/player'
 const targetHz = 30
+
+const router = useRouter();
+const route = useRoute();
 
 const UPDATE = '/topic/calories'
 
@@ -39,10 +43,8 @@ const UPDATE = '/topic/calories'
 const MAXCALORIES = 3000;
 const currentCalories  = ref(0);
 const caloriesMessage = ref('');
-
-
-
-
+const playerRole = ref(route.query.role || ''); // Player role from the URL query
+console.log('Player Role in GameView:', route.query.role);
 
 const SNACKMAN_TEXTURE: string = 'src/assets/kirby.glb';
 let snackManModel: THREE.Group<THREE.Object3DEventMap>;
@@ -86,19 +88,35 @@ stompclient.onConnect = frame => {
 
   });
 
-  // Calories Verarbeitung
-  stompclient.subscribe(UPDATE, message => {
-    const event: IFrontendCaloriesMessageEvent = JSON.parse(message.body);
+// Calories Verarbeitung
+stompclient.subscribe(UPDATE, message => {
+  const event: IFrontendCaloriesMessageEvent = JSON.parse(message.body);
 
+  if (event.calories !== undefined) {
+    currentCalories.value = event.calories;
+  }
 
-    // Get Calories
-    if (event.calories !== undefined) {
-      currentCalories.value = event.calories;
-    }
-    if ( event.message) {
-      caloriesMessage.value = event.message;
-    }
-  });
+  // Check win/lose conditions for SnackMan or Ghosts
+  if (event.calories >= MAXCALORIES) {
+    // Navigate to GameEndView with "SnackMan Wins"
+    router.push({
+      name: 'GameEnd',
+      query: {
+        role: playerRole.value,
+        result: playerRole.value === 'SNACKMAN' ? 'Gewonnen' : 'Verloren'
+      }
+    });
+  } else if (event.calories < 0) {
+    // Navigate to GameEndView with "Ghosts Win"
+    router.push({
+      name: 'GameEnd',
+      query: {
+        role: playerRole.value,
+        result: playerRole.value === 'GHOST' ? 'Gewonnen' : 'Verloren'
+      }
+    });
+  }
+    });
 
 }
 
