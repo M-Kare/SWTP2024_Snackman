@@ -49,7 +49,7 @@ public class GameMapController {
     @GetMapping("/download")
     public ResponseEntity<Resource> downloadMap(){
         try{
-            Path filePath = Paths.get(mapService.getFilePath()).toAbsolutePath();
+            Path filePath = Paths.get(mapService.getFilePath() + ".backup").toAbsolutePath();
             Resource resource = new UrlResource(filePath.toUri());
 
             if(!resource.exists()){

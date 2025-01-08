@@ -18,6 +18,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.beans.PropertyChangeEvent;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -53,9 +58,10 @@ public class MapService {
         this.frontendMessageService = frontendMessageService;
         this.filePath = filePath;
         this.readMazeService = readMazeService;
-
+        
+        backupOriginalMazeFile();
         generateNewMaze();
-
+        
         this.mazeData = readMazeService.readMazeFromFile(this.filePath);
         if (this.mazeData == null) {
             throw new IllegalStateException("Maze data cannot be null. Check your ReadMazeService.");
@@ -300,5 +306,31 @@ public class MapService {
 
     public String getFilePath(){
         return this.filePath;
+    }
+
+    private void backupOriginalMazeFile() {
+        Path source = Paths.get(filePath);
+        Path backup = Paths.get(filePath + ".backup");
+
+        try {
+            if (!Files.exists(backup)) {
+                Files.copy(source, backup, StandardCopyOption.REPLACE_EXISTING);
+                log.info("Original maze file backed up to {}", backup.toString());
+            }
+        } catch (IOException e) {
+            log.error("Failed to back up the original maze file", e);
+        }
+    }
+
+    private void restoreOriginalMazeFile() {
+        Path source = Paths.get(filePath + ".backup");
+        Path target = Paths.get(filePath);
+    
+        try {
+            Files.copy(source, target, StandardCopyOption.REPLACE_EXISTING);
+            log.info("Maze file restored from backup.");
+        } catch (IOException e) {
+            log.error("Failed to restore the original maze file", e);
+        }
     }
 }
