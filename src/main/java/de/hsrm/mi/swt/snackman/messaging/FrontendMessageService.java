@@ -19,26 +19,26 @@ public class FrontendMessageService {
     }
 
     public void sendEvent(FrontendMessageEvent ev) {
-        log.info("Send Event: eventType {}, changeTyp {}, square {}", ev.eventType(), ev.changeType(),
+        log.debug("Send Event: eventType {}, changeTyp {}, square {}", ev.eventType(), ev.changeType(),
                 ev.square().toString());
 
         messagingTemplate.convertAndSend("/topic/square", ev);
     }
 
     public void sendChickenEvent(FrontendChickenMessageEvent ev) {
-        log.info("Send Event: eventType {}, changeTyp {}, chicken {}", ev.eventType(), ev.changeType(), ev.chicken());
+        log.debug("Send Event: eventType {}, changeTyp {}, chicken {}", ev.eventType(), ev.changeType(), ev.chicken());
 
         messagingTemplate.convertAndSend("/topic/chicken", ev);
     }
 
     public void sendScriptGhostEvent(FrontendScriptGhostMessageEvent ev) {
-        log.info("Send Event: eventType {}, changeTyp {}, scriptGhost {}", ev.eventType(), ev.changeType(), ev.scriptGhost());
+        log.debug("Send Event: eventType {}, changeTyp {}, scriptGhost {}", ev.eventType(), ev.changeType(), ev.scriptGhost());
 
         messagingTemplate.convertAndSend("/topic/scriptGhost", ev);
     }
 
     public void sendGhostEvent(FrontendGhostMessageEvent ev){
-        log.info("Send Event: eventType {}, changeTyp {}, ghost {}", ev.eventType(), ev.changeType(), ev.ghost().toString());
+        log.debug("Send Event: eventType {}, changeTyp {}, ghost {}", ev.eventType(), ev.changeType(), ev.ghost().toString());
 
         messagingTemplate.convertAndSend("/topic/ghost" , ev);
     }

@@ -46,9 +46,7 @@ public abstract class Mob {
         this.mapService = mapService;
         position = new Vector3d();
         quat = new Quaterniond();
-        id = generateId();
     }
-
 
     /**
      * Constructor for Mob with custom spawn point

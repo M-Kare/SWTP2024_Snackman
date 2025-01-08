@@ -47,7 +47,7 @@ public class MapService {
     private GameMap gameMap;
     private PythonInterpreter pythonInterpreter = null;
     private Properties pythonProps = new Properties();
-    private SnackMan snackman;
+    //private SnackMan snackman;        // TODO ghost player id is hardcoded on 0!
     private int AMOUNT_PLAYERS_FOR_GAME = 1;
     private int initialisedPlayers = 0;
 
@@ -67,7 +67,7 @@ public class MapService {
         this.filePath = filePath;
         char[][] mazeData = readMazeService.readMazeFromFile(this.filePath);
         gameMap = convertMazeDataGameMap(mazeData);
-        snackman = new SnackMan(this, GameConfig.SNACKMAN_SPEED, GameConfig.SNACKMAN_RADIUS);
+        //snackman = new SnackMan(this, GameConfig.SNACKMAN_SPEED, GameConfig.SNACKMAN_RADIUS);
     }
 
     /**
@@ -157,6 +157,7 @@ public class MapService {
             case 'G':
                 log.debug("Initialising ghost");
                 if (initialisedPlayers < AMOUNT_PLAYERS_FOR_GAME) {
+                    log.info("Initialising playerGhost");
                     // init real players here aka Ghost
                     square = new Square(MapObjectType.FLOOR, x, z);
                     Ghost ghost = new Ghost(square, this);
@@ -169,9 +170,10 @@ public class MapService {
                     });
                     FrontendGhostMessageEvent message = new FrontendGhostMessageEvent(EventType.GHOST, ChangeType.CREATE, ghost);
                     frontendMessageService.sendGhostEvent(message);
+                    log.info("New player ghost is: {}", ghost);
 
                 } else {
-                    log.debug("Initialising scriptGhost");
+                    log.info("Initialising scriptGhost");
                     square = new Square(MapObjectType.FLOOR, x, z);
                     ScriptGhost newScriptGhost = new ScriptGhost(this, square, ScriptGhostDifficulty.EASY);
                     Thread ghostThread = new Thread(newScriptGhost);
@@ -185,6 +187,7 @@ public class MapService {
                             frontendMessageService.sendScriptGhostEvent(messageEvent);
                         }
                     });
+                    log.info("New scriptGhost is: {}", newScriptGhost);
                 }
                 break;
             default: {
@@ -276,8 +279,9 @@ public class MapService {
     }
 
     public SnackMan getSnackMan() {
-        return snackman;
+        return null; //snackman;
     }
+
     public Ghost getGhost(long id) {
         Square[][] squares = this.gameMap.getGameMap();
         for (Square square[] : squares) {
