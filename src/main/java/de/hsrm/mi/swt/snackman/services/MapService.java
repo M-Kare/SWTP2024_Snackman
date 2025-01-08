@@ -2,8 +2,10 @@ package de.hsrm.mi.swt.snackman.services;
 
 import java.beans.PropertyChangeEvent;
 
+import de.hsrm.mi.swt.snackman.entities.mobileObjects.ScriptGhost;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.Ghost;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.Mob;
+import de.hsrm.mi.swt.snackman.entities.mobileObjects.ScriptGhostDifficulty;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken.Chicken;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken.Direction;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.SnackMan;
@@ -22,10 +24,12 @@ import de.hsrm.mi.swt.snackman.messaging.ChangeType;
 import de.hsrm.mi.swt.snackman.messaging.EventType;
 import de.hsrm.mi.swt.snackman.messaging.FrontendMessageEvent;
 import de.hsrm.mi.swt.snackman.messaging.FrontendMessageService;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
+
 import org.python.core.PyObject;
 import de.hsrm.mi.swt.snackman.messaging.*;
 
@@ -44,7 +48,8 @@ public class MapService {
     private PythonInterpreter pythonInterpreter = null;
     private Properties pythonProps = new Properties();
     private SnackMan snackman;
-
+    private int AMOUNT_PLAYERS_FOR_GAME = 1;
+    private int initialisedPlayers = 0;
 
     /**
      * Constructs a new MapService
@@ -63,7 +68,6 @@ public class MapService {
         char[][] mazeData = readMazeService.readMazeFromFile(this.filePath);
         gameMap = convertMazeDataGameMap(mazeData);
         snackman = new SnackMan(this, GameConfig.SNACKMAN_SPEED, GameConfig.SNACKMAN_RADIUS);
-
     }
 
     /**
@@ -113,7 +117,7 @@ public class MapService {
      * @return a created Square
      */
     private Square createSquare(char symbol, int x, int z) {
-        Square square;
+        Square square = null;
 
         switch (symbol) {
             case '#': {
@@ -150,29 +154,39 @@ public class MapService {
                     }
                 });
                 break;
-            case'G':
+            case 'G':
                 log.debug("Initialising ghost");
-                square = new Square(MapObjectType.FLOOR,  x, z);
-                System.out.println("DIESE Square " + square);
-                Ghost ghost = new Ghost(square, this);
-                System.out.println("Neue Position Geis Berechnung " + ghost.toString());
-                ghost.addPropertyChangeListener((PropertyChangeEvent evt ) ->{
-                    System.out.println("Hier massage ");
-                    System.out.println("Hier is massage Event " + evt.getNewValue());
-                    System.out.println("Da war das ");
-                    if ( evt.getPropertyName().equals("ghost")){
-                        FrontendGhostMessageEvent messageEvent = new FrontendGhostMessageEvent(EventType.GHOST, ChangeType.UPDATE, (Ghost) evt.getNewValue() );
-                        frontendMessageService.sendGhostEvent(messageEvent);
-                        System.out.println("----------Neue Mesage Event  " + messageEvent) ;
-                    }
-                });
-                FrontendGhostMessageEvent message = new FrontendGhostMessageEvent(EventType.GHOST, ChangeType.CREATE, ghost);
-                frontendMessageService.sendGhostEvent(message);
-                System.out.println("message ghost : " + message);
+                if (initialisedPlayers < AMOUNT_PLAYERS_FOR_GAME) {
+                    // init real players here aka Ghost
+                    square = new Square(MapObjectType.FLOOR, x, z);
+                    Ghost ghost = new Ghost(square, this);
+                    initialisedPlayers++;
+                    ghost.addPropertyChangeListener((PropertyChangeEvent evt) -> {
+                        if (evt.getPropertyName().equals("ghost")) {
+                            FrontendGhostMessageEvent messageEvent = new FrontendGhostMessageEvent(EventType.GHOST, ChangeType.UPDATE, (Ghost) evt.getNewValue());
+                            frontendMessageService.sendGhostEvent(messageEvent);
+                        }
+                    });
+                    FrontendGhostMessageEvent message = new FrontendGhostMessageEvent(EventType.GHOST, ChangeType.CREATE, ghost);
+                    frontendMessageService.sendGhostEvent(message);
 
+                } else {
+                    log.debug("Initialising scriptGhost");
+                    square = new Square(MapObjectType.FLOOR, x, z);
+                    ScriptGhost newScriptGhost = new ScriptGhost(this, square, ScriptGhostDifficulty.EASY);
+                    Thread ghostThread = new Thread(newScriptGhost);
+                    ghostThread.start();
 
+                    newScriptGhost.addPropertyChangeListener((PropertyChangeEvent evt) -> {
+                        if (evt.getPropertyName().equals("scriptGhost")) {
+                            FrontendScriptGhostMessageEvent messageEvent = new FrontendScriptGhostMessageEvent(EventType.SCRIPT_GHOST,
+                                    ChangeType.UPDATE, (ScriptGhost) evt.getNewValue());
+
+                            frontendMessageService.sendScriptGhostEvent(messageEvent);
+                        }
+                    });
+                }
                 break;
-
             default: {
                 square = new Square(MapObjectType.FLOOR, x, z);
             }
@@ -192,14 +206,37 @@ public class MapService {
      */
     public synchronized List<String> getSquaresVisibleForChicken(Square currentPosition, Direction lookingDirection) {
         List<String> squares = new ArrayList<>();
-        squares.add(Direction.NORTH_WEST.getNorthWestSquare(this, currentPosition).getPrimaryType());
-        squares.add(Direction.NORTH.getNorthSquare(this, currentPosition).getPrimaryType());
-        squares.add(Direction.NORTH_EAST.getNorthEastSquare(this, currentPosition).getPrimaryType());
-        squares.add(Direction.EAST.getEastSquare(this, currentPosition).getPrimaryType());
-        squares.add(Direction.SOUTH_EAST.getSouthEastSquare(this, currentPosition).getPrimaryType());
-        squares.add(Direction.SOUTH.getSouthSquare(this, currentPosition).getPrimaryType());
-        squares.add(Direction.SOUTH_WEST.getSouthWestSquare(this, currentPosition).getPrimaryType());
-        squares.add(Direction.WEST.getWestSquare(this, currentPosition).getPrimaryType());
+        squares.add(Direction.NORTH_WEST.getNorthWestSquare(this, currentPosition).getPrimaryTypeForChicken());
+        squares.add(Direction.NORTH.getNorthSquare(this, currentPosition).getPrimaryTypeForChicken());
+        squares.add(Direction.NORTH_EAST.getNorthEastSquare(this, currentPosition).getPrimaryTypeForChicken());
+        squares.add(Direction.EAST.getEastSquare(this, currentPosition).getPrimaryTypeForChicken());
+        squares.add(Direction.SOUTH_EAST.getSouthEastSquare(this, currentPosition).getPrimaryTypeForChicken());
+        squares.add(Direction.SOUTH.getSouthSquare(this, currentPosition).getPrimaryTypeForChicken());
+        squares.add(Direction.SOUTH_WEST.getSouthWestSquare(this, currentPosition).getPrimaryTypeForChicken());
+        squares.add(Direction.WEST.getWestSquare(this, currentPosition).getPrimaryTypeForChicken());
+        squares.add(lookingDirection.toString());
+        return squares;
+    }
+
+    /**
+     * @param currentPosition  the square the ghost is standing on top of
+     * @param lookingDirection
+     * @return a list of 8 square which are around the current square + the
+     * direction the ghost is looking in the order:
+     * northwest_square, north_square, northeast_square, east_square,
+     * southeast_square, south_square, southwest_square, west_square,
+     * direction
+     */
+    public synchronized List<String> getSquaresVisibleForGhost(Square currentPosition, Direction lookingDirection) {
+        List<String> squares = new ArrayList<>();
+        squares.add(Direction.NORTH_WEST.getNorthWestSquare(this, currentPosition).getPrimaryTypeForGhost());
+        squares.add(Direction.NORTH.getNorthSquare(this, currentPosition).getPrimaryTypeForGhost());
+        squares.add(Direction.NORTH_EAST.getNorthEastSquare(this, currentPosition).getPrimaryTypeForGhost());
+        squares.add(Direction.EAST.getEastSquare(this, currentPosition).getPrimaryTypeForGhost());
+        squares.add(Direction.SOUTH_EAST.getSouthEastSquare(this, currentPosition).getPrimaryTypeForGhost());
+        squares.add(Direction.SOUTH.getSouthSquare(this, currentPosition).getPrimaryTypeForGhost());
+        squares.add(Direction.SOUTH_WEST.getSouthWestSquare(this, currentPosition).getPrimaryTypeForGhost());
+        squares.add(Direction.WEST.getWestSquare(this, currentPosition).getPrimaryTypeForGhost());
         squares.add(lookingDirection.toString());
         return squares;
     }
@@ -232,7 +269,7 @@ public class MapService {
             System.out.print("x");
             for (int z = 0; z < gameMap[x].length; z++) {
                 Square square = gameMap[x][z];
-                System.out.print(square.getPrimaryType());
+                System.out.print(square.getPrimaryTypeForChicken());
             }
             System.out.println("");
         }
@@ -255,5 +292,4 @@ public class MapService {
         }
         return null;
     }
-
 }

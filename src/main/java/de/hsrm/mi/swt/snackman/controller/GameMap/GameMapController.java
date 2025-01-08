@@ -1,5 +1,6 @@
 package de.hsrm.mi.swt.snackman.controller.GameMap;
 
+import de.hsrm.mi.swt.snackman.controller.Ghost.GhostDTO;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.Ghost;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

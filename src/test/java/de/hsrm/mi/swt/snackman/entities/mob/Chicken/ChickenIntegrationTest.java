@@ -19,7 +19,7 @@ public class ChickenIntegrationTest {
 
     /**
      * Tests if the Chicken's 'executeMovementSkript' method correctly identifies
-     * and chooses the correct empty square (" ") to move to.
+     * and chooses the correct square to move to.
      */
     @Test
     public void testExecuteMovementSkript() {
@@ -37,17 +37,15 @@ public class ChickenIntegrationTest {
         visibleEnvironment.add("L");
         visibleEnvironment.add("1");
 
-        List<String> result = chicken.executeMovementSkript(visibleEnvironment);
+        int result = chicken.executeMovementSkript(visibleEnvironment);
 
-        int chosenDirectionIndex = Integer.parseInt(result.get(result.size() - 1));
-
-        assertEquals(" ", result.get(chosenDirectionIndex),
+        assertEquals(0, result,
                 "The Chicken should move to the correct empty square (' ') based on its direction.");
     }
 
     /**
      * Verifies that the Chicken can interact with the Python script directly,
-     * using a Jython interpreter and chooses the correct empty square (" ").
+     * using a Jython interpreter and chooses the correct square.
      */
     @Test
     public void testChickenMovement() {
@@ -58,10 +56,9 @@ public class ChickenIntegrationTest {
             pyInterp.exec("from ChickenMovementSkript import choose_next_square");
             pyInterp.exec("result = choose_next_square(['W', 'L', 'W', 'L', 'W', 'L', 'W', 'L', 0])");
 
-            String result = pyInterp.get("result").toString();
+            int result = Integer.parseInt(pyInterp.get("result").toString());
             
-            String expectedResult = "[' ', 'L', 'L', 'L', 0]";
-            assertEquals(expectedResult, result,
+            assertEquals(0, result,
                     "The Python script should correctly determine the next move (' ').");
         }
     }

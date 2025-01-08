@@ -1,4 +1,4 @@
-package de.hsrm.mi.swt.snackman.controller.GameMap;
+package de.hsrm.mi.swt.snackman.controller.Ghost;
 
 import de.hsrm.mi.swt.snackman.configuration.GameConfig;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.Ghost;

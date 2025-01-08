@@ -57,7 +57,7 @@ public class Chicken extends EatingMob implements Runnable {
     }
 
     /**
-     * Method to generate the next id of a new Square. It is synchronized because of thread-safety.
+     * Method to generate the next id of a new Chicken. It is synchronized because of thread-safety.
      *
      * @return the next incremented id
      */
@@ -76,9 +76,9 @@ public class Chicken extends EatingMob implements Runnable {
      *
      * @param newMove a list representing the next move for the chicken.
      */
-    private void setNewPosition(List<String> newMove) {
+    private void setNewPosition(int newMove) {
         //get positions
-        Direction walkingDirection = Direction.getDirection(newMove.getLast());
+        Direction walkingDirection = Direction.getDirection(newMove);
         log.debug("Walking direction is: {}", walkingDirection);
 
         this.lookingDirection = walkingDirection;
@@ -119,7 +119,7 @@ public class Chicken extends EatingMob implements Runnable {
             log.debug("Current position is x {} z {}", this.chickenPosX, this.chickenPosZ);
             //super.mapService.printGameMap();
 
-            List<String> newMove = executeMovementSkript(squares);
+            int newMove = executeMovementSkript(squares);
 
             // set new square you move to
             setNewPosition(newMove);
@@ -174,24 +174,18 @@ public class Chicken extends EatingMob implements Runnable {
      * @param squares a list of squares visible from the chicken's current position.
      * @return a list of moves resulting from the Python script's execution.
      */
-    public List<String> executeMovementSkript(List<String> squares) {
+    public int executeMovementSkript(List<String> squares) {
         try {
             log.debug("Running python chicken script with: {}", squares.toString());
             PyObject func = pythonInterpreter.get("choose_next_square");
             PyObject result = func.__call__(new PyList(squares));
 
-            if (result instanceof PyList) {
-                PyList pyList = (PyList) result;
-                log.debug("Python chicken script return: {}", pyList);
-                return convertPythonList(pyList);
-            }
-
-            throw new Exception("Python chicken script did not load.");
+            return Integer.parseInt(result.toString());
         } catch (Exception ex) {
             log.error("Error while executing chicken python script: ", ex);
             ex.printStackTrace();
         }
-        return squares;
+        return 0;
     }
 
     /**
