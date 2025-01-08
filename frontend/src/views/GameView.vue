@@ -16,7 +16,7 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, onMounted, onUnmounted, ref, watch} from 'vue'
+import {computed, onMounted, onUnmounted, reactive, ref, watch} from 'vue'
 import * as THREE from 'three'
 import { Player } from '@/components/Player';
 import { fetchSnackManFromBackend } from '@/services/SnackManInitService';
@@ -52,6 +52,14 @@ let renderer: THREE.WebGLRenderer
 let player: Player
 let scene: THREE.Scene
 let prevTime = performance.now()
+
+const sprintData = reactive({
+    sprintTimeLeft: 100, // percentage (0-100)
+    isSprinting: false,
+    isCooldown: false,
+  })
+
+let sprintInCooldown = false;
 
 // camera setup
 let camera: THREE.PerspectiveCamera
@@ -146,16 +154,19 @@ onMounted(async () => {
     gameMapStore.setPlayer(player)
 
     watch(player.sprintData, (newSprintData) =>{
-      console.debug("watching...")
-      if (player.sprintData.isCooldown) {
-      const usedSprintTime = 5 - player.sprintData.sprintTimeLeft
-      startCooldownFill(usedSprintTime)
-    }
+      sprintData.isSprinting = player.sprintData.isSprinting
+      sprintData.sprintTimeLeft = (player.sprintData.sprintTimeLeft / 5) * 100
 
-    // When the backend cooldown has ended, but the local state is still in cooldown
-    if (!player.sprintData.isCooldown) {
-      stopCooldownFill()
-    }
+      if (player.sprintData.isCooldown && !sprintData.isCooldown) {
+        const usedSprintTime = 5 - player.sprintData.sprintTimeLeft
+        startCooldownFill(usedSprintTime)
+      }
+
+      // When the backend cooldown has ended, but the local state is still in cooldown
+      if (!player.sprintData.isCooldown && sprintData.isCooldown) {
+        stopCooldownFill()
+      }
+      sprintData.isCooldown = player.sprintData.isCooldown
     })
 
   camera = player.getCamera()
@@ -187,10 +198,10 @@ function startCooldownFill(usedSprintTime: number) {
 
   const cooldownDuration = usedSprintTime * 2 * 1000 // Total cooldown duration in ms
   const startTime = performance.now()
-  const startValue = player.sprintData.sprintTimeLeft
+  const startValue = sprintData.sprintTimeLeft
   const fillAmount = 100 - startValue
 
-  player.sprintData.isCooldown = true
+  sprintData.isCooldown = true
 
   /**
    * Recursive function to animate the cooldown fill using requestAnimationFrame.
@@ -199,15 +210,15 @@ function startCooldownFill(usedSprintTime: number) {
     const now = performance.now()
     const elapsed = now - startTime
     const progress = Math.min(elapsed / cooldownDuration, 1)
-    player.sprintData.sprintTimeLeft = startValue + progress * fillAmount
+    sprintData.sprintTimeLeft = startValue + progress * fillAmount
 
     if (progress < 1) {
       // If the animation is not complete, request the next animation frame
       cooldownAnimationFrame = requestAnimationFrame(animateFill)
     } else {
       stopCooldownFill()
-      player.sprintData.isCooldown = false
-      player.sprintData.sprintTimeLeft = 100
+      sprintData.isCooldown = false
+      sprintData.sprintTimeLeft = 100
     }
   }
 
@@ -237,17 +248,14 @@ const getBackgroundStyle = computed(() => {
 
 const sprintBarStyle = computed(() => {
   let color = 'green'
-  if(player != undefined){
-
-    if (player.sprintData.isSprinting) {
-      color = 'red'
-    } else if (player.sprintData.isCooldown) {
-      color = 'blue'
-    }
-    return {
-      width: `${player.sprintData.sprintTimeLeft}%`,
-      backgroundColor: color,
-    }
+  if (sprintData.isSprinting) {
+    color = 'red'
+  } else if (sprintData.isCooldown) {
+    color = 'blue'
+  }
+  return {
+    width: `${sprintData.sprintTimeLeft}%`,
+    backgroundColor: color,
   }
 })
 </script>
@@ -293,8 +301,6 @@ const sprintBarStyle = computed(() => {
 
 .sprint-bar-inner {
   height: 100%;
-  transition:
-    width 0.1s ease-out,
-    background-color 0.2s ease-out;
+  transition: width 0.1s ease-out, background-color 0.2s ease-out;
 }
 </style>

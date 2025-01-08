@@ -96,8 +96,7 @@ export const useGameMapStore = defineStore('gameMap', () => {
 
                   player.setCalories(mobUpdate.calories)
 
-                  //TODO fix sprinting
-                  player.sprintData.sprintTimeLeft = (mobUpdate.sprintTimeLeft / 5) * 100
+                  player.sprintData.sprintTimeLeft = mobUpdate.sprintTimeLeft
                   player.sprintData.isSprinting = mobUpdate.isSprinting
                   player.sprintData.isCooldown = mobUpdate.isInCooldown
 
