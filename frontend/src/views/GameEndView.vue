@@ -13,8 +13,7 @@
 <script setup lang="ts">
 import MainMenuButton from '@/components/MainMenuButton.vue';
 import MapButton from '@/components/MapButton.vue';
-import { ref } from 'vue';
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
 const route = useRoute();
