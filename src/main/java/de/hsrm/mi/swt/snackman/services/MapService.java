@@ -154,8 +154,8 @@ public class MapService {
                 log.debug("Initialising ghost");
                 square = new Square(MapObjectType.FLOOR,  x, z);
                 System.out.println("DIESE Square " + square);
-                Ghost ghost = new Ghost(square, this, GameConfig.GHOST_SPEED , GameConfig.GHOST_RADIUS);
-
+                Ghost ghost = new Ghost(square, this);
+                System.out.println("Neue Position Geis Berechnung " + ghost.toString());
                 ghost.addPropertyChangeListener((PropertyChangeEvent evt ) ->{
                     System.out.println("Hier massage ");
                     System.out.println("Hier is massage Event " + evt.getNewValue());
