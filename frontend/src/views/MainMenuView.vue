@@ -26,57 +26,48 @@
 </template>
 
 <script setup lang="ts">
-import MainMenuButton from '@/components/MainMenuButton.vue';
-import MenuBackground from '@/components/MenuBackground.vue';
-import {useRouter} from 'vue-router';
-import {useLobbiesStore} from '@/stores/Lobby/lobbiesstore';
-import MainMenuButton from '@/components/MainMenuButton.vue';
-import MenuBackground from '@/components/MenuBackground.vue';
-import {useRouter} from 'vue-router';
-import {ref} from "vue";
-import Leaderboard from "@/components/Leaderboard.vue";
-import CreateNewLeaderboardEntryForm from "@/components/CreateNewLeaderboardEntryForm.vue";
+import {useLobbiesStore} from '@/stores/Lobby/lobbiesstore'
+import MainMenuButton from '@/components/MainMenuButton.vue'
+import MenuBackground from '@/components/MenuBackground.vue'
+import {useRouter} from 'vue-router'
+import {ref} from "vue"
+import Leaderboard from "@/components/Leaderboard.vue"
+import CreateNewLeaderboardEntryForm from "@/components/CreateNewLeaderboardEntryForm.vue"
 
 const router = useRouter()
 const lobbiesStore = useLobbiesStore()
-const router = useRouter()
 const showLeaderboardPopUp = ref(false)
 const showCreateNewLeaderboardEntry = ref(false)
-
-const toGameView = () => {
-  router.push({name: 'GameView'})
-}
 
 const showLobbies = () => {
   router.push({name: 'LobbyListView'})
 }
 
-
 const showLeaderboard = () => {
-  showLeaderboardPopUp.value = true;
+  showLeaderboardPopUp.value = true
 }
 
 const hideLeaderboard = () => {
-  showLeaderboardPopUp.value = false;
+  showLeaderboardPopUp.value = false
 }
 
 const cancelNewLeaderboardEntryCreation = () => {
-  showCreateNewLeaderboardEntry.value = false;
+  showCreateNewLeaderboardEntry.value = false
   console.log(showCreateNewLeaderboardEntry.value)
 }
 
 const showCreateNewLeaderboardEntryForm = () => {
-  showCreateNewLeaderboardEntry.value = true;
+  showCreateNewLeaderboardEntry.value = true
   console.log(showCreateNewLeaderboardEntry.value)
 }
 
 const startSingleplayer = () => {
-  lobbiesStore.lobbydata.currentPlayer.role = 'SNACKMAN';
+  lobbiesStore.lobbydata.currentPlayer.role = 'SNACKMAN'
 
   router.push({
     name: 'GameView',
     query: {role: 'SNACKMAN'}
-  });
+  })
 }
 
 </script>
@@ -100,11 +91,11 @@ const startSingleplayer = () => {
 }
 
 #singleplayer-button {
-  top: 45%;
+  top: 45%
 }
 
 #multiplayer-button {
-  top: 65%;
+  top: 65%
 }
 
 #leaderboard-button {
