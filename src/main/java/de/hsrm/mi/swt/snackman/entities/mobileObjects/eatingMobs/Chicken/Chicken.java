@@ -440,8 +440,6 @@ public class Chicken extends EatingMob implements Runnable {
     public void addEggToSquare(Square square, Snack laidEgg) {
         square.setSnack(laidEgg);
         log.debug("{} kcal egg add to square {} and square {}", laidEgg.getCalories(), square.getId(), square.getId());
-        //TODO fix with message loop
-        //frontendMessageService.sendEvent(new FrontendMessageEvent(EventType.SNACK, ChangeType.CREATE, square));
     }
 
     public boolean isScared() {

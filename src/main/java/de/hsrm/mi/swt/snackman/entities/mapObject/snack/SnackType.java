@@ -22,7 +22,7 @@ public enum SnackType {
      * @return random snack
      */
     public static SnackType getRandomSnack() {
-        SnackType[] snacks = values();
+        SnackType[] snacks = {CHERRY, STRAWBERRY, ORANGE, APPLE};
         Random random = new Random();
         int randomIndex = random.nextInt(snacks.length);
         SnackType returnSnack = snacks[randomIndex];

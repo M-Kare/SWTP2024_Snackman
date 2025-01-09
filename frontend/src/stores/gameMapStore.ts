@@ -229,7 +229,7 @@ export const useGameMapStore = defineStore('gameMap', () => {
     }
 
     const thicknessValue =
-      ChickenThickness[chickenUpdate.thickness as keyof typeof ChickenThickness]
+      ChickenThickness[chickenUpdate.thickness as unknown as keyof typeof ChickenThickness]
 
     switch (thicknessValue) {
       case ChickenThickness.THIN:
