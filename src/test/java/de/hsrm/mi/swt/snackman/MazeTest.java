@@ -7,6 +7,7 @@ import java.nio.file.Paths;
 import java.util.List;
 
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -14,6 +15,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 class MazeTest {
     
     private static final String MAZE_FILE_PATH = "./extensions/map/Maze.txt";
+
+    @BeforeAll
+    static void fileSetUp() {
+        SnackmanApplication.checkAndCopyResources();
+    }
 
     @Test
     void mazeExists() {

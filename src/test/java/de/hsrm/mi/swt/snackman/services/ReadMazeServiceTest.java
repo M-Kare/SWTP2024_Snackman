@@ -1,17 +1,28 @@
 package de.hsrm.mi.swt.snackman.services;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-public class ReadMazeServiceTest {
+import de.hsrm.mi.swt.snackman.SnackmanApplication;
+
+class ReadMazeServiceTest {
 
     private ReadMazeService readMazeService;
+
+    @BeforeAll
+    static void fileSetUp() {
+        SnackmanApplication.checkAndCopyResources();
+    }
 
     @BeforeEach
     void setUp() {
