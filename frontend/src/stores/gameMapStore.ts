@@ -133,7 +133,7 @@ export const useGameMapStore = defineStore('gameMap', () => {
           }
         })
       }
-      //TODO This is from chicken laying. Must be added to the gameloop
+      //TODO funktioniert bereits, da squares einen property change listener haben?
       /*
               snackStompclient.subscribe(DEST_SQUARE, async message => {
           const change: IFrontendMessageEvent = JSON.parse(message.body)

@@ -6,9 +6,6 @@ import de.hsrm.mi.swt.snackman.entities.mapObject.snack.Snack;
 import de.hsrm.mi.swt.snackman.entities.mapObject.snack.SnackType;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.Mob;
 
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
-
 /**
  * A mob which can consume snacks
  */
@@ -16,8 +13,6 @@ public abstract class EatingMob extends Mob {
     private int kcal;
 
     private int MAXKCAL = 0;
-
-    private final PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
 
     public EatingMob(GameMap gameMap, double speed, double radius) {
         super(gameMap, speed, radius);
@@ -35,9 +30,7 @@ public abstract class EatingMob extends Mob {
     }
 
     public void setKcal(int value) {
-        int oldKcal = kcal;
         kcal = value;
-        propertyChangeSupport.firePropertyChange("currentCalories", oldKcal, this.kcal);
     }
 
     public int getKcal() {
@@ -82,8 +75,6 @@ public abstract class EatingMob extends Mob {
         Snack snackOnSquare = square.getSnack();
 
         if (snackOnSquare.getSnackType() != SnackType.EMPTY) {
-            int oldCalories = this.kcal;
-
             if ((kcal + snackOnSquare.getCalories()) >= MAXKCAL) {
                 setKcal(MAXKCAL);
             } else {
@@ -92,15 +83,6 @@ public abstract class EatingMob extends Mob {
 
             //set snack to null after consuming it
             square.setSnack(new Snack(SnackType.EMPTY));
-
-            if ((this) instanceof SnackMan) {
-                propertyChangeSupport.firePropertyChange("currentCalories", oldCalories, kcal);
-            }
         }
-    }
-
-    // Listener hinzufügen
-    public void addPropertyChangeListener(PropertyChangeListener listener) {
-        propertyChangeSupport.addPropertyChangeListener(listener);
     }
 }

@@ -120,18 +120,6 @@ public class MapService {
                 log.debug("Initialising ghost");
 
                 square = new Square(x, z, new Spawnpoint(SpawnpointMobType.GHOST));
-                /*
-                TODO FIX CHICKEN LAY EGG
-                else if (evt.getPropertyName().equals("egg")) {
-                        Square squareToAddEgg = (Square) evt.getNewValue();
-                        if (squareToAddEgg != null && squareToAddEgg.getSnack() != null && squareToAddEgg.getSnack().getSnackType() == SnackType.EGG) {
-                            FrontendMessageEvent messageEvent = new FrontendMessageEvent(EventType.SNACK, ChangeType.CREATE, squareToAddEgg);
-                            frontendMessageService.sendEvent(messageEvent);
-                            log.info("Sending FrontendMessageEvent: EventType={}, ChangeType={}, SquareId={}",
-                                    messageEvent.eventType().name(), messageEvent.changeType().name(), messageEvent.square().getId());
-                        }
-                 */
-
                 break;
             case 'S':
                 log.debug("Initialising snackman");
