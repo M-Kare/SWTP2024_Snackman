@@ -27,13 +27,13 @@ public class Lobby {
         this.gameMap = gameMap;
         this.name = name;
         this.adminClient = adminClient;
-        this.isGameStarted = false;;
+        this.isGameStarted = false;
         this.members = new ArrayList<>();
         this.members.add(adminClient);
         this.clientMobMap = new TreeMap<>();
     }
 
-    public SortedMap<String, Mob> getClientMobMap() { return clientMobMap; };
+    public SortedMap<String, Mob> getClientMobMap() { return clientMobMap; }
 
     public String getName() {
         return name;
