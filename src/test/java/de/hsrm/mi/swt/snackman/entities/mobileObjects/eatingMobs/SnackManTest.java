@@ -12,7 +12,6 @@ import de.hsrm.mi.swt.snackman.entities.map.Square;
 import de.hsrm.mi.swt.snackman.entities.mapObject.snack.Snack;
 import de.hsrm.mi.swt.snackman.entities.mapObject.snack.SnackType;
 import de.hsrm.mi.swt.snackman.entities.mechanics.SprintHandler;
-import de.hsrm.mi.swt.snackman.messaging.FrontendMessageService;
 import de.hsrm.mi.swt.snackman.services.MapService;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -26,10 +25,7 @@ import static org.mockito.Mockito.when;
 class SnackManTest {
     @Autowired
     private MapService mapService;
-    private FrontendMessageService frontendMessageService;
 
-    @Autowired
-    private ReadMazeService readMazeService;
     private SprintHandler sprintHandler;
 
     private SnackMan snackMan;
@@ -51,12 +47,15 @@ class SnackManTest {
         Square secondSquare = new Square(new Snack(SnackType.ORANGE), 0, 1);
 
         snackMan.consumeSnackOnSquare(firstSquare);
-        assertEquals(snackMan.getKcal(), SnackType.APPLE.getCalories());
-        assertNull(firstSquare.getSnack());
+        assertEquals(snackMan.getKcal(), SnackType.APPLE.getCalories(), "Snackman should consume the calories");
+        assertEquals(firstSquare.getSnack().getSnackType(), SnackType.EMPTY, "After snacking the Snack the Square " +
+                "should be empty.");
 
         snackMan.consumeSnackOnSquare(secondSquare);
-        assertEquals(snackMan.getKcal(), SnackType.APPLE.getCalories() + SnackType.ORANGE.getCalories());
-        assertNull(secondSquare.getSnack());
+        assertEquals(snackMan.getKcal(), SnackType.APPLE.getCalories() + SnackType.ORANGE.getCalories(), "Snacking " +
+                "snacks should increase snackmans kcal");
+        assertEquals(secondSquare.getSnack().getSnackType(), SnackType.EMPTY, "After snacking the Snack the " +
+                "second Square should be empty");
     }
 
     @Test
@@ -76,11 +75,12 @@ class SnackManTest {
         snackMan.consumeSnackOnSquare(square6);
 
         assertEquals(snackMan.getKcal(), snackMan.getMAXKCAL());
-        assertNull(square1.getSnack());
-        assertNull(square2.getSnack());
-        assertNull(square3.getSnack());
-        assertNull(square4.getSnack());
-        assertNull(square5.getSnack());
+        assertEquals(square1.getSnack().getSnackType(), SnackType.EMPTY);
+        assertEquals(square2.getSnack().getSnackType(), SnackType.EMPTY);
+        assertEquals(square3.getSnack().getSnackType(), SnackType.EMPTY);
+        assertEquals(square4.getSnack().getSnackType(), SnackType.EMPTY);
+        assertEquals(square5.getSnack().getSnackType(), SnackType.EMPTY);
+        assertEquals(square6.getSnack().getSnackType(), SnackType.EMPTY);
     }
 
     @Test
