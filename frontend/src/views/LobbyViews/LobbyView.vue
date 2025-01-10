@@ -192,7 +192,7 @@
     const uploadFileToServer = (file: File, lobbyId: string) => {
         const formData = new FormData();
         formData.append('file', file);
-        formData.append('lobbyId', lobbyId)
+        formData.append('lobbyId', lobbyId);
 
         fetch('/api/upload', {
             method: 'POST',
@@ -234,6 +234,31 @@
         }, 3000);
     }
 
+    /**
+     * Delete uploaded File, when the lobby doesn't exist anymore.
+     * @param lobbyId 
+     */
+    const deleteUploadedFile = async (lobbyId: string) => {
+        const formData = new FormData();
+        formData.append('lobbyId', lobbyId);
+
+        fetch('/api/deleteMap', {
+            method: 'DELETE',
+            body: formData
+        })
+        .then(response => {
+            if (!response.ok) {
+                console.error('Error deleting file:', response.text());
+            }
+            else {
+                console.log('File deleted successfully');
+            }
+        })
+        .catch(error => {
+            console.error('Error deleting file:', error);
+        });
+    }
+
     watchEffect(() => {
         if (lobbiesStore.lobbydata) {
             const lobbyId = route.params.lobbyId as string;
@@ -245,6 +270,7 @@
                     router.push({ name: 'GameView' });
                 }
             }else {
+                deleteUploadedFile(lobbyId);
                 router.push({ name: 'LobbyListView' });
             }
         }
@@ -279,6 +305,7 @@
             for (const member of lobby.value.members) {
                 if (member.playerId !== playerId) {
                     await lobbiesStore.leaveLobby(lobby.value.uuid, member.playerId);
+                    deleteUploadedFile(lobbyId);
                 }
             }
         } 

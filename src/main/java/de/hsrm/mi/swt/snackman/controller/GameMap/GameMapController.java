@@ -1,18 +1,22 @@
 package de.hsrm.mi.swt.snackman.controller.GameMap;
 
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -50,8 +54,10 @@ public class GameMapController {
 
     /**
      * Upload custom map and save in folder "./extensions/map"
-     * @param file file .txt
-     * @return
+     * @param file uploaded File
+     * @param lobbyId lobbyId, where upload custom map
+     * @return ResponseEntity: file is uploaded sucessfully or 
+     *          409 (Conflict) status of an error occurs during the upload process
      */
     @PostMapping("/upload")
     public ResponseEntity<String> uploadMap(@RequestParam("file") MultipartFile file, @RequestParam("lobbyId") String lobbyId){
@@ -71,6 +77,34 @@ public class GameMapController {
         } catch (Exception e){
             log.error("Error occurred: ", e);
             return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+        }
+    }
+
+    /**
+     * Deletes the uploaded map file associated with a given lobby ID.
+     * This method is invoked when a lobby no longer exists, and the map file
+     * for that lobby needs to be deleted from the server.
+     * @param requestBody A map containing the lobbyId
+     * @return ResponseEntity:
+     *     - HTTP 200 (OK) if the file was successfully deleted.
+     *     - HTTP 404 (Not Found) if the file does not exist.
+     *     - HTTP 500 (Internal Server Error) if an error occurs during the deletion process.
+     */
+    @DeleteMapping("/deleteMap")
+    public ResponseEntity<Void> deleteUploadedMap(@RequestParam("lobbyId") String lobbyId){
+        try {
+            String fileName = String.format("SnackManMap_%s.txt", lobbyId);
+            Path filePath = Paths.get("./extensions/map/" + fileName).toAbsolutePath();
+
+            if (Files.exists(filePath)) {
+                Files.delete(filePath);
+                return ResponseEntity.ok().build();
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            }
+        } catch (IOException e) {
+            log.error("Error occurred while deleting the file: ", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 }
