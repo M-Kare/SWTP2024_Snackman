@@ -46,10 +46,17 @@ public class GameMapController {
         return ResponseEntity.ok(new SnackManInitDTO(snackman.getPosX(), snackman.getPosY(), snackman.getPosZ(), snackman.getRadius(), GameConfig.SNACKMAN_SPEED, GameConfig.SNACKMAN_SPRINT_MULTIPLIER));
     }
 
+    /**
+     * Downloads the last map file as "SnackManMap.txt".
+     *
+     * @return ResponseEntity containing the map file as a resource, or:
+     *         - HTTP 404 (Not Found) if the file does not exist.
+     *         - HTTP 409 (Conflict) if an error occurs during the process.
+     */
     @GetMapping("/download")
     public ResponseEntity<Resource> downloadMap(){
         try{
-            Path filePath = Paths.get(mapService.getFilePath() + ".backup").toAbsolutePath();
+            Path filePath = Paths.get("./extensions/map/LastMap.txt").toAbsolutePath();
             Resource resource = new UrlResource(filePath.toUri());
 
             if(!resource.exists()){

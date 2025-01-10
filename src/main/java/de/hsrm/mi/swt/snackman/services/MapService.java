@@ -59,7 +59,8 @@ public class MapService {
         this.filePath = filePath;
         this.readMazeService = readMazeService;
         
-        backupOriginalMazeFile();
+        saveLastMapFile();
+
         generateNewMaze();
         
         this.mazeData = readMazeService.readMazeFromFile(this.filePath);
@@ -304,33 +305,20 @@ public class MapService {
         gameMap.setGameMap(square, x, y);
     }
 
-    public String getFilePath(){
-        return this.filePath;
-    }
-
-    private void backupOriginalMazeFile() {
-        Path source = Paths.get(filePath);
-        Path backup = Paths.get(filePath + ".backup");
+    /**
+     * Save the last map in LastMap.txt in Game-Beginn, for later to download.
+     */
+    private void saveLastMapFile() {
+        Path source = Paths.get(filePath).toAbsolutePath();
+        Path lastMapPath = Paths.get("./extensions/map/LastMap.txt").toAbsolutePath();
 
         try {
-            if (!Files.exists(backup)) {
-                Files.copy(source, backup, StandardCopyOption.REPLACE_EXISTING);
-                log.info("Original maze file backed up to {}", backup.toString());
+            if (!Files.exists(lastMapPath)) {
+                Files.copy(source, lastMapPath, StandardCopyOption.REPLACE_EXISTING);
             }
         } catch (IOException e) {
             log.error("Failed to back up the original maze file", e);
         }
     }
 
-    private void restoreOriginalMazeFile() {
-        Path source = Paths.get(filePath + ".backup");
-        Path target = Paths.get(filePath);
-    
-        try {
-            Files.copy(source, target, StandardCopyOption.REPLACE_EXISTING);
-            log.info("Maze file restored from backup.");
-        } catch (IOException e) {
-            log.error("Failed to restore the original maze file", e);
-        }
-    }
 }
