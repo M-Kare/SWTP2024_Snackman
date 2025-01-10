@@ -179,8 +179,6 @@ onMounted(async () => {
   camera = player.getCamera()
   scene.add(player.getControls().object)
 
-  MAXCALORIES.value = playerData.maxCalories;
-
   loadPlayerModel(SNACKMAN_TEXTURE)
 
   renderer.render(scene, camera)

@@ -5,7 +5,15 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.SortedMap;
 
+import de.hsrm.mi.swt.snackman.entities.lobby.Lobby;
+import de.hsrm.mi.swt.snackman.entities.lobby.PlayerClient;
+import de.hsrm.mi.swt.snackman.entities.lobby.ROLE;
+import de.hsrm.mi.swt.snackman.entities.map.Spawnpoint;
+import de.hsrm.mi.swt.snackman.entities.map.SpawnpointMobType;
+import de.hsrm.mi.swt.snackman.entities.mobileObjects.Mob;
+import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken.Chicken;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -24,10 +32,6 @@ import de.hsrm.mi.swt.snackman.entities.mapObject.MapObjectType;
 import de.hsrm.mi.swt.snackman.entities.mapObject.snack.Snack;
 import de.hsrm.mi.swt.snackman.entities.mapObject.snack.SnackType;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken.Direction;
-import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.SnackMan;
-import de.hsrm.mi.swt.snackman.messaging.EventType;
-import de.hsrm.mi.swt.snackman.messaging.FrontendMessageEvent;
-import de.hsrm.mi.swt.snackman.messaging.FrontendMessageService;
 
 @SpringBootTest
 class MapServiceTest {

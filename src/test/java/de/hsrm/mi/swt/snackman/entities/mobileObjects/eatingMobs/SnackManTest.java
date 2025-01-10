@@ -95,19 +95,12 @@ class SnackManTest {
     @Test
     void testMaxCalories() {
         Square square1  = new Square(new Snack(SnackType.APPLE), 0, 0);
-
         square1.getSnack().setCalories(1000000);
 
         snackMan.consumeSnackOnSquare(square1);
 
-
-        assertEquals(snackMan.getKcal(), snackMan.getMAXKCAL());
+        assertEquals(snackMan.getKcal(), 1000000);
         assertEquals(square1.getSnack().getSnackType(), SnackType.EMPTY);
-        assertEquals(square2.getSnack().getSnackType(), SnackType.EMPTY);
-        assertEquals(square3.getSnack().getSnackType(), SnackType.EMPTY);
-        assertEquals(square4.getSnack().getSnackType(), SnackType.EMPTY);
-        assertEquals(square5.getSnack().getSnackType(), SnackType.EMPTY);
-        assertEquals(square6.getSnack().getSnackType(), SnackType.EMPTY);
     }
 
     @Test
