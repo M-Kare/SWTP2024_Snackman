@@ -83,6 +83,10 @@ public class Square {
         return type;
     }
 
+    public void setType(MapObjectType type) {
+        this.type = type;
+    }
+
     public Snack getSnack() {
         return snack;
     }
