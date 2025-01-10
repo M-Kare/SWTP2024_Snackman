@@ -4,7 +4,7 @@
             <label>
                 
                 Please enter your name:
-                <input v-model.trim="playerName" type="text" autofocus>
+                <input v-model.trim="playerName" type="text" maxlength="16" autofocus>
             </label>
             <p
                 id="error-message"
@@ -39,7 +39,7 @@
     // TODO needed?
     const emit = defineEmits<(event: 'savePlayerName', value: string) => void>()
 
-    // TODO implement
+    // TODO implement, look up how lobbies are created & saved
     /**
      * Saves the name of a player.
      * Validates the admin client and playerName before attempting to save the playerName.
@@ -52,40 +52,7 @@
      * @returns {void}
      */
     const savePlayerName = async () => {
-        const adminClient = currentPlayer;
-    
-        // if (!adminClient || adminClient.playerId === '' || adminClient.playerName === '') {
-        //     alert("Admin client is not valid!");
-        //     return;
-        // }
-
-        if (!playerName.value.trim()) {
-            errorMessage.value = "Playername can't be empty";
-            return;
-        }
-
-        // TODO implement
-        const isDuplicateName = lobbiesStore.lobbydata.lobbies.some(
-            (lobby) => lobby.name === playerName.value.trim()
-        );
-
-        if (isDuplicateName) {
-            errorMessage.value = "Playername already exists! Please choose another name.";
-            return;
-        }
-
-        // TODO implement
-        try{
-            const newLobby = await lobbiesStore.createLobby(playerName.value.trim(), adminClient);
-            if (newLobby && newLobby.uuid) {
-                // cancelLobbyCreation();
-            } else {
-                throw new Error("Name save returned invalid response.");
-            }
-        } catch (error: any){
-            console.error('Error:', error);
-            alert("Error saving PlayerName!");
-        }
+        
     }
 
 </script>
