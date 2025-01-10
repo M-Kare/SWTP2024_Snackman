@@ -49,7 +49,7 @@
     const errorMessage = ref('');
 
     // defines event wich can be triggered by this component
-    const emit = defineEmits<(event: 'cancelLobbyCreation', value: boolean) => void>()
+    const emit = defineEmits< (event: 'cancelLobbyCreation', value: boolean) => void >()
     
     /**
      * Emits an event to cancel the lobby creation process.
@@ -58,7 +58,6 @@
      * @returns {void}
      */
     const cancelLobbyCreation = () => {
-        errorMessage.value = "";
         emit('cancelLobbyCreation', false);
     }
 
