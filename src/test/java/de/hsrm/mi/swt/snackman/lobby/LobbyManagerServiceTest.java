@@ -1,15 +1,16 @@
 package de.hsrm.mi.swt.snackman.lobby;
 
+import java.util.NoSuchElementException;
+
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import java.util.NoSuchElementException;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import org.springframework.boot.test.context.SpringBootTest;
 
 import de.hsrm.mi.swt.snackman.entities.lobby.Lobby;
 import de.hsrm.mi.swt.snackman.entities.lobby.PlayerClient;
@@ -17,14 +18,19 @@ import de.hsrm.mi.swt.snackman.entities.lobby.ROLE;
 import de.hsrm.mi.swt.snackman.services.GameAlreadyStartedException;
 import de.hsrm.mi.swt.snackman.services.LobbyAlreadyExistsException;
 import de.hsrm.mi.swt.snackman.services.LobbyManagerService;
+import de.hsrm.mi.swt.snackman.services.MapService;
 
+@SpringBootTest
 public class LobbyManagerServiceTest {
+
+      @Mock
+      private MapService mapService;
 
       private LobbyManagerService lobbyManagerService;
 
       @BeforeEach
-      void setUp() {
-            lobbyManagerService = new LobbyManagerService();
+      public void setup() {
+            lobbyManagerService = new LobbyManagerService(mapService);
       }
 
       @Test
@@ -62,7 +68,7 @@ public class LobbyManagerServiceTest {
             PlayerClient adminPlayer = lobbyManagerService.createNewClient("AdminPlayer");
             Lobby lobby = lobbyManagerService.createLobby("TestLobby", adminPlayer);
             PlayerClient secondPlayer = lobbyManagerService.createNewClient("2.Player");
-            lobby = lobbyManagerService.joinLobby(lobby.getUuid(), secondPlayer.getPlayerId());
+            lobby = lobbyManagerService.joinLobby(lobby.getLobbyId(), secondPlayer.getPlayerId());
 
             assertNotNull(lobby);
             assertEquals(2, lobby.getMembers().size());
@@ -76,13 +82,13 @@ public class LobbyManagerServiceTest {
             Lobby lobby = lobbyManagerService.createLobby("TestLobby", adminPlayer);
 
             assertDoesNotThrow(() -> {
-                  lobbyManagerService.joinLobby(lobby.getUuid(), secondPlayer.getPlayerId());
+                  lobbyManagerService.joinLobby(lobby.getLobbyId(), secondPlayer.getPlayerId());
             });
-            lobbyManagerService.startGame(lobby.getUuid());
+            lobbyManagerService.startGame(lobby.getLobbyId());
             PlayerClient thirdPlayer = lobbyManagerService.createNewClient("3.Player");
 
             assertThrows(GameAlreadyStartedException.class, () -> {
-                  lobbyManagerService.joinLobby(lobby.getUuid(), thirdPlayer.getPlayerId());
+                  lobbyManagerService.joinLobby(lobby.getLobbyId(), thirdPlayer.getPlayerId());
             });
       }
 
@@ -94,10 +100,10 @@ public class LobbyManagerServiceTest {
             PlayerClient secondPlayer = lobbyManagerService.createNewClient("2.Player");
 
             assertDoesNotThrow(() -> {
-                  lobbyManagerService.joinLobby(lobby.getUuid(), secondPlayer.getPlayerId());
+                  lobbyManagerService.joinLobby(lobby.getLobbyId(), secondPlayer.getPlayerId());
             });
 
-            lobbyManagerService.leaveLobby(lobby.getUuid(), secondPlayer.getPlayerId());
+            lobbyManagerService.leaveLobby(lobby.getLobbyId(), secondPlayer.getPlayerId());
             assertEquals(1, lobby.getMembers().size());
             assertEquals(adminPlayer.getPlayerId(), lobby.getMembers().get(0).getPlayerId());
       }
@@ -106,10 +112,10 @@ public class LobbyManagerServiceTest {
       public void testLeaveLobbyAdminLeavesDeletesLobby() throws LobbyAlreadyExistsException {
             PlayerClient adminPlayer = lobbyManagerService.createNewClient("AdminPlayer");
             Lobby lobby = lobbyManagerService.createLobby("TestLobby", adminPlayer);
-            lobbyManagerService.leaveLobby(lobby.getUuid(), adminPlayer.getPlayerId());
+            lobbyManagerService.leaveLobby(lobby.getLobbyId(), adminPlayer.getPlayerId());
 
             assertThrows(NoSuchElementException.class, () -> {
-                  lobbyManagerService.findLobbyByUUID(lobby.getUuid());
+                  lobbyManagerService.findLobbyByLobbyId(lobby.getLobbyId());
             });
       }
 
@@ -122,11 +128,11 @@ public class LobbyManagerServiceTest {
             PlayerClient thirdPlayer = lobbyManagerService.createNewClient("3.Player");
 
             assertDoesNotThrow(() -> {
-                  lobbyManagerService.joinLobby(lobby.getUuid(), secondPlayer.getPlayerId());
-                  lobbyManagerService.joinLobby(lobby.getUuid(), thirdPlayer.getPlayerId());
+                  lobbyManagerService.joinLobby(lobby.getLobbyId(), secondPlayer.getPlayerId());
+                  lobbyManagerService.joinLobby(lobby.getLobbyId(), thirdPlayer.getPlayerId());
             });
 
-            lobbyManagerService.startGame(lobby.getUuid());
+            lobbyManagerService.startGame(lobby.getLobbyId());
             assertTrue(lobby.isGameStarted());
       }
 
@@ -136,7 +142,7 @@ public class LobbyManagerServiceTest {
             Lobby lobby = lobbyManagerService.createLobby("TestLobby", adminPlayer);
 
             assertThrows(IllegalStateException.class, () -> {
-                  lobbyManagerService.startGame(lobby.getUuid());
+                  lobbyManagerService.startGame(lobby.getLobbyId());
             });
       }
 
@@ -145,16 +151,16 @@ public class LobbyManagerServiceTest {
             PlayerClient adminPlayer = lobbyManagerService.createNewClient("AdminPlayer");
             Lobby lobby = lobbyManagerService.createLobby("TestLobby", adminPlayer);
 
-            Lobby foundLobby = lobbyManagerService.findLobbyByUUID(lobby.getUuid());
+            Lobby foundLobby = lobbyManagerService.findLobbyByLobbyId(lobby.getLobbyId());
 
             assertNotNull(foundLobby);
-            assertEquals(lobby.getUuid(), foundLobby.getUuid());
+            assertEquals(lobby.getLobbyId(), foundLobby.getLobbyId());
       }
 
       @Test
       public void testFindLobbyByUUIDNotFound() {
             assertThrows(NoSuchElementException.class, () -> {
-                  lobbyManagerService.findLobbyByUUID("1234");
+                  lobbyManagerService.findLobbyByLobbyId("1234");
             });
       }
 

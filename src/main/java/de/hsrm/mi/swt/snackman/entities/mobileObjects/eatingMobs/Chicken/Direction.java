@@ -1,11 +1,9 @@
 package de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken;
 
+import de.hsrm.mi.swt.snackman.entities.map.GameMap;
 import de.hsrm.mi.swt.snackman.entities.map.Square;
-import de.hsrm.mi.swt.snackman.entities.mapObject.snack.SnackType;
-import de.hsrm.mi.swt.snackman.services.MapService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import java.util.Random;
 
 /**
@@ -25,8 +23,6 @@ import java.util.Random;
  *              /                 |                 \           *
  *         SOUTHWEST           SOUTH           SOUTHEAST        *
  *          (1, -1)            (1, 0)            (1, 1)         *
- *
- * 
  * 2N2W | 2NW  |  2N  | 2NO  | 2N2O  |
  *  N2W |  NW  |   N  |  NO  |  N2O  |
  *   2W |   W  |      |   O  |   2O  |
@@ -36,12 +32,13 @@ import java.util.Random;
  */
 public enum Direction {
     //NORTH_WEST("", -1, -1), NORTH("0", -1, 0), NORTH_EAST("", -1, 1), EAST("1", 0, 1), SOUTH_EAST("", 1, 1), SOUTH("2", 1, 0), SOUTH_WEST("", 1, -1), WEST("3", 0, -1),
-    
+
     TWO_NORTH_TWO_WEST("", -2, -2), TWO_NORTH_ONE_WEST("", -2, -1), TWO_NORTH("ß", -2, 0), TWO_NORTH_ONE_EAST("", -2, 1), TWO_NORTH_TWO_EAST("", -2, 2),
     ONE_NORTH_TWO_WEST("", -1, -2), ONE_NORTH_ONE_WEST("", -1, -1), ONE_NORTH("0", -1, 0), ONE_NORTH_ONE_EAST("", -1, 1), ONE_NORTH_TWO_EAST("", -1, 2),
     TWO_WEST("", 0, -2), ONE_WEST("3", 0, -1), CHICKEN("", 0, 0), ONE_EAST("1", 0, 1), TWO_EAST("", 0, 2),
     ONE_SOUTH_TWO_WEST("", 1, -2), ONE_SOUTH_ONE_WEST("", 1, -1), ONE_SOUTH("2", 1, 0), ONE_SOUTH_ONE_EAST("", 1, 1), ONE_SOUTH_TWO_EAST("", 1, 2),
     TWO_SOUTH_TWO_WEST("", 2, -2), TWO_SOUTH_ONE_WEST("", 2, -1), TWO_SOUTH("", 2, 0), TWO_SOUTH_ONE_EAST("", 2, 1), TWO_SOUTH_TWO_EAST("", 2, 2);
+
 
     private final String indexOfList;
     private final int deltaX;
@@ -78,113 +75,114 @@ public enum Direction {
      * @param direction in which the chicken decided to go
      * @return the square which is laying in the direction of the currentPosition
      */
-    public synchronized Square getNewPosition(MapService mapService, int x, int z, Direction direction) {
-        Square currentChickenPosition = mapService.getSquareAtIndexXZ(x, z);
+    public synchronized Square getNewPosition(GameMap gameMap, int x, int z, Direction direction) {
+        Square currentChickenPosition = gameMap.getSquareAtIndexXZ(x, z);
 
-        return mapService.getSquareAtIndexXZ(
+        return gameMap.getSquareAtIndexXZ(
                 currentChickenPosition.getIndexX() + direction.deltaX,
                 currentChickenPosition.getIndexZ() + direction.deltaZ
         );
     }
 
-    public Square get_two_North_two_West_Square(MapService mapService, Square currentPosition) {
-        return mapService.getSquareAtIndexXZ(currentPosition.getIndexX() + TWO_NORTH_TWO_WEST.deltaX, currentPosition.getIndexZ() + TWO_NORTH_TWO_WEST.deltaZ);
+    public Square get_two_North_two_West_Square(GameMap gameMap, Square currentPosition) {
+        return gameMap.getSquareAtIndexXZ(currentPosition.getIndexX() + TWO_NORTH_TWO_WEST.deltaX, currentPosition.getIndexZ() + TWO_NORTH_TWO_WEST.deltaZ);
     }
 
-    public Square get_two_North_one_West_Square(MapService mapService, Square currentPosition) {
-        return mapService.getSquareAtIndexXZ(currentPosition.getIndexX() + TWO_NORTH_ONE_WEST.deltaX, currentPosition.getIndexZ() + TWO_NORTH_ONE_WEST.deltaZ);
+    public Square get_two_North_one_West_Square(GameMap gameMap, Square currentPosition) {
+        return gameMap.getSquareAtIndexXZ(currentPosition.getIndexX() + TWO_NORTH_ONE_WEST.deltaX, currentPosition.getIndexZ() + TWO_NORTH_ONE_WEST.deltaZ);
     }
 
-    public Square get_two_North_Square(MapService mapService, Square currentPosition) {
-        return mapService.getSquareAtIndexXZ(currentPosition.getIndexX() + TWO_NORTH.deltaX, currentPosition.getIndexZ() + TWO_NORTH.deltaZ);
+    public Square get_two_North_Square(GameMap gameMap, Square currentPosition) {
+        return gameMap.getSquareAtIndexXZ(currentPosition.getIndexX() + TWO_NORTH.deltaX, currentPosition.getIndexZ() + TWO_NORTH.deltaZ);
     }
 
-    public Square get_two_North_one_East_Square(MapService mapService, Square currentPosition) {
-        return mapService.getSquareAtIndexXZ(currentPosition.getIndexX() + TWO_NORTH_ONE_EAST.deltaX, currentPosition.getIndexZ() + TWO_NORTH_ONE_EAST.deltaZ);
+    public Square get_two_North_one_East_Square(GameMap gameMap, Square currentPosition) {
+        return gameMap.getSquareAtIndexXZ(currentPosition.getIndexX() + TWO_NORTH_ONE_EAST.deltaX, currentPosition.getIndexZ() + TWO_NORTH_ONE_EAST.deltaZ);
     }
 
-    public Square get_two_North_two_East_Square(MapService mapService, Square currentPosition) {
-        return mapService.getSquareAtIndexXZ(currentPosition.getIndexX() + TWO_NORTH_TWO_EAST.deltaX, currentPosition.getIndexZ() + TWO_NORTH_TWO_EAST.deltaZ);
+    public Square get_two_North_two_East_Square(GameMap gameMap, Square currentPosition) {
+        return gameMap.getSquareAtIndexXZ(currentPosition.getIndexX() + TWO_NORTH_TWO_EAST.deltaX, currentPosition.getIndexZ() + TWO_NORTH_TWO_EAST.deltaZ);
     }
 
-    public Square get_one_North_two_West_Square(MapService mapService, Square currentPosition) {
-        return mapService.getSquareAtIndexXZ(currentPosition.getIndexX() + ONE_NORTH_TWO_WEST.deltaX, currentPosition.getIndexZ() + ONE_NORTH_TWO_WEST.deltaZ);
+    public Square get_one_North_two_West_Square(GameMap gameMap, Square currentPosition) {
+        return gameMap.getSquareAtIndexXZ(currentPosition.getIndexX() + ONE_NORTH_TWO_WEST.deltaX, currentPosition.getIndexZ() + ONE_NORTH_TWO_WEST.deltaZ);
     }
 
-    public Square get_one_North_one_West_Square(MapService mapService, Square currentPosition) {
-        return mapService.getSquareAtIndexXZ(currentPosition.getIndexX() + ONE_NORTH_ONE_WEST.deltaX, currentPosition.getIndexZ() + ONE_NORTH_ONE_WEST.deltaZ);
+    public Square get_one_North_one_West_Square(GameMap gameMap, Square currentPosition) {
+        return gameMap.getSquareAtIndexXZ(currentPosition.getIndexX() + ONE_NORTH_ONE_WEST.deltaX, currentPosition.getIndexZ() + ONE_NORTH_ONE_WEST.deltaZ);
     }
 
-    public Square get_one_North_Square(MapService mapService, Square currentPosition) {
-        return mapService.getSquareAtIndexXZ(currentPosition.getIndexX() + ONE_NORTH.deltaX, currentPosition.getIndexZ() + ONE_NORTH.deltaZ);
+    public Square get_one_North_Square(GameMap gameMap, Square currentPosition) {
+        return gameMap.getSquareAtIndexXZ(currentPosition.getIndexX() + ONE_NORTH.deltaX, currentPosition.getIndexZ() + ONE_NORTH.deltaZ);
     }
 
-    public Square get_one_North_one_East_Square(MapService mapService, Square currentPosition) {
-        return mapService.getSquareAtIndexXZ(currentPosition.getIndexX() + ONE_NORTH_ONE_EAST.deltaX, currentPosition.getIndexZ() + ONE_NORTH_ONE_EAST.deltaZ);
+    public Square get_one_North_one_East_Square(GameMap gameMap, Square currentPosition) {
+        return gameMap.getSquareAtIndexXZ(currentPosition.getIndexX() + ONE_NORTH_ONE_EAST.deltaX, currentPosition.getIndexZ() + ONE_NORTH_ONE_EAST.deltaZ);
     }
 
-    public Square get_one_North_two_East_Square(MapService mapService, Square currentPosition) {
-        return mapService.getSquareAtIndexXZ(currentPosition.getIndexX() + ONE_NORTH_TWO_EAST.deltaX, currentPosition.getIndexZ() + ONE_NORTH_TWO_EAST.deltaZ);
+    public Square get_one_North_two_East_Square(GameMap gameMap, Square currentPosition) {
+        return gameMap.getSquareAtIndexXZ(currentPosition.getIndexX() + ONE_NORTH_TWO_EAST.deltaX, currentPosition.getIndexZ() + ONE_NORTH_TWO_EAST.deltaZ);
     }
 
-    public Square get_two_West_Square(MapService mapService, Square currentPosition) {
-        return mapService.getSquareAtIndexXZ(currentPosition.getIndexX() + TWO_WEST.deltaX, currentPosition.getIndexZ() + TWO_WEST.deltaZ);
+    public Square get_two_West_Square(GameMap gameMap, Square currentPosition) {
+        return gameMap.getSquareAtIndexXZ(currentPosition.getIndexX() + TWO_WEST.deltaX, currentPosition.getIndexZ() + TWO_WEST.deltaZ);
     }
 
-    public Square get_one_West_Square(MapService mapService, Square currentPosition) {
-        return mapService.getSquareAtIndexXZ(currentPosition.getIndexX() + ONE_WEST.deltaX, currentPosition.getIndexZ() + ONE_WEST.deltaZ);
+    public Square get_one_West_Square(GameMap gameMap, Square currentPosition) {
+        return gameMap.getSquareAtIndexXZ(currentPosition.getIndexX() + ONE_WEST.deltaX, currentPosition.getIndexZ() + ONE_WEST.deltaZ);
     }
 
-    public Square get_Chicken_Square(MapService mapService, Square currentPosition) {
-        return mapService.getSquareAtIndexXZ(currentPosition.getIndexX() + CHICKEN.deltaX, currentPosition.getIndexZ() + CHICKEN.deltaZ);
+    public Square get_Chicken_Square(GameMap gameMap, Square currentPosition) {
+        return gameMap.getSquareAtIndexXZ(currentPosition.getIndexX() + CHICKEN.deltaX, currentPosition.getIndexZ() + CHICKEN.deltaZ);
     }
 
-    public Square get_one_East_Square(MapService mapService, Square currentPosition) {
-        return mapService.getSquareAtIndexXZ(currentPosition.getIndexX() + ONE_EAST.deltaX, currentPosition.getIndexZ() + ONE_EAST.deltaZ);
+    public Square get_one_East_Square(GameMap gameMap, Square currentPosition) {
+        return gameMap.getSquareAtIndexXZ(currentPosition.getIndexX() + ONE_EAST.deltaX, currentPosition.getIndexZ() + ONE_EAST.deltaZ);
     }
 
-    public Square get_two_East_Square(MapService mapService, Square currentPosition) {
-        return mapService.getSquareAtIndexXZ(currentPosition.getIndexX() + TWO_EAST.deltaX, currentPosition.getIndexZ() + TWO_EAST.deltaZ);
+    public Square get_two_East_Square(GameMap gameMap, Square currentPosition) {
+        return gameMap.getSquareAtIndexXZ(currentPosition.getIndexX() + TWO_EAST.deltaX, currentPosition.getIndexZ() + TWO_EAST.deltaZ);
     }
 
-    public Square get_one_South_two_West_Square(MapService mapService, Square currentPosition) {
-        return mapService.getSquareAtIndexXZ(currentPosition.getIndexX() + ONE_SOUTH_TWO_WEST.deltaX, currentPosition.getIndexZ() + ONE_SOUTH_TWO_WEST.deltaZ);
+    public Square get_one_South_two_West_Square(GameMap gameMap, Square currentPosition) {
+        return gameMap.getSquareAtIndexXZ(currentPosition.getIndexX() + ONE_SOUTH_TWO_WEST.deltaX, currentPosition.getIndexZ() + ONE_SOUTH_TWO_WEST.deltaZ);
     }
 
-    public Square get_one_South_one_West_Square(MapService mapService, Square currentPosition) {
-        return mapService.getSquareAtIndexXZ(currentPosition.getIndexX() + ONE_SOUTH_ONE_WEST.deltaX, currentPosition.getIndexZ() + ONE_SOUTH_ONE_WEST.deltaZ);
+    public Square get_one_South_one_West_Square(GameMap gameMap, Square currentPosition) {
+        return gameMap.getSquareAtIndexXZ(currentPosition.getIndexX() + ONE_SOUTH_ONE_WEST.deltaX, currentPosition.getIndexZ() + ONE_SOUTH_ONE_WEST.deltaZ);
     }
 
-    public Square get_one_South_Square(MapService mapService, Square currentPosition) {
-        return mapService.getSquareAtIndexXZ(currentPosition.getIndexX() + ONE_SOUTH.deltaX, currentPosition.getIndexZ() + ONE_SOUTH.deltaZ);
+    public Square get_one_South_Square(GameMap gameMap, Square currentPosition) {
+        return gameMap.getSquareAtIndexXZ(currentPosition.getIndexX() + ONE_SOUTH.deltaX, currentPosition.getIndexZ() + ONE_SOUTH.deltaZ);
     }
 
-    public Square get_one_South_one_East_Square(MapService mapService, Square currentPosition) {
-        return mapService.getSquareAtIndexXZ(currentPosition.getIndexX() + ONE_SOUTH_ONE_EAST.deltaX, currentPosition.getIndexZ() + ONE_SOUTH_ONE_EAST.deltaZ);
+    public Square get_one_South_one_East_Square(GameMap gameMap, Square currentPosition) {
+        return gameMap.getSquareAtIndexXZ(currentPosition.getIndexX() + ONE_SOUTH_ONE_EAST.deltaX, currentPosition.getIndexZ() + ONE_SOUTH_ONE_EAST.deltaZ);
     }
 
-    public Square get_one_South_two_East_Square(MapService mapService, Square currentPosition) {
-        return mapService.getSquareAtIndexXZ(currentPosition.getIndexX() + ONE_SOUTH_TWO_EAST.deltaX, currentPosition.getIndexZ() + ONE_SOUTH_TWO_EAST.deltaZ);
+    public Square get_one_South_two_East_Square(GameMap gameMap, Square currentPosition) {
+        return gameMap.getSquareAtIndexXZ(currentPosition.getIndexX() + ONE_SOUTH_TWO_EAST.deltaX, currentPosition.getIndexZ() + ONE_SOUTH_TWO_EAST.deltaZ);
     }
 
-    public Square get_two_South_two_West_Square(MapService mapService, Square currentPosition) {
-        return mapService.getSquareAtIndexXZ(currentPosition.getIndexX() + TWO_SOUTH_TWO_WEST.deltaX, currentPosition.getIndexZ() + TWO_SOUTH_TWO_WEST.deltaZ);
+    public Square get_two_South_two_West_Square(GameMap gameMap, Square currentPosition) {
+        return gameMap.getSquareAtIndexXZ(currentPosition.getIndexX() + TWO_SOUTH_TWO_WEST.deltaX, currentPosition.getIndexZ() + TWO_SOUTH_TWO_WEST.deltaZ);
     }
 
-    public Square get_two_South_one_West_Square(MapService mapService, Square currentPosition) {
-        return mapService.getSquareAtIndexXZ(currentPosition.getIndexX() + TWO_SOUTH_ONE_WEST.deltaX, currentPosition.getIndexZ() + TWO_SOUTH_ONE_WEST.deltaZ);
+    public Square get_two_South_one_West_Square(GameMap gameMap, Square currentPosition) {
+        return gameMap.getSquareAtIndexXZ(currentPosition.getIndexX() + TWO_SOUTH_ONE_WEST.deltaX, currentPosition.getIndexZ() + TWO_SOUTH_ONE_WEST.deltaZ);
     }
 
-    public Square get_two_South_Square(MapService mapService, Square currentPosition) {
-        return mapService.getSquareAtIndexXZ(currentPosition.getIndexX() + TWO_SOUTH.deltaX, currentPosition.getIndexZ() + TWO_SOUTH.deltaZ);
+    public Square get_two_South_Square(GameMap gameMap, Square currentPosition) {
+        return gameMap.getSquareAtIndexXZ(currentPosition.getIndexX() + TWO_SOUTH.deltaX, currentPosition.getIndexZ() + TWO_SOUTH.deltaZ);
     }
 
-    public Square get_two_South_one_East_Square(MapService mapService, Square currentPosition) {
-        return mapService.getSquareAtIndexXZ(currentPosition.getIndexX() + TWO_SOUTH_ONE_EAST.deltaX, currentPosition.getIndexZ() + TWO_SOUTH_ONE_EAST.deltaZ);
+    public Square get_two_South_one_East_Square(GameMap gameMap, Square currentPosition) {
+        return gameMap.getSquareAtIndexXZ(currentPosition.getIndexX() + TWO_SOUTH_ONE_EAST.deltaX, currentPosition.getIndexZ() + TWO_SOUTH_ONE_EAST.deltaZ);
     }
 
-    public Square get_two_South_two_East_Square(MapService mapService, Square currentPosition) {
-        return mapService.getSquareAtIndexXZ(currentPosition.getIndexX() + TWO_SOUTH_TWO_EAST.deltaX, currentPosition.getIndexZ() + TWO_SOUTH_TWO_EAST.deltaZ);
+    public Square get_two_South_two_East_Square(GameMap gameMap, Square currentPosition) {
+
+    return gameMap.getSquareAtIndexXZ(currentPosition.getIndexX() + TWO_SOUTH_TWO_EAST.deltaX, currentPosition.getIndexZ() + TWO_SOUTH_TWO_EAST.deltaZ);
     }
 
     @Override
