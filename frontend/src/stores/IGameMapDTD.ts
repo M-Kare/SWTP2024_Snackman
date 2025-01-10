@@ -1,5 +1,7 @@
 import type {ISquare, ISquareDTD} from "@/stores/Square/ISquareDTD";
 import type {IChicken, IChickenDTD} from "@/stores/Chicken/IChickenDTD";
+import type { Player } from "@/components/Player";
+import * as THREE from 'three'
 
 export interface IGameMapDTD {
   DEFAULT_WALL_HEIGHT: number,
@@ -15,6 +17,6 @@ export enum MapObjectType {
 export interface IGameMap {
   DEFAULT_WALL_HEIGHT: number,
   DEFAULT_SQUARE_SIDE_LENGTH: number,
-  gameMap: Map<number, ISquare>
-  chickens: IChicken[]
+  gameMap: Map<number, ISquare>,
+  chickens: IChicken[],
 }

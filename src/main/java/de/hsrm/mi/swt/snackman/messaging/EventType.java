@@ -1,5 +1,5 @@
 package de.hsrm.mi.swt.snackman.messaging;
 
 public enum EventType {
-    SNACK, CHICKEN, CALORIES, LEADERBOARD
+    LEADERBOARD
 }
