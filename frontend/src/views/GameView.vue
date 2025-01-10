@@ -26,6 +26,7 @@ import type { IGameMap } from '@/stores/IGameMapDTD';
 import { useLobbiesStore } from '@/stores/Lobby/lobbiesstore';
 import type {IPlayerClientDTD} from "@/stores/Lobby/IPlayerClientDTD";
 import { GLTFLoader } from 'three/examples/jsm/Addons.js'
+import { useRouter, useRoute } from 'vue-router';
 
 const { lobbydata } = useLobbiesStore();
 const gameMapStore = useGameMapStore()
@@ -36,6 +37,10 @@ const targetHz = 30
 let clients: Array<IPlayerClientDTD>;
 let playerHashMap = new Map<String, THREE.Mesh>()
 
+const router = useRouter();
+const route = useRoute();
+
+const UPDATE = '/topic/calories'
 const stompclient = gameMapStore.stompclient
 // stompclient.activate()
 
@@ -43,6 +48,7 @@ const stompclient = gameMapStore.stompclient
 const MAXCALORIES = 3000
 let currentCalories = ref()
 let caloriesMessage = ref('')
+const playerRole = ref(route.query.role || ''); // Player role from the URL query
 
 const SNACKMAN_TEXTURE: string = 'src/assets/kirby.glb'
 let snackManModel: THREE.Group<THREE.Object3DEventMap>
@@ -172,6 +178,8 @@ onMounted(async () => {
 
   camera = player.getCamera()
   scene.add(player.getControls().object)
+
+  MAXCALORIES.value = playerData.maxCalories;
 
   loadPlayerModel(SNACKMAN_TEXTURE)
 

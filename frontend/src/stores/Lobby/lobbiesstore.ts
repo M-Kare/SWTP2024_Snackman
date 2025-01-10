@@ -44,6 +44,12 @@ export const useLobbiesStore = defineStore('lobbiesstore', () =>{
 
             if(response.ok){
                 const newPlayer = await response.json()
+
+                // Only update the role if the backend returns it
+                if (newPlayer.role) {
+                    newPlayerClient.role = newPlayer.role
+                }
+
                 Object.assign(lobbydata.currentPlayer, newPlayer)
             } else {
                 console.error(`Failed to create a new player client: ${response.statusText}`)
@@ -176,6 +182,13 @@ export const useLobbiesStore = defineStore('lobbiesstore', () =>{
             if(response.ok){
                 const lobby: ILobbyDTD = await response.json()
                 lobbydata.currentPlayer.joinedLobbyId = lobby.lobbyId
+
+                // Admin client should have the SNACKMAN role
+                const adminPlayer = lobby.members.find((member) => member.playerId === adminClient.playerId)
+                if (adminPlayer) {
+                    lobbydata.currentPlayer.role = adminPlayer.role
+                }
+
                 lobbydata.lobbies.push(lobby)
                 return lobby
             } else {
@@ -221,7 +234,12 @@ export const useLobbiesStore = defineStore('lobbiesstore', () =>{
                 const lobby: ILobbyDTD = await response.json()
                 lobbydata.currentPlayer.joinedLobbyId = lobby.lobbyId
 
-                console.log('lobbiesStore joinLobby successful')
+                // Find the current player in the lobby data and update the role
+                const updatedPlayer = lobby.members.find((member) => member.playerId === playerId)
+                if (updatedPlayer) {
+                    lobbydata.currentPlayer.role = updatedPlayer.role
+                }
+
                 return lobby
             } else {
                 console.error(`Failed to join lobby: ${response.statusText}`)

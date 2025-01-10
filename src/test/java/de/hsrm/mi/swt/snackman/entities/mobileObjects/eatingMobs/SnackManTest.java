@@ -7,12 +7,22 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import de.hsrm.mi.swt.snackman.SnackmanApplication;
 import de.hsrm.mi.swt.snackman.configuration.GameConfig;
 import de.hsrm.mi.swt.snackman.entities.map.Square;
 import de.hsrm.mi.swt.snackman.entities.mapObject.snack.Snack;
 import de.hsrm.mi.swt.snackman.entities.mapObject.snack.SnackType;
 import de.hsrm.mi.swt.snackman.entities.mechanics.SprintHandler;
 import de.hsrm.mi.swt.snackman.services.MapService;
+import de.hsrm.mi.swt.snackman.services.ReadMazeService;
+
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.util.FileSystemUtils;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
@@ -20,6 +30,11 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 @SpringBootTest
 class SnackManTest {
@@ -29,6 +44,25 @@ class SnackManTest {
     private SprintHandler sprintHandler;
 
     private SnackMan snackMan;
+
+    private static final Path workFolder = Paths.get("./extensions").toAbsolutePath();
+
+    @BeforeAll
+    static void fileSetUp() {
+        try{
+            tearDownAfter();
+        }catch(Exception e){
+            System.out.println("No file to delete");
+        }
+        SnackmanApplication.checkAndCopyResources();
+    }
+
+    @AfterAll
+    static void tearDownAfter() throws IOException {
+        if (Files.exists(workFolder)) {
+            FileSystemUtils.deleteRecursively(workFolder.toFile());
+        }
+    }
 
     @BeforeEach
     public void setUp() {
@@ -60,19 +94,12 @@ class SnackManTest {
 
     @Test
     void testMaxCalories() {
-        Square square1  = new Square(new Snack(SnackType.ORANGE), 0, 0);
-        Square square2 = new Square(new Snack(SnackType.ORANGE), 0, 1);
-        Square square3 = new Square(new Snack(SnackType.ORANGE), 0, 2);
-        Square square4  = new Square(new Snack(SnackType.ORANGE), 0, 0);
-        Square square5 = new Square(new Snack(SnackType.ORANGE), 0, 1);
-        Square square6 = new Square(new Snack(SnackType.ORANGE), 0, 3);
+        Square square1  = new Square(new Snack(SnackType.APPLE), 0, 0);
+
+        square1.getSnack().setCalories(1000000);
 
         snackMan.consumeSnackOnSquare(square1);
-        snackMan.consumeSnackOnSquare(square2);
-        snackMan.consumeSnackOnSquare(square3);
-        snackMan.consumeSnackOnSquare(square4);
-        snackMan.consumeSnackOnSquare(square5);
-        snackMan.consumeSnackOnSquare(square6);
+
 
         assertEquals(snackMan.getKcal(), snackMan.getMAXKCAL());
         assertEquals(square1.getSnack().getSnackType(), SnackType.EMPTY);

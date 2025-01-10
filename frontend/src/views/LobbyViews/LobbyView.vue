@@ -140,8 +140,15 @@
                 console.log("Gamestarted in Lobby-View", updatedLobby.gameStarted)
                 if (updatedLobby.gameStarted){
                     console.log('Game has started! Redirecting to GameView...');
-                    router.push({ name: 'GameView' });
+                    router.push({ 
+                        name: 'GameView', 
+                        query: { role: lobbiesStore.lobbydata.currentPlayer.role } 
+                    });
+                    console.log('Navigating to GameView with role:', lobbiesStore.lobbydata.currentPlayer.role);
                 }
+            }
+            else {
+                router.push({ name: 'LobbyListView' });
             }
         }
     });
