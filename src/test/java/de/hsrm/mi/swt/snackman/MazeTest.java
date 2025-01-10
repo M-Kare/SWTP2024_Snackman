@@ -6,13 +6,21 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.util.FileSystemUtils;
+
+import de.hsrm.mi.swt.snackman.services.ReadMazeService;
 
 @SpringBootTest
 class MazeTest {
     
+    // @Autowired
+    // ReadMazeService mazeService;
+
     private static final String MAZE_FILE_PATH = "./extensions/map/Maze.txt";
     private static final Path workFolder = Paths.get("./extensions").toAbsolutePath();
 
@@ -24,6 +32,7 @@ class MazeTest {
             System.out.println("No file to delete");
         }   
         SnackmanApplication.checkAndCopyResources();
+        ReadMazeService.generateNewMaze();
     }
 
     @AfterAll
@@ -32,6 +41,11 @@ class MazeTest {
             FileSystemUtils.deleteRecursively(workFolder.toFile());
         }
     }
+
+    // @BeforeEach
+    // void setup(){
+    //     mazeService.generateNewMaze();
+    // }
 
     @Test
     void mazeExists() {
@@ -46,7 +60,7 @@ class MazeTest {
         Assertions.assertFalse(maze.isEmpty(), "The Maze.txt file is empty!");
     }
 
-    @Test
+    @Test 
     void mazeHasDefinedCharacters() {
         List<String> maze = readMazeFile();
 

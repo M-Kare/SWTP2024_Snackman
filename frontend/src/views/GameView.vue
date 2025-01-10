@@ -45,7 +45,7 @@ const stompclient = gameMapStore.stompclient
 // stompclient.activate()
 
 //Reaktive Calories Variable
-const MAXCALORIES = 3000
+const MAXCALORIES = 20000
 let currentCalories = ref()
 let caloriesMessage = ref('')
 const playerRole = ref(route.query.role || ''); // Player role from the URL query
@@ -242,9 +242,8 @@ function stopCooldownFill() {
 
 // Kalorien-Overlay Fill berrechnen
 const getBackgroundStyle = computed(() => {
-  const maxCalories = 3000
   //Prozent berechnen
-  const percentage = Math.min(currentCalories.value / maxCalories, 1)
+  const percentage = Math.min(currentCalories.value / MAXCALORIES, 1)
 
   const color = `linear-gradient(to right, #EEC643 ${percentage * 100}%, #5E4A08 ${percentage * 100}%)`
 

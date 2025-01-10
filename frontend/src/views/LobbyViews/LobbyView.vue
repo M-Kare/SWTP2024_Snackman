@@ -101,7 +101,8 @@
     const route = useRoute();
     const lobbiesStore = useLobbiesStore();
 
-    let lobby = computed(() => lobbiesStore.lobbydata.lobbies.find(l => l.lobbyId === route.params.lobbyId));
+    const lobbyUrl = route.params.lobbyId
+    let lobby = computed(() => lobbiesStore.lobbydata.lobbies.find(l => l.lobbyId === lobbyUrl));
     const members = computed(() => lobby.value?.members || [] as Array<IPlayerClientDTD>);
     const playerCount = computed(() => members.value.length);
     const maxPlayerCount = ref(5);
@@ -129,11 +130,12 @@
         darkenBackground.value = false;
     }
 
-    watchEffect(() => {
+    watchEffect(async () => {
+        // await lobbiesStore.fetchLobbyList()
+        console.log("asdasd" + lobbiesStore.lobbydata)
         if (lobbiesStore.lobbydata) {
-            const lobbyId = route.params.lobbyId as string;
 
-            const updatedLobby = lobbiesStore.lobbydata.lobbies.find(l => l.lobbyId === lobbyId);
+            const updatedLobby = lobbiesStore.lobbydata.lobbies.find(l => l.lobbyId === lobbyUrl);
             console.log("Updated Lobby in Lobby-View", updatedLobby)
 
             if (updatedLobby) {
@@ -175,6 +177,7 @@
         }
 
     })
+    
 
     const joinLobby = async (lobby: ILobbyDTD) => {
 
