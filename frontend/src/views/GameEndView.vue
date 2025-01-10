@@ -109,21 +109,13 @@ const downloadMap = async () => {
 
 .map-exportieren-button {
   font-size: 1.5rem;
-  position: absolute;
-  top: 70%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 3;
+  margin-top: 4rem;
 }
 
 .feedback-message {
-  position: absolute;
-  left: 50%;
-  top: 78%;
-  transform: translate(-50%, -50%);
   font-size: 2rem;
+  margin-top: 4rem;
   font-weight: bold;
-  z-index: 3;
   padding: 10px 20px;
   border-radius: 5px;
   text-align: center;
