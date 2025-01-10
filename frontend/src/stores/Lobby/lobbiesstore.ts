@@ -197,9 +197,8 @@ export const useLobbiesStore = defineStore('lobbiesstore', () =>{
     async function joinLobby(lobbyId: string, playerId: string): Promise<ILobbyDTD | null> {
         try{
             const currentLobby = await fetchLobbyById(lobbyId);
-            if (currentLobby && currentLobby.members.length >= 4) {
+            if (currentLobby && currentLobby.members.length >= 5) {
                 console.error('Lobby is full. Cannot join.');
-                alert(`Lobby "${currentLobby.name}" is full!`);
                 return null;
             }
 
