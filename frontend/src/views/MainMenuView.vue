@@ -41,7 +41,7 @@
   }
 
   onMounted(() => {
-    darkenBackground.value = false;
+    darkenBackground.value = true;
     console.log("darkenBackground - ", darkenBackground)
     showPopUp.value = true;
   })

@@ -62,7 +62,7 @@
     import PopUp from '@/components/PopUp.vue';
 
     import { useRouter } from 'vue-router';
-    import { computed, onMounted, onUpdated, ref } from 'vue';
+    import { computed, onMounted, ref } from 'vue';
     import { useLobbiesStore } from '@/stores/Lobby/lobbiesstore';
     import type { ILobbyDTD } from '@/stores/Lobby/ILobbyDTD';
     import type { IPlayerClientDTD } from '@/stores/Lobby/IPlayerClientDTD';
