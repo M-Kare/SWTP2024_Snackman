@@ -94,8 +94,8 @@
     import { computed, onMounted, ref, watchEffect } from 'vue';
     import { useLobbiesStore } from '@/stores/Lobby/lobbiesstore';
     import type { IPlayerClientDTD } from '@/stores/Lobby/IPlayerClientDTD';
-import type { ILobbyDTD } from '@/stores/Lobby/ILobbyDTD';
-import LobbyListView from './LobbyListView.vue';
+    import type { ILobbyDTD } from '@/stores/Lobby/ILobbyDTD';
+    import LobbyListView from './LobbyListView.vue';
 
     const router = useRouter();
     const route = useRoute();
@@ -104,7 +104,7 @@ import LobbyListView from './LobbyListView.vue';
     let lobby = computed(() => lobbiesStore.lobbydata.lobbies.find(l => l.lobbyId === route.params.lobbyId));
     const members = computed(() => lobby.value?.members || [] as Array<IPlayerClientDTD>);
     const playerCount = computed(() => members.value.length);
-    const maxPlayerCount = ref(4);
+    const maxPlayerCount = ref(5);
 
     const darkenBackground = ref(false);
     const showPopUp = ref(false);
@@ -299,7 +299,7 @@ import LobbyListView from './LobbyListView.vue';
     transform: translateX(-50%);
     width: 70vw;
     max-width: 1000px;
-    height: 30rem;
+    height: 35rem;
     max-height: 45rem;
     background: rgba(255, 255, 255, 60%);
     border-radius: 0.5rem;

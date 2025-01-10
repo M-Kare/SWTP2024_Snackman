@@ -73,7 +73,7 @@
     const lobbies = computed(() => lobbiesStore.lobbydata.lobbies);
     const currentPlayer = lobbiesStore.lobbydata.currentPlayer as IPlayerClientDTD;
 
-    const MAX_PLAYER_COUNT = 4;
+    const MAX_PLAYER_COUNT = 5;
 
     const filteredLobbies = computed(() => {
         return lobbies.value.filter(lobby => !lobby.gameStarted);
