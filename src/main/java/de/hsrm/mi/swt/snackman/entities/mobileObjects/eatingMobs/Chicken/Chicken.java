@@ -162,7 +162,7 @@ public class Chicken extends EatingMob implements Runnable {
         while (isWalking) {
             // get 9 squares
             Square currentPosition = super.getGameMap().getSquareAtIndexXZ(this.chickenPosX, this.chickenPosZ);
-            List<String> squares = getSquaresVisibleForChicken(currentPosition, lookingDirection);
+            List<String> squares = getSquaresVisibleForChicken(getGameMap(), currentPosition, lookingDirection);
             log.debug("Squares chicken is seeing: {}", squares);
 
             if (!blockingPath) {
@@ -478,9 +478,9 @@ public class Chicken extends EatingMob implements Runnable {
      * southeast_square, south_square, southwest_square, west_square,
      * direction
      */
-    public synchronized List<String> getSquaresVisibleForChicken(Square currentPosition, Direction lookingDirection) {
+    public synchronized List<String> getSquaresVisibleForChicken(GameMap gameMap, Square currentPosition,
+                                                                 Direction lookingDirection) {
         List<String> squares = new ArrayList<>();
-        GameMap gameMap = getGameMap();
 
         squares.add(Direction.TWO_NORTH_TWO_WEST.get_two_North_two_West_Square(gameMap, currentPosition).getPrimaryType());
         squares.add(Direction.TWO_NORTH_ONE_WEST.get_two_North_one_West_Square(gameMap, currentPosition).getPrimaryType());
