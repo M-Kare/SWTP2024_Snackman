@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import de.hsrm.mi.swt.snackman.entities.lobby.PlayerClient;
@@ -43,12 +42,13 @@ public class LobbyController {
 
       /**
        * Creates a new lobby with the specified name and creator UUID.
-       * 
-       * @param name        the name of the lobby to create
-       * @param creatorUuid the UUID of the client creating the lobby
+       *
+       * @param requestBody A Map containing name and creatorUuid
+       *                     - name             :the name of the lobby to create
+       *                     - creatorUuid      :the UUID of the client creating the lobby
        * @return the newly created {@link Lobby}, or a 409 Conflict status if the
        *         lobby name already exists
-       */
+      */
       @PostMapping("/create/lobby")
       public ResponseEntity<Lobby> createLobby(@RequestBody Map<String, String> requestBody) {
             String name = requestBody.get("name");
@@ -58,9 +58,9 @@ public class LobbyController {
                   return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
             }
 
-      
-            //PlayerClient client = lobbyManagerService.getClient("Player Test", creatorUuid);
-            PlayerClient client = lobbyManagerService.findClientByUUID(creatorUuid);
+
+            //PlayerClient client = lobbyManagerService.getClient(name, creatorUuid);
+            PlayerClient client = lobbyManagerService.findClientByClientId(creatorUuid);
 
             try {
                   Lobby newLobby = lobbyManagerService.createLobby(name, client);
@@ -77,7 +77,7 @@ public class LobbyController {
       /**
        * Create a new player client with a name
        * 
-       * @param name  the player's name
+       * @param requestBody the player's name
        * @return  the newly created {@link PlayerClient} object
        */
       @PostMapping("/create/player")
@@ -88,7 +88,7 @@ public class LobbyController {
 
             PlayerClient newPlayerClient = lobbyManagerService.createNewClient(name);
             logger.info("Creating new player with name: {} and playerUuid: {}", newPlayerClient.getPlayerName(), newPlayerClient.getPlayerId());
-            
+
             return ResponseEntity.ok(newPlayerClient);
       }
 
@@ -107,19 +107,19 @@ public class LobbyController {
       /**
        * Find a Lobby with lobby UUID
        * @param lobbyId Lobby UUID
-       * @return {@link lobby} object
+       * @return {@link Lobby} object
        */
       @GetMapping("/lobby/{lobbyId}")
       public ResponseEntity<Lobby> findLobbyById(@PathVariable("lobbyId") String lobbyId){
-            Lobby lobby = lobbyManagerService.findLobbyByUUID(lobbyId);
+            Lobby lobby = lobbyManagerService.findLobbyByLobbyId(lobbyId);
             return ResponseEntity.ok(lobby);
       }
 
       /**
        * Adds a player to an existing lobby.
-       * 
-       * @param lobbyId  the ID of the lobby to join
-       * @param playerId the UUID of the player joining the lobby
+       * @param requestBody A Map containing lobbyId and playerId
+       *                      - lobbyId   :the ID of the lobby to join
+       *                      - playerId  :the UUID of the player joining the lobby
        * @return the updated {@link Lobby}, or a 409 Conflict status if the game in
        *         the lobby has already started
        */
@@ -142,9 +142,9 @@ public class LobbyController {
 
       /**
        * Removes a player from an existing lobby
-       * 
-       * @param lobbyId  the ID of the lobby to leave
-       * @param playerId the UUID of the player leaving the lobby
+       * @param requestBody A Map containing lobbyId and playerId
+       *                      - lobbyId   :the ID of the lobby to join
+       *                      - playerId  :the UUID of the player joining the lobby
        * @return a {@link ResponseEntity} with an HTTP 200 OK status
        */
       @PostMapping("/leave")
@@ -162,7 +162,7 @@ public class LobbyController {
       /**
        * Starts the game in the specified lobby.
        * 
-       * @param lobbyId the ID of the lobby where the game is to be started
+       * @param requestBody A Map containing the ID of the lobby where the game is to be started
        * @return a {@link ResponseEntity} with an HTTP 200 OK status
        */
       @PostMapping("/start")

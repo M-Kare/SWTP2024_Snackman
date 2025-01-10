@@ -13,4 +13,5 @@ export enum SnackType {
   ORANGE = 'ORANGE',
   APPLE = 'APPLE',
   EGG = 'EGG',
+  EMPTY = 'EMPTY'
 }

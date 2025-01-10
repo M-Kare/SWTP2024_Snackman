@@ -8,7 +8,7 @@
             id="menu-back-button"
             class="small-nav-buttons"
             @click="backToMainMenu">
-            
+
             Back
         </SmallNavButton>
         <SmallNavButton
@@ -22,14 +22,14 @@
         <div class="inner-box">
             <ul>
                 <li
-                    v-for="lobby in filteredLobbies" :key="lobby.uuid"
+                    v-for="lobby in filteredLobbies" :key="lobby.lobbyId"
                     class="lobby-list-items"
                     @click="joinLobby(lobby)">
 
                     <div class="lobby-name">
                         {{ lobby.name }}
                     </div>
-                    
+
                     <div class="playercount">
                         {{ lobby.members.length }} / {{ MAX_PLAYER_COUNT }}
                     </div>
@@ -72,9 +72,9 @@
 
     const lobbies = computed(() => lobbiesStore.lobbydata.lobbies);
     const currentPlayer = lobbiesStore.lobbydata.currentPlayer as IPlayerClientDTD;
-    
-    const MAX_PLAYER_COUNT = 4;
-    
+
+    const MAX_PLAYER_COUNT = 5;
+
     const filteredLobbies = computed(() => {
         return lobbies.value.filter(lobby => !lobby.gameStarted);
     });
@@ -106,7 +106,7 @@
      * Joins a specified lobby if it is not full and the game has not started.
      * Alerts the user if the lobby is full or if the game has already started.
      * On successful join, redirects to the lobby view.
-     * 
+     *
      * @async
      * @function joinLobby
      * @param {ILobbyDTD} lobby - The lobby object that the player wants to join.
@@ -114,7 +114,7 @@
      * @throws {Error} Throws an alert if there is an error joining the lobby.
      */
     const joinLobby = async (lobby: ILobbyDTD) => {
-        
+
         if(lobby.members.length >= MAX_PLAYER_COUNT){
             showPopUp.value = true;
             darkenBackground.value = true;
@@ -122,11 +122,11 @@
         }
 
         try{
-            const joinedLobby = await lobbiesStore.joinLobby(lobby.uuid, currentPlayer.playerId);
+            const joinedLobby = await lobbiesStore.joinLobby(lobby.lobbyId, currentPlayer.playerId);
 
             if(joinedLobby) {
                 console.log('Successfully joined lobby', joinedLobby.name);
-                router.push({ name: "LobbyView", params: { lobbyId: lobby.uuid } });
+                router.push({ name: "LobbyView", params: { lobbyId: lobby.lobbyId } });
             }
         } catch (error: any){
             console.error('Error:', error);

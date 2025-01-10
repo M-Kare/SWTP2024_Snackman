@@ -2,22 +2,27 @@ package de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
-import de.hsrm.mi.swt.snackman.configuration.GameConfig;
-import java.nio.file.Paths;
-import de.hsrm.mi.swt.snackman.entities.map.Square;
-import de.hsrm.mi.swt.snackman.entities.mapObject.snack.Snack;
-import de.hsrm.mi.swt.snackman.entities.mapObject.snack.SnackType;
-import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.EatingMob;
-import de.hsrm.mi.swt.snackman.services.MapService;
+import java.util.Random;
+import java.util.Timer;
+import java.util.TimerTask;
+
 import org.python.core.PyList;
 import org.python.core.PyObject;
 import org.python.util.PythonInterpreter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import java.util.*;
+
+import de.hsrm.mi.swt.snackman.configuration.GameConfig;
+import de.hsrm.mi.swt.snackman.entities.map.GameMap;
+import de.hsrm.mi.swt.snackman.entities.map.Square;
+import de.hsrm.mi.swt.snackman.entities.mapObject.MapObjectType;
+import de.hsrm.mi.swt.snackman.entities.mapObject.snack.Snack;
+import de.hsrm.mi.swt.snackman.entities.mapObject.snack.SnackType;
+import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.EatingMob;
 
 /**
  * Represents a chicken entity in the game, capable of moving around the map,
@@ -57,8 +62,8 @@ public class Chicken extends EatingMob implements Runnable {
         initJython();
     }
 
-    public Chicken(Square initialPosition, MapService mapService) {
-        super(mapService);
+    public Chicken(Square initialPosition, GameMap gameMap) {
+        super(gameMap);
         id = generateId();
         this.chickenPosX = initialPosition.getIndexX();
         this.chickenPosZ = initialPosition.getIndexZ();
@@ -66,7 +71,7 @@ public class Chicken extends EatingMob implements Runnable {
         this.fileName = "ChickenMovementSkript";
         this.isWalking = true;
         this.lookingDirection = Direction.getRandomDirection();
-        log.info("Chicken looking direction is {}", lookingDirection);
+        // log.info("Chicken looking direction is {}", lookingDirection);
         initJython();
         initTimer();
     }
@@ -75,7 +80,6 @@ public class Chicken extends EatingMob implements Runnable {
         List<String> result = executeMovementSkript(squares);
         return result;
     }
-
 
 
     /**
@@ -126,15 +130,15 @@ public class Chicken extends EatingMob implements Runnable {
         log.debug("Walking direction is: {}", walkingDirection);
 
         this.lookingDirection = walkingDirection;
-        Square oldPosition = super.mapService.getSquareAtIndexXZ(this.chickenPosX, this.chickenPosZ);
-        Square newPosition = walkingDirection.getNewPosition(super.mapService, this.chickenPosX, this.chickenPosZ, walkingDirection);
+        Square oldPosition = super.getGameMap().getSquareAtIndexXZ(this.chickenPosX, this.chickenPosZ);
+        Square newPosition = walkingDirection.getNewPosition(super.getGameMap(), this.chickenPosX, this.chickenPosZ,
+                walkingDirection);
         propertyChangeSupport.firePropertyChange("chicken", null, this);
 
         try {
             log.debug("Waiting " + WAITING_TIME + " sec before walking on next square.");
             Thread.sleep(WAITING_TIME);
         } catch (InterruptedException e) {
-            log.error(e.getMessage());
             log.error(e.getMessage());
             Thread.currentThread().interrupt();
         }
@@ -157,14 +161,12 @@ public class Chicken extends EatingMob implements Runnable {
         //initJython();
         while (isWalking) {
             // get 9 squares
-            Square currentPosition = super.mapService.getSquareAtIndexXZ(this.chickenPosX, this.chickenPosZ);
-            List<String> squares = super.mapService.getSquaresVisibleForChicken(currentPosition, lookingDirection);
+            Square currentPosition = super.getGameMap().getSquareAtIndexXZ(this.chickenPosX, this.chickenPosZ);
+            List<String> squares = getSquaresVisibleForChicken(getGameMap(), currentPosition, lookingDirection);
             log.debug("Squares chicken is seeing: {}", squares);
 
             if (!blockingPath) {
                 log.debug("Current position is x {} z {}", this.chickenPosX, this.chickenPosZ);
-                //super.mapService.printGameMap();
-                //System.out.println("---------------------------------");
 
                 List<String> newMove = act(squares);
 
@@ -174,8 +176,8 @@ public class Chicken extends EatingMob implements Runnable {
             }
 
             // consume snack if present
-            currentPosition = super.mapService.getSquareAtIndexXZ(this.chickenPosX, this.chickenPosZ);
-            if (currentPosition.getSnack() != null && super.getKcal() < MAX_CALORIES && !currentPosition.getSnack().getSnackType().equals(SnackType.EGG)) {
+            currentPosition = super.getGameMap().getSquareAtIndexXZ(this.chickenPosX, this.chickenPosZ);
+            if (currentPosition.getSnack().getSnackType() != SnackType.EMPTY && super.getKcal() < MAX_CALORIES && !currentPosition.getSnack().getSnackType().equals(SnackType.EGG)) {
                 log.debug("Snack being eaten at x {} z {}", this.chickenPosX, this.chickenPosZ);
                 consumeSnackOnSquare();
             }
@@ -186,29 +188,29 @@ public class Chicken extends EatingMob implements Runnable {
      * If there is one that remove it from the square.
      */
     public void consumeSnackOnSquare() {
-        Square currentSquare = super.mapService.getSquareAtIndexXZ(this.chickenPosX, this.chickenPosZ);
+        Square currentSquare = super.getGameMap().getSquareAtIndexXZ(this.chickenPosX, this.chickenPosZ);
         Snack snackOnSquare = currentSquare.getSnack();
 
-        if (snackOnSquare != null) {
+        if (snackOnSquare.getSnackType() != SnackType.EMPTY) {
+
             try {
-                super.gainKcal(snackOnSquare.getCalories());
-                //set snack to null after consuming it
-                currentSquare.setSnack(null);
+                gainKcal(snackOnSquare.getCalories());
+                currentSquare.setSnack(new Snack(SnackType.EMPTY));
                 if (super.getKcal() >= this.MAX_CALORIES) {
                     this.thickness = Thickness.VERY_HEAVY;
 
-                    if (mapService.squareIsBetweenWalls(this.chickenPosX, this.chickenPosZ)) {
+                    if (squareIsBetweenWalls(this.chickenPosX, this.chickenPosZ)) {
                         new Thread(() -> {
                             try {
                                 blockingPath = true;
                                 Thread.sleep(10000);
                                 blockingPath = false;
+                                layEgg();
                             } catch (InterruptedException e) {
                                 e.printStackTrace();
                             }
                         }).start();
                     }
-                    layEgg();
                 } else {
                     if ((super.getKcal()) <= 2 * CALORIES_PER_SIXTH) {
                         this.thickness = Thickness.THIN;
@@ -222,11 +224,30 @@ public class Chicken extends EatingMob implements Runnable {
                         this.thickness = Thickness.HEAVY;
                     }
                 }
+
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            currentSquare.setSnack(null);   //set snack to null after consuming it
+
+            currentSquare.setSnack(new Snack(SnackType.EMPTY));
         }
+    }
+
+    public boolean squareIsBetweenWalls(int x, int z){
+        Square squareAbove = getGameMap().getSquareAtIndexXZ(x - 1, z);
+        Square squareBelow = getGameMap().getSquareAtIndexXZ(x + 1, z);
+        Square squareRight = getGameMap().getSquareAtIndexXZ(x, z + 1);
+        Square squareLeft = getGameMap().getSquareAtIndexXZ(x, z - 1);
+
+        if((squareAbove.getType() == MapObjectType.WALL) && (squareBelow.getType() == MapObjectType.WALL)){
+            return true;
+        }
+
+        if((squareRight.getType() == MapObjectType.WALL) && (squareLeft.getType() == MapObjectType.WALL)){
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -285,31 +306,31 @@ public class Chicken extends EatingMob implements Runnable {
         return squares;
     }
 
-    /**
-     * Adjusts the chicken's thickness state, cycling through predefined values,
-     * and updates its path-blocking status accordingly.
-     */
-    private void incrementThickness() {
-        switch (this.thickness) {
-            case Thickness.THIN:
-                this.thickness = Thickness.SLIGHTLY_THICK;
-                break;
-            case Thickness.SLIGHTLY_THICK:
-                this.thickness = Thickness.MEDIUM;
-                break;
-            case Thickness.MEDIUM:
-                this.thickness = Thickness.HEAVY;
-                break;
-            case Thickness.HEAVY:
-                this.thickness = Thickness.VERY_HEAVY;
-                blockingPath = true;
-                break;
-            case Thickness.VERY_HEAVY:
-                this.thickness = Thickness.THIN;
-                blockingPath = true;
-                break;
-        }
-    }
+    // /**
+    //  * Adjusts the chicken's thickness state, cycling through predefined values,
+    //  * and updates its path-blocking status accordingly.
+    //  */
+    // private void incrementThickness() {
+    //     switch (this.thickness) {
+    //         case Thickness.THIN:
+    //             this.thickness = Thickness.SLIGHTLY_THICK;
+    //             break;
+    //         case Thickness.SLIGHTLY_THICK:
+    //             this.thickness = Thickness.MEDIUM;
+    //             break;
+    //         case Thickness.MEDIUM:
+    //             this.thickness = Thickness.HEAVY;
+    //             break;
+    //         case Thickness.HEAVY:
+    //             this.thickness = Thickness.VERY_HEAVY;
+    //             blockingPath = true;
+    //             break;
+    //         case Thickness.VERY_HEAVY:
+    //             this.thickness = Thickness.THIN;
+    //             blockingPath = true;
+    //             break;
+    //     }
+    // }
 
     public boolean getBlockingPath() {
         return this.blockingPath;
@@ -392,14 +413,14 @@ public class Chicken extends EatingMob implements Runnable {
     protected void layEgg() {
         if (super.getKcal() > 0) {
             timerRestarted = false;
-            Square currentSquare = this.mapService.getSquareAtIndexXZ(this.chickenPosX, this.chickenPosZ);
+            Square currentSquare = getGameMap().getSquareAtIndexXZ(this.chickenPosX, this.chickenPosZ);
 
             // new egg with current chicken-calories * 1.5
             int eggCalories = (int) (super.getKcal() * 1.5);
             Snack egg = new Snack(SnackType.EGG);
             egg.setCalories(eggCalories);
             // add egg to current square
-            this.mapService.addEggToSquare(currentSquare, egg);
+            addEggToSquare(currentSquare, egg);
             // Chicken becomes thin again and has no calories after it has laid an egg
             this.setThickness(Thickness.THIN);
             super.setKcal(0);
@@ -408,6 +429,17 @@ public class Chicken extends EatingMob implements Runnable {
             timerRestarted = true;
             startNewTimer();
         }
+    }
+
+    /**
+     * Adds a laid egg to a specified square on the map
+     *
+     * @param square  The square where the egg is to be added
+     * @param laidEgg The snack representing the egg that has been laid
+     */
+    public void addEggToSquare(Square square, Snack laidEgg) {
+        square.setSnack(laidEgg);
+        log.debug("{} kcal egg add to square {} and square {}", laidEgg.getCalories(), square.getId(), square.getId());
     }
 
     public boolean isScared() {
@@ -436,4 +468,48 @@ public class Chicken extends EatingMob implements Runnable {
                 ", kcal=" + super.getKcal() +
                 '}';
     }
+
+    /**
+     * @param currentPosition  the square the chicken is standing on top of
+     * @param lookingDirection
+     * @return a list of 8 square which are around the current square + the
+     * direction the chicken is looking in the order:
+     * northwest_square, north_square, northeast_square, east_square,
+     * southeast_square, south_square, southwest_square, west_square,
+     * direction
+     */
+    public synchronized List<String> getSquaresVisibleForChicken(GameMap gameMap, Square currentPosition,
+                                                                 Direction lookingDirection) {
+        List<String> squares = new ArrayList<>();
+
+        squares.add(Direction.TWO_NORTH_TWO_WEST.get_two_North_two_West_Square(gameMap, currentPosition).getPrimaryType());
+        squares.add(Direction.TWO_NORTH_ONE_WEST.get_two_North_one_West_Square(gameMap, currentPosition).getPrimaryType());
+        squares.add(Direction.TWO_NORTH.get_two_North_Square(gameMap, currentPosition).getPrimaryType());
+        squares.add(Direction.TWO_NORTH_ONE_EAST.get_two_North_one_East_Square(gameMap, currentPosition).getPrimaryType());
+        squares.add(Direction.TWO_NORTH_TWO_EAST.get_two_North_two_East_Square(gameMap, currentPosition).getPrimaryType());
+        squares.add(Direction.ONE_NORTH_TWO_WEST.get_one_North_two_West_Square(gameMap, currentPosition).getPrimaryType());
+        squares.add(Direction.ONE_NORTH_ONE_WEST.get_one_North_one_West_Square(gameMap, currentPosition).getPrimaryType());
+        squares.add(Direction.ONE_NORTH.get_one_North_Square(gameMap, currentPosition).getPrimaryType());
+        squares.add(Direction.ONE_NORTH_ONE_EAST.get_one_North_one_East_Square(gameMap, currentPosition).getPrimaryType());
+        squares.add(Direction.ONE_NORTH_TWO_EAST.get_one_North_two_East_Square(gameMap, currentPosition).getPrimaryType());
+        squares.add(Direction.TWO_WEST.get_two_West_Square(gameMap, currentPosition).getPrimaryType());
+        squares.add(Direction.ONE_WEST.get_one_West_Square(gameMap, currentPosition).getPrimaryType());
+        squares.add(Direction.CHICKEN.get_Chicken_Square(gameMap, currentPosition).getPrimaryType());
+        squares.add(Direction.ONE_EAST.get_one_East_Square(gameMap, currentPosition).getPrimaryType());
+        squares.add(Direction.TWO_EAST.get_two_East_Square(gameMap, currentPosition).getPrimaryType());
+        squares.add(Direction.ONE_SOUTH_TWO_WEST.get_one_South_two_West_Square(gameMap, currentPosition).getPrimaryType());
+        squares.add(Direction.ONE_SOUTH_ONE_WEST.get_one_South_one_West_Square(gameMap, currentPosition).getPrimaryType());
+        squares.add(Direction.ONE_SOUTH.get_one_South_Square(gameMap, currentPosition).getPrimaryType());
+        squares.add(Direction.ONE_SOUTH_ONE_EAST.get_one_South_one_East_Square(gameMap, currentPosition).getPrimaryType());
+        squares.add(Direction.ONE_SOUTH_TWO_EAST.get_one_South_two_East_Square(gameMap, currentPosition).getPrimaryType());
+        squares.add(Direction.TWO_SOUTH_TWO_WEST.get_two_South_two_West_Square(gameMap, currentPosition).getPrimaryType());
+        squares.add(Direction.TWO_SOUTH_ONE_WEST.get_two_South_one_West_Square(gameMap, currentPosition).getPrimaryType());
+        squares.add(Direction.TWO_SOUTH.get_two_South_Square(gameMap, currentPosition).getPrimaryType());
+        squares.add(Direction.TWO_SOUTH_ONE_EAST.get_two_South_one_East_Square(gameMap, currentPosition).getPrimaryType());
+        squares.add(Direction.TWO_SOUTH_TWO_EAST.get_two_South_two_East_Square(gameMap, currentPosition).getPrimaryType());
+        squares.add(lookingDirection.toString());
+
+        return squares;
+    }
+
 }
