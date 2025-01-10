@@ -16,126 +16,56 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, onMounted, onUnmounted, reactive, ref } from 'vue'
+import {computed, onMounted, onUnmounted, reactive, ref, watch} from 'vue'
 import * as THREE from 'three'
-import { Client } from '@stomp/stompjs'
-import { Player } from '@/components/Player'
-import type { IPlayerDTD } from '@/stores/Player/IPlayerDTD'
-import { fetchSnackManFromBackend } from '@/services/SnackManInitService'
-import { GameMapRenderer } from '@/renderer/GameMapRenderer'
-import { useGameMapStore } from '@/stores/gameMapStore'
-import type { IGameMap } from '@/stores/IGameMapDTD'
-import type { IFrontendCaloriesMessageEvent } from '@/services/IFrontendMessageEvent'
+import { Player } from '@/components/Player';
+import { fetchSnackManFromBackend } from '@/services/SnackManInitService';
+import { GameMapRenderer } from '@/renderer/GameMapRenderer';
+import { useGameMapStore } from '@/stores/gameMapStore';
+import type { IGameMap } from '@/stores/IGameMapDTD';
+import { useLobbiesStore } from '@/stores/Lobby/lobbiesstore';
+import type {IPlayerClientDTD} from "@/stores/Lobby/IPlayerClientDTD";
 import { GLTFLoader } from 'three/examples/jsm/Addons.js'
 import { useRouter, useRoute } from 'vue-router';
 
-const WSURL = `ws://${window.location.host}/stompbroker`
-const DEST = '/topic/player'
+const { lobbydata } = useLobbiesStore();
+const gameMapStore = useGameMapStore()
+gameMapStore.startGameMapLiveUpdate()
+
+
 const targetHz = 30
+let clients: Array<IPlayerClientDTD>;
+let playerHashMap = new Map<String, THREE.Mesh>()
 
 const router = useRouter();
 const route = useRoute();
 
 const UPDATE = '/topic/calories'
+const stompclient = gameMapStore.stompclient
+// stompclient.activate()
 
 //Reaktive Calories Variable
-const MAXCALORIES = 3000;
-const currentCalories  = ref(0);
-const caloriesMessage = ref('');
+const MAXCALORIES = 3000
+let currentCalories = ref()
+let caloriesMessage = ref('')
 const playerRole = ref(route.query.role || ''); // Player role from the URL query
-console.log('Player Role in GameView:', route.query.role);
 
 const SNACKMAN_TEXTURE: string = 'src/assets/kirby.glb'
 let snackManModel: THREE.Group<THREE.Object3DEventMap>
-// other textures
-
-// stomp
-const stompclient = new Client({ brokerURL: WSURL })
-stompclient.onWebSocketError = event => {
-  //console.log(event)
-}
-stompclient.onStompError = frame => {
-  //console.log(frame)
-}
-stompclient.onConnect = frame => {
-  // Callback: erfolgreicher Verbindugsaufbau zu Broker
-  stompclient.subscribe(DEST, message => {
-    // Callback: Nachricht auf DEST empfangen
-    // empfangene Nutzdaten in message.body abrufbar,
-    // ggf. mit JSON.parse(message.body) zu JS konvertieren
-    const event: IPlayerDTD = JSON.parse(message.body)
-
-    sprintData.sprintTimeLeft = (event.sprintTimeLeft / 5) * 100
-    sprintData.isSprinting = event.isSprinting
-
-    // If the cooldown is active in the backend and the local state is not yet in cooldown
-    if (event.isInCooldown && !sprintData.isCooldown) {
-      const usedSprintTime = 5 - event.sprintTimeLeft
-      startCooldownFill(usedSprintTime)
-    }
-
-    // When the backend cooldown has ended, but the local state is still in cooldown
-    if (!event.isInCooldown && sprintData.isCooldown) {
-      stopCooldownFill()
-    }
-
-    sprintData.isCooldown = event.isInCooldown
-
-    player.setPosition(event.posX, event.posY, event.posZ)
-  })
-
-// Calories Verarbeitung
-stompclient.subscribe(UPDATE, message => {
-  const event: IFrontendCaloriesMessageEvent = JSON.parse(message.body);
-
-  if (event.calories !== undefined) {
-    currentCalories.value = event.calories;
-  }
-
-  // Check win/lose conditions for SnackMan or Ghosts
-  if (event.calories >= MAXCALORIES) {
-    // Navigate to GameEndView with "SnackMan Wins"
-    router.push({
-      name: 'GameEnd',
-      query: {
-        role: playerRole.value,
-        result: playerRole.value === 'SNACKMAN' ? 'Gewonnen' : 'Verloren'
-      }
-    });
-  } else if (event.calories < 0) {
-    // Navigate to GameEndView with "Ghosts Win"
-    router.push({
-      name: 'GameEnd',
-      query: {
-        role: playerRole.value,
-        result: playerRole.value === 'GHOST' ? 'Gewonnen' : 'Verloren'
-      }
-    });
-  }
-    });
-
-}
-
-// Kalorien-Overlay Fill berrechnen
-const getBackgroundStyle = computed(() => {
-  const maxCalories = 3000
-  //Prozent berechnen
-  const percentage = Math.min(currentCalories.value / maxCalories, 1)
-
-  const color = `linear-gradient(to right, #EEC643 ${percentage * 100}%, #5E4A08 ${percentage * 100}%)`
-
-  return {
-    background: color,
-  }
-})
-
-stompclient.activate()
 
 const canvasRef = ref()
 let renderer: THREE.WebGLRenderer
 let player: Player
 let scene: THREE.Scene
 let prevTime = performance.now()
+
+const sprintData = reactive({
+    sprintTimeLeft: 100, // percentage (0-100)
+    isSprinting: false,
+    isCooldown: false,
+  })
+
+let sprintInCooldown = false;
 
 // camera setup
 let camera: THREE.PerspectiveCamera
@@ -148,6 +78,7 @@ let counter = 0
 // is called every frame, changes camera position and velocity
 // only sends updates to backend at 30hz
 function animate() {
+  currentCalories.value = player.getCalories()
   fps = 1 / clock.getDelta()
   player.updatePlayer()
   if (counter >= fps / targetHz) {
@@ -156,32 +87,24 @@ function animate() {
     try {
       //Sende and /topic/player/update
       stompclient.publish({
-        destination: DEST + '/update',
-        headers: {},
-        body: JSON.stringify(
-          Object.assign(
-            {},
-            player.getInput(),
-            {
-              qX: player.getCamera().quaternion.x,
-              qY: player.getCamera().quaternion.y,
-              qZ: player.getCamera().quaternion.z,
-              qW: player.getCamera().quaternion.w,
-            },
-            { delta: delta },
-            { jump: player.getIsJumping() },
-            { doubleJump: player.getIsDoubleJumping() },
-            { sprinting: player.isSprinting },
-          ),
-        ),
-      })
+        destination: `/topic/lobbies/${lobbydata.currentPlayer.joinedLobbyId!}/player/update`, headers: {},
+        body: JSON.stringify(Object.assign({}, player.getInput(), {jump: player.getIsJumping()},
+          {doubleJump: player.getIsDoubleJumping()},
+          { sprinting: player.isSprinting },
+          {
+            qX: player.getCamera().quaternion.x,
+            qY: player.getCamera().quaternion.y,
+            qZ: player.getCamera().quaternion.z,
+            qW: player.getCamera().quaternion.w
+          }, {delta: delta}, {playerId: lobbydata.currentPlayer.playerId})),
+      });
     } catch (fehler) {
       console.error(fehler)
     }
     prevTime = time
     counter = 0
   }
-  counter++
+  counter++;
 
   renderer.render(scene, camera)
 }
@@ -206,31 +129,53 @@ onMounted(async () => {
   const { initRenderer, createGameMap, getScene } = GameMapRenderer()
   scene = getScene()
   renderer = initRenderer(canvasRef.value)
-
   //Add gameMap
   try {
-    const gameMapStore = useGameMapStore()
     await gameMapStore.initGameMap()
-
     const mapContent = gameMapStore.mapContent
     createGameMap(mapContent as IGameMap)
 
-    await gameMapStore.startGameMapLiveUpdate()
   } catch (error) {
     console.error('Error when retrieving the gameMap:', error)
   }
 
-  const playerData = await fetchSnackManFromBackend()
-  player = new Player(
-    renderer,
-    playerData.posX,
-    playerData.posY,
-    playerData.posZ,
-    playerData.radius,
-    playerData.speed,
-    playerData.baseSpeed,
-    playerData.sprintMultiplier,
-  )
+    clients = lobbydata.lobbies.find((elem)=>elem.lobbyId===lobbydata.currentPlayer.joinedLobbyId)?.members!
+    console.log(clients)
+    const playerData = await
+    fetchSnackManFromBackend(lobbydata.currentPlayer.joinedLobbyId!, lobbydata.currentPlayer.playerId);
+    clients.forEach(it => {
+      if(it.playerId === lobbydata.currentPlayer.playerId){
+        player = new Player(renderer, playerData.posX, playerData.posY, playerData.posZ, playerData.radius,
+          playerData.speed, playerData.sprintMultiplier)
+      } else {
+        let material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } )
+        material.color = new THREE.Color(Math.random(), Math.random(), Math.random());
+        let cube = new THREE.Mesh( new THREE.BoxGeometry( 1, 3, 1 ),  material);
+        cube.position.lerp(new THREE.Vector3(playerData.posX, playerData.posY, playerData.posZ), 0.5)
+        scene.add(cube);
+        playerHashMap.set(it.playerId, cube);
+      }
+    });
+    gameMapStore.setOtherPlayers(playerHashMap)
+    gameMapStore.setPlayer(player)
+    caloriesMessage = player.message
+
+    watch(player.sprintData, (newSprintData) =>{
+      sprintData.isSprinting = player.sprintData.isSprinting
+      sprintData.sprintTimeLeft = (player.sprintData.sprintTimeLeft / 5) * 100
+
+      if (player.sprintData.isCooldown && !sprintData.isCooldown) {
+        const usedSprintTime = 5 - player.sprintData.sprintTimeLeft
+        startCooldownFill(usedSprintTime)
+      }
+
+      // When the backend cooldown has ended, but the local state is still in cooldown
+      if (!player.sprintData.isCooldown && sprintData.isCooldown) {
+        stopCooldownFill()
+      }
+      sprintData.isCooldown = player.sprintData.isCooldown
+    })
+
   camera = player.getCamera()
   scene.add(player.getControls().object)
 
@@ -295,10 +240,17 @@ function stopCooldownFill() {
   }
 }
 
-const sprintData = reactive({
-  sprintTimeLeft: 100, // percentage (0-100)
-  isSprinting: false,
-  isCooldown: false,
+// Kalorien-Overlay Fill berrechnen
+const getBackgroundStyle = computed(() => {
+  const maxCalories = 3000
+  //Prozent berechnen
+  const percentage = Math.min(currentCalories.value / maxCalories, 1)
+
+  const color = `linear-gradient(to right, #EEC643 ${percentage * 100}%, #5E4A08 ${percentage * 100}%)`
+
+  return {
+    background: color,
+  }
 })
 
 const sprintBarStyle = computed(() => {
@@ -308,7 +260,6 @@ const sprintBarStyle = computed(() => {
   } else if (sprintData.isCooldown) {
     color = 'blue'
   }
-
   return {
     width: `${sprintData.sprintTimeLeft}%`,
     backgroundColor: color,
@@ -357,8 +308,6 @@ const sprintBarStyle = computed(() => {
 
 .sprint-bar-inner {
   height: 100%;
-  transition:
-    width 0.1s ease-out,
-    background-color 0.2s ease-out;
+  transition: width 0.1s ease-out, background-color 0.2s ease-out;
 }
 </style>

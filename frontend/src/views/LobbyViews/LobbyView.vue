@@ -2,6 +2,21 @@
     <MenuBackground></MenuBackground>
     <h1 class="title"> {{ lobby?.name || 'Lobby Name' }} </h1>
     <div class="outer-box">
+        <SmallNavButton
+            id="menu-back-button"
+            class="small-nav-buttons"
+            @click="leaveLobby">
+
+            Leave Lobby
+        </SmallNavButton>
+        <SmallNavButton
+            id="start-game-button"
+            class="small-nav-buttons"
+            @click="startGame">
+
+            Start Game
+        </SmallNavButton>
+
         <div id="player-count">
                 {{ playerCount }} / {{ maxPlayerCount }} Players
         </div>
@@ -28,7 +43,7 @@
             id="menu-back-button"
             class="small-nav-buttons"
             @click="leaveLobby">
-            
+
             Leave Lobby
         </SmallNavButton>
         <SmallNavButton
@@ -38,7 +53,7 @@
 
             Start Game
         </SmallNavButton>
-        <SmallNavButton 
+        <SmallNavButton
         id="copyToClip"
         class="small-nav-buttons"
         @click="copyToClip()">
@@ -79,17 +94,17 @@
     import { computed, onMounted, ref, watchEffect } from 'vue';
     import { useLobbiesStore } from '@/stores/Lobby/lobbiesstore';
     import type { IPlayerClientDTD } from '@/stores/Lobby/IPlayerClientDTD';
-    import type { ILobbyDTD } from '@/stores/Lobby/ILobbyDTD';
-    import LobbyListView from './LobbyListView.vue';
+        import type { ILobbyDTD } from '@/stores/Lobby/ILobbyDTD';
+        import LobbyListView from './LobbyListView.vue';
 
     const router = useRouter();
     const route = useRoute();
     const lobbiesStore = useLobbiesStore();
 
-    let lobby = computed(() => lobbiesStore.lobbydata.lobbies.find(l => l.uuid === route.params.lobbyId));
+    let lobby = computed(() => lobbiesStore.lobbydata.lobbies.find(l => l.lobbyId === route.params.lobbyId));
     const members = computed(() => lobby.value?.members || [] as Array<IPlayerClientDTD>);
     const playerCount = computed(() => members.value.length);
-    const maxPlayerCount = ref(4);
+    const maxPlayerCount = ref(5);
 
     const darkenBackground = ref(false);
     const showPopUp = ref(false);
@@ -102,7 +117,7 @@
     const mouseY = ref(0)
 
     const mouseInfoBox = ref(document.getElementById("infoBox"))
- 
+
 
     const MAX_PLAYER_COUNT = 4;
 
@@ -113,12 +128,12 @@
         showPopUp.value = false;
         darkenBackground.value = false;
     }
-    
+
     watchEffect(() => {
         if (lobbiesStore.lobbydata) {
             const lobbyId = route.params.lobbyId as string;
             
-            const updatedLobby = lobbiesStore.lobbydata.lobbies.find(l => l.uuid === lobbyId);
+            const updatedLobby = lobbiesStore.lobbydata.lobbies.find(l => l.lobbyId === lobbyId);
 
             if (updatedLobby) {
                 if (updatedLobby.gameStarted){
@@ -128,12 +143,15 @@
                     });
                 }
             }
+            else {
+                router.push({ name: 'LobbyListView' });
+            }
         }
     });
 
     onMounted(async () => {
         await lobbiesStore.fetchLobbyList()
-        
+
         if(!lobby.value){
             infoHeading.value = "Lobby does not exist"
             infoText.value = "Please choose or create another one!"
@@ -143,7 +161,7 @@
         if (!lobbiesStore.lobbydata.currentPlayer || lobbiesStore.lobbydata.currentPlayer.playerId === '' || lobbiesStore.lobbydata.currentPlayer.playerName === '') {
             if(lobby.value!.members.length >= MAX_PLAYER_COUNT){
                 infoHeading.value = "Lobby full"
-                infoText.value = "Please choose or create another one!" 
+                infoText.value = "Please choose or create another one!"
                 errorBox.value = true
                 darkenBackground.value = true
             } else {
@@ -155,7 +173,7 @@
     })
 
     const joinLobby = async (lobby: ILobbyDTD) => {
-        
+
         // if(lobby.members.length >= 4){
         //     showPopUp.value = true;
         //     darkenBackground.value = true;
@@ -163,10 +181,10 @@
         // }
 
         try{
-            const joinedLobby = await lobbiesStore.joinLobby(lobby.uuid, lobbiesStore.lobbydata.currentPlayer.playerId);
+            const joinedLobby = await lobbiesStore.joinLobby(lobby.lobbyId, lobbiesStore.lobbydata.currentPlayer.playerId);
 
             if(joinedLobby) {
-                router.push({ name: "LobbyView", params: { lobbyId: lobby.uuid } });
+                router.push({ name: "LobbyView", params: { lobbyId: lobby.lobbyId } });
             }
         } catch (error: any){
             console.error('Error:', error);
@@ -180,7 +198,7 @@
     /**
      * Leaves the current lobby. If the player is the admin, it will remove other members from the lobby first.
      * After leaving the lobby, the user is redirected to the Lobby List View.
-     * 
+     *
      * @async
      * @function leaveLobby
      * @throws {Error} If the player or lobby is not found.
@@ -195,19 +213,19 @@
         if(playerId === lobby.value.adminClient.playerId){
             for (const member of lobby.value.members) {
                 if (member.playerId !== playerId) {
-                    await lobbiesStore.leaveLobby(lobby.value.uuid, member.playerId);
+                    await lobbiesStore.leaveLobby(lobby.value.lobbyId, member.playerId);
                 }
             }
-        } 
+        }
 
-        await lobbiesStore.leaveLobby(lobby.value.uuid, playerId);
+        await lobbiesStore.leaveLobby(lobby.value.lobbyId, playerId);
         router.push({ name: 'LobbyListView' });
     }
 
     /**
      * Starts the game if the player is the admin and there are enough members in the lobby.
      * If the player is not the admin or there are not enough members, a popup will be shown.
-     * 
+     *
      * @async
      * @function startGame
      * @throws {Error} If the player or lobby is not found.
@@ -227,7 +245,7 @@
         }
 
         if(playerId === lobby.value.adminClient.playerId){
-            await lobbiesStore.startGame(lobby.value.uuid);
+            await lobbiesStore.startGame(lobby.value.lobbyId);
         } else {
             showPopUp.value = true;
             darkenBackground.value = true;
@@ -282,7 +300,7 @@
     transform: translateX(-50%);
     width: 70vw;
     max-width: 1000px;
-    height: 30rem;
+    height: 35rem;
     max-height: 45rem;
     background: rgba(255, 255, 255, 60%);
     border-radius: 0.5rem;
