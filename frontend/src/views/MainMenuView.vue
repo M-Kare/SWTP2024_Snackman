@@ -1,8 +1,16 @@
 <template>
     <MenuBackground></MenuBackground>
 
+    <div v-if="darkenBackground" id="darken-background"></div>
+
+    <PlayerNameForm
+      v-if="showPopUp"
+      @hidePopUp="hidePopUp"
+      >
+    </PlayerNameForm>
+
     <h1 class="title">Snackman</h1>
-    <!--
+    <!-- TODO / REMOVE COMMENT
     Buttons will be merged later on,
     right now we need a fast entry into the game to test things (Singpleplayer-Button)
      -->
@@ -13,13 +21,30 @@
 <script setup lang="ts">
   import MainMenuButton from '@/components/MainMenuButton.vue';
   import MenuBackground from '@/components/MenuBackground.vue';
+  import PlayerNameForm from '@/components/PlayerNameForm.vue';
+  import { onMounted, ref } from 'vue';
   import { useRouter } from 'vue-router';
 
+  // const initialPopUpShown = ref(false);
+  const darkenBackground = ref(false);
+  const showPopUp = ref(false);
+
   const router = useRouter();
+
+  const hidePopUp = () => {
+        showPopUp.value = false;
+        darkenBackground.value = false;
+  }
 
   const showLobbies = () => {
       router.push({name: 'LobbyListView'});
   }
+
+  onMounted(() => {
+    darkenBackground.value = false;
+    console.log("darkenBackground - ", darkenBackground)
+    showPopUp.value = true;
+  })
 
 </script>
 
@@ -47,5 +72,16 @@
 
 #multiplayer-button {
   top: 70%;
+}
+
+#darken-background {
+    z-index: 1;
+    position: fixed;
+    top: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 50%);
+
+    transition: background 0.3s ease;
 }
 </style>
