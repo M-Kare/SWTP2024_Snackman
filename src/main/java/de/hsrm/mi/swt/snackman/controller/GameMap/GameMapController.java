@@ -31,7 +31,7 @@ public class GameMapController {
     @Autowired
     private LobbyManagerService lobbyManagerService;
 
-    Logger log = LoggerFactory.getLogger(MapService.class);
+    Logger log = LoggerFactory.getLogger(GameMapController.class);
 
     @GetMapping("/lobby/{lobbyId}/game-map")
     public ResponseEntity<GameMapDTO> getGameMap(@PathVariable("lobbyId") String lobbyId) {

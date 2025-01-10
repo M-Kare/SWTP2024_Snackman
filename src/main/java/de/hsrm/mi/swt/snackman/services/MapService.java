@@ -40,9 +40,6 @@ public class MapService {
     private final ReadMazeService readMazeService;
     private final MessageLoop messageLoop;
 
-    /*TODO: change later for download */
-    private String filePath;
-
     Logger log = LoggerFactory.getLogger(MapService.class);
 
     /**
@@ -62,7 +59,10 @@ public class MapService {
     }
 
     public GameMap createNewGameMap(String lobbyId) {
-        return createNewGameMap(lobbyId, "./extensions/map/Maze.txt");
+        String filePath = "./extensions/map/Maze.txt";
+        saveLastMapFile(filePath);
+        
+        return createNewGameMap(lobbyId, filePath);
     }
 
     /**
@@ -263,8 +263,9 @@ public class MapService {
 
     /**
      * Save the last map in LastMap.txt in Game-Beginn, for later to download.
+     * @param filePath path of last map file
      */
-    private void saveLastMapFile() {
+    private void saveLastMapFile(String filePath) {
         Path source = Paths.get(filePath).toAbsolutePath();
         Path lastMapPath = Paths.get("./extensions/map/LastMap.txt").toAbsolutePath();
 
