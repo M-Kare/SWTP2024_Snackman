@@ -14,7 +14,7 @@
     Buttons will be merged later on,
     right now we need a fast entry into the game to test things (Singpleplayer-Button)
      -->
-    <MainMenuButton class="menu-button" id="singleplayer-button">Singleplayer</MainMenuButton>
+    <MainMenuButton class="menu-button" id="singleplayer-button" @click="startSingleplayer">Singleplayer</MainMenuButton>
     <MainMenuButton class="menu-button" id="multiplayer-button" @click="showLobbies">Multiplayer</MainMenuButton>
 </template>
 
@@ -24,12 +24,14 @@
   import PlayerNameForm from '@/components/PlayerNameForm.vue';
   import { onMounted, ref } from 'vue';
   import { useRouter } from 'vue-router';
+  import { useLobbiesStore } from '@/stores/Lobby/lobbiesstore';
 
   // const initialPopUpShown = ref(false);
   const darkenBackground = ref(false);
   const showPopUp = ref(false);
 
   const router = useRouter();
+  const lobbiesStore = useLobbiesStore();
 
   const hidePopUp = () => {
         showPopUp.value = false;
@@ -40,6 +42,15 @@
       router.push({name: 'LobbyListView'});
   }
 
+  const startSingleplayer = () => {
+      lobbiesStore.lobbydata.currentPlayer.role = 'SNACKMAN';
+
+      router.push({
+          name: 'GameView',
+          query: { role: 'SNACKMAN' }
+      });
+  }
+  
   onMounted(() => {
     darkenBackground.value = true;
     console.log("darkenBackground - ", darkenBackground)

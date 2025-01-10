@@ -1,7 +1,7 @@
 import type { IPlayerClientDTD } from "./IPlayerClientDTD"
 
 export interface ILobbyDTD{
-    uuid: string
+    lobbyId: string
     name: string
     adminClient: IPlayerClientDTD
     gameStarted: boolean
