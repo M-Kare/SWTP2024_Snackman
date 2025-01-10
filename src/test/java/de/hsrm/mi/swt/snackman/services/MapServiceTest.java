@@ -1,7 +1,12 @@
 package de.hsrm.mi.swt.snackman.services;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -12,6 +17,7 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.util.FileSystemUtils;
 
 import de.hsrm.mi.swt.snackman.SnackmanApplication;
 import de.hsrm.mi.swt.snackman.entities.map.GameMap;
@@ -34,9 +40,23 @@ class MapServiceTest {
     @MockBean
     private FrontendMessageService frontendMessageService;
 
+    private static final Path workFolder = Paths.get("./extensions").toAbsolutePath();
+
     @BeforeAll
     static void fileSetUp() {
+        try{
+            tearDownAfter();  
+        }catch(Exception e){
+            System.out.println("No file to delete");
+        }   
         SnackmanApplication.checkAndCopyResources();
+    }
+
+    @AfterAll
+    static void tearDownAfter() throws IOException {
+        if (Files.exists(workFolder)) {
+            FileSystemUtils.deleteRecursively(workFolder.toFile());
+        }
     }
 
 	@Test
