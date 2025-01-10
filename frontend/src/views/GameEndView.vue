@@ -44,12 +44,12 @@ const gameReason = computed(() => {
 
   if (gameResult === 'Gewonnen') {
     return playerRole === 'SNACKMAN'
-      ? 'SnackMan hat 3000kcal erreicht!'
-      : 'Die Geister haben SnackMan auf negative Kalorien gebracht!'
+      ? 'SnackMan hat das Kalorienziel erreicht!'
+      : 'Die Geister haben SnackMan auf negative Kalorien gebracht!';
   } else {
     return playerRole === 'SNACKMAN'
       ? 'Die Geister haben SnackMan auf negative Kalorien gebracht!'
-      : 'SnackMan hat 3000kcal erreicht!'
+      : 'SnackMan hat das Kalorienziel erreicht!';
   }
 
 })

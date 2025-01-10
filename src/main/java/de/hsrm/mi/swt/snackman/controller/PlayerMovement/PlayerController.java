@@ -23,6 +23,6 @@ public class PlayerController {
         return ResponseEntity.ok(new PlayerToFrontendDTO(playerMob.getPosX(), playerMob.getPosY(), playerMob.getPosZ(),
                 playerMob.getRotationQuaternion().x, playerMob.getRotationQuaternion().y,
                 playerMob.getRotationQuaternion().z, playerMob.getRotationQuaternion().w, playerMob.getRadius(),
-                playerMob.getSpeed(), playerId, GameConfig.SNACKMAN_SPRINT_MULTIPLIER));
+                playerMob.getSpeed(), playerId, GameConfig.SNACKMAN_SPRINT_MULTIPLIER, GameConfig.SNACKMAN_MAX_CALORIES));
     }
 }

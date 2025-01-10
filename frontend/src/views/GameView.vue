@@ -8,7 +8,7 @@
     <div :style="getBackgroundStyle" class="Calories-Overlay">
       <div class="overlayContent">
         <img alt="calories" class="calories-icon" src="@/assets/calories.svg" />
-        <p v-if="currentCalories < MAXCALORIES">{{ currentCalories }}kcal</p>
+        <p v-if="currentCalories < maxCalories">{{ currentCalories }}kcal</p>
         <p v-else>{{ caloriesMessage }}</p>
       </div>
     </div>
@@ -27,6 +27,7 @@ import { useLobbiesStore } from '@/stores/Lobby/lobbiesstore';
 import type {IPlayerClientDTD} from "@/stores/Lobby/IPlayerClientDTD";
 import { GLTFLoader } from 'three/examples/jsm/Addons.js'
 import { useRouter, useRoute } from 'vue-router';
+import type {IPlayerDTD} from "@/stores/Player/IPlayerDTD";
 
 const { lobbydata } = useLobbiesStore();
 const gameMapStore = useGameMapStore()
@@ -43,49 +44,13 @@ const route = useRoute();
 const stompclient = gameMapStore.stompclient
 
 //Reaktive Calories Variable
-const MAXCALORIES = 3000
+let maxCalories = 0
 let currentCalories = ref()
 let caloriesMessage = ref('')
+const playerRole = ref(route.query.role || ''); // Player role from the URL query
 
 const SNACKMAN_TEXTURE: string = 'src/assets/kirby.glb'
 let snackManModel: THREE.Group<THREE.Object3DEventMap>
-
-//TODO create endgame / leaderboard
-/*
-// Calories Verarbeitung
-stompclient.subscribe(UPDATE, message => {
-  const event: IFrontendCaloriesMessageEvent = JSON.parse(message.body);
-
-  if (event.calories !== undefined) {
-    currentCalories.value = event.calories;
-  }
-
-  // Check win/lose conditions for SnackMan or Ghosts
-  if (event.calories >= MAXCALORIES) {
-    // Navigate to GameEndView with "SnackMan Wins"
-    router.push({
-      name: 'GameEnd',
-      query: {
-        role: playerRole.value,
-        result: playerRole.value === 'SNACKMAN' ? 'Gewonnen' : 'Verloren'
-      }
-    });
-  } else if (event.calories < 0) {
-    // Navigate to GameEndView with "Ghosts Win"
-    router.push({
-      name: 'GameEnd',
-      query: {
-        role: playerRole.value,
-        result: playerRole.value === 'GHOST' ? 'Gewonnen' : 'Verloren'
-      }
-    });
-  }
-});
-
-}
-
- */
-
 
 const canvasRef = ref()
 let renderer: THREE.WebGLRenderer
@@ -115,6 +80,9 @@ function animate() {
   currentCalories.value = player.getCalories()
   fps = 1 / clock.getDelta()
   player.updatePlayer()
+  maxCalories = player.getMaxCalories()
+  checkIfGameEnd()
+
   if (counter >= fps / targetHz) {
     const time = performance.now()
     const delta = (time - prevTime) / 1000
@@ -174,13 +142,12 @@ onMounted(async () => {
   }
 
     clients = lobbydata.lobbies.find((elem)=>elem.lobbyId===lobbydata.currentPlayer.joinedLobbyId)?.members!
-    console.log(clients)
-    const playerData = await
+    const playerData: IPlayerDTD = await
     fetchSnackManFromBackend(lobbydata.currentPlayer.joinedLobbyId!, lobbydata.currentPlayer.playerId);
     clients.forEach(it => {
       if(it.playerId === lobbydata.currentPlayer.playerId){
         player = new Player(renderer, playerData.posX, playerData.posY, playerData.posZ, playerData.radius,
-          playerData.speed, playerData.sprintMultiplier)
+          playerData.speed, playerData.sprintMultiplier, playerData.maxCalories)
       } else {
         let material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } )
         material.color = new THREE.Color(Math.random(), Math.random(), Math.random());
@@ -271,6 +238,30 @@ function stopCooldownFill() {
   if (cooldownAnimationFrame) {
     cancelAnimationFrame(cooldownAnimationFrame)
     cooldownAnimationFrame = null
+  }
+}
+
+//TODO because it's muliplayer now it has to be checked in the backend that snackman won
+
+function checkIfGameEnd(){
+  if (player.getCalories() >= maxCalories) {
+    // Navigate to GameEndView with "SnackMan Wins"
+    router.push({
+      name: 'GameEnd',
+      query: {
+        role: playerRole.value,
+        result: playerRole.value === 'SNACKMAN' ? 'Gewonnen' : 'Verloren',
+      }
+    });
+  } else if (player.getCalories() < 0) {
+    // Navigate to GameEndView with "Ghosts Win"
+    router.push({
+      name: 'GameEnd',
+      query: {
+        role: playerRole.value,
+        result: playerRole.value === 'GHOST' ? 'Gewonnen' : 'Verloren',
+      }
+    });
   }
 }
 
