@@ -125,7 +125,6 @@
             const joinedLobby = await lobbiesStore.joinLobby(lobby.uuid, currentPlayer.playerId);
 
             if(joinedLobby) {
-                console.log('Successfully joined lobby', joinedLobby.name);
                 router.push({ name: "LobbyView", params: { lobbyId: lobby.uuid } });
             }
         } catch (error: any){
@@ -136,13 +135,10 @@
 
     onMounted(async () => {
         await lobbiesStore.fetchLobbyList();
-        console.log(lobbies)
 
         if (!lobbiesStore.lobbydata.currentPlayer || lobbiesStore.lobbydata.currentPlayer.playerId === '' || lobbiesStore.lobbydata.currentPlayer.playerName === '') {
             lobbiesStore.createPlayer("Player Test");
         }
-
-        console.log("Current Player:", lobbiesStore.lobbydata.currentPlayer);
 
         lobbiesStore.startLobbyLiveUpdate();
     })

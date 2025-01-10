@@ -44,7 +44,6 @@ export const useLobbiesStore = defineStore('lobbiesstore', () =>{
 
             if(response.ok){
                 const newPlayer = await response.json()
-                console.log('Created Player:', newPlayer)
     
                 // Only update the role if the backend returns it
                 if (newPlayer.role) {
@@ -111,7 +110,6 @@ export const useLobbiesStore = defineStore('lobbiesstore', () =>{
             }
 
             const lobby: ILobbyDTD = await response.json()
-            console.log('Fetched Lobby: ', lobby)
             return lobby
         } catch (error: any){
             console.error('Error:', error)
@@ -132,14 +130,10 @@ export const useLobbiesStore = defineStore('lobbiesstore', () =>{
         }
 
         stompclient.onConnect = (frame) => {
-            console.log('STOMP connected:', frame)
-
             if (stompclient) {
                 stompclient.subscribe(DEST, async (message) => {
-                    console.log('STOMP Client subscribe')
                     const updatedLobbies = JSON.parse(message.body)
                     lobbydata.lobbies = [...updatedLobbies]
-                    console.log('Received lobby update:', updatedLobbies)
                 })
             } else {
                 console.error('STOMP client is not initialized.')
@@ -182,13 +176,11 @@ export const useLobbiesStore = defineStore('lobbiesstore', () =>{
 
             if(response.ok){
                 const lobby: ILobbyDTD = await response.json()
-                console.log('Created Lobby:', lobby)
     
                 // Admin client should have the SNACKMAN role
                 const adminPlayer = lobby.members.find((member) => member.playerId === adminClient.playerId)
                 if (adminPlayer) {
                     lobbydata.currentPlayer.role = adminPlayer.role
-                    console.log('Admin Role:', adminPlayer.role)
                 }
     
                 lobbydata.lobbies.push(lobby)
@@ -215,7 +207,6 @@ export const useLobbiesStore = defineStore('lobbiesstore', () =>{
             const currentLobby = await fetchLobbyById(lobbyId);
             if (currentLobby && currentLobby.members.length >= 4) {
                 console.error('Lobby is full. Cannot join.');
-                alert(`Lobby "${currentLobby.name}" is full!`);
                 return null;
             }
 
@@ -235,14 +226,11 @@ export const useLobbiesStore = defineStore('lobbiesstore', () =>{
 
             if(response.ok){
                 const lobby: ILobbyDTD = await response.json()
-                console.log('lobbiesStore joinLobby successful')
-                console.log('Joined Lobby:', lobby)
     
                 // Find the current player in the lobby data and update the role
                 const updatedPlayer = lobby.members.find((member) => member.playerId === playerId)
                 if (updatedPlayer) {
                     lobbydata.currentPlayer.role = updatedPlayer.role
-                    console.log('Updated Role for Current Player:', updatedPlayer.role)
                 }
     
                 return lobby
@@ -305,7 +293,7 @@ export const useLobbiesStore = defineStore('lobbiesstore', () =>{
             if (lobby) {
                 lobby.gameStarted = true
             }
-            console.log(`Game started successfully in lobby: ${lobbyId}`)
+            
         } catch (error: any) {
             console.error(`Error starting game in lobby ${lobbyId}:`, error)
             throw new Error('Could not start the game. Please try again.')
