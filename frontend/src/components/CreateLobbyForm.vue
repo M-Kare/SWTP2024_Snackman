@@ -6,7 +6,7 @@
             <label>
 
                 Enter Name:
-                <input v-model.trim="lobbyName" type="text">
+                <input v-model.trim="lobbyName" ref="lobbyInput" type="text">
             </label>
             <p
                 id="error-message"
@@ -36,7 +36,7 @@
 <script setup lang="ts">
     import SmallNavButton from '@/components/SmallNavButton.vue';
     import { useRouter } from 'vue-router';
-    import { ref } from 'vue';
+    import { onMounted, ref } from 'vue';
     import { useLobbiesStore } from '@/stores/Lobby/lobbiesstore';
     import type { IPlayerClientDTD } from '@/stores/Lobby/IPlayerClientDTD';
 
@@ -45,6 +45,7 @@
     const currentPlayer = lobbiesStore.lobbydata.currentPlayer as IPlayerClientDTD;
     
     const lobbyName = ref('');
+    const lobbyInput = ref();
     const errorMessage = ref('');
 
     // defines event wich can be triggered by this component
@@ -82,7 +83,7 @@
         }
 
         if (!lobbyName.value.trim()) {
-            errorMessage.value = "Lobby name can't be empty";
+            errorMessage.value = "Lobbyname can't be empty";
             return;
         }
 
@@ -108,6 +109,13 @@
             alert("Error create Lobby!");
         }
     }
+
+    /**
+     * autofocus for input-field if CreateLobbyForm is shown on LobbyListView.vue
+     */
+    onMounted(() => {
+        lobbyInput.value.focus();
+    })
 
 </script>
 
@@ -146,12 +154,15 @@
     color: #fff;
 }
 
-#form > input {
+#form > label {
+    display: block;
+    margin-bottom: 2rem;
+}
+
+#form > label > input {
     font-size: 1.2rem;
     width: 90%;
     height: 2rem;
-    margin-top: 0.2rem;
-    margin-bottom: 2rem;
     padding: 1.2rem;
 }
 
