@@ -6,4 +6,5 @@ export interface IPlayerInitDTD {
     speed: number
     baseSpeed: number
     sprintMultiplier: number
+    maxCalories: number
   }

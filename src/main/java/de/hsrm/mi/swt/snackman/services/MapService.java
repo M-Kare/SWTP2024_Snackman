@@ -67,12 +67,23 @@ public class MapService {
         snackman.addPropertyChangeListener(event -> {
             if (event.getPropertyName().equals("currentCalories")) {
                 int newCalories = (int) event.getNewValue();
-                String message = newCalories == snackman.getMAXKCAL() ? "Maximum calories reached!" : "";
-                System.out.println("Listener initilized");
-
-                FrontendMessageCaloriesEvent messageEvent = new FrontendMessageCaloriesEvent(EventType.CALORIES, ChangeType.UPDATE, newCalories, message);
-
-                frontendMessageService.sendUpdateCaloriesEvent(messageEvent);
+        
+                if (newCalories >= GameConfig.SNACKMAN_MAX_CALORIES) {
+                    String message = newCalories == snackman.getMAXKCAL() ? "Maximum calories reached!" : "";
+                    FrontendMessageCaloriesEvent messageEvent = new FrontendMessageCaloriesEvent(
+                        EventType.CALORIES,
+                        ChangeType.UPDATE,
+                        newCalories,
+                        message
+                    );
+                    frontendMessageService.sendUpdateCaloriesEvent(messageEvent);
+                } else {
+                    // Normale Kalorienaktualisierung
+                    String message = "";
+                    FrontendMessageCaloriesEvent messageEvent = new FrontendMessageCaloriesEvent(EventType.CALORIES, ChangeType.UPDATE, newCalories, message);
+                    
+                    frontendMessageService.sendUpdateCaloriesEvent(messageEvent);
+                }
             }
         });
 

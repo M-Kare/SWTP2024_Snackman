@@ -1,5 +1,6 @@
 package de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs;
 
+import de.hsrm.mi.swt.snackman.configuration.GameConfig;
 import de.hsrm.mi.swt.snackman.entities.map.Square;
 import de.hsrm.mi.swt.snackman.entities.mapObject.snack.Snack;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.Mob;
@@ -22,7 +23,7 @@ public abstract class EatingMob extends Mob {
     public EatingMob(MapService mapService, double speed, double radius) {
         super(mapService, speed, radius);
         if ((this) instanceof SnackMan) {
-            MAXKCAL = 3000;
+            MAXKCAL = GameConfig.SNACKMAN_MAX_CALORIES;
         }
     }
 

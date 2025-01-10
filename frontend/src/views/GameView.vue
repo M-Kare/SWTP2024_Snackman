@@ -27,17 +27,22 @@ import { useGameMapStore } from '@/stores/gameMapStore'
 import type { IGameMap } from '@/stores/IGameMapDTD'
 import type { IFrontendCaloriesMessageEvent } from '@/services/IFrontendMessageEvent'
 import { GLTFLoader } from 'three/examples/jsm/Addons.js'
+import { useRouter, useRoute } from 'vue-router';
 
 const WSURL = `ws://${window.location.host}/stompbroker`
 const DEST = '/topic/player'
 const targetHz = 30
 
+const router = useRouter();
+const route = useRoute();
+
 const UPDATE = '/topic/calories'
 
 //Reaktive Calories Variable
-const MAXCALORIES = 3000
-const currentCalories = ref(0)
-const caloriesMessage = ref('')
+const MAXCALORIES = ref(0);
+const currentCalories  = ref(0);
+const caloriesMessage = ref('');
+const playerRole = ref(route.query.role || ''); // Player role from the URL query
 
 const SNACKMAN_TEXTURE: string = 'src/assets/kirby.glb'
 let snackManModel: THREE.Group<THREE.Object3DEventMap>
@@ -78,27 +83,42 @@ stompclient.onConnect = frame => {
     player.setPosition(event.posX, event.posY, event.posZ)
   })
 
-  // Calories Verarbeitung
-  stompclient.subscribe(UPDATE, message => {
-    const event: IFrontendCaloriesMessageEvent = JSON.parse(message.body)
+// Calories Verarbeitung
+stompclient.subscribe(UPDATE, message => {
+  const event: IFrontendCaloriesMessageEvent = JSON.parse(message.body);
 
-    // Get Calories
-    if (event.calories !== undefined) {
-      currentCalories.value = event.calories
-    }
-    if (event.message) {
-      caloriesMessage.value = event.message
-    }
-  })
+  if (event.calories !== undefined) {
+    currentCalories.value = event.calories;
+  }
+
+  // Check win/lose conditions for SnackMan or Ghosts
+  if (event.calories >= MAXCALORIES.value) {
+    // Navigate to GameEndView with "SnackMan Wins"
+    router.push({
+      name: 'GameEnd',
+      query: {
+        role: playerRole.value,
+        result: playerRole.value === 'SNACKMAN' ? 'Gewonnen' : 'Verloren',
+      }
+    });
+  } else if (event.calories < 0) {
+    // Navigate to GameEndView with "Ghosts Win"
+    router.push({
+      name: 'GameEnd',
+      query: {
+        role: playerRole.value,
+        result: playerRole.value === 'GHOST' ? 'Gewonnen' : 'Verloren',
+      }
+    });
+  }
+    });
+
 }
 
 // Kalorien-Overlay Fill berrechnen
 const getBackgroundStyle = computed(() => {
-  const maxCalories = 3000
-  //Prozent berechnen
-  const percentage = Math.min(currentCalories.value / maxCalories, 1)
-
-  const color = `linear-gradient(to right, #EEC643 ${percentage * 100}%, #5E4A08 ${percentage * 100}%)`
+  const percentage = Math.min(currentCalories.value / MAXCALORIES.value, 1);
+  const color = `linear-gradient(to right, #EEC643 ${percentage * 100}%, #5E4A08 ${percentage * 100}%)`;
 
   return {
     background: color,
@@ -209,6 +229,8 @@ onMounted(async () => {
   )
   camera = player.getCamera()
   scene.add(player.getControls().object)
+
+  MAXCALORIES.value = playerData.maxCalories;
 
   loadPlayerModel(SNACKMAN_TEXTURE)
 

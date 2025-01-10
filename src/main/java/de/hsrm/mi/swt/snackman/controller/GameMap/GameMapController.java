@@ -36,7 +36,7 @@ public class GameMapController {
     @GetMapping("/snackman")
     public ResponseEntity<SnackManInitDTO> getSnackManPos(){
         SnackMan snackman = mapService.getSnackMan();
-        return ResponseEntity.ok(new SnackManInitDTO(snackman.getPosX(), snackman.getPosY(), snackman.getPosZ(), snackman.getRadius(), GameConfig.SNACKMAN_SPEED, GameConfig.SNACKMAN_SPRINT_MULTIPLIER));
+        return ResponseEntity.ok(new SnackManInitDTO(snackman.getPosX(), snackman.getPosY(), snackman.getPosZ(), snackman.getRadius(), GameConfig.SNACKMAN_SPEED, GameConfig.SNACKMAN_SPRINT_MULTIPLIER, GameConfig.SNACKMAN_MAX_CALORIES));
     }
 
 }
