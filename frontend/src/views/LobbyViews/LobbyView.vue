@@ -16,15 +16,21 @@
             accept=".txt" 
             @change="handleFileImport"
         />
-        <div v-if="feedbackMessage" :class="['feedback-message', feedbackClass]">
-            {{ feedbackMessage }}
+
+        <div class="map-list" v-for="map in mapList" :key="map.mapName">
+            <div class="map-list-item">
+                <input class="map-choose" 
+                    type="radio" 
+                    :value="map.mapName" 
+                    :checked="selectedMap === map.mapName" 
+                    @change="selectMap(map.mapName)"
+                />
+                <span>{{ map.mapName }}</span>
+            </div>
         </div>
 
-        <div class="map-list" v-for="map in mapList" :key="map.name">
-            <div class="map-list-item">
-                <input class="map-choose" type="radio" :value="map.name"/>
-                <span>{{ map.name }}</span>
-            </div>
+        <div v-if="feedbackMessage" :class="['feedback-message', feedbackClass]">
+            {{ feedbackMessage }}
         </div>
     </div>
 
@@ -98,6 +104,7 @@
 
     const playerId = lobbiesStore.lobbydata.currentPlayer.playerId;
     const lobbyId = route.params.lobbyId as string;
+
     const lobby = computed(() => lobbiesStore.lobbydata.lobbies.find(l => l.uuid === route.params.lobbyId));
     const adminClientId = lobby.value?.adminClient.playerId;
     const members = computed(() => lobby.value?.members || [] as Array<IPlayerClientDTD>);
@@ -114,9 +121,15 @@
         darkenBackground.value = false;
     }
 
-    const mapList = ref<{ name: string }[]>([]);
-    const basicMap = { name: `Maze.txt` };
-    mapList.value.push(basicMap);
+    const mapList = ref<{ mapName: string; fileName: string }[]>([
+        { mapName: `Maze`, fileName: `Maze.txt` },
+    ]);
+
+    const selectedMap = ref<string | null>(null);
+
+    const selectMap = (mapName: string) => {
+        selectedMap.value = mapName;
+    };
 
     const feedbackMessage = ref('');
     const feedbackClass = ref('');
@@ -132,6 +145,15 @@
 
     const fileInput = ref<HTMLInputElement | null>(null);
 
+    /**
+     * This function processes the file selected by the user in an input field. 
+     * It ensures the file is a `.txt` file
+     * and validates its content to match a specific pattern for render map 
+     * If the file is valid, it triggers an upload to the server.
+     * Otherwise, it displays a popup with error information.
+     * 
+     * @param event - The event triggered by the file input change.
+     */
     const handleFileImport = (event: Event) => {
         const input = event.target as HTMLInputElement;
 
@@ -178,15 +200,21 @@
         })
         .then(response => {
             if (response.ok) {
-                console.log('File uploaded successfully');
                 // Success feedback
                 feedbackMessage.value = 'Map saved';
                 feedbackClass.value = 'success';
 
-                const newMap = { name: `SnackManMap_${lobbyId}.txt` };
-                mapList.value.push(newMap);
+                const mapName = 'Snack Man Map';
+                const fileName = `SnackManMap_${lobbyId}.txt`;
+
+                if (mapList.value.length > 1) {
+                    mapList.value[1] = { mapName, fileName };
+                } else {
+                    mapList.value.push({ mapName, fileName });
+                }
+
+                selectedMap.value = mapName;
             } else {
-                console.error('Error uploading file:', response.statusText);
                 // Failure feedback
                 feedbackMessage.value = 'Map not saved';
                 feedbackClass.value = 'error';
@@ -211,12 +239,9 @@
             const lobbyId = route.params.lobbyId as string;
             
             const updatedLobby = lobbiesStore.lobbydata.lobbies.find(l => l.uuid === lobbyId);
-            console.log("Updated Lobby in Lobby-View", updatedLobby)
 
             if (updatedLobby) {
-                console.log("Gamestarted in Lobby-View", updatedLobby.gameStarted) 
                 if (updatedLobby.gameStarted){
-                    console.log('Game has started! Redirecting to GameView...');
                     router.push({ name: 'GameView' });
                 }
             }else {
@@ -425,17 +450,10 @@
 
 .map-list{
     font-size: 2rem;
-    top: 30px;
+    margin-top: 30px;
     gap: 25px;
     justify-content: center;
     align-items: center;
-    /* 
-    word-wrap: break-word; 
-    word-break: break-word; 
-    overflow-wrap: break-word;
-    width: inherit; 
-    max-width: 100%;
-    */
 }
 
 .map-choose{
@@ -450,11 +468,9 @@
 }
 
 .feedback-message {
-    position: absolute;
-    top: 125px;
+    margin-top: 30px;
     font-size: 2rem;
     font-weight: bold;
-    z-index: 3;
     padding: 10px 20px;
     border-radius: 5px;
     text-align: center;
