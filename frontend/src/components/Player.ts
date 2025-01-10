@@ -32,6 +32,7 @@ export class Player {
   private spacePressed: boolean;
 
   private calories: number;
+  private _maxCalories: number;
 
   private _message = ref("")
 
@@ -55,7 +56,7 @@ export class Player {
    * @param radius size of the player
    * @param speed speed-modifier of the player
    */
-  constructor(renderer: WebGLRenderer, posX: number, posY: number, posZ: number, radius: number, speed: number, sprintMultiplier: number) {
+  constructor(renderer: WebGLRenderer, posX: number, posY: number, posZ: number, radius: number, speed: number, sprintMultiplier: number, maxCalories: number) {
     this.prevTime = performance.now();
     this.moveBackward = false;
     this.moveForward = false;
@@ -65,6 +66,7 @@ export class Player {
     this.sprinting = false;
     this.movementDirection = new THREE.Vector3();
     this.calories = 0;
+    this._maxCalories = maxCalories;
 
     this.isJumping = false;
     this.lastJumpTime = 0;
@@ -412,5 +414,9 @@ export class Player {
 
   public setCalories(cal: number): void {
     this.calories = cal;
+  }
+
+  public getMaxCalories(): number {
+    return this._maxCalories;
   }
 }

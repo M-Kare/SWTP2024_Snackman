@@ -27,7 +27,6 @@ public class GameMapController {
     Logger log = LoggerFactory.getLogger(MapService.class);
 
 
-    //TODO Add to Snackman GameConfig.SNACKMAN_MAX_CALORIES
     @GetMapping("/lobby/{lobbyId}/game-map")
     public ResponseEntity<GameMapDTO> getGameMap(@PathVariable("lobbyId") String lobbyId) {
         log.debug("Get GameMap");
