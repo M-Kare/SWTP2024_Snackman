@@ -9,7 +9,6 @@ import java.util.List;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -45,19 +44,16 @@ class MazeTest {
         }
     }
 
-    @BeforeEach
-    void setup(){
-        mazeService.generateNewMaze();
-    }
-
     @Test
     void mazeExists() {
+        mazeService.generateNewMaze();
         Path filePath = Paths.get(MAZE_FILE_PATH);
         Assertions.assertTrue(Files.exists(filePath), "The Maze.txt file does not exist!");
     }
 
     @Test
     void mazeHasContent() {
+        mazeService.generateNewMaze();
         List<String> maze = readMazeFile();
 
         Assertions.assertFalse(maze.isEmpty(), "The Maze.txt file is empty!");
@@ -65,6 +61,7 @@ class MazeTest {
 
     @Test 
     void mazeHasDefinedCharacters() {
+        mazeService.generateNewMaze();
         List<String> maze = readMazeFile();
 
         for (int i = 0; i < maze.size(); i++) {
