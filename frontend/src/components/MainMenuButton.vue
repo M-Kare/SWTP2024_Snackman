@@ -1,36 +1,48 @@
-<!-- Refactor later on to ShowLobbyButton -->
 <template>
-    <button class="main-menu-button" @click="handleClick">
-      <slot></slot>
-    </button>
+  <button class="button-mainmenu" @click="handleClick">
+    <slot></slot>
+  </button>
 </template>
-  
+
 <script setup lang="ts">
-  import { useRouter } from 'vue-router';
+import { defineProps, defineEmits } from 'vue';
 
-  const router = useRouter();
+defineProps({
+  type: {
+    type: String,
+    default: 'button',
+  },
+});
 
-  const handleClick = () => {
-    router.push({name: 'GameView'});
-  };
+const emit = defineEmits(['click']);
 
+const handleClick = () => {
+  emit('click');
+};
 </script>
-  
+
 <style scoped>
-.main-menu-button {
-  position: relative;
-  padding: 1.75rem 4rem;
-  border: none;
-  border-radius: 0.3125rem;
-  background: #fff;
-  color: #000;
-  font-size: 2rem;
+.button-mainmenu {
+  display: inline-flex;
+  padding: 2rem 3.75rem;
+  justify-content: center;
+  align-items: center;
+  gap: 0.625rem;
+
+  border-radius: 0.5rem;
+  border: 6px solid var(--black);
+  background: var(--white);
+  box-shadow: 10px 10px 0px 0px var(--black);
+
+  font-size: 3.5rem; /* h3 font-size */
+  font-family: var(--font-main);
   font-weight: bold;
   cursor: pointer;
-  transition: box-shadow 0.3s ease, transform 0.3s ease;
+  transition: all 0.3s ease-in-out;
 }
 
-.main-menu-button:hover {
-  box-shadow: 0px 0px 40px 5px rgba(255, 255, 255, 0.7);
+.button-mainmenu:hover {
+  background: var(--primary);
+  color: var(--black);
 }
 </style>
