@@ -306,32 +306,6 @@ public class Chicken extends EatingMob implements Runnable {
         return squares;
     }
 
-    // /**
-    //  * Adjusts the chicken's thickness state, cycling through predefined values,
-    //  * and updates its path-blocking status accordingly.
-    //  */
-    // private void incrementThickness() {
-    //     switch (this.thickness) {
-    //         case Thickness.THIN:
-    //             this.thickness = Thickness.SLIGHTLY_THICK;
-    //             break;
-    //         case Thickness.SLIGHTLY_THICK:
-    //             this.thickness = Thickness.MEDIUM;
-    //             break;
-    //         case Thickness.MEDIUM:
-    //             this.thickness = Thickness.HEAVY;
-    //             break;
-    //         case Thickness.HEAVY:
-    //             this.thickness = Thickness.VERY_HEAVY;
-    //             blockingPath = true;
-    //             break;
-    //         case Thickness.VERY_HEAVY:
-    //             this.thickness = Thickness.THIN;
-    //             blockingPath = true;
-    //             break;
-    //     }
-    // }
-
     public boolean getBlockingPath() {
         return this.blockingPath;
     }
