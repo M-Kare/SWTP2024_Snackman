@@ -1,5 +1,7 @@
 package de.hsrm.mi.swt.snackman.entities.mobileObjects;
 
+import de.hsrm.mi.swt.snackman.entities.map.GameMap;
+import de.hsrm.mi.swt.snackman.services.MapService;
 import org.joml.Quaterniond;
 import org.joml.Vector3d;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -8,7 +10,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import de.hsrm.mi.swt.snackman.configuration.GameConfig;
-import de.hsrm.mi.swt.snackman.entities.map.GameMap;
 import de.hsrm.mi.swt.snackman.entities.map.Square;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.SnackMan;
 

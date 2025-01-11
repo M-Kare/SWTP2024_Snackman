@@ -1,8 +1,8 @@
 package de.hsrm.mi.swt.snackman.entities.mobileObjects;
 
+import de.hsrm.mi.swt.snackman.entities.map.GameMap;
 import de.hsrm.mi.swt.snackman.entities.map.Square;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken.Direction;
-import de.hsrm.mi.swt.snackman.services.MapService;
 import org.python.core.PyList;
 import org.python.core.PyObject;
 import org.python.util.PythonInterpreter;
@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -42,25 +43,51 @@ public class ScriptGhost extends Mob implements Runnable {
         super(null);
     }
 
-    public ScriptGhost(MapService mapService, ScriptGhostDifficulty difficulty) {
-        super(mapService);
+    public ScriptGhost(GameMap gameMap, ScriptGhostDifficulty difficulty) {
+        super(gameMap);
         this.difficulty = difficulty;
+        initJython();
     }
 
-    public ScriptGhost(MapService mapService, Square initialPosition, ScriptGhostDifficulty difficulty) {
-        this(mapService, initialPosition);
+    public ScriptGhost(GameMap gameMap, Square initialPosition, ScriptGhostDifficulty difficulty) {
+        this(gameMap, initialPosition);
         this.difficulty = difficulty;
+        initJython();
     }
 
-    public ScriptGhost(MapService mapService, Square initialPosition) {
-        super(mapService);
+    public ScriptGhost(GameMap gameMap, Square initialPosition) {
+        super(gameMap);
         id = generateId();
         this.ghostPosX = initialPosition.getIndexX();
         this.ghostPosZ = initialPosition.getIndexZ();
         initialPosition.addMob(this);
 
         this.isWalking = true;
-        this.lookingDirection = Direction.NORTH;
+        this.lookingDirection = Direction.ONE_NORTH; // todo choose random
+        initJython();
+    }
+
+    /**
+     * @param currentPosition  the square the ghost is standing on top of
+     * @param lookingDirection
+     * @return a list of 8 square which are around the current square + the
+     * direction the ghost is looking in the order:
+     * northwest_square, north_square, northeast_square, east_square,
+     * southeast_square, south_square, southwest_square, west_square,
+     * direction
+     */
+    public synchronized List<String> getSquaresVisibleForGhost(Square currentPosition, Direction lookingDirection) {
+        List<String> squares = new ArrayList<>();
+        squares.add(Direction.ONE_NORTH_ONE_WEST.get_one_North_one_West_Square(this.getGameMap(), currentPosition).getPrimaryTypeForGhost());
+        squares.add(Direction.ONE_NORTH.get_one_North_Square(this.getGameMap(), currentPosition).getPrimaryTypeForGhost());
+        squares.add(Direction.ONE_NORTH_ONE_EAST.get_one_North_one_East_Square(this.getGameMap(), currentPosition).getPrimaryTypeForGhost());
+        squares.add(Direction.ONE_EAST.get_one_East_Square(this.getGameMap(), currentPosition).getPrimaryTypeForGhost());
+        squares.add(Direction.ONE_SOUTH_TWO_EAST.get_one_South_one_East_Square(this.getGameMap(), currentPosition).getPrimaryTypeForGhost());
+        squares.add(Direction.ONE_SOUTH.get_one_South_Square(this.getGameMap(), currentPosition).getPrimaryTypeForGhost());
+        squares.add(Direction.ONE_SOUTH_ONE_WEST.get_one_South_one_West_Square(this.getGameMap(), currentPosition).getPrimaryTypeForGhost());
+        squares.add(Direction.ONE_WEST.get_one_West_Square(this.getGameMap(), currentPosition).getPrimaryTypeForGhost());
+        squares.add(lookingDirection.toString());
+        return squares;
     }
 
     public void addPropertyChangeListener(PropertyChangeListener listener) {
@@ -81,11 +108,11 @@ public class ScriptGhost extends Mob implements Runnable {
      * moves and updates its position.
      */
     protected void move() {
-        initJython();
+        //initJython();
         while (isWalking) {
             // get 9 squares
-            Square currentPosition = super.mapService.getSquareAtIndexXZ(this.ghostPosX, this.ghostPosZ);
-            List<String> squares = super.mapService.getSquaresVisibleForGhost(currentPosition, lookingDirection);
+            Square currentPosition = this.getGameMap().getSquareAtIndexXZ(this.ghostPosX, this.ghostPosZ);
+            List<String> squares = getSquaresVisibleForGhost(currentPosition, lookingDirection);
             log.debug("Squares ghost is seeing: {}", squares);
 
             log.debug("Current position is x {} z {}", this.ghostPosX, this.ghostPosZ);
@@ -95,7 +122,7 @@ public class ScriptGhost extends Mob implements Runnable {
                 newMove = executeMovementSkript(squares);
             } else {
                 List<List<String>> pythonList = new ArrayList<>();
-                for (String[] row : mapService.getGameMap().getStringMap(this.id)) {
+                for (String[] row : this.getGameMap().getStringMap(this.id)) {
                     pythonList.add(Arrays.asList(row));
                 }
                 newMove = executeMovementSkriptDifficult(pythonList);
@@ -151,16 +178,34 @@ public class ScriptGhost extends Mob implements Runnable {
     }
 
     /**
-     * Initializes Jython for executing the ghost's movement script.
+     * Initializes Jython for executing the chicken's movement script.
      * Sets up the required Python environment and interpreter.
+     *
+     * todo adjust
      */
     public void initJython() {
-        pythonProps.setProperty("python.path", "src/main/java/de/hsrm/mi/swt/snackman");
-        PythonInterpreter.initialize(System.getProperties(), pythonProps, new String[0]);
-        log.info("Initialising jython for ghost movement");
         this.pythonInterpreter = new PythonInterpreter();
-        pythonInterpreter.exec("from GhostMovementSkript import choose_next_square");
-        pythonInterpreter.exec("from SmartGhostMovementSkript import choose_next_move");
+
+        try {
+            String scriptPath = Paths.get("extensions/ghost/GhostMovementSkript.py").normalize().toAbsolutePath().toString();
+            log.debug("Resolved script path: {}", scriptPath);
+
+            // Get the directory of the script (without the .)
+            String scriptDir = Paths.get(scriptPath).getParent().toString();
+            this.pythonInterpreter.exec("import sys");
+            this.pythonInterpreter.exec(String.format("sys.path.append('%s')", scriptDir.replace("\\", "\\\\")));
+
+            // Log sys.path to ensure it's correct
+            this.pythonInterpreter.exec("import sys; print(sys.path)");
+
+            // Execute the Python script
+            this.pythonInterpreter.execfile(scriptPath);
+
+        } catch (Exception ex) {
+            log.error("Error initializing GhostMovementSkript.py: ", ex);
+            ex.printStackTrace();
+        }
+        this.pythonInterpreter.exec("from GhostMovementSkript import choose_next_square");
     }
 
     /**
@@ -171,12 +216,12 @@ public class ScriptGhost extends Mob implements Runnable {
      */
     private void setNewPosition(int newMove) {
         //get positions
-        Direction walkingDirection = Direction.getDirection(newMove);
+        Direction walkingDirection = Direction.getDirection(String.valueOf(newMove));       // todo woroking?
         log.debug("Walking direction is: {}", walkingDirection);
 
         this.lookingDirection = walkingDirection;
-        Square oldPosition = super.mapService.getSquareAtIndexXZ(this.ghostPosX, this.ghostPosZ);
-        Square newPosition = walkingDirection.getNewPosition(super.mapService, this.ghostPosX, this.ghostPosZ, walkingDirection);
+        Square oldPosition = this.getGameMap().getSquareAtIndexXZ(this.ghostPosX, this.ghostPosZ);
+        Square newPosition = walkingDirection.getNewPosition(this.getGameMap(), this.ghostPosX, this.ghostPosZ, walkingDirection);
         propertyChangeSupport.firePropertyChange("scriptGhost", null, this);      // todo update in frontend + init in backend
 
         try {

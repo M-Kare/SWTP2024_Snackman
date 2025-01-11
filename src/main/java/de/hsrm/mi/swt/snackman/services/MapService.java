@@ -3,14 +3,10 @@ package de.hsrm.mi.swt.snackman.services;
 import java.beans.PropertyChangeEvent;
 import java.util.ArrayList;
 import java.util.List;
-import de.hsrm.mi.swt.snackman.entities.mobileObjects.ScriptGhost;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.Ghost;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.Mob;
-import de.hsrm.mi.swt.snackman.entities.mobileObjects.ScriptGhostDifficulty;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken.Chicken;
-import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken.Direction;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.SnackMan;
-import org.python.util.PythonInterpreter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,21 +22,7 @@ import de.hsrm.mi.swt.snackman.entities.map.Square;
 import de.hsrm.mi.swt.snackman.entities.mapObject.MapObjectType;
 import de.hsrm.mi.swt.snackman.entities.mapObject.snack.Snack;
 import de.hsrm.mi.swt.snackman.entities.mapObject.snack.SnackType;
-import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken.Chicken;
-import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.SnackMan;
 import de.hsrm.mi.swt.snackman.messaging.MessageLoop.MessageLoop;
-import de.hsrm.mi.swt.snackman.messaging.ChangeType;
-import de.hsrm.mi.swt.snackman.messaging.EventType;
-import de.hsrm.mi.swt.snackman.messaging.FrontendMessageEvent;
-import de.hsrm.mi.swt.snackman.messaging.FrontendMessageService;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Properties;
-
-import org.python.core.PyObject;
-import de.hsrm.mi.swt.snackman.messaging.*;
 
 /**
  * Service class for managing the game map
@@ -196,53 +178,6 @@ public class MapService {
     }
 
     /**
-     * TODO auslagern in script ghost!!
-     * @param currentPosition  the square the chicken is standing on top of
-     * @param lookingDirection
-     * @return a list of 8 square which are around the current square + the
-     * direction the chicken is looking in the order:
-     * northwest_square, north_square, northeast_square, east_square,
-     * southeast_square, south_square, southwest_square, west_square,
-     * direction
-     */
-    public synchronized List<String> getSquaresVisibleForChicken(Square currentPosition, Direction lookingDirection) {
-        List<String> squares = new ArrayList<>();
-        squares.add(Direction.NORTH_WEST.getNorthWestSquare(this, currentPosition).getPrimaryTypeForChicken());
-        squares.add(Direction.NORTH.getNorthSquare(this, currentPosition).getPrimaryTypeForChicken());
-        squares.add(Direction.NORTH_EAST.getNorthEastSquare(this, currentPosition).getPrimaryTypeForChicken());
-        squares.add(Direction.EAST.getEastSquare(this, currentPosition).getPrimaryTypeForChicken());
-        squares.add(Direction.SOUTH_EAST.getSouthEastSquare(this, currentPosition).getPrimaryTypeForChicken());
-        squares.add(Direction.SOUTH.getSouthSquare(this, currentPosition).getPrimaryTypeForChicken());
-        squares.add(Direction.SOUTH_WEST.getSouthWestSquare(this, currentPosition).getPrimaryTypeForChicken());
-        squares.add(Direction.WEST.getWestSquare(this, currentPosition).getPrimaryTypeForChicken());
-        squares.add(lookingDirection.toString());
-        return squares;
-    }
-
-    /**
-     * @param currentPosition  the square the ghost is standing on top of
-     * @param lookingDirection
-     * @return a list of 8 square which are around the current square + the
-     * direction the ghost is looking in the order:
-     * northwest_square, north_square, northeast_square, east_square,
-     * southeast_square, south_square, southwest_square, west_square,
-     * direction
-     */
-    public synchronized List<String> getSquaresVisibleForGhost(Square currentPosition, Direction lookingDirection) {
-        List<String> squares = new ArrayList<>();
-        squares.add(Direction.NORTH_WEST.getNorthWestSquare(this, currentPosition).getPrimaryTypeForGhost());
-        squares.add(Direction.NORTH.getNorthSquare(this, currentPosition).getPrimaryTypeForGhost());
-        squares.add(Direction.NORTH_EAST.getNorthEastSquare(this, currentPosition).getPrimaryTypeForGhost());
-        squares.add(Direction.EAST.getEastSquare(this, currentPosition).getPrimaryTypeForGhost());
-        squares.add(Direction.SOUTH_EAST.getSouthEastSquare(this, currentPosition).getPrimaryTypeForGhost());
-        squares.add(Direction.SOUTH.getSouthSquare(this, currentPosition).getPrimaryTypeForGhost());
-        squares.add(Direction.SOUTH_WEST.getSouthWestSquare(this, currentPosition).getPrimaryTypeForGhost());
-        squares.add(Direction.WEST.getWestSquare(this, currentPosition).getPrimaryTypeForGhost());
-        squares.add(lookingDirection.toString());
-        return squares;
-    }
-
-    /**
      * Adds a random generated snack inside a square of type FLOOR
      *
      * @param square to put snack in
@@ -299,21 +234,6 @@ public class MapService {
 
         placeMobsOnMap(lobby, ghostSpawnSquares, snackmanSpawnSquares);
     }
-
-    public void printGameMap() {
-        // TODO fix that
-        Square[][] gameMap = this.gameMap.getGameMap();
-
-        for (int x = 0; x < gameMap.length; x++) {
-            System.out.print("x");
-            for (int z = 0; z < gameMap[x].length; z++) {
-                Square square = gameMap[x][z];
-                System.out.print(square.getPrimaryTypeForChicken());
-            }
-            System.out.println("");
-        }
-    }
-
 
     /**
      *
@@ -379,7 +299,7 @@ public class MapService {
         return null; //snackman;
     }
 
-    public Ghost getGhost(long id) {
+    /*public Ghost getGhost(long id) {
         Square[][] squares = this.gameMap.getGameMap();
         for (Square square[] : squares) {
             for (Square square1 : square) {
@@ -392,6 +312,6 @@ public class MapService {
             }
         }
         return null;
-    }
+    }*/
 
 }

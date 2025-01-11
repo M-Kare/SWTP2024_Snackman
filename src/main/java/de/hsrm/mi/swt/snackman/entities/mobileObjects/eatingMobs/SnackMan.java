@@ -1,13 +1,11 @@
 package de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs;
 
+import de.hsrm.mi.swt.snackman.entities.map.GameMap;
 import de.hsrm.mi.swt.snackman.entities.mechanics.SprintHandler;
-import de.hsrm.mi.swt.snackman.entities.mobileObjects.Ghost;
-import de.hsrm.mi.swt.snackman.entities.mobileObjects.Mob;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.hsrm.mi.swt.snackman.configuration.GameConfig;
-import de.hsrm.mi.swt.snackman.entities.map.GameMap;
 import de.hsrm.mi.swt.snackman.entities.map.Square;
 import de.hsrm.mi.swt.snackman.entities.mapObject.snack.Snack;
 import de.hsrm.mi.swt.snackman.entities.mapObject.snack.SnackType;
@@ -37,7 +35,6 @@ public class SnackMan extends EatingMob {
     }
 
     // TODO check if snackman kcal reducing correctly
-    @Override
     public void loseKcal() {
         // Calorsies reduced by 300 if Ghost hit
         setKcal(getKcal() - GameConfig.GHOST_DAMAGE);

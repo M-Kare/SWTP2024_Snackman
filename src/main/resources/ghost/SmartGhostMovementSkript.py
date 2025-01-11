@@ -25,9 +25,7 @@
 #     https://levelup.gitconnected.com/a-star-a-search-for-solving-a-maze-using-python-with-visualization-b0cae1c3ba92
 #
 #    returns: indexOfNextPosition
-import random
 import heapq  # This module provides an implementation of the heap queue algorithm
-from GhostMovementSkript import choose_next_square
 
 WALL = 'W'
 EMPTY = 'L'

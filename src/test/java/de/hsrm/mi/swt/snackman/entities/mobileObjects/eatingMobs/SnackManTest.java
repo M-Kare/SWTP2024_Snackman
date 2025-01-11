@@ -2,6 +2,8 @@ package de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+
+import de.hsrm.mi.swt.snackman.services.MapService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,15 +15,9 @@ import de.hsrm.mi.swt.snackman.entities.map.Square;
 import de.hsrm.mi.swt.snackman.entities.mapObject.snack.Snack;
 import de.hsrm.mi.swt.snackman.entities.mapObject.snack.SnackType;
 import de.hsrm.mi.swt.snackman.entities.mechanics.SprintHandler;
-import de.hsrm.mi.swt.snackman.services.MapService;
-import de.hsrm.mi.swt.snackman.services.ReadMazeService;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.util.FileSystemUtils;
 
 import static org.junit.jupiter.api.Assertions.*;

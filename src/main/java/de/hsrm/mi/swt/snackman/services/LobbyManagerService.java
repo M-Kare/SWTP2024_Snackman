@@ -7,13 +7,12 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
+import de.hsrm.mi.swt.snackman.entities.map.GameMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import de.hsrm.mi.swt.snackman.entities.lobby.Lobby;
 import de.hsrm.mi.swt.snackman.entities.lobby.PlayerClient;
 import de.hsrm.mi.swt.snackman.entities.lobby.ROLE;
-import de.hsrm.mi.swt.snackman.entities.map.GameMap;
 
 /**
  * Service for managing lobbies and clients in the application.
@@ -58,7 +57,7 @@ public class LobbyManagerService {
 
         //TODO change to SessionId
         var uuid = UUID.randomUUID().toString();
-        GameMap gameMap = mapService.createNewGameMap(uuid);
+        GameMap gameMap = this.mapService.createNewGameMap(uuid);
 
         Lobby lobby = new Lobby(uuid, name, admin, gameMap);
 

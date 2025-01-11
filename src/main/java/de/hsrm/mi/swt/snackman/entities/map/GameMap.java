@@ -48,13 +48,13 @@ public class GameMap {
     }
 
     public String[][] getStringMap(long ghostId){
-        int rows = gameMap.length;
-        int cols = gameMap[0].length;
+        int rows = gameMapSquares.length;
+        int cols = gameMapSquares[0].length;
         String[][] result = new String[rows][cols];
 
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
-                result[i][j] = gameMap[i][j].getPrimaryTypeForGhostWithHighDifficulty(ghostId);
+                result[i][j] = gameMapSquares[i][j].getPrimaryTypeForGhostWithHighDifficulty(ghostId);
             }
         }
 

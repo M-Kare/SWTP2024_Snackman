@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import de.hsrm.mi.swt.snackman.entities.map.GameMap;
+import de.hsrm.mi.swt.snackman.services.MapService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +21,6 @@ import de.hsrm.mi.swt.snackman.entities.mobileObjects.Mob;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken.Chicken;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.SnackMan;
 import de.hsrm.mi.swt.snackman.services.LobbyManagerService;
-import de.hsrm.mi.swt.snackman.services.MapService;
 
 @Service
 public class MessageLoop {
@@ -90,7 +91,7 @@ public class MessageLoop {
             messagingTemplate.convertAndSend("/topic/lobbies/" + lobby.getLobbyId() + "/update", messages);
             long currentTime = System.currentTimeMillis();
             if ((currentTime - lobby.getTimeSinceLastSnackSpawn()) > GameConfig.TIME_FOR_SNACKS_TO_RESPAWN) {
-                mapService.respawnSnacks(lobbyService.getGameMapByLobbyId(lobby.getLobbyId()));
+                this.mapService.respawnSnacks(lobbyService.getGameMapByLobbyId(lobby.getLobbyId()));
                 lobby.setTimeSinceLastSnackSpawn(System.currentTimeMillis());
             }
         }

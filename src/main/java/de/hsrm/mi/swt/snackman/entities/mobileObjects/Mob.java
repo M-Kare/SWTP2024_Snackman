@@ -1,13 +1,11 @@
 package de.hsrm.mi.swt.snackman.entities.mobileObjects;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import de.hsrm.mi.swt.snackman.entities.map.GameMap;
 import org.joml.Quaterniond;
 import org.joml.Vector3d;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import de.hsrm.mi.swt.snackman.configuration.GameConfig;
-import de.hsrm.mi.swt.snackman.entities.map.GameMap;
 import de.hsrm.mi.swt.snackman.entities.map.Square;
 import de.hsrm.mi.swt.snackman.entities.mapObject.MapObjectType;
 
@@ -136,6 +134,10 @@ public abstract class Mob {
      */
     public void setCurrentSquareWithIndex(double x, double z) {
         currentSquare = gameMap.getSquareAtIndexXZ(calcMapIndexOfCoordinate(x), calcMapIndexOfCoordinate(z));
+    }
+
+    public Square getCurrentSquare() {
+        return currentSquare;
     }
 
     public void setPositionWithIndexXZ(double x, double z){

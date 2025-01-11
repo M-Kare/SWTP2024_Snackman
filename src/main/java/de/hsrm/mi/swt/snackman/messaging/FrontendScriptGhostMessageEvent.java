@@ -2,7 +2,7 @@ package de.hsrm.mi.swt.snackman.messaging;
 
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.ScriptGhost;
 
-public record FrontendScriptGhostMessageEvent(EventType eventType, ChangeType changeType, ScriptGhost scriptGhost) {
+/*public record FrontendScriptGhostMessageEvent(EventType eventType, ChangeType changeType, ScriptGhost scriptGhost) {
 
     @Override
     public EventType eventType() {
@@ -26,4 +26,4 @@ public record FrontendScriptGhostMessageEvent(EventType eventType, ChangeType ch
                 ", scriptGhost=" + scriptGhost +
                 '}';
     }
-}
+}*/
