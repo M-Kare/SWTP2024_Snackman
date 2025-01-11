@@ -95,12 +95,6 @@ public class SnackMan extends EatingMob {
             oldSquare.removeMob(this);
             newSquare.addMob(this);
         }
-        /*for (Mob mob : getCurrentSquareWithIndex(x, y).getMobs()){
-            if(mob instanceof Ghost)loseKcal();
-        }
-        TODO scare ghost and snakcan
-
-        */
     }
 
     public int getSprintTimeLeft() {
