@@ -20,6 +20,7 @@ public class Lobby {
     private GameMap gameMap;
     private SortedMap<String, Mob> clientMobMap;
     private long timeSinceLastSnackSpawn;
+    private boolean usedCustomMap;
 
 
     public Lobby(String lobbyId, String name, PlayerClient adminClient, GameMap gameMap) {
@@ -27,13 +28,14 @@ public class Lobby {
         this.gameMap = gameMap;
         this.name = name;
         this.adminClient = adminClient;
-        this.isGameStarted = false;;
+        this.isGameStarted = false;
         this.members = new ArrayList<>();
         this.members.add(adminClient);
         this.clientMobMap = new TreeMap<>();
+        this.usedCustomMap = false;
     }
 
-    public SortedMap<String, Mob> getClientMobMap() { return clientMobMap; };
+    public SortedMap<String, Mob> getClientMobMap() { return clientMobMap; }
 
     public String getName() {
         return name;
@@ -66,6 +68,10 @@ public class Lobby {
         return gameMap;
     }
 
+    public void setGameMap(GameMap newGameMap){
+        this.gameMap = newGameMap;
+    }
+
     public String getLobbyId() {
         return lobbyId;
     }
@@ -76,5 +82,13 @@ public class Lobby {
 
     public void setTimeSinceLastSnackSpawn(long time) {
         timeSinceLastSnackSpawn = time;
+    }
+
+    public boolean getUsedCustomMap(){
+        return usedCustomMap;
+    }
+
+    public void setUsedCustomMap(boolean value){
+        this.usedCustomMap = value;
     }
 }

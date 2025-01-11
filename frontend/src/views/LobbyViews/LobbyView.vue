@@ -50,7 +50,7 @@
         </SmallNavButton>
 
         <div id="player-count">
-                {{ playerCount }} / {{ maxPlayerCount }} Players
+                {{ playerCount }} / {{ MAX_PLAYER_COUNT }} Players
         </div>
 
         <div class="inner-box">
@@ -142,7 +142,6 @@
     const adminClientId = lobby.value?.adminClient.playerId;
     const members = computed(() => lobby.value?.members || [] as Array<IPlayerClientDTD>);
     const playerCount = computed(() => members.value.length);
-    const maxPlayerCount = ref(5);
 
     const darkenBackground = ref(false);
     const showPopUp = ref(false);
@@ -157,7 +156,7 @@
     const mouseInfoBox = ref(document.getElementById("infoBox"))
 
 
-    const MAX_PLAYER_COUNT = 4;
+    const MAX_PLAYER_COUNT = 5;
 
     const TIP_TOP_DIST = 30;
     const TIP_SIDE_DIST = 20;
@@ -168,13 +167,21 @@
     }
 
     const mapList = ref<{ mapName: string; fileName: string }[]>([
-        { mapName: `Maze`, fileName: `Maze.txt` },
+        { mapName: 'Original Map', fileName: `Maze.txt` },
     ]);
 
+    const usedCustomMap = ref(false);
     const selectedMap = ref<string | null>(null);
 
     const selectMap = (mapName: string) => {
         selectedMap.value = mapName;
+
+        if (selectedMap.value === 'Original Map'){
+            usedCustomMap.value = false;
+        }
+        else if (selectedMap.value === 'Snack Man Map') {
+            usedCustomMap.value = true;
+        } 
     };
 
     const feedbackMessage = ref('');
@@ -212,7 +219,6 @@
                     const validPattern = /^[SGCo#\s]*$/;
 
                     if (validPattern.test(fileContent)){
-                        console.log('File Content:\n', fileContent);
                         uploadFileToServer(file, lobbyId);
                     } else {
                         showPopUp.value = true;
@@ -233,7 +239,8 @@
 
     /**
      * Upload file to server
-     * @param file 
+     * @param file - new custom map in file .txt
+     * @param lobbyId - The unique identifier of the lobby.
      */
     const uploadFileToServer = (file: File, lobbyId: string) => {
         const formData = new FormData();
@@ -259,7 +266,7 @@
                     mapList.value.push({ mapName, fileName });
                 }
 
-                selectedMap.value = mapName;
+                selectMap(mapName);
             } else {
                 // Failure feedback
                 feedbackMessage.value = 'Map not saved';
@@ -282,7 +289,7 @@
 
     /**
      * Delete uploaded File, when the lobby doesn't exist anymore.
-     * @param lobbyId 
+     * @param lobbyId - The unique identifier of the lobby.
      */
     const deleteUploadedFile = async (lobbyId: string) => {
         const formData = new FormData();
@@ -296,12 +303,33 @@
             if (!response.ok) {
                 console.error('Error deleting file:', response.text());
             }
-            else {
-                console.log('File deleted successfully');
-            }
         })
         .catch(error => {
             console.error('Error deleting file:', error);
+        });
+    }
+
+    /**
+     * Sends a request to update the used map status for a specific lobby.
+     *
+     * @param {string} lobbyId - The unique identifier of the lobby.
+     * @param {boolean} usedCustomMap - Indicates whether a custom map is used (true) or not (false). 
+    */
+    const changeUsedMapStatus = async (lobbyId: string, usedCustomMap: boolean) => {
+        fetch('/api/change-used-map-status', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ lobbyId, usedCustomMap })
+        })
+        .then(response => {
+            if (!response.ok) {
+                console.error('Error change the used map status:', response.text());
+            }
+        })
+        .catch(error => {
+            console.error('Error change the used map status:', error);
         });
     }
 
@@ -320,6 +348,7 @@
                 }
             }
             else {
+                deleteUploadedFile(lobbyId);
                 router.push({ name: 'LobbyListView' });
             }
         }
@@ -424,6 +453,7 @@
         }
 
         if(playerId === lobby.value.adminClient.playerId){
+            await changeUsedMapStatus(lobbyId, usedCustomMap.value);
             await lobbiesStore.startGame(lobby.value.lobbyId);
         } else {
             showPopUp.value = true;

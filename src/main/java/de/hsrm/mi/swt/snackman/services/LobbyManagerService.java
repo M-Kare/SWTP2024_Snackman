@@ -1,5 +1,8 @@
 package de.hsrm.mi.swt.snackman.services;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -8,6 +11,8 @@ import java.util.NoSuchElementException;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import de.hsrm.mi.swt.snackman.entities.lobby.Lobby;
@@ -131,6 +136,15 @@ public class LobbyManagerService {
             throw new IllegalStateException("Not enough players to start the game");
         }
 
+        // If Admin want to play with custom map
+        if(lobby.getUsedCustomMap()){
+            String customMapName = String.format("SnackManMap_%s.txt", lobbyId);
+            
+            String newFilePath = "./extensions/map/" + customMapName;
+            GameMap newGameMap = mapService.createNewGameMap(lobbyId, newFilePath);
+            lobby.setGameMap(newGameMap);
+        }
+
         mapService.spawnMobs(lobby.getGameMap(), lobby);
         lobby.setGameStarted(true);
     }
@@ -175,5 +189,9 @@ public class LobbyManagerService {
 
     public GameMap getGameMapByLobbyId(String lobbyId) {
         return lobbies.get(lobbyId).getGameMap();
+    }
+
+    private void setNewGameMap(){
+
     }
 }

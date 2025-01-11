@@ -23,8 +23,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import de.hsrm.mi.swt.snackman.entities.lobby.Lobby;
 import de.hsrm.mi.swt.snackman.services.LobbyManagerService;
-import de.hsrm.mi.swt.snackman.services.MapService;
 
 /**
  * REST Controller for handling map-related API requests
@@ -38,7 +38,7 @@ public class GameMapController {
     @Autowired
     private LobbyManagerService lobbyManagerService;
 
-    Logger log = LoggerFactory.getLogger(MapService.class);
+    Logger log = LoggerFactory.getLogger(GameMapController.class);
 
     @GetMapping("/lobby/{lobbyId}/game-map")
     public ResponseEntity<GameMapDTO> getGameMap(@PathVariable("lobbyId") String lobbyId) {
@@ -79,7 +79,7 @@ public class GameMapController {
      * This method is invoked when a lobby no longer exists, and the map file
      * for that lobby needs to be deleted from the server.
      * @param requestBody A map containing the lobbyId
-     * @return ResponseEntity:
+     * @return Returns an HTTP status code:
      *     - HTTP 200 (OK) if the file was successfully deleted.
      *     - HTTP 404 (Not Found) if the file does not exist.
      *     - HTTP 500 (Internal Server Error) if an error occurs during the deletion process.
@@ -100,6 +100,38 @@ public class GameMapController {
             log.error("Error occurred while deleting the file: ", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
+    }
+
+    /**
+     * Updates the custom map usage status for a lobby.
+     *
+     * @param requestBody A Map containing the following parameters:
+     *                    - lobbyId          :The ID of the lobby (String).
+     *                    - usedCustomMap    :The custom map usage status (Boolean).
+     * @return Returns an HTTP status code:
+     *         - 200 OK if the update is successful.
+     *         - 404 Not Found if the lobby is not found.
+     *         - 400 Bad Request if an error occurs during processing.
+     */
+    @PostMapping("/change-used-map-status")
+    public ResponseEntity<Void> updateUsedMapStatus(@RequestBody Map<String, Object> requestBody){
+        try{
+            String lobbyId = (String) requestBody.get("lobbyId");
+            Boolean usedCustomMap = (Boolean) requestBody.get("usedCustomMap");
+            
+            Lobby lobby = lobbyManagerService.findLobbyByLobbyId(lobbyId);
+            if (lobby == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            }
+        
+            lobby.setUsedCustomMap(usedCustomMap);
+            // log.info(lobbyId + " have the staus of used custom map: " + usedCustomMap.toString());
+
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+        
     }
 }
 

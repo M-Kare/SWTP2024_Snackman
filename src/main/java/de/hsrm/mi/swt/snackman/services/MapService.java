@@ -34,8 +34,6 @@ public class MapService {
     private final ReadMazeService readMazeService;
     private final MessageLoop messageLoop;
 
-    private String filePath;
-
     Logger log = LoggerFactory.getLogger(MapService.class);
 
     /**
@@ -49,7 +47,6 @@ public class MapService {
     }
 
     public GameMap createNewGameMap(String lobbyId, String filePath) {
-        this.filePath = filePath;
         readMazeService.generateNewMaze();
         char[][] mazeData = readMazeService.readMazeFromFile(filePath);
         return convertMazeDataGameMap(lobbyId, mazeData);
@@ -253,7 +250,4 @@ public class MapService {
         }
     }
 
-    public void setFilePath(String path){
-        this.filePath = path;
-    }
 }
