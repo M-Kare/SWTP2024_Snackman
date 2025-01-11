@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Map;
 
 import de.hsrm.mi.swt.snackman.entities.map.GameMap;
+import de.hsrm.mi.swt.snackman.entities.mobileObjects.Ghost;
+import de.hsrm.mi.swt.snackman.entities.mobileObjects.ScriptGhost;
 import de.hsrm.mi.swt.snackman.services.MapService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,16 +63,22 @@ public class MessageLoop {
 
                 switch (mob) {
                     case SnackMan snackMan -> {
-                        messages.add(new Message<>(EventEnum.MobUpdate, new MobUpdateMessage(snackMan.getPosition(),
+                        messages.add(new Message<>(EventEnum.SnackManUpdate, new MobUpdateMessage(snackMan.getPosition(),
                         snackMan.getQuat(), snackMan.getRadius(), snackMan.getSpeed(), client, snackMan.getSprintTimeLeft(),
                                 snackMan.isSprinting(), snackMan.isInCooldown(), snackMan.getCurrentCalories(), snackMan.getCurrentCalories() >= GameConfig.MAX_KALORIEN ? GameConfig.MAX_KALORIEN_MESSAGE : null
                         )));
                     }
-                    default -> {
-                        messages.add(new Message<>(EventEnum.MobUpdate, new MobUpdateMessage(mob.getPosition(),
-                                mob.getQuat(), mob.getRadius(), mob.getSpeed(), client, 0,
-                                false, false, 0, null)));
+                    case Ghost ghost ->{
+                        messages.add(new Message <> (EventEnum.GhostUpdate, GhostUpdateMessage.fromGhost(ghost, client)));
                     }
+                    /*
+                    case ScriptGhost scriptGhost ->{
+                        messages.add(new Message <> (EventEnum.ScriptGhostUpdate, ScriptGhostDTO.fromScriptGhost(scriptGhost)));
+                    }
+
+                     */
+                    // TODO add chicken here
+                    default -> throw new IllegalStateException("Unexpected value: " + mob);
                 }
             }
             if(squareQueue != null){

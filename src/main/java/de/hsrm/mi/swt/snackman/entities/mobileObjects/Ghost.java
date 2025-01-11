@@ -12,14 +12,6 @@ public class Ghost extends Mob {
 
     private final PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
 
-    public Ghost(GameMap gameMap, int speed, double radius){
-        super(gameMap, speed, radius);
-    }
-
-    public Ghost(GameMap gameMap, int speed, double radius, double posX, double posY, double posZ){
-        super(gameMap, speed, radius, posX, posY, posZ);
-    }
-
     // TODO change constructors
     public Ghost(Square currentSquare, GameMap gameMap) {
         super(gameMap, GameConfig.GHOST_SPEED, GameConfig.GHOST_RADIUS, (currentSquare.getIndexX() * GameConfig.SQUARE_SIZE + 0.5 * GameConfig.SQUARE_SIZE), GameConfig.SNACKMAN_GROUND_LEVEL, (currentSquare.getIndexZ() * GameConfig.SQUARE_SIZE + 0.5 * GameConfig.SQUARE_SIZE));
@@ -48,7 +40,7 @@ public class Ghost extends Mob {
         Square oldSquare = this.getGameMap().getSquareAtIndexXZ(calcMapIndexOfCoordinate(super.getPosX()), calcMapIndexOfCoordinate(super.getPosZ()));
         super.move(f, b, l, r, delta);
         Square newSquare = this.getGameMap().getSquareAtIndexXZ(calcMapIndexOfCoordinate(super.getPosX()), calcMapIndexOfCoordinate(super.getPosZ()));
-        propertyChangeSupport.firePropertyChange("ghost", null, this); // ghost ändern
+        //propertyChangeSupport.firePropertyChange("ghost", null, this); // ghost ändern
         scare(newSquare);
         if (!oldSquare.equals(newSquare)) {
             oldSquare.removeMob(this);

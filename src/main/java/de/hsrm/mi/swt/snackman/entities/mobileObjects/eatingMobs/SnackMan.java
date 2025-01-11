@@ -17,15 +17,13 @@ public class SnackMan extends EatingMob {
     private boolean isSprinting = false;
     private SprintHandler sprintHandler = new SprintHandler();
 
-    public SnackMan(GameMap gameMap) {
-        //TODO add Snackman id to match client
-        this(gameMap, GameConfig.SNACKMAN_SPEED, GameConfig.SNACKMAN_RADIUS);
-    }
-
-    public SnackMan(GameMap gameMap, double posX, double posY, double posZ) {
+    public SnackMan(GameMap gameMap, Square currentSquare, double posX, double posY, double posZ) {
         this(gameMap, GameConfig.SNACKMAN_SPEED, GameConfig.SNACKMAN_RADIUS, posX, posY, posZ);
+
+        currentSquare.addMob(this);
     }
 
+    // only for tests??
     public SnackMan(GameMap gameMap, double speed, double radius) {
         super(gameMap, speed, radius);
     }
@@ -89,7 +87,14 @@ public class SnackMan extends EatingMob {
             setSpeed(GameConfig.SNACKMAN_SPEED);
         }
 
+        Square oldSquare = this.getGameMap().getSquareAtIndexXZ(calcMapIndexOfCoordinate(super.getPosX()), calcMapIndexOfCoordinate(super.getPosZ()));
         super.move(forward, backward, left, right, delta);
+        Square newSquare = this.getGameMap().getSquareAtIndexXZ(calcMapIndexOfCoordinate(super.getPosX()), calcMapIndexOfCoordinate(super.getPosZ()));
+
+        if (!oldSquare.equals(newSquare)) {
+            oldSquare.removeMob(this);
+            newSquare.addMob(this);
+        }
         /*for (Mob mob : getCurrentSquareWithIndex(x, y).getMobs()){
             if(mob instanceof Ghost)loseKcal();
         }

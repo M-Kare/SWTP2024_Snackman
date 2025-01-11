@@ -8,7 +8,6 @@ import {reactive, ref, type UnwrapNestedRefs} from "vue";
 
 export class Player {
   private prevTime: DOMHighResTimeStamp
-  private id : number ;
 
   // Booleans for checking movement-input
   private moveForward: boolean;
@@ -56,8 +55,7 @@ export class Player {
    * @param radius size of the player
    * @param speed speed-modifier of the player
    */
-  constructor(renderer: WebGLRenderer, id : number , posX: number, posY: number, posZ: number, radius: number, speed: number, sprintMultiplier: number ) {
-    this.id = id;
+  constructor(renderer: WebGLRenderer, posX: number, posY: number, posZ: number, radius: number, speed: number, sprintMultiplier: number) {
     this.prevTime = performance.now();
     this.moveBackward = false;
     this.moveForward = false;
@@ -432,10 +430,5 @@ export class Player {
       z: this.camera.position.z,
     };
   }
-
-  getId(): number{
-    return this.id;
-  }
-
 
 }

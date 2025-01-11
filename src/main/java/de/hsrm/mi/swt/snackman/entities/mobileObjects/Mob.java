@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import de.hsrm.mi.swt.snackman.entities.map.GameMap;
 import org.joml.Quaterniond;
 import org.joml.Vector3d;
-
 import de.hsrm.mi.swt.snackman.configuration.GameConfig;
 import de.hsrm.mi.swt.snackman.entities.map.Square;
 import de.hsrm.mi.swt.snackman.entities.mapObject.MapObjectType;
@@ -17,7 +16,6 @@ public abstract class Mob {
     private Vector3d position;
     private double radius;
     private Quaterniond quat;
-    private Square currentSquare;
     private double speed;
 
     @JsonIgnore
@@ -133,11 +131,11 @@ public abstract class Mob {
      * @param z z-position
      */
     public void setCurrentSquareWithIndex(double x, double z) {
-        currentSquare = gameMap.getSquareAtIndexXZ(calcMapIndexOfCoordinate(x), calcMapIndexOfCoordinate(z));
+        setPositionWithIndexXZ(calcMapIndexOfCoordinate(x), calcMapIndexOfCoordinate(z));
     }
 
     public Square getCurrentSquare() {
-        return currentSquare;
+        return this.gameMap.getSquareAtIndexXZ(calcMapIndexOfCoordinate(this.position.x), calcMapIndexOfCoordinate(this.position.z));
     }
 
     public void setPositionWithIndexXZ(double x, double z){
@@ -262,6 +260,7 @@ public abstract class Mob {
         }
 
         int collisionCase = 0;
+        Square currentSquare = this.gameMap.getSquareAtIndexXZ(calcMapIndexOfCoordinate(x), calcMapIndexOfCoordinate(z));
 
         double squareCenterX = currentSquare.getIndexX() * GameConfig.SQUARE_SIZE + GameConfig.SQUARE_SIZE / 2;
         double squareCenterZ = currentSquare.getIndexZ() * GameConfig.SQUARE_SIZE + GameConfig.SQUARE_SIZE / 2;
@@ -357,5 +356,16 @@ public abstract class Mob {
         return id;
     }
 
-
+    @Override
+    public String toString() {
+        return "Mob{" +
+                "id=" + id +
+                ", position=" + position +
+                ", radius=" + radius +
+                ", quat=" + quat +
+                ", speed=" + speed +
+                ", gameMap=" + gameMap +
+                ", spawn=" + spawn +
+                '}';
+    }
 }

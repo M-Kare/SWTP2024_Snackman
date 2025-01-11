@@ -3,11 +3,6 @@ import {reactive, readonly} from "vue";
 import type {IGameMap, IGameMapDTD} from './IGameMapDTD';
 import {fetchGameMapDataFromBackend} from "../services/GameMapDataService.js";
 import {Client} from "@stomp/stompjs";
-import type {
-  IFrontendChickenMessageEvent,
-  IFrontendGhostMessageEvent,
-  IFrontendMessageEvent, IFrontendScriptGhostMessageEvent
-} from "@/services/IFrontendMessageEvent";
 import type {ISquare} from "@/stores/Square/ISquareDTD";
 import * as THREE from "three";
 import {Scene} from "three";
@@ -17,11 +12,12 @@ import {GameObjectRenderer} from "@/renderer/GameObjectRenderer";
 import {useLobbiesStore} from "@/stores/Lobby/lobbiesstore";
 import {Player} from '@/components/Player';
 import {EventType, type IMessageDTD} from './messaging/IMessageDTD';
-import type {IMobUpdateDTD} from './messaging/IMobUpdateDTD';
+import type {ISnackmanUpdateDTD} from './messaging/ISnackmanUpdateDTD';
 import type {ISquareUpdateDTD} from './messaging/ISquareUpdateDTD';
 import {SnackType} from './Snack/ISnackDTD';
 import type {IGhost, IGhostDTD} from "@/stores/Ghost/IGhostDTD";
 import type {IScriptGhost, IScriptGhostDTD} from "@/stores/Ghost/IScriptGhostDTD";
+import type {IGhostUpdateDTD} from "@/stores/messaging/IGhostUpdateDTD";
 
 /**
  * Defines the pinia store used for saving the map from
@@ -103,8 +99,9 @@ export const useGameMapStore = defineStore('gameMap', () => {
           const content: Array<IMessageDTD> = JSON.parse(message.body)
           for (const mess of content) {
             switch (mess.event) {
-              case EventType.MobUpdate:
-                const mobUpdate: IMobUpdateDTD = mess.message
+              // TODO GhostUpdate / ScriptGhostUpdate Rolle Unterschieden
+              case EventType.SnackManUpdate:
+                const mobUpdate: ISnackmanUpdateDTD = mess.message
                 if (mobUpdate.playerId === lobbydata.currentPlayer.playerId) {
                   if (player == undefined) {
                     continue;
@@ -116,7 +113,7 @@ export const useGameMapStore = defineStore('gameMap', () => {
                   player.sprintData.isSprinting = mobUpdate.isSprinting
                   player.sprintData.isCooldown = mobUpdate.isInCooldown
 
-                  if(mobUpdate.message != null){
+                  if (mobUpdate.message != null) {
                     player.message.value = mobUpdate.message
                   }
 
@@ -129,6 +126,23 @@ export const useGameMapStore = defineStore('gameMap', () => {
                   otherPlayers.get(mobUpdate.playerId)?.setRotationFromQuaternion(mobUpdate.rotation)
                 }
                 break;
+
+              case EventType.GhostUpdate:
+                const ghostUpdate: IGhostUpdateDTD = mess.message
+                if (ghostUpdate.playerId === lobbydata.currentPlayer.playerId) {
+                  if (player == undefined) {
+                    continue;
+                  }
+
+                  player.setPosition(ghostUpdate.position);
+                  break;
+                } else {
+                  if (otherPlayers == undefined || otherPlayers.size == 0) {
+                    continue;
+                  }
+                  otherPlayers.get(ghostUpdate.playerId)?.position.lerp(ghostUpdate.position, 0.3)
+                  otherPlayers.get(ghostUpdate.playerId)?.setRotationFromQuaternion(ghostUpdate.rotation)
+                }
               case EventType.SquareUpdate:
                 const squareUpdate: ISquareUpdateDTD = mess.message
                 if (squareUpdate.square.snack.snackType == SnackType.EMPTY) {
@@ -146,7 +160,7 @@ export const useGameMapStore = defineStore('gameMap', () => {
               default:
                 console.log(mess.message)
 
-                // todo add ghst and script ghost update
+              // todo add ghst and script ghost update
             }
           }
         })
@@ -367,7 +381,7 @@ todo logic here for ghosts
     currentChicken.lookingDirection = chickenUpdate.lookingDirection
     switch (
       currentChicken.lookingDirection // rotates the chicken depending on what its looking direction is
-    ) {
+      ) {
       case Direction.NORTH || Direction.SOUTH:
         chickenMesh!.setRotationFromEuler(new THREE.Euler(0))
         break
@@ -427,7 +441,7 @@ todo logic here for ghosts
     currentGhost.posZ = ghostUpdate.posZ
     currentGhost.posY = ghostUpdate.posY
 
-    ghostMesh!.position.set(currentGhost.posX ,currentGhost.posY, currentGhost.posZ )
+    ghostMesh!.position.set(currentGhost.posX, currentGhost.posY, currentGhost.posZ)
   }
 
   function setSnackMeshId(squareId: number, meshId: number) {
