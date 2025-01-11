@@ -1,11 +1,11 @@
 <template>
   <div class="Main">
     <canvas ref="canvasRef"></canvas>
-    <div class="sprint-bar">
+    <div class="sprint-bar" v-if="lobbydata.currentPlayer.role == 'SNACKMAN'">
       <div :style="sprintBarStyle" class="sprint-bar-inner"></div>
     </div>
 
-    <div :style="getBackgroundStyle" class="Calories-Overlay">
+    <div :style="getBackgroundStyle" class="Calories-Overlay" v-if="lobbydata.currentPlayer.role == 'SNACKMAN'">
       <div class="overlayContent">
         <img alt="calories" class="calories-icon" src="@/assets/calories.svg" />
         <p v-if="currentCalories < MAXCALORIES">{{ currentCalories }}kcal</p>
