@@ -132,8 +132,8 @@ public class LobbyManagerService {
             throw new IllegalStateException("Not enough players to start the game");
         }
 
+        lobby.startGame();
         mapService.spawnMobs(lobby.getGameMap(), lobby);
-        lobby.setGameStarted(true);
     }
 
     /**
