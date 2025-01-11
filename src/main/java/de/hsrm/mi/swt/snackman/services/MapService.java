@@ -3,6 +3,7 @@ package de.hsrm.mi.swt.snackman.services;
 import java.beans.PropertyChangeEvent;
 import java.util.ArrayList;
 import java.util.List;
+
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.Ghost;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.Mob;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken.Chicken;
@@ -35,11 +36,6 @@ public class MapService {
     private final MessageLoop messageLoop;
     Logger log = LoggerFactory.getLogger(MapService.class);
 
-    /*
-        private int AMOUNT_PLAYERS_FOR_GAME = 1;
-    private int initialisedPlayers = 0;
-     */
-
     /**
      * Constructs a new MapService
      * Initializes the maze data by reading from a file and creates a Map object
@@ -65,8 +61,7 @@ public class MapService {
      *
      * @param mazeData the char array representing the maze
      */
-    public GameMap convertMazeDataGameMap(String lobbyId,
-                                           char[][] mazeData) {
+    public GameMap convertMazeDataGameMap(String lobbyId, char[][] mazeData) {
         Square[][] squaresBuildingMap = new Square[mazeData.length][mazeData[0].length];
 
         for (int x = 0; x < mazeData.length; x++) {
@@ -121,6 +116,7 @@ public class MapService {
 
                 break;
             case 'G':
+
                 log.debug("Initialising ghost");
 
                 square = new Square(x, z, new Spawnpoint(SpawnpointMobType.GHOST));
@@ -193,11 +189,11 @@ public class MapService {
      * Goes trough the map and checks if it's a spawnpoint and sets a Mob
      *
      * @param gameMap where the mobs should spawn
-     * @param lobby of the mobs
+     * @param lobby   of the mobs
      */
     public void spawnMobs(GameMap gameMap, Lobby lobby) {
         List<Square> ghostSpawnSquares = new ArrayList<>();
-        List<Square> snackmanSpawnSquares = new ArrayList<>();
+        Square snackmanSpawnSquare = null;
 
         for (int i = 0; i < gameMap.getGameMapSquares().length; i++) {
             for (int j = 0; j < gameMap.getGameMapSquares()[i].length; j++) {
@@ -223,51 +219,59 @@ public class MapService {
                             ghostSpawnSquares.add(currentSquare);
                             break;
                         case SpawnpointMobType.SNACKMAN:
-                            snackmanSpawnSquares.add(currentSquare);
+                            snackmanSpawnSquare = currentSquare;
                             break;
                     }
-
                 }
-
             }
         }
 
-        placeMobsOnMap(lobby, ghostSpawnSquares, snackmanSpawnSquares);
+        placeMobsOnMap(lobby, ghostSpawnSquares, snackmanSpawnSquare);
     }
 
     /**
-     *
-     * @param lobby where the Mobs should spawn
-     * @param ghostSpawnSquares list of spawnpoints of ghosts
-     * @param snackmanSpawnSquares list of spawnpoints of snackmans
+     * @param lobby                where the Mobs should spawn
+     * @param ghostSpawnSquares    list of spawnpoints of ghosts
+     * @param snackmanSpawnSquare spawnpoint of the snackman
      */
-    private void placeMobsOnMap(Lobby lobby, List<Square> ghostSpawnSquares, List<Square> snackmanSpawnSquares) {
+    private void placeMobsOnMap(Lobby lobby, List<Square> ghostSpawnSquares, Square snackmanSpawnSquare) {
         int ghostSpawnIndex = 0;
-        int snackmanSpawnIndex = 0;
         Square temp;
 
         for (PlayerClient client : lobby.getMembers()) {
             switch (client.getRole()) {
                 // TODO change to spawn ghost instead of snackman
                 case GHOST:
+                    log.info("Initialising playerGhost");
+                    // init real players here aka Ghost
+
+                    Ghost ghost = new Ghost(ghostSpawnSquares.get(ghostSpawnIndex), lobby.getGameMap());
+                    ghost.addPropertyChangeListener((PropertyChangeEvent evt) -> {
+                           /* if (evt.getPropertyName().equals("ghost")) {
+                                FrontendGhostMessageEvent messageEvent = new FrontendGhostMessageEvent(EventType.GHOST, ChangeType.UPDATE, (Ghost) evt.getNewValue());
+                                frontendMessageService.sendGhostEvent(messageEvent);
+                            }
+
+                        });
+                        FrontendGhostMessageEvent message = new FrontendGhostMessageEvent(EventType.GHOST, ChangeType.CREATE, ghost);
+                        frontendMessageService.sendGhostEvent(message);
+
+                           */
+                    });
+                    log.info("New player ghost is: {}", ghost);
+
                     if (ghostSpawnIndex >= ghostSpawnSquares.size()) {
                         ghostSpawnIndex = 0;
                     }
                     temp = ghostSpawnSquares.get(ghostSpawnIndex);
-                    lobby.getClientMobMap().put(client.getPlayerId(),
-                            new SnackMan(lobby.getGameMap(), calcCenterPositionFromMapIndex(temp.getIndexX()),
-                                    GameConfig.SNACKMAN_GROUND_LEVEL,
-                                    calcCenterPositionFromMapIndex(temp.getIndexZ())));
+                    lobby.getClientMobMap().put(client.getPlayerId(), ghost);
                     ghostSpawnIndex++;
                     break;
                 case SNACKMAN:
-                    if (snackmanSpawnIndex >= snackmanSpawnSquares.size()) {
-                        snackmanSpawnIndex = 0;
-                    }
-                    temp = snackmanSpawnSquares.get(snackmanSpawnIndex);
-                    SnackMan snackMan = new SnackMan(lobby.getGameMap(), calcCenterPositionFromMapIndex(temp.getIndexX()), GameConfig.SNACKMAN_GROUND_LEVEL, calcCenterPositionFromMapIndex(temp.getIndexZ()));
+                    SnackMan snackMan = new SnackMan(lobby.getGameMap(), snackmanSpawnSquare, calcCenterPositionFromMapIndex(snackmanSpawnSquare.getIndexX()), GameConfig.SNACKMAN_GROUND_LEVEL, calcCenterPositionFromMapIndex(snackmanSpawnSquare.getIndexZ()));
+
+                    log.info("New Player snackman is {}", snackMan);
                     lobby.getClientMobMap().put(client.getPlayerId(), snackMan);
-                    snackmanSpawnIndex++;
                     break;
             }
         }
