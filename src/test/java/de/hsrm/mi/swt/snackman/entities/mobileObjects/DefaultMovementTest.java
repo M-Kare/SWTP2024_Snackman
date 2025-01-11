@@ -6,22 +6,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.junit.jupiter.MockitoExtension;
 
 import de.hsrm.mi.swt.snackman.configuration.GameConfig;
 import de.hsrm.mi.swt.snackman.entities.map.GameMap;
 import de.hsrm.mi.swt.snackman.entities.map.Square;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.SnackMan;
-import de.hsrm.mi.swt.snackman.services.MapService;
 
-@ExtendWith(MockitoExtension.class)
 class DefaultMovementTest {
     
-    @Mock
-    MapService  mockMapService;
     private SnackMan snackman;
 
     @BeforeEach
@@ -30,9 +22,8 @@ class DefaultMovementTest {
                                 {new Square(1,0), new Square(1,1), new Square(1,2)}, 
                                 {new Square(2,0), new Square(2,1), new Square(2,2)} };
         GameMap gameMap = new GameMap(emptyMap);
-        Mockito.when(mockMapService.getGameMap()).thenReturn(gameMap);
 
-        snackman = new SnackMan(mockMapService, 10, 0.3);
+        snackman = new SnackMan(gameMap, 10, 0.3);
     }
 
 

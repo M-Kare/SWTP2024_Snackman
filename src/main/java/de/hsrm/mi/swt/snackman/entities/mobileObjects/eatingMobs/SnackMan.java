@@ -1,15 +1,15 @@
 package de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs;
 
 import de.hsrm.mi.swt.snackman.entities.mechanics.SprintHandler;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
-import de.hsrm.mi.swt.snackman.configuration.GameConfig;
-import de.hsrm.mi.swt.snackman.services.MapService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@Component
+import de.hsrm.mi.swt.snackman.configuration.GameConfig;
+import de.hsrm.mi.swt.snackman.entities.map.GameMap;
+import de.hsrm.mi.swt.snackman.entities.map.Square;
+import de.hsrm.mi.swt.snackman.entities.mapObject.snack.Snack;
+import de.hsrm.mi.swt.snackman.entities.mapObject.snack.SnackType;
+
 public class SnackMan extends EatingMob {
     private final Logger log = LoggerFactory.getLogger(SnackMan.class);
     private boolean isJumping = false;
@@ -17,17 +17,21 @@ public class SnackMan extends EatingMob {
     private boolean isSprinting = false;
     private SprintHandler sprintHandler = new SprintHandler();
 
-    @Autowired
-    public SnackMan(MapService mapService) {
-        this(mapService, GameConfig.SNACKMAN_SPEED, GameConfig.SNACKMAN_RADIUS);
+    public SnackMan(GameMap gameMap) {
+        //TODO add Snackman id to match client
+        this(gameMap, GameConfig.SNACKMAN_SPEED, GameConfig.SNACKMAN_RADIUS);
     }
 
-    public SnackMan(MapService mapService, double speed, double radius) {
-        super(mapService, speed, radius);
+    public SnackMan(GameMap gameMap, double posX, double posY, double posZ) {
+        this(gameMap, GameConfig.SNACKMAN_SPEED, GameConfig.SNACKMAN_RADIUS, posX, posY, posZ);
     }
 
-    public SnackMan(MapService mapService, double speed, double radius, double posX, double posY, double posZ) {
-        super(mapService, speed, radius, posX, posY, posZ);
+    public SnackMan(GameMap gameMap, double speed, double radius) {
+        super(gameMap, speed, radius);
+    }
+
+    public SnackMan(GameMap gameMap, double speed, double radius, double posX, double posY, double posZ) {
+        super(gameMap, speed, radius, posX, posY, posZ);
     }
 
     //JUMPING
@@ -61,20 +65,8 @@ public class SnackMan extends EatingMob {
         }
     }
 
-    private void jumpOverChicken() {
-
-    }
-
-    private void jumpToSeeMap() {
-
-    }
-
-    private void jumpOverWall() {
-
-    }
-
-    public void collectItems() {
-
+    public int getCurrentCalories() {
+        return super.getKcal();
     }
 
     @Override
@@ -120,8 +112,26 @@ public class SnackMan extends EatingMob {
         }
     }
 
-    public int getCurrentCalories() {
-        return super.getKcal();
+    /**
+     * Collects the snack on the square if there is one.
+     * If there is one that remove it from the square.
+     *
+     * @param square to eat the snack from
+     */
+    @Override
+    public void consumeSnackOnSquare(Square square) {
+        Snack snackOnSquare = square.getSnack();
+
+        if (snackOnSquare.getSnackType() != SnackType.EMPTY) {
+            try {
+                super.gainKcal(snackOnSquare.getCalories());
+            } catch (Exception e) {
+                log.error(e.getMessage());
+            }
+
+            //set snack to null after consuming it
+            square.setSnack(new Snack(SnackType.EMPTY));
+        }
     }
 
     public boolean isJumping() {

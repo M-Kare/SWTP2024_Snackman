@@ -6,7 +6,7 @@
     Buttons will be merged later on,
     right now we need a fast entry into the game to test things (Singpleplayer-Button)
      -->
-    <MainMenuButton class="menu-button" id="singleplayer-button">Singleplayer</MainMenuButton>
+    <MainMenuButton class="menu-button" id="singleplayer-button" @click="startSingleplayer">Singleplayer</MainMenuButton>
     <MainMenuButton class="menu-button" id="multiplayer-button" @click="showLobbies">Multiplayer</MainMenuButton>
 </template>
 
@@ -14,13 +14,24 @@
   import MainMenuButton from '@/components/MainMenuButton.vue';
   import MenuBackground from '@/components/MenuBackground.vue';
   import { useRouter } from 'vue-router';
+  import { useLobbiesStore } from '@/stores/Lobby/lobbiesstore';
 
   const router = useRouter();
+  const lobbiesStore = useLobbiesStore();
 
   const showLobbies = () => {
       router.push({name: 'LobbyListView'});
   }
 
+  const startSingleplayer = () => {
+      lobbiesStore.lobbydata.currentPlayer.role = 'SNACKMAN';
+
+      router.push({
+          name: 'GameView',
+          query: { role: 'SNACKMAN' }
+      });
+  }
+  
 </script>
 
 <style scoped>

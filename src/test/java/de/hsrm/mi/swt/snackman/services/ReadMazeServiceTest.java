@@ -3,25 +3,44 @@ package de.hsrm.mi.swt.snackman.services;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.util.FileSystemUtils;
 
 import de.hsrm.mi.swt.snackman.SnackmanApplication;
 
 class ReadMazeServiceTest {
 
     private ReadMazeService readMazeService;
+    private static final Path workFolder = Paths.get("./extensions").toAbsolutePath();
 
     @BeforeAll
     static void fileSetUp() {
+        try{
+            tearDownAfter();  
+        }catch(Exception e){
+            System.out.println("No file to delete");
+        }   
         SnackmanApplication.checkAndCopyResources();
+    }
+
+    @AfterAll
+    static void tearDownAfter() throws IOException {
+        if (Files.exists(workFolder)) {
+            FileSystemUtils.deleteRecursively(workFolder.toFile());
+        }
     }
 
     @BeforeEach

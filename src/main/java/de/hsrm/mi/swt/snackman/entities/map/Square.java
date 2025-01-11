@@ -32,16 +32,25 @@ public class Square {
 
     private List<Mob> mobs = new ArrayList<Mob>();
 
+    private Spawnpoint spawnpoint;
+
     public Square(int indexX, int indexZ) {
         id = generateId();
         type = MapObjectType.FLOOR;
         this.indexX = indexX;
         this.indexZ = indexZ;
+        this.snack = new Snack(SnackType.EMPTY);
     }
 
+    public Square(int indexX, int indexZ, Spawnpoint spawnpoint) {
+        this(indexX, indexZ);
+        this.spawnpoint = spawnpoint;
+        this.snack = new Snack(SnackType.EMPTY);
+    }
     public Square(MapObjectType type, int indexX, int indexZ) {
         this(indexX, indexZ);
         this.type = type;
+        this.snack = new Snack(SnackType.EMPTY);
     }
 
     public Square(Snack snack, int indexX, int indexZ) {
@@ -72,6 +81,10 @@ public class Square {
 
     public MapObjectType getType() {
         return type;
+    }
+
+    public void setType(MapObjectType type) {
+        this.type = type;
     }
 
     public Snack getSnack() {
@@ -132,5 +145,13 @@ public class Square {
                 ", snack=" + snack +
                 ", mobs=" + mobs +
                 '}';
+    }
+
+    public void setSpawnpoint(Spawnpoint spawnpoint) {
+        this.spawnpoint = spawnpoint;
+    }
+
+    public Spawnpoint getSpawnpoint() {
+        return spawnpoint;
     }
 }

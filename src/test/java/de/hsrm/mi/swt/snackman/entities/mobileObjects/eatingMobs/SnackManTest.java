@@ -1,41 +1,71 @@
 package de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs;
 
-import de.hsrm.mi.swt.snackman.configuration.GameConfig;
-import de.hsrm.mi.swt.snackman.entities.map.Square;
-import de.hsrm.mi.swt.snackman.entities.mapObject.snack.Snack;
-import de.hsrm.mi.swt.snackman.entities.mapObject.snack.SnackType;
-import de.hsrm.mi.swt.snackman.entities.mechanics.SprintHandler;
-import de.hsrm.mi.swt.snackman.messaging.FrontendMessageService;
-import de.hsrm.mi.swt.snackman.services.MapService;
-import de.hsrm.mi.swt.snackman.services.ReadMazeService;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
+import org.junit.jupiter.api.AfterAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.util.FileSystemUtils;
+
+import de.hsrm.mi.swt.snackman.SnackmanApplication;
+import de.hsrm.mi.swt.snackman.configuration.GameConfig;
+import de.hsrm.mi.swt.snackman.entities.map.GameMap;
+import de.hsrm.mi.swt.snackman.entities.map.Square;
+import de.hsrm.mi.swt.snackman.entities.mapObject.snack.Snack;
+import de.hsrm.mi.swt.snackman.entities.mapObject.snack.SnackType;
+import de.hsrm.mi.swt.snackman.entities.mechanics.SprintHandler;
+import de.hsrm.mi.swt.snackman.services.MapService;
 
 @SpringBootTest
 class SnackManTest {
-
     @Autowired
-    private FrontendMessageService frontendMessageService;
+    private MapService mapService;
 
-    @Autowired
-    private ReadMazeService readMazeService;
     private SprintHandler sprintHandler;
 
     private SnackMan snackMan;
 
+    private static final Path workFolder = Paths.get("./extensions").toAbsolutePath();
+
+    @BeforeAll
+    static void fileSetUp() {
+        try{
+            tearDownAfter();
+        }catch(Exception e){
+            System.out.println("No file to delete");
+        }
+        SnackmanApplication.checkAndCopyResources();
+    }
+
+    @AfterAll
+    static void tearDownAfter() throws IOException {
+        if (Files.exists(workFolder)) {
+            FileSystemUtils.deleteRecursively(workFolder.toFile());
+        }
+    }
+
     @BeforeEach
     public void setUp() {
-        MapService mapService = new MapService(frontendMessageService, readMazeService);
-        snackMan = new SnackMan(mapService, GameConfig.SNACKMAN_SPEED, GameConfig.SNACKMAN_RADIUS);
+        Square[][] emptyMap = { {new Square(0,0), new Square(0,1), new Square(0,2)},
+                                {new Square(1,0), new Square(1,1), new Square(1,2)}, 
+                                {new Square(2,0), new Square(2,1), new Square(2,2)} };
+        GameMap gameMap = new GameMap(emptyMap);
+
+        snackMan = new SnackMan(gameMap, 10, 0.3);
         snackMan.setKcal(0);
         snackMan.setPosY(GameConfig.SNACKMAN_GROUND_LEVEL);
         sprintHandler = mock(SprintHandler.class);
@@ -43,45 +73,34 @@ class SnackManTest {
         snackMan.setSpeed(GameConfig.SNACKMAN_SPEED);
     }
 
-    @Test
+    @Test 
     void testConsumeSnack() {
         Square firstSquare = new Square(new Snack(SnackType.APPLE), 0, 0);
         Square secondSquare = new Square(new Snack(SnackType.ORANGE), 0, 1);
 
         snackMan.consumeSnackOnSquare(firstSquare);
-        assertEquals(snackMan.getKcal(), SnackType.APPLE.getCalories());
-        assertNull(firstSquare.getSnack());
+        assertEquals(snackMan.getKcal(), SnackType.APPLE.getCalories(), "Snackman should consume the calories");
+        assertEquals(firstSquare.getSnack().getSnackType(), SnackType.EMPTY, "After snacking the Snack the Square " +
+                "should be empty.");
 
         snackMan.consumeSnackOnSquare(secondSquare);
-        assertEquals(snackMan.getKcal(), SnackType.APPLE.getCalories() + SnackType.ORANGE.getCalories());
-        assertNull(secondSquare.getSnack());
+        assertEquals(snackMan.getKcal(), SnackType.APPLE.getCalories() + SnackType.ORANGE.getCalories(), "Snacking " +
+                "snacks should increase snackmans kcal");
+        assertEquals(secondSquare.getSnack().getSnackType(), SnackType.EMPTY, "After snacking the Snack the " +
+                "second Square should be empty");
     }
-
-    @Test
+    @Test 
     void testMaxCalories() {
-        Square square1  = new Square(new Snack(SnackType.ORANGE), 0, 0);
-        Square square2 = new Square(new Snack(SnackType.ORANGE), 0, 1);
-        Square square3 = new Square(new Snack(SnackType.ORANGE), 0, 2);
-        Square square4  = new Square(new Snack(SnackType.ORANGE), 0, 0);
-        Square square5 = new Square(new Snack(SnackType.ORANGE), 0, 1);
-        Square square6 = new Square(new Snack(SnackType.ORANGE), 0, 3);
+        Square square1  = new Square(new Snack(SnackType.APPLE), 0, 0);
+        square1.getSnack().setCalories(1000000);
 
         snackMan.consumeSnackOnSquare(square1);
-        snackMan.consumeSnackOnSquare(square2);
-        snackMan.consumeSnackOnSquare(square3);
-        snackMan.consumeSnackOnSquare(square4);
-        snackMan.consumeSnackOnSquare(square5);
-        snackMan.consumeSnackOnSquare(square6);
 
-        assertEquals(snackMan.getKcal(), snackMan.getMAXKCAL());
-        assertNull(square1.getSnack());
-        assertNull(square2.getSnack());
-        assertNull(square3.getSnack());
-        assertNull(square4.getSnack());
-        assertNull(square5.getSnack());
+        assertEquals(snackMan.getKcal(), 1000000);
+        assertEquals(square1.getSnack().getSnackType(), SnackType.EMPTY);
     }
 
-    @Test
+    @Test 
     void testJump() {
         snackMan.setKcal(200);
         snackMan.jump();
@@ -91,7 +110,7 @@ class SnackManTest {
         assertTrue(snackMan.isJumping());
     }
 
-    @Test
+    @Test 
     void testJumpInsufficientKcal() {
         snackMan.setKcal(50);
         snackMan.jump();
@@ -100,7 +119,7 @@ class SnackManTest {
         assertFalse(snackMan.isJumping());
     }
 
-    @Test
+    @Test 
     void testDoubleJump() {
         snackMan.setKcal(300);
         snackMan.jump();
@@ -110,7 +129,7 @@ class SnackManTest {
         assertEquals(GameConfig.JUMP_STRENGTH + GameConfig.DOUBLEJUMP_STRENGTH, snackMan.getVelocityY());
     }
 
-    @Test
+    @Test 
     void testDoubleJumpWithoutEnoughKcal() {
         snackMan.setKcal(100);
         snackMan.jump();
@@ -120,7 +139,7 @@ class SnackManTest {
         assertEquals(GameConfig.JUMP_STRENGTH, snackMan.getVelocityY());
     }
 
-    @Test
+    @Test 
     void testUpdateJumpPosition() {
         snackMan.setKcal(100);
         snackMan.jump();
@@ -140,7 +159,7 @@ class SnackManTest {
     }
 
 
-    @Test
+    @Test 
     void testMoveWhileSprintingCanSprint() {
         when(sprintHandler.canSprint()).thenReturn(true);
         snackMan.setSprinting(true);
@@ -150,7 +169,7 @@ class SnackManTest {
         assertEquals(GameConfig.SNACKMAN_SPEED * GameConfig.SNACKMAN_SPRINT_MULTIPLIER, snackMan.getSpeed());
     }
 
-    @Test
+    @Test 
     void testMoveWhileSprintingCannotSprint() {
         when(sprintHandler.canSprint()).thenReturn(false);
         snackMan.setSprinting(true);
@@ -161,7 +180,7 @@ class SnackManTest {
         assertFalse(snackMan.isSprinting());
     }
 
-    @Test
+    @Test 
     void testMoveNotSprinting() {
         snackMan.setSprinting(false);
 
@@ -170,7 +189,7 @@ class SnackManTest {
         assertEquals(GameConfig.SNACKMAN_SPEED, snackMan.getSpeed());
     }
 
-    @Test
+    @Test 
     void testSetSprintingCanSprint() {
         when(sprintHandler.canSprint()).thenReturn(true);
 
@@ -179,7 +198,7 @@ class SnackManTest {
         assertTrue(snackMan.isSprinting());
     }
 
-    @Test
+    @Test 
     void testSetSprintingCannotSprint() {
         when(sprintHandler.canSprint()).thenReturn(false);
 
@@ -188,7 +207,7 @@ class SnackManTest {
         assertFalse(snackMan.isSprinting());
     }
 
-    @Test
+    @Test 
     void testSetSprintingToFalse() {
         snackMan.setSprinting(false);
 
@@ -196,7 +215,7 @@ class SnackManTest {
         assertFalse(snackMan.isSprinting());
     }
 
-    @Test
+    @Test 
     void testMoveWithAllDirections() {
         snackMan.move(true, true, true, true, 0.016);
         assertEquals(GameConfig.SNACKMAN_SPEED, snackMan.getSpeed());

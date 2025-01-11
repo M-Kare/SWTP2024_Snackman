@@ -1,12 +1,18 @@
 package de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
+import org.junit.jupiter.api.AfterAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.python.util.PythonInterpreter;
+import org.springframework.util.FileSystemUtils;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import de.hsrm.mi.swt.snackman.SnackmanApplication;
 
 
 /**
@@ -20,11 +26,30 @@ public class ChickenIntegrationTest {
      * Verifies that the Chicken can interact with the Python script directly,
      * using a Jython interpreter and chooses the correct empty square (" ").
      */
+
+    private static final Path workFolder = Paths.get("./extensions").toAbsolutePath();
+
+    @BeforeAll
+    static void fileSetUp() {
+        try{
+            tearDownAfter();  
+        }catch(Exception e){
+            System.out.println("No file to delete");
+        }   
+        SnackmanApplication.checkAndCopyResources();
+    }
+
+    @AfterAll
+    static void tearDownAfter() throws IOException {
+        if (Files.exists(workFolder)) {
+            FileSystemUtils.deleteRecursively(workFolder.toFile());
+        }
+    }
     @Test
     void testChickenMovement() {
         try (PythonInterpreter pyInterp = new PythonInterpreter()) {
             pyInterp.exec("import sys");
-            pyInterp.exec("sys.path.append('./scripts')");
+            pyInterp.exec("sys.path.append('./extensions/chicken/')");
 
             String mapAroundChicken = "'W', 'W', 'W', 'L', 'W', " +
                     "'SM', 'L', 'W', 'L', 'L'," +

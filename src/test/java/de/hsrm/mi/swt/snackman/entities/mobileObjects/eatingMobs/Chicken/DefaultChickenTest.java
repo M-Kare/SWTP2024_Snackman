@@ -3,11 +3,39 @@ package de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.springframework.util.FileSystemUtils;
 
-public class DefaultChickenTest {
+import de.hsrm.mi.swt.snackman.SnackmanApplication;
+
+class DefaultChickenTest {
+
+    private static final Path workFolder = Paths.get("./extensions").toAbsolutePath();
+
+    @BeforeAll
+    static void fileSetUp() {
+        try{
+            tearDownAfter();  
+        }catch(Exception e){
+            System.out.println("No file to delete");
+        }   
+        SnackmanApplication.checkAndCopyResources();
+    }
+
+    @AfterAll
+    static void tearDownAfter() throws IOException {
+        if (Files.exists(workFolder)) {
+            FileSystemUtils.deleteRecursively(workFolder.toFile());
+        }
+    }
 
     @Test
     public void chickenMovementTest_big(){

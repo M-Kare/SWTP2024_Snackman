@@ -1,15 +1,20 @@
-import {defineStore} from 'pinia'
-import {reactive, readonly} from 'vue'
-import type {IGameMap, IGameMapDTD} from './IGameMapDTD'
-import {fetchGameMapDataFromBackend} from '@/services/GameMapDataService'
-import {Client} from '@stomp/stompjs'
-import type {ChangeType, IFrontendChickenMessageEvent, IFrontendMessageEvent,} from '@/services/IFrontendMessageEvent'
-import type {ISquare} from '@/stores/Square/ISquareDTD'
-import * as THREE from 'three'
-import {Scene} from 'three'
-import type {IChicken, IChickenDTD} from '@/stores/Chicken/IChickenDTD'
-import {ChickenThickness, Direction} from '@/stores/Chicken/IChickenDTD'
-import {GameObjectRenderer} from '@/renderer/GameObjectRenderer'
+import {defineStore} from 'pinia';
+import {reactive, readonly} from "vue";
+import type {IGameMap, IGameMapDTD} from './IGameMapDTD';
+import {fetchGameMapDataFromBackend} from "../services/GameMapDataService.js";
+import {Client} from "@stomp/stompjs";
+import type {ISquare} from "@/stores/Square/ISquareDTD";
+import * as THREE from "three";
+import {Scene} from "three";
+import type {IChicken, IChickenDTD} from "@/stores/Chicken/IChickenDTD";
+import {ChickenThickness, Direction} from "@/stores/Chicken/IChickenDTD";
+import {GameObjectRenderer} from "@/renderer/GameObjectRenderer";
+import {useLobbiesStore} from "@/stores/Lobby/lobbiesstore";
+import {Player} from '@/components/Player';
+import {EventType, type IMessageDTD} from './messaging/IMessageDTD';
+import type {IMobUpdateDTD} from './messaging/IMobUpdateDTD';
+import type {ISquareUpdateDTD} from './messaging/ISquareUpdateDTD';
+import {SnackType} from './Snack/ISnackDTD';
 
 /**
  * Defines the pinia store used for saving the map from
@@ -18,11 +23,19 @@ import {GameObjectRenderer} from '@/renderer/GameObjectRenderer'
  * which the game is build up on.
  */
 export const useGameMapStore = defineStore('gameMap', () => {
-  let snackStompclient: Client
+  const protocol = window.location.protocol.replace('http', 'ws')
+  const wsurl = `${protocol}//${window.location.host}/stompbroker`
+  let stompclient = new Client({brokerURL: wsurl})
   let chickenStompclient: Client
   const scene = new THREE.Scene()
   const gameObjectRenderer = GameObjectRenderer()
-  const CHICKEN_MOVEMENT_SPEED = 0.1 // step size of the interpolation: between 0 and 1
+  const {lobbydata} = useLobbiesStore()
+  const CHICKEN_MOVEMENT_SPEED = 0.1    // step size of the interpolation: between 0 and 1
+  let player: Player
+  let otherPlayers: Map<String, THREE.Group<THREE.Object3DEventMap>>
+  let OFFSET: number
+  let DEFAULT_SIDE_LENGTH: number
+
 
   const mapData = reactive({
     DEFAULT_SQUARE_SIDE_LENGTH: 0,
@@ -33,9 +46,14 @@ export const useGameMapStore = defineStore('gameMap', () => {
 
   async function initGameMap() {
     try {
-      const response: IGameMapDTD = await fetchGameMapDataFromBackend()
+
+      const response: IGameMapDTD = await fetchGameMapDataFromBackend(lobbydata.currentPlayer.joinedLobbyId!)
       mapData.DEFAULT_SQUARE_SIDE_LENGTH = response.DEFAULT_SQUARE_SIDE_LENGTH
       mapData.DEFAULT_WALL_HEIGHT = response.DEFAULT_WALL_HEIGHT
+
+      OFFSET = mapData.DEFAULT_SQUARE_SIDE_LENGTH / 2
+      DEFAULT_SIDE_LENGTH = mapData.DEFAULT_SQUARE_SIDE_LENGTH
+
 
       for (const square of response.gameMap) {
         mapData.gameMap.set(square.id, square as ISquare)
@@ -49,27 +67,76 @@ export const useGameMapStore = defineStore('gameMap', () => {
     }
   }
 
-  async function startGameMapLiveUpdate() {
-    const protocol = window.location.protocol.replace('http', 'ws')
-    const wsurl = `${protocol}//${window.location.host}/stompbroker`
-    const DEST_SQUARE = '/topic/square'
-    const DEST_CHICKEN = '/topic/chicken'
+  function startGameMapLiveUpdate() {
 
-    if (!snackStompclient) {
-      snackStompclient = new Client({ brokerURL: wsurl })
+    const DEST_UPDATES = `/topic/lobbies/${lobbydata.currentPlayer.joinedLobbyId}/update`
+    if (!stompclient.active) {
 
-      snackStompclient.onWebSocketError = event => {
+      stompclient.onWebSocketError = (event) => {
         throw new Error('Websocket wit message: ' + event)
       }
 
-      snackStompclient.onStompError = frameElement => {
+      stompclient.onStompError = (frameElement) => {
         throw new Error('Stompclient with message: ' + frameElement)
       }
 
-      snackStompclient.onConnect = frameElement => {
+      stompclient.onConnect = (frameElement) => {
         console.log('Stompclient connected')
 
-        snackStompclient.subscribe(DEST_SQUARE, async message => {
+        stompclient.subscribe(DEST_UPDATES, message => {
+          const content: Array<IMessageDTD> = JSON.parse(message.body)
+          for (const mess of content) {
+            switch (mess.event) {
+              case EventType.MobUpdate:
+                const mobUpdate: IMobUpdateDTD = mess.message
+                if (mobUpdate.playerId === lobbydata.currentPlayer.playerId) {
+                  if (player == undefined) {
+                    continue;
+                  }
+
+                  player.setCalories(mobUpdate.calories)
+
+                  player.sprintData.sprintTimeLeft = mobUpdate.sprintTimeLeft
+                  player.sprintData.isSprinting = mobUpdate.isSprinting
+                  player.sprintData.isCooldown = mobUpdate.isInCooldown
+
+                  if(mobUpdate.message != null){
+                    player.message.value = mobUpdate.message
+                  }
+
+                  player.setPosition(mobUpdate.position);
+                } else {
+                  if (otherPlayers == undefined || otherPlayers.size == 0) {
+                    continue;
+                  }
+                  otherPlayers.get(mobUpdate.playerId)?.setRotationFromQuaternion(mobUpdate.rotation)
+                  //TODO adjust player height
+                  otherPlayers.get(mobUpdate.playerId)?.position.lerp(new THREE.Vector3( mobUpdate.position.x, mobUpdate.position.y - 2, mobUpdate.position.z), 0.3)
+                }
+                break;
+              case EventType.SquareUpdate:
+                const squareUpdate: ISquareUpdateDTD = mess.message
+                if (squareUpdate.square.snack.snackType == SnackType.EMPTY) {
+                  const savedMeshId = mapData.gameMap.get(squareUpdate.square.id)!.snack.meshId
+                  removeMeshFromScene(scene, savedMeshId)
+                  mapData.gameMap.set(squareUpdate.square.id, squareUpdate.square)
+                } else {
+                  spawnSnack(squareUpdate)
+                }
+                break;
+              case EventType.ChickenUpdate:
+                const chickenUpdate: IChickenDTD = mess.message
+                updateChicken(chickenUpdate)
+                break;
+              default:
+                console.log(mess.message)
+            }
+          }
+        })
+      }
+      //TODO funktioniert bereits, da squares einen property change listener haben?
+      /*
+              snackStompclient.subscribe(DEST_SQUARE, async message => {
           const change: IFrontendMessageEvent = JSON.parse(message.body)
 
           if (change.changeType == 'CREATE') {
@@ -101,68 +168,53 @@ export const useGameMapStore = defineStore('gameMap', () => {
               mapData.gameMap.set(change.square.id, change.square as ISquare)
             }
           }
-        })
-      }
+       */
 
-      snackStompclient.onDisconnect = () => {
+      stompclient.onDisconnect = () => {
         console.log('Stompclient disconnected.')
       }
 
-      snackStompclient.activate()
+      stompclient.activate()
     }
+  }
 
-    if (!chickenStompclient) {
-      chickenStompclient = new Client({ brokerURL: wsurl })
-
-      chickenStompclient.onWebSocketError = event => {
-        throw new Error('Chicken Websocket with message: ' + event)
+  function updateChicken(change: IChickenDTD) {
+    const chickenUpdate: IChickenDTD = change
+    const currentChicken = mapData.chickens.find(chicken => chicken.id == chickenUpdate.id)
+    if (currentChicken == undefined) {
+      console.error("A chicken is undefined in pinia")
+    } else {
+      if (currentChicken.thickness != chickenUpdate.thickness) {
+        updateThickness(currentChicken, chickenUpdate)
       }
-
-      chickenStompclient.onStompError = frameElement => {
-        throw new Error('Chicken Stompclient with message: ' + frameElement)
+      if (chickenUpdate.chickenPosX == currentChicken!.chickenPosX && chickenUpdate.chickenPosZ == currentChicken!.chickenPosZ) {
+        updateLookingDirection(currentChicken, chickenUpdate)
+      } else {
+        updateWalkingDirection(currentChicken, chickenUpdate, DEFAULT_SIDE_LENGTH, OFFSET)
       }
-
-      chickenStompclient.onConnect = frameElement => {
-        console.log('Stompclient for chicken connected')
-
-        chickenStompclient.subscribe(DEST_CHICKEN, async message => {
-          const change: IFrontendChickenMessageEvent = JSON.parse(message.body)
-          const chickenUpdate: IChickenDTD = change.chicken
-          const OFFSET = mapData.DEFAULT_SQUARE_SIDE_LENGTH / 2
-          const DEFAULT_SIDE_LENGTH = mapData.DEFAULT_SQUARE_SIDE_LENGTH
-          const currentChicken = mapData.chickens.find(
-            chicken => chicken.id == chickenUpdate.id,
-          )
-
-          if (currentChicken == undefined) {
-            console.error('A chicken is undefined in pinia')
-          } else {
-            if (currentChicken.thickness != chickenUpdate.thickness) {
-              updateThickness(currentChicken, chickenUpdate)
-            }
-            if (
-              chickenUpdate.chickenPosX == currentChicken!.chickenPosX &&
-              chickenUpdate.chickenPosZ == currentChicken!.chickenPosZ
-            ) {
-              updateLookingDirection(currentChicken, chickenUpdate)
-            } else {
-              updateWalkingDirection(
-                currentChicken,
-                chickenUpdate,
-                DEFAULT_SIDE_LENGTH,
-                OFFSET,
-              )
-            }
-          }
-        })
-      }
-
-      chickenStompclient.onDisconnect = () => {
-        console.log('Chicken Stompclient disconnected.')
-      }
-
-      chickenStompclient.activate()
     }
+  }
+
+  function spawnSnack(squareUpdate: ISquareUpdateDTD) {
+    const savedMeshId = mapData.gameMap.get(squareUpdate.square.id)!.snack.meshId
+    removeMeshFromScene(scene, savedMeshId)
+    mapData.gameMap.set(squareUpdate.square.id, squareUpdate.square)
+    const snackToAdd = gameObjectRenderer.createSnackOnFloor(
+      squareUpdate.square.indexX * DEFAULT_SIDE_LENGTH + OFFSET,
+      squareUpdate.square.indexZ * DEFAULT_SIDE_LENGTH + OFFSET,
+      DEFAULT_SIDE_LENGTH,
+      squareUpdate.square.snack?.snackType,
+    )
+    scene.add(snackToAdd)
+    setSnackMeshId(squareUpdate.square.id, snackToAdd.id)
+  }
+
+  function setPlayer(p: Player) {
+    player = p
+  }
+
+  function setOtherPlayers(other: Map<String, THREE.Group<THREE.Object3DEventMap>>) {
+    otherPlayers = other
   }
 
   function updateThickness(
@@ -178,7 +230,7 @@ export const useGameMapStore = defineStore('gameMap', () => {
     }
 
     const thicknessValue =
-      ChickenThickness[chickenUpdate.thickness as keyof typeof ChickenThickness]
+      ChickenThickness[chickenUpdate.thickness as unknown as keyof typeof ChickenThickness]
 
     switch (thicknessValue) {
       case ChickenThickness.THIN:
@@ -241,7 +293,7 @@ export const useGameMapStore = defineStore('gameMap', () => {
 
   function setSnackMeshId(squareId: number, meshId: number) {
     const square = mapData.gameMap.get(squareId)
-    if (square != undefined && square.snack != null)
+    if (square != undefined && square.snack.snackType != SnackType.EMPTY)
       square.snack.meshId = meshId
   }
 
@@ -268,5 +320,8 @@ export const useGameMapStore = defineStore('gameMap', () => {
     setSnackMeshId,
     setChickenMeshId,
     getScene,
-  }
+    setPlayer,
+    setOtherPlayers,
+    stompclient: stompclient
+  };
 })
