@@ -18,8 +18,12 @@ java {
 	}
 }
 
+jar {
+    enabled = true
+}
+
 application {
- mainClass = "impl.Prog"
+    mainClass = "de.hsrm.mi.swt.snackman.SnackmanApplication"
 }
 
 repositories {
