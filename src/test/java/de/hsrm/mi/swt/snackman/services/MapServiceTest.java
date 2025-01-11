@@ -60,7 +60,6 @@ class MapServiceTest {
 
 	@Test
     void testMapServiceInitialization() {
-
         // Ensure mapService is properly initialized
         assertNotNull(mapService);
 
@@ -175,37 +174,48 @@ class MapServiceTest {
      * 	Empty	SnackMan	Empty
      */
     public void spawnLocationTest() {
-        Square[][] testMap = {{new Square(0, 0, new Spawnpoint(SpawnpointMobType.GHOST)), new Square(0, 1, new Spawnpoint(SpawnpointMobType.GHOST)), new Square(0, 2)},
+        Square[][] testMap = {
+                {new Square(0, 0, new Spawnpoint(SpawnpointMobType.GHOST)), new Square(0, 1, new Spawnpoint(SpawnpointMobType.GHOST)),
+                new Square(0, 2, new Spawnpoint(SpawnpointMobType.GHOST))},
                 {new Square(1, 0), new Square(1, 1, new Spawnpoint(SpawnpointMobType.SNACKMAN)), new Square(1, 2)},
-                {new Square(2, 0), new Square(2, 1, new Spawnpoint(SpawnpointMobType.SNACKMAN)), new Square(2, 2)}};
+                {new Square(2, 0), new Square(2, 1, new Spawnpoint(SpawnpointMobType.GHOST)), new Square(2, 2)}};
         GameMap gameMap = new GameMap(testMap);
         PlayerClient testClient01 = new PlayerClient("01", "testClient01");
         PlayerClient testClient02 = new PlayerClient("02", "testClient02");
         PlayerClient testClient03 = new PlayerClient("03", "testClient03");
         PlayerClient testClient04 = new PlayerClient("04", "testClient04");
         PlayerClient testClient05 = new PlayerClient("05", "testClient05");
-        PlayerClient testClient06 = new PlayerClient("06", "testClient06");
+
         testClient01.setRole(ROLE.SNACKMAN);
         testClient02.setRole(ROLE.GHOST);
         testClient03.setRole(ROLE.GHOST);
         testClient04.setRole(ROLE.GHOST);
         testClient05.setRole(ROLE.SNACKMAN);
-        testClient06.setRole(ROLE.SNACKMAN);
+
         Lobby testLobby = new Lobby("1", "testLobby", testClient01, gameMap);
         testLobby.getMembers().add(testClient02);
         testLobby.getMembers().add(testClient03);
         testLobby.getMembers().add(testClient04);
         testLobby.getMembers().add(testClient05);
-        testLobby.getMembers().add(testClient06);
+
         mapService.spawnMobs(gameMap, testLobby);
         SortedMap<String, Mob> clientMobs = testLobby.getClientMobMap();
 
-        Assertions.assertTrue(clientMobs.get("01").getCurrentSquare() == testMap[1][1]);
-        Assertions.assertTrue(clientMobs.get("02").getCurrentSquare() == testMap[0][0]);
-        Assertions.assertTrue(clientMobs.get("03").getCurrentSquare() == testMap[0][1]);
-        Assertions.assertTrue(clientMobs.get("04").getCurrentSquare() == testMap[0][0]);
-        Assertions.assertTrue(clientMobs.get("05").getCurrentSquare() == testMap[2][1]);
-        Assertions.assertTrue(clientMobs.get("06").getCurrentSquare() == testMap[1][1]);
+        Assertions.assertTrue(clientMobs.get("01").getPosition().x == testMap[1][1].getIndexX());
+        Assertions.assertTrue(clientMobs.get("01").getPosition().z == testMap[1][1].getIndexZ());
+
+        Assertions.assertTrue(clientMobs.get("02").getPosition().x == testMap[1][1].getIndexX());
+        Assertions.assertTrue(clientMobs.get("02").getPosition().z == testMap[1][1].getIndexZ());
+
+        Assertions.assertTrue(clientMobs.get("03").getPosition().x == testMap[1][1].getIndexX());
+        Assertions.assertTrue(clientMobs.get("03").getPosition().z == testMap[1][1].getIndexZ());
+
+        Assertions.assertTrue(clientMobs.get("04").getPosition().x == testMap[1][1].getIndexX());
+        Assertions.assertTrue(clientMobs.get("04").getPosition().z == testMap[1][1].getIndexZ());
+
+        Assertions.assertTrue(clientMobs.get("05").getPosition().x == testMap[1][1].getIndexX());
+        Assertions.assertTrue(clientMobs.get("05").getPosition().z == testMap[1][1].getIndexZ());
+
     }
 
 }

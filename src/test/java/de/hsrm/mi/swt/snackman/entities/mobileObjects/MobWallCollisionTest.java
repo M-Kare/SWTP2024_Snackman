@@ -25,6 +25,8 @@ class MobWallCollisionTest {
 
     private SnackMan snackman;
 
+    private GameMap gameMap;
+
     private static final Path workFolder = Paths.get("./extensions").toAbsolutePath();
 
     @BeforeAll
@@ -49,7 +51,7 @@ class MobWallCollisionTest {
         Square[][] testMap1 = { {new Square(0,0), new Square(0,1), new Square(MapObjectType.WALL,0,2)},
                                 {new Square(MapObjectType.WALL,1,0), new Square(1,1), new Square(1,2)}, 
                                 {new Square(2,0), new Square(MapObjectType.WALL,2,1), new Square(2,2)} };
-        GameMap gameMap = new GameMap(testMap1);
+        this.gameMap = new GameMap(testMap1);
 
         snackman = new SnackMan(gameMap, 10, 0.3);
     }
@@ -58,34 +60,34 @@ class MobWallCollisionTest {
     void checkCollisionNoWallLeft(){
         double xNew = snackman.getPosX() - (GameConfig.SQUARE_SIZE/2) + (snackman.getRadius()/2);
         double zNew = snackman.getPosZ();
-        assertEquals(0, snackman.checkWallCollision(xNew, zNew));
+        assertEquals(0, snackman.checkWallCollision(xNew, zNew, this.gameMap));
     }
 
     @Test
     void checkCollisionWallVertical(){
         double xNew = snackman.getPosX();
         double zNew = snackman.getPosZ() - (GameConfig.SQUARE_SIZE/2) + (snackman.getRadius()/2);
-        assertEquals(2, snackman.checkWallCollision(xNew, zNew));
+        assertEquals(2, snackman.checkWallCollision(xNew, zNew, this.gameMap));
     }
 
     @Test
     void checkCollisionWallHorizontal(){
         double xNew = snackman.getPosX() + (GameConfig.SQUARE_SIZE/2) - (snackman.getRadius()/2);
         double zNew = snackman.getPosZ();
-        assertEquals(1, snackman.checkWallCollision(xNew, zNew));
+        assertEquals(1, snackman.checkWallCollision(xNew, zNew, this.gameMap));
     }
 
     @Test
     void checkCollisionWallDiagonal(){
         double xNew = snackman.getPosX() - (GameConfig.SQUARE_SIZE/2) + (snackman.getRadius()/2);
         double zNew = snackman.getPosZ() + (GameConfig.SQUARE_SIZE/2) - (snackman.getRadius()/2);
-        assertEquals(3, snackman.checkWallCollision(xNew, zNew));
+        assertEquals(3, snackman.checkWallCollision(xNew, zNew, this.gameMap));
     }
 
     @Test
     void checkCollisionWallRightTop(){
         double xNew = snackman.getPosX() + (GameConfig.SQUARE_SIZE/2) - (snackman.getRadius()/2);
         double zNew = snackman.getPosZ() - (GameConfig.SQUARE_SIZE/2) + (snackman.getRadius()/2);
-        assertEquals(3, snackman.checkWallCollision(xNew, zNew));
+        assertEquals(3, snackman.checkWallCollision(xNew, zNew, this.gameMap));
     }
 }
