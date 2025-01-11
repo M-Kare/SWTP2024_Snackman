@@ -48,6 +48,9 @@ public class GameMapController {
      */
     @GetMapping("/download")
     public ResponseEntity<Resource> downloadMap(){
+        
+        // TODO: download map with the lobbyId
+
         try{
             Path filePath = Paths.get("./extensions/map/LastMap.txt").toAbsolutePath();
             Resource resource = new UrlResource(filePath.toUri());
