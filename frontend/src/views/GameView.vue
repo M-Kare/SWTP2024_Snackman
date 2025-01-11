@@ -27,6 +27,7 @@ import { useLobbiesStore } from '@/stores/Lobby/lobbiesstore';
 import type {IPlayerClientDTD} from "@/stores/Lobby/IPlayerClientDTD";
 import { GLTFLoader } from 'three/examples/jsm/Addons.js'
 import { useRouter, useRoute } from 'vue-router';
+import type { IPlayerDTD } from '@/stores/Player/IPlayerDTD';
 
 const { lobbydata } = useLobbiesStore();
 const gameMapStore = useGameMapStore()
@@ -35,14 +36,14 @@ gameMapStore.startGameMapLiveUpdate()
 
 const targetHz = 30
 let clients: Array<IPlayerClientDTD>;
-let playerHashMap = new Map<String, THREE.Mesh>()
+let playerHashMap = new Map<String, THREE.Group<THREE.Object3DEventMap>>()
 
 const router = useRouter();
 const route = useRoute();
 
 const UPDATE = '/topic/calories'
 const stompclient = gameMapStore.stompclient
-// stompclient.activate()
+let playerData: IPlayerDTD
 
 //Reaktive Calories Variable
 const MAXCALORIES = 20000
@@ -109,21 +110,6 @@ function animate() {
   renderer.render(scene, camera)
 }
 
-// initially loads the playerModel & attaches playerModel to playerCamera
-function loadPlayerModel(texture: string) {
-  const loader = new GLTFLoader()
-  loader.load(texture, gltf => {
-    snackManModel = gltf.scene
-
-    snackManModel.scale.set(1, 1, 1)
-    // rotation in radians (Bogenmaß), 180° doesnt work as intended
-    snackManModel.rotation.y = Math.PI
-    // optional offset for thirdPersonView
-    // snackManModel.position.set(0, -1.55, -5);
-    player.getCamera().add(snackManModel)
-  })
-}
-
 onMounted(async () => {
   // for rendering the scene, create gameMap in 3d and change window size
   const { initRenderer, createGameMap, getScene } = GameMapRenderer()
@@ -141,19 +127,20 @@ onMounted(async () => {
 
     clients = lobbydata.lobbies.find((elem)=>elem.lobbyId===lobbydata.currentPlayer.joinedLobbyId)?.members!
     console.log(clients)
-    const playerData = await
+    playerData = await
     fetchSnackManFromBackend(lobbydata.currentPlayer.joinedLobbyId!, lobbydata.currentPlayer.playerId);
     clients.forEach(it => {
       if(it.playerId === lobbydata.currentPlayer.playerId){
         player = new Player(renderer, playerData.posX, playerData.posY, playerData.posZ, playerData.radius,
           playerData.speed, playerData.sprintMultiplier)
       } else {
-        let material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } )
-        material.color = new THREE.Color(Math.random(), Math.random(), Math.random());
-        let cube = new THREE.Mesh( new THREE.BoxGeometry( 1, 3, 1 ),  material);
-        cube.position.lerp(new THREE.Vector3(playerData.posX, playerData.posY, playerData.posZ), 0.5)
-        scene.add(cube);
-        playerHashMap.set(it.playerId, cube);
+        // let material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } )
+        // material.color = new THREE.Color(Math.random(), Math.random(), Math.random());
+        // let cube = new THREE.Mesh( new THREE.BoxGeometry( 1, 3, 1 ),  material);
+        loadPlayerModel(it.playerId,SNACKMAN_TEXTURE);
+        // snackManModel.position.lerp(new THREE.Vector3(playerData.posX, playerData.posY, playerData.posZ), 0.5)
+        // scene.add(snackManModel);
+        // playerHashMap.set(it.playerId, snackManModel);
       }
     });
     gameMapStore.setOtherPlayers(playerHashMap)
@@ -179,12 +166,25 @@ onMounted(async () => {
   camera = player.getCamera()
   scene.add(player.getControls().object)
 
-  loadPlayerModel(SNACKMAN_TEXTURE)
-
   renderer.render(scene, camera)
   renderer.setAnimationLoop(animate)
   window.addEventListener('resize', resizeCallback)
 })
+
+// initially loads the playerModel & attaches playerModel to playerCamera
+async function loadPlayerModel(playerId: string, texture: string) {
+  const loader = new GLTFLoader()
+  loader.load(texture, gltf => {
+    snackManModel = gltf.scene
+    snackManModel.scale.set(1, 1, 1)
+    scene.add(snackManModel)
+    snackManModel.position.lerp(new THREE.Vector3(playerData.posX, playerData.posY-2, playerData.posZ), 0.5)
+    playerHashMap.set(playerId, snackManModel);
+    // optional offset for thirdPersonView
+    // snackManModel.position.set(0, -1.55, -5);
+    // player.getCamera().add(snackManModel)
+  })
+}
 
 onUnmounted(() => {
   renderer.setAnimationLoop(null)
