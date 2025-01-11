@@ -100,7 +100,9 @@
     const route = useRoute();
     const lobbiesStore = useLobbiesStore();
 
-    let lobby = computed(() => lobbiesStore.lobbydata.lobbies.find(l => l.lobbyId === route.params.lobbyId));
+    const lobbyUrl = route.params.lobbyId
+    let lobbyLoaded = false
+    let lobby = computed(() => lobbiesStore.lobbydata.lobbies.find(l => l.lobbyId === lobbyUrl));
     const members = computed(() => lobby.value?.members || [] as Array<IPlayerClientDTD>);
     const playerCount = computed(() => members.value.length);
     const maxPlayerCount = ref(5);
@@ -129,12 +131,11 @@
     }
 
     watchEffect(() => {
-        if (lobbiesStore.lobbydata) {
-            const lobbyId = route.params.lobbyId as string;
-            
-            const updatedLobby = lobbiesStore.lobbydata.lobbies.find(l => l.lobbyId === lobbyId);
+        if (lobbiesStore.lobbydata && lobbiesStore.lobbydata.lobbies) {
 
+            const updatedLobby = lobbiesStore.lobbydata.lobbies.find(l => l.lobbyId === lobbyUrl);
             if (updatedLobby) {
+                lobbyLoaded = true
                 if (updatedLobby.gameStarted){
                     router.push({ 
                         name: 'GameView', 
@@ -142,7 +143,7 @@
                     });
                 }
             }
-            else {
+            else if(lobbyLoaded){
                 router.push({ name: 'LobbyListView' });
             }
         }
