@@ -1,5 +1,1 @@
-package de.hsrm.mi.swt.snackman.messaging;
-
-public enum EventType {
-    SNACK, CHICKEN, SCRIPT_GHOST, GHOST
-}
+// TODO stomp von script_ghost and ghost

@@ -7,12 +7,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import de.hsrm.mi.swt.snackman.configuration.GameConfig;
-import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.SnackMan;
+import de.hsrm.mi.swt.snackman.services.LobbyManagerService;
 import de.hsrm.mi.swt.snackman.services.MapService;
 
 /**
@@ -25,20 +25,14 @@ import de.hsrm.mi.swt.snackman.services.MapService;
 public class GameMapController {
 
     @Autowired
-    private MapService mapService;
+    private LobbyManagerService lobbyManagerService;
 
     Logger log = LoggerFactory.getLogger(MapService.class);
 
-    @GetMapping("/game-map")
-    public ResponseEntity<GameMapDTO> getGameMap() {
+    @GetMapping("/lobby/{lobbyId}/game-map")
+    public ResponseEntity<GameMapDTO> getGameMap(@PathVariable("lobbyId") String lobbyId) {
         log.debug("Get GameMap");
-        return ResponseEntity.ok(GameMapDTO.fromGameMap(mapService.getGameMap()));
-    }
-
-    @GetMapping("/snackman")
-    public ResponseEntity<SnackManInitDTO> getSnackManPos(){
-        SnackMan snackman = mapService.getSnackMan();
-        return ResponseEntity.ok(new SnackManInitDTO(snackman.getPosX(), snackman.getPosY(), snackman.getPosZ(), snackman.getRadius(), GameConfig.SNACKMAN_SPEED));
+        return ResponseEntity.ok(GameMapDTO.fromGameMap(lobbyManagerService.getGameMapByLobbyId(lobbyId)));
     }
 
     @GetMapping("/ghost")

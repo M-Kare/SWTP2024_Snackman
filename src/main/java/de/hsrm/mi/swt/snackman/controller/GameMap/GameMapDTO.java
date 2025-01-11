@@ -21,12 +21,12 @@ public record GameMapDTO(int DEFAULT_SQUARE_SIDE_LENGTH, int DEFAULT_WALL_HEIGHT
     private final static Logger log = LoggerFactory.getLogger(GameMapDTO.class);
 
     public static GameMapDTO fromGameMap(GameMap gameMap) {
-        List<SquareDTO> squareDTOs = Stream.of(gameMap.getGameMap())
+        List<SquareDTO> squareDTOs = Stream.of(gameMap.getGameMapSquares())
                 .flatMap(Stream::of)
                 .map(SquareDTO::fromSquare)
                 .collect(Collectors.toList());
 
-        List<ChickenDTO> chickenDTOs = Stream.of(gameMap.getGameMap())
+        List<ChickenDTO> chickenDTOs = Stream.of(gameMap.getGameMapSquares())
                 .flatMap(Stream::of)
                 .flatMap(square -> square.getMobs().stream()
                         .filter(mob -> mob instanceof Chicken)

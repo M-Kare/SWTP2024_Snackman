@@ -1,5 +1,6 @@
 package de.hsrm.mi.swt.snackman.entities.mobileObjects;
 
+import de.hsrm.mi.swt.snackman.entities.map.GameMap;
 import de.hsrm.mi.swt.snackman.configuration.GameConfig;
 import de.hsrm.mi.swt.snackman.entities.map.Square;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken.Chicken;
@@ -14,6 +15,15 @@ public class Ghost extends Mob {
 
     private final PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
 
+    public Ghost(GameMap gameMap, int speed, double radius){
+        super(gameMap, speed, radius);
+    }
+
+    public Ghost(GameMap gameMap, int speed, double radius, double posX, double posY, double posZ){
+        super(gameMap, speed, radius, posX, posY, posZ);
+    }
+
+    // TODO change constructors
     public Ghost(Square currentSquare, MapService mapService) {
         super(mapService, GameConfig.GHOST_SPEED, GameConfig.GHOST_RADIUS, (currentSquare.getIndexX() * GameConfig.SQUARE_SIZE + 0.5 * GameConfig.SQUARE_SIZE), GameConfig.SNACKMAN_GROUND_LEVEL, (currentSquare.getIndexZ() * GameConfig.SQUARE_SIZE + 0.5 * GameConfig.SQUARE_SIZE));
 

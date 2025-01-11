@@ -3,10 +3,13 @@ package de.hsrm.mi.swt.snackman.entities.mobileObjects;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.joml.Quaterniond;
 import org.joml.Vector3d;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import de.hsrm.mi.swt.snackman.configuration.GameConfig;
+import de.hsrm.mi.swt.snackman.entities.map.GameMap;
 import de.hsrm.mi.swt.snackman.entities.map.Square;
 import de.hsrm.mi.swt.snackman.entities.mapObject.MapObjectType;
-import de.hsrm.mi.swt.snackman.services.MapService;
 
 /**
  * A mobile object with the ability to move its position
@@ -15,35 +18,38 @@ public abstract class Mob {
     protected long id;
     private Vector3d position;
     private double radius;
-    protected Quaterniond quat;
-    /**@JsonIgnore
-    private Square currentSquare;*/
+    private Quaterniond quat;
+    private Square currentSquare;
+    private double speed;
 
-    private int speed;
-    protected MapService mapService;
+    @JsonIgnore
+    private GameMap gameMap;
+
     private Vector3d spawn;
     private  static long idCounter = 0;
 
     /**
      * Base constructor for Map with spawn-location at center of Map
      *
-     * @param mapService MapService of the map the mob is located on
+     * @param gameMap GameMap
      * @param speed      speed of the mob
      * @param radius     size of the mob
      */
-    public Mob(MapService mapService, int speed, double radius) {
+    public Mob(GameMap gameMap, double speed, double radius) {
+        this.gameMap = gameMap;
         this.speed = speed;
         this.radius = radius;
-        this.mapService = mapService;
-        spawn = new Vector3d((mapService.getGameMap().getGameMap()[0].length / 2.0) * GameConfig.SQUARE_SIZE, GameConfig.SNACKMAN_GROUND_LEVEL, (mapService.getGameMap().getGameMap()[0].length / 2.0) * GameConfig.SQUARE_SIZE);
+        spawn = new Vector3d((gameMap.getGameMapSquares()[0].length / 2.0) * GameConfig.SQUARE_SIZE, GameConfig.SNACKMAN_GROUND_LEVEL,
+                (gameMap.getGameMapSquares()[0].length / 2.0) * GameConfig.SQUARE_SIZE);
         position = new Vector3d(spawn);
         quat = new Quaterniond();
+        setCurrentSquareWithIndex(position.x, position.z);
         setPositionWithIndexXZ(position.x, position.z);
         id = generateId();
     }
 
-    public Mob(MapService mapService) {
-        this.mapService = mapService;
+    public Mob(GameMap gameMap) {
+        this.gameMap = gameMap;
         position = new Vector3d();
         quat = new Quaterniond();
     }
@@ -51,19 +57,21 @@ public abstract class Mob {
     /**
      * Constructor for Mob with custom spawn point
      *
-     * @param mapService MapService of the map the mob is located on
+     * @param gameMap MapService of the map the mob is located on
      * @param speed      speed of the mob
      * @param radius     size of the mob
      * @param posX       x-spawn-position
      * @param posY       y-spawn-positon
      * @param posZ       z-spawn-position
      */
-    public Mob(MapService mapService, int speed, double radius, double posX, double posY, double posZ) {
+    public Mob(GameMap gameMap, double speed, double radius, double posX, double posY, double posZ) {
         this.speed = speed;
         this.radius = radius;
-        this.mapService = mapService;
+        this.gameMap = gameMap;
+
         spawn = new Vector3d(posX, posY, posZ);
         position = new Vector3d(spawn);
+        setCurrentSquareWithIndex(position.x, position.z);
         quat = new Quaterniond();
         setPositionWithIndexXZ(position.x, position.z);
         id = generateId();
@@ -109,25 +117,31 @@ public abstract class Mob {
         this.spawn = spawn;
     }
 
+    public double getSpeed(){
+        return speed;
+    }
 
+    public void setSpeed(double speed){
+        this.speed = speed;
+    }
 
+    public Quaterniond getRotationQuaternion(){
+        return this.quat;
+    }
     /**
      * Calculates the square-indices to set the currentSquare
      *
      * @param x x-position
      * @param z z-position
      */
-   public Square getCurrentSquareWithIndex(double x, double z) {
-        return  mapService.getGameMap().getSquareAtIndexXZ(calcMapIndexOfCoordinate(x), calcMapIndexOfCoordinate(z));
+    public void setCurrentSquareWithIndex(double x, double z) {
+        currentSquare = gameMap.getSquareAtIndexXZ(calcMapIndexOfCoordinate(x), calcMapIndexOfCoordinate(z));
     }
-
-
 
     public void setPositionWithIndexXZ(double x, double z){
         this.position.x = x;
         this.position.z = z;
     }
-
 
     /**
      * Teleports player to given coordinates
@@ -208,18 +222,24 @@ public abstract class Mob {
         return quat;
     }
 
-    public void setQuat(Quaterniond quat) {
-        this.quat = quat;
-    }
-// TODO: SnackMan spawn in MapService benötigt
-
     /**
      * respawns the mob at his spawn-location
      */
     public void respawn() {
-        this.position.x = (mapService.getGameMap().getGameMap().length / 2) * GameConfig.SQUARE_SIZE;
+        this.position.x = spawn.x;
+        this.position.z = spawn.z;
+        setCurrentSquareWithIndex(position.x, position.z);
+
+    /*
+    TODO unterschied zwischen snackman und geistern beachten in konstructor ändern!!
+    für geister
+
+    this.position.x = (mapService.getGameMap().getGameMap().length / 2) * GameConfig.SQUARE_SIZE;
         this.position.z = (mapService.getGameMap().getGameMap()[0].length / 2) * GameConfig.SQUARE_SIZE;
         setPositionWithIndexXZ(position.x, position.z);
+
+     */
+
     }
 
     /**
@@ -235,33 +255,29 @@ public abstract class Mob {
      * 3 = both / diagonal collision / corner
      */
     public int checkWallCollision(double x, double z) throws IndexOutOfBoundsException {
-        if (mapService.getGameMap().getSquareAtIndexXZ(calcMapIndexOfCoordinate(x), calcMapIndexOfCoordinate(z)).getType() == MapObjectType.WALL) {
+        if (gameMap.getSquareAtIndexXZ(calcMapIndexOfCoordinate(x), calcMapIndexOfCoordinate(z)).getType() == MapObjectType.WALL) {
             return 3;
         }
 
         int collisionCase = 0;
 
-
-        int currentIndexX = calcMapIndexOfCoordinate(this.position.x);
-        int currentIndexZ = calcMapIndexOfCoordinate(this.position.z);
-
-        double squareCenterX = currentIndexX * GameConfig.SQUARE_SIZE + GameConfig.SQUARE_SIZE / 2;
-        double squareCenterZ = currentIndexZ * GameConfig.SQUARE_SIZE + GameConfig.SQUARE_SIZE / 2;
+        double squareCenterX = currentSquare.getIndexX() * GameConfig.SQUARE_SIZE + GameConfig.SQUARE_SIZE / 2;
+        double squareCenterZ = currentSquare.getIndexZ() * GameConfig.SQUARE_SIZE + GameConfig.SQUARE_SIZE / 2;
 
         int horizontalRelativeToCenter = (x - squareCenterX <= 0) ? -1 : 1;
         int verticalRelativeToCenter = (z - squareCenterZ <= 0) ? -1 : 1;
 
-        Square squareLeftRight = mapService.getGameMap().getSquareAtIndexXZ(currentIndexX + horizontalRelativeToCenter,
-                currentIndexZ);
-        Square squareTopBottom = mapService.getGameMap().getSquareAtIndexXZ(currentIndexX,
-                currentIndexZ + verticalRelativeToCenter);
-        Square squareDiagonal = mapService.getGameMap().getSquareAtIndexXZ(currentIndexX + horizontalRelativeToCenter,
-                currentIndexZ + verticalRelativeToCenter);
+        Square squareLeftRight = gameMap.getSquareAtIndexXZ(currentSquare.getIndexX() + horizontalRelativeToCenter,
+                currentSquare.getIndexZ());
+        Square squareTopBottom = gameMap.getSquareAtIndexXZ(currentSquare.getIndexX(),
+                currentSquare.getIndexZ() + verticalRelativeToCenter);
+        Square squareDiagonal = gameMap.getSquareAtIndexXZ(currentSquare.getIndexX() + horizontalRelativeToCenter,
+                currentSquare.getIndexZ() + verticalRelativeToCenter);
 
         if (squareLeftRight.getType() == MapObjectType.WALL) {
             Vector3d origin = new Vector3d(
-                    horizontalRelativeToCenter > 0 ? (currentIndexX + 1) * GameConfig.SQUARE_SIZE
-                            :currentIndexX * GameConfig.SQUARE_SIZE,
+                    horizontalRelativeToCenter > 0 ? (currentSquare.getIndexX() + 1) * GameConfig.SQUARE_SIZE
+                            : currentSquare.getIndexX() * GameConfig.SQUARE_SIZE,
                     0, 1);
             Vector3d line = new Vector3d(0, 1, 0);
             if (calcIntersectionWithLine(x, z, origin, line)) {
@@ -271,8 +287,8 @@ public abstract class Mob {
 
         if (squareTopBottom.getType() == MapObjectType.WALL) {
             Vector3d origin = new Vector3d(0,
-                    verticalRelativeToCenter > 0 ? (currentIndexZ + 1) * GameConfig.SQUARE_SIZE
-                            : currentIndexZ * GameConfig.SQUARE_SIZE,
+                    verticalRelativeToCenter > 0 ? (currentSquare.getIndexZ() + 1) * GameConfig.SQUARE_SIZE
+                            : currentSquare.getIndexZ() * GameConfig.SQUARE_SIZE,
                     1);
             Vector3d line = new Vector3d(1, 0, 0);
             if (calcIntersectionWithLine(x, z, origin, line)) {
@@ -281,10 +297,10 @@ public abstract class Mob {
         }
 
         if (squareDiagonal.getType() == MapObjectType.WALL && collisionCase == 0) {
-            double diagX = horizontalRelativeToCenter > 0 ? (currentIndexX + 1) * GameConfig.SQUARE_SIZE
-                    : currentIndexX * GameConfig.SQUARE_SIZE;
-            double diagZ = verticalRelativeToCenter > 0 ? (currentIndexZ + 1) * GameConfig.SQUARE_SIZE
-                    : currentIndexZ * GameConfig.SQUARE_SIZE;
+            double diagX = horizontalRelativeToCenter > 0 ? (currentSquare.getIndexX() + 1) * GameConfig.SQUARE_SIZE
+                    : currentSquare.getIndexX() * GameConfig.SQUARE_SIZE;
+            double diagZ = verticalRelativeToCenter > 0 ? (currentSquare.getIndexZ() + 1) * GameConfig.SQUARE_SIZE
+                    : currentSquare.getIndexZ() * GameConfig.SQUARE_SIZE;
             double dist = Math.sqrt((diagX - x) * (diagX - x) + (diagZ - z) * (diagZ - z));
             if (dist <= this.radius)
                 collisionCase = 3;
@@ -321,6 +337,10 @@ public abstract class Mob {
 
     public int calcMapIndexOfCoordinate(double a) {
         return (int) (a / GameConfig.SQUARE_SIZE);
+    }
+
+    public GameMap getGameMap() {
+        return gameMap;
     }
 
     public Vector3d getSpawn() {

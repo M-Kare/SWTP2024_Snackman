@@ -1,116 +1,187 @@
 <template>
-  <canvas ref="canvasRef"></canvas>
+  <div class="Main">
+    <canvas ref="canvasRef"></canvas>
+    <div class="sprint-bar">
+      <div :style="sprintBarStyle" class="sprint-bar-inner"></div>
+    </div>
+
+    <div :style="getBackgroundStyle" class="Calories-Overlay">
+      <div class="overlayContent">
+        <img alt="calories" class="calories-icon" src="@/assets/calories.svg" />
+        <p v-if="currentCalories < MAXCALORIES">{{ currentCalories }}kcal</p>
+        <p v-else>{{ caloriesMessage }}</p>
+      </div>
+    </div>
+  </div>
 </template>
 
-<script setup lang="ts">
-import {onMounted, onUnmounted, ref} from 'vue'
+<script lang="ts" setup>
+import {computed, onMounted, onUnmounted, reactive, ref, watch} from 'vue'
 import * as THREE from 'three'
-import {Client} from '@stomp/stompjs'
-import {Player} from '@/components/Player';
-import type {IPlayerDTD} from '@/stores/Player/IPlayerDTD';
-import {fetchSnackManFromBackend} from '@/services/SnackManInitService';
-import {GameMapRenderer} from "@/renderer/GameMapRenderer";
-import {useGameMapStore} from '@/stores/gameMapStore'
-import type {IGameMap} from "@/stores/IGameMapDTD";
-import type {IGhostDTD} from "@/stores/Ghost/IGhostDTD";
-import {fetchGhostFromBackend} from "@/services/GhostInitService";
+import { Player } from '@/components/Player';
+import { fetchSnackManFromBackend } from '@/services/SnackManInitService';
+import { GameMapRenderer } from '@/renderer/GameMapRenderer';
+import { useGameMapStore } from '@/stores/gameMapStore';
+import type { IGameMap } from '@/stores/IGameMapDTD';
+import { useLobbiesStore } from '@/stores/Lobby/lobbiesstore';
+import type {IPlayerClientDTD} from "@/stores/Lobby/IPlayerClientDTD";
+import { GLTFLoader } from 'three/examples/jsm/Addons.js'
+import { useRouter, useRoute } from 'vue-router';
+
+const { lobbydata } = useLobbiesStore();
+const gameMapStore = useGameMapStore()
+gameMapStore.startGameMapLiveUpdate()
 
 const WSURL = `ws://${window.location.host}/stompbroker`
-//const DEST = '/topic/player'
-
-const GhostDEST = '/topic/player/ghost'
+const DEST = '/topic/player'  // todo send to ghost and snackman
 const targetHz = 30
+let clients: Array<IPlayerClientDTD>;
+let playerHashMap = new Map<String, THREE.Mesh>()
 
-// stomp
-const stompclient = new Client({brokerURL: WSURL})
-stompclient.onWebSocketError = event => {
-  //console.log(event)
-}
-stompclient.onStompError = frame => {
-  //console.log(frame)
-}
-stompclient.onConnect = frame => {
-  // Callback: erfolgreicher Verbindugsaufbau zu Broker
-  stompclient.subscribe(GhostDEST, message => {
-    // Callback: Nachricht auf DEST empfangen
-    // empfangene Nutzdaten in message.body abrufbar,
-    // ggf. mit JSON.parse(message.body) zu JS konvertieren
-    const event: IGhostDTD = JSON.parse(message.body)
-    player.setPosition(event.posX, event.posY, event.posZ);
-    console.log("Backend Info kommt hier an !! " + event.posX+ " x "+ event.posZ + " z ");
-  })
-}
-stompclient.activate()
+const router = useRouter();
+const route = useRoute();
+
+const UPDATE = '/topic/calories'
+const stompclient = gameMapStore.stompclient
+// stompclient.activate()
+
+//Reaktive Calories Variable
+const MAXCALORIES = 3000
+let currentCalories = ref()
+let caloriesMessage = ref('')
+const playerRole = ref(route.query.role || ''); // Player role from the URL query
+
+const SNACKMAN_TEXTURE: string = 'src/assets/kirby.glb'
+let snackManModel: THREE.Group<THREE.Object3DEventMap>
 
 const canvasRef = ref()
 let renderer: THREE.WebGLRenderer
-let player: Player;
+let player: Player
 let scene: THREE.Scene
-let prevTime = performance.now();
+let prevTime = performance.now()
+
+const sprintData = reactive({
+    sprintTimeLeft: 100, // percentage (0-100)
+    isSprinting: false,
+    isCooldown: false,
+  })
+
+let sprintInCooldown = false;
 
 // camera setup
-let camera: THREE.PerspectiveCamera;
-
+let camera: THREE.PerspectiveCamera
 
 // used to calculate fps in animate()
-const clock = new THREE.Clock();
-let fps: number;
-let counter = 0;
+const clock = new THREE.Clock()
+let fps: number
+let counter = 0
 
 // is called every frame, changes camera position and velocity
 // only sends updates to backend at 30hz
 function animate() {
+  currentCalories.value = player.getCalories()
   fps = 1 / clock.getDelta()
-  player.updatePlayer();
+  player.updatePlayer()
   if (counter >= fps / targetHz) {
-    // console.log(`${player.getCamera().position.x}  |  ${player.getCamera().position.z}`)
     const time = performance.now()
     const delta = (time - prevTime) / 1000
     try {
       //Sende and /topic/player/update
+      // TODO add player role for backend identification
       stompclient.publish({
-        destination: GhostDEST + "/update", headers: {},
-        body: JSON.stringify(Object.assign({}, player.getInput(), {
-          id: player.getId(),
-          qX: player.getCamera().quaternion.x,
-          qY: player.getCamera().quaternion.y,
-          qZ: player.getCamera().quaternion.z,
-          qW: player.getCamera().quaternion.w
-        }, {delta: delta}))
+        destination: `/topic/lobbies/${lobbydata.currentPlayer.joinedLobbyId!}/player/update`, headers: {},
+        body: JSON.stringify(Object.assign({}, player.getInput(), {jump: player.getIsJumping()},
+          {doubleJump: player.getIsDoubleJumping()},
+          { sprinting: player.isSprinting },
+          {
+            qX: player.getCamera().quaternion.x,
+            qY: player.getCamera().quaternion.y,
+            qZ: player.getCamera().quaternion.z,
+            qW: player.getCamera().quaternion.w
+          }, {delta: delta}, {playerId: lobbydata.currentPlayer.playerId})),
       });
     } catch (fehler) {
-      console.log(fehler)
+      console.error(fehler)
     }
-    prevTime = time;
+    prevTime = time
     counter = 0
   }
   counter++;
+
   renderer.render(scene, camera)
 }
 
+// initially loads the playerModel & attaches playerModel to playerCamera
+function loadPlayerModel(texture: string) {
+  const loader = new GLTFLoader()
+  loader.load(texture, gltf => {
+    snackManModel = gltf.scene
+
+    snackManModel.scale.set(1, 1, 1)
+    // rotation in radians (Bogenmaß), 180° doesnt work as intended
+    snackManModel.rotation.y = Math.PI
+    // optional offset for thirdPersonView
+    // snackManModel.position.set(0, -1.55, -5);
+    player.getCamera().add(snackManModel)
+  })
+}
+
 onMounted(async () => {
-// for rendering the scene, create gameMap in 3d and change window size
-  const {initRenderer, createGameMap, getScene} = GameMapRenderer()
+  // for rendering the scene, create gameMap in 3d and change window size
+  const { initRenderer, createGameMap, getScene } = GameMapRenderer()
   scene = getScene()
   renderer = initRenderer(canvasRef.value)
-
   //Add gameMap
   try {
-    const gameMapStore = useGameMapStore()
     await gameMapStore.initGameMap()
-
     const mapContent = gameMapStore.mapContent
     createGameMap(mapContent as IGameMap)
 
-    await gameMapStore.startGameMapLiveUpdate()
   } catch (error) {
     console.error('Error when retrieving the gameMap:', error)
   }
 
-  const playerData = await fetchGhostFromBackend(0);
-  player = new Player(renderer,playerData.id,  playerData.posX, playerData.posY, playerData.posZ, playerData.radius, playerData.speed)
+    clients = lobbydata.lobbies.find((elem)=>elem.lobbyId===lobbydata.currentPlayer.joinedLobbyId)?.members!
+    console.log(clients)
+    const playerData = await
+    fetchSnackManFromBackend(lobbydata.currentPlayer.joinedLobbyId!, lobbydata.currentPlayer.playerId);
+    clients.forEach(it => {
+      if(it.playerId === lobbydata.currentPlayer.playerId){
+        player = new Player(renderer, playerData.posX, playerData.posY, playerData.posZ, playerData.radius,
+          playerData.speed, playerData.sprintMultiplier)
+      } else {
+        let material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } )
+        material.color = new THREE.Color(Math.random(), Math.random(), Math.random());
+        let cube = new THREE.Mesh( new THREE.BoxGeometry( 1, 3, 1 ),  material);
+        cube.position.lerp(new THREE.Vector3(playerData.posX, playerData.posY, playerData.posZ), 0.5)
+        scene.add(cube);
+        playerHashMap.set(it.playerId, cube);
+      }
+    });
+    gameMapStore.setOtherPlayers(playerHashMap)
+    gameMapStore.setPlayer(player)
+    caloriesMessage = player.message
+
+    watch(player.sprintData, (newSprintData) =>{
+      sprintData.isSprinting = player.sprintData.isSprinting
+      sprintData.sprintTimeLeft = (player.sprintData.sprintTimeLeft / 5) * 100
+
+      if (player.sprintData.isCooldown && !sprintData.isCooldown) {
+        const usedSprintTime = 5 - player.sprintData.sprintTimeLeft
+        startCooldownFill(usedSprintTime)
+      }
+
+      // When the backend cooldown has ended, but the local state is still in cooldown
+      if (!player.sprintData.isCooldown && sprintData.isCooldown) {
+        stopCooldownFill()
+      }
+      sprintData.isCooldown = player.sprintData.isCooldown
+    })
+
   camera = player.getCamera()
   scene.add(player.getControls().object)
+
+  loadPlayerModel(SNACKMAN_TEXTURE)
 
   renderer.render(scene, camera)
   renderer.setAnimationLoop(animate)
@@ -126,4 +197,119 @@ function resizeCallback() {
   camera.aspect = window.innerWidth / window.innerHeight
   camera.updateProjectionMatrix()
 }
+
+// SPRINT-BAR
+let cooldownAnimationFrame: number | null = null
+
+// Starts the cooldown animation for the sprint bar, filling it dynamically (this function is mostly AI generated)
+function startCooldownFill(usedSprintTime: number) {
+  if (cooldownAnimationFrame) return // Prevent starting a new animation if one is already running
+
+  const cooldownDuration = usedSprintTime * 2 * 1000 // Total cooldown duration in ms
+  const startTime = performance.now()
+  const startValue = sprintData.sprintTimeLeft
+  const fillAmount = 100 - startValue
+
+  sprintData.isCooldown = true
+
+  /**
+   * Recursive function to animate the cooldown fill using requestAnimationFrame.
+   */
+  function animateFill() {
+    const now = performance.now()
+    const elapsed = now - startTime
+    const progress = Math.min(elapsed / cooldownDuration, 1)
+    sprintData.sprintTimeLeft = startValue + progress * fillAmount
+
+    if (progress < 1) {
+      // If the animation is not complete, request the next animation frame
+      cooldownAnimationFrame = requestAnimationFrame(animateFill)
+    } else {
+      stopCooldownFill()
+      sprintData.isCooldown = false
+      sprintData.sprintTimeLeft = 100
+    }
+  }
+
+  cooldownAnimationFrame = requestAnimationFrame(animateFill)
+}
+
+// Stops the cooldown fill animation and cleans up the animation frame reference. (this function is mostly AI generated)
+function stopCooldownFill() {
+  if (cooldownAnimationFrame) {
+    cancelAnimationFrame(cooldownAnimationFrame)
+    cooldownAnimationFrame = null
+  }
+}
+
+// Kalorien-Overlay Fill berrechnen
+const getBackgroundStyle = computed(() => {
+  const maxCalories = 3000
+  //Prozent berechnen
+  const percentage = Math.min(currentCalories.value / maxCalories, 1)
+
+  const color = `linear-gradient(to right, #EEC643 ${percentage * 100}%, #5E4A08 ${percentage * 100}%)`
+
+  return {
+    background: color,
+  }
+})
+
+const sprintBarStyle = computed(() => {
+  let color = 'green'
+  if (sprintData.isSprinting) {
+    color = 'red'
+  } else if (sprintData.isCooldown) {
+    color = 'blue'
+  }
+  return {
+    width: `${sprintData.sprintTimeLeft}%`,
+    backgroundColor: color,
+  }
+})
 </script>
+
+<style>
+.Calories-Overlay {
+  color: black;
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  padding: 10px;
+  border-radius: 5px;
+  z-index: 10;
+  font-size: 25px;
+  width: 400px;
+  height: 60px;
+  display: flex;
+  justify-content: left;
+}
+
+.overlayContent {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.calories-icon {
+  width: 30px;
+  height: 30px;
+}
+
+.sprint-bar {
+  position: absolute;
+  bottom: 3vh;
+  right: 3vh;
+  width: 25rem;
+  height: 2.5rem;
+  background-color: #ccc;
+  border: 0.25rem solid #000;
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+
+.sprint-bar-inner {
+  height: 100%;
+  transition: width 0.1s ease-out, background-color 0.2s ease-out;
+}
+</style>

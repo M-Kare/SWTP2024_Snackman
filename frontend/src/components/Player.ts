@@ -1,9 +1,10 @@
 import {useGameMapStore} from '@/stores/gameMapStore';
 import {MapObjectType, type IGameMap} from '@/stores/IGameMapDTD';
 import type {ISquare} from '@/stores/Square/ISquareDTD';
-import type {WebGLRenderer} from 'three'
+import {type WebGLRenderer} from 'three'
 import * as THREE from 'three'
 import {PointerLockControls} from 'three/addons/controls/PointerLockControls.js'
+import {reactive, ref, type UnwrapNestedRefs} from "vue";
 
 export class Player {
   private prevTime: DOMHighResTimeStamp
@@ -15,9 +16,11 @@ export class Player {
   private moveLeft: boolean;
   private moveRight: boolean;
   private canJump: boolean;
+  private sprinting: boolean;
 
   private radius: number;
   private speed: number;
+  private sprintMultiplier: number;
 
   private camera: THREE.PerspectiveCamera;
   private controls: PointerLockControls;
@@ -28,6 +31,16 @@ export class Player {
   private lastJumpTime: number;
   private doubleJump: boolean;
   private spacePressed: boolean;
+
+  private calories: number;
+
+  private _message = ref("")
+
+  private _sprintData = reactive({
+    sprintTimeLeft: 100, // percentage (0-100)
+    isSprinting: false,
+    isCooldown: false,
+  })
 
   //TODO: ersetzten durch das maze im pinia store
   private squareSize: Readonly<number>;
@@ -43,7 +56,7 @@ export class Player {
    * @param radius size of the player
    * @param speed speed-modifier of the player
    */
-  constructor(renderer: WebGLRenderer, id : number , posX: number, posY: number, posZ: number, radius: number, speed: number ) {
+  constructor(renderer: WebGLRenderer, id : number , posX: number, posY: number, posZ: number, radius: number, speed: number, sprintMultiplier: number ) {
     this.id = id;
     this.prevTime = performance.now();
     this.moveBackward = false;
@@ -51,7 +64,9 @@ export class Player {
     this.moveLeft = false;
     this.moveRight = false;
     this.canJump = true;
+    this.sprinting = false;
     this.movementDirection = new THREE.Vector3();
+    this.calories = 0;
 
     this.isJumping = false;
     this.lastJumpTime = 0;
@@ -69,9 +84,10 @@ export class Player {
 
     this.radius = radius;
     this.speed = speed;
+    this.sprintMultiplier = sprintMultiplier;
 
     this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 60)
-    this.camera.lookAt(1,1,1)
+    this.camera.lookAt(1,1,1) // TODO delete?
     this.camera.position.set(posX, posY, posZ)
     this.controls = new PointerLockControls(this.camera, renderer.domElement)
     document.addEventListener('keydown', (event) => {
@@ -121,6 +137,7 @@ export class Player {
       case 'ArrowUp':
       case 'KeyW':
         this.moveForward = false
+        this.sprinting = false;
         break
 
       case 'ArrowLeft':
@@ -141,6 +158,10 @@ export class Player {
       case 'Space':
         this.spacePressed = false;
         break
+
+      case 'ShiftLeft':
+        this.sprinting = false;
+        break;
     }
   }
 
@@ -153,6 +174,9 @@ export class Player {
       case 'ArrowUp':
       case 'KeyW':
         this.moveForward = true
+        if (event.shiftKey) {
+          this.sprinting = true;
+        }
         break
 
       case 'ArrowLeft':
@@ -185,6 +209,13 @@ export class Player {
           }
         }
         break;
+
+      case 'ShiftLeft':
+        this.sprinting = this.moveForward;
+        if (this.moveForward) {
+          this.sprinting = true;
+        }
+        break;
     }
   }
 
@@ -199,10 +230,10 @@ export class Player {
   /**
    * lerp is used to interpolate the two positions
    */
-  public setPosition(x: number, y: number, z: number) {
-    this.camera.position.lerp(new THREE.Vector3(x, y, z), 0.5);
+  public setPosition(pos: THREE.Vector3) {
+    this.camera.position.lerp(pos, 0.5);
 
-    if (y <= 2) {
+    if (pos.y <= 2) {
       this.isJumping = false
       this.doubleJump = false
     }
@@ -227,6 +258,9 @@ export class Player {
     const delta = (time - this.prevTime) / 1000
     let result = 3;
 
+    const currentSpeed = this._sprintData.isSprinting ? this.speed * this.sprintMultiplier : this.speed;
+    const adjustedDelta = Math.min(delta, 0.016) // max. 60 FPS, otherwise it lags while sprinting
+
     this.movementDirection.z = Number(this.moveForward) - Number(this.moveBackward)
     this.movementDirection.x = Number(this.moveRight) - Number(this.moveLeft)
 
@@ -242,8 +276,8 @@ export class Player {
     move.y = 0;
     if (!(move.x == 0 && move.z == 0))
       move.normalize();
-    move.x = move.x * delta * this.speed
-    move.z = move.z * delta * this.speed
+    move.x = move.x * adjustedDelta * currentSpeed;
+    move.z = move.z * adjustedDelta * currentSpeed;
     const xNew = this.camera.position.x + move.x;
     const zNew = this.camera.position.z + move.z;
     try {
@@ -361,6 +395,26 @@ export class Player {
 
   public getIsDoubleJumping() {
     return this.doubleJump;
+  }
+
+  public get isSprinting(): boolean {
+    return this.sprinting;
+  }
+
+  get sprintData(): UnwrapNestedRefs<{ isSprinting: boolean; sprintTimeLeft: number; isCooldown: boolean }> & {} {
+    return this._sprintData;
+  }
+
+  public get message(){
+    return this._message;
+  }
+
+  public getCalories(): number {
+    return this.calories;
+  }
+
+  public setCalories(cal: number): void {
+    this.calories = cal;
   }
 
 
