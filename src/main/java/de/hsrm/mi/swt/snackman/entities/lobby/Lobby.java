@@ -77,4 +77,18 @@ public class Lobby {
     public void setTimeSinceLastSnackSpawn(long time) {
         timeSinceLastSnackSpawn = time;
     }
+
+    @Override
+    public String toString() {
+        return "Lobby{" +
+                "lobbyId='" + lobbyId + '\'' +
+                ", name='" + name + '\'' +
+                ", adminClient=" + adminClient +
+                ", isGameStarted=" + isGameStarted +
+                ", members=" + members +
+                ", gameMap=" + gameMap +
+                ", clientMobMap=" + clientMobMap +
+                ", timeSinceLastSnackSpawn=" + timeSinceLastSnackSpawn +
+                '}';
+    }
 }
