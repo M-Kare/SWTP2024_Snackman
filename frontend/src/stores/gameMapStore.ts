@@ -48,8 +48,6 @@ export const useGameMapStore = defineStore('gameMap', () => {
 
   async function initGameMap() {
     try {
-
-      // todo working for ghost and snackman??
       const response: IGameMapDTD = await fetchGameMapDataFromBackend(lobbydata.currentPlayer.joinedLobbyId!)
       mapData.DEFAULT_SQUARE_SIDE_LENGTH = response.DEFAULT_SQUARE_SIDE_LENGTH
       mapData.DEFAULT_WALL_HEIGHT = response.DEFAULT_WALL_HEIGHT
@@ -93,7 +91,6 @@ export const useGameMapStore = defineStore('gameMap', () => {
           const content: Array<IMessageDTD> = JSON.parse(message.body)
           for (const mess of content) {
             switch (mess.event) {
-              // TODO GhostUpdate / ScriptGhostUpdate Rolle Unterschieden
               case EventType.SnackManUpdate:
                 const mobUpdate: ISnackmanUpdateDTD = mess.message
                 if (mobUpdate.playerId === lobbydata.currentPlayer.playerId) {
@@ -215,94 +212,6 @@ export const useGameMapStore = defineStore('gameMap', () => {
     scene.add(snackToAdd)
     setSnackMeshId(squareUpdate.square.id, snackToAdd.id)
   }
-
-  /*
-  if (!ghostStompclient) {
-      ghostStompclient = new Client({brokerURL: wsurl})
-
-      ghostStompclient.onWebSocketError = (event) => {
-        throw new Error('Ghost Websocket with message: ' + event)
-      }
-
-      ghostStompclient.onStompError = (frameElement) => {
-        throw new Error('Ghost Stompclient with message: ' + frameElement)
-      }
-
-      ghostStompclient.onConnect = () => {
-        console.log('Stompclient for ghost connected')
-
-        ghostStompclient.subscribe(DEST_GHOST, async (message) => {
-          const change: IFrontendGhostMessageEvent = JSON.parse(message.body)
-          console.log("Received a ghost update: {}", change)
-
-          // todo only display ghosts which are not you -> fix when lobby ready
-
-          const ghostUpdate: IGhostDTD = change.ghost
-          const OFFSET = mapData.DEFAULT_SQUARE_SIDE_LENGTH / 2
-          const DEFAULT_SIDE_LENGTH = mapData.DEFAULT_SQUARE_SIDE_LENGTH
-          const currentGhost = mapData.ghosts.find(ghost => ghost.id == ghostUpdate.id)
-          console.log("ghost update {}", ghostUpdate)
-
-          if (currentGhost == undefined) {
-            console.error("A ghost is undefined in pinia")
-          } else {
-            updateGhost(currentGhost, ghostUpdate, DEFAULT_SIDE_LENGTH, OFFSET)
-          }
-        })
-      }
-
-      ghostStompclient.onDisconnect = () => {
-        console.log('Chicken Stompclient disconnected.')
-      }
-
-      ghostStompclient.activate()
-    }
-
-todo logic here for ghosts
-    if (!scriptGhostStompclient) {
-      scriptGhostStompclient = new Client({brokerURL: wsurl})
-
-      scriptGhostStompclient.onWebSocketError = (event) => {
-        throw new Error('Script ghost Websocket with message: ' + event)
-      }
-
-      scriptGhostStompclient.onStompError = (frameElement) => {
-        throw new Error('Script ghost Stompclient with message: ' + frameElement)
-      }
-
-      scriptGhostStompclient.onConnect = () => {
-        console.log('Stompclient for script ghost connected')
-
-        scriptGhostStompclient.subscribe(DEST_SCRIPT_GHOST, async (message) => {
-          const change: IFrontendScriptGhostMessageEvent = JSON.parse(message.body)
-          console.log("Received a script ghost update: {} ghost: {}", change, change.scriptGhost)
-
-          const ghostUpdate: IScriptGhostDTD = change.scriptGhost
-          const OFFSET = mapData.DEFAULT_SQUARE_SIDE_LENGTH / 2
-          const DEFAULT_SIDE_LENGTH = mapData.DEFAULT_SQUARE_SIDE_LENGTH
-          const currentScriptGhost = mapData.scriptGhosts.find(ghost => ghost.id == ghostUpdate.id)
-          console.log("script ghost update {}", ghostUpdate)
-
-          if (currentScriptGhost == undefined) {
-            console.error("A script ghost is undefined in pinia")
-          } else {
-            if (ghostUpdate.ghostPosX == currentScriptGhost!.ghostPosX && ghostUpdate.ghostPosZ == currentScriptGhost!.ghostPosZ) {
-              updateLookingDirectionScriptGhost(currentScriptGhost, ghostUpdate)
-            } else {
-              updateWalkingDirectionScriptGhost(currentScriptGhost, ghostUpdate, DEFAULT_SIDE_LENGTH, OFFSET)
-            }
-          }
-        })
-      }
-
-      scriptGhostStompclient.onDisconnect = () => {
-        console.log('Scriptghost Stompclient disconnected.')
-      }
-
-      scriptGhostStompclient.activate()
-    }
-  }
-   */
 
   function setPlayer(p: Player) {
     player = p

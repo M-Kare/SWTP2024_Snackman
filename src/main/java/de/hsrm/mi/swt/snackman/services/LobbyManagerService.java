@@ -40,7 +40,7 @@ public class LobbyManagerService {
      */
     public PlayerClient createNewClient(String name) {
         String uuid = UUID.randomUUID().toString();
-        PlayerClient newClient = new PlayerClient(uuid, name); // TODO ROLLE
+        PlayerClient newClient = new PlayerClient(uuid, name);
         this.clients.put(uuid, newClient);
 
         return newClient;
@@ -95,8 +95,6 @@ public class LobbyManagerService {
         }
 
         PlayerClient newJoiningClient = findClientByClientId(playerId);
-        // Set role: Admin remains SNACKMAN, others become GHOST TODO SNAcKMAN GHOST unterscheiden
-
         if (!lobby.getAdminClientId().equals(playerId)) {
             newJoiningClient.setRole(ROLE.GHOST);
         }

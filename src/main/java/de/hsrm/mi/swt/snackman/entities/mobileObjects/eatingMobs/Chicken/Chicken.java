@@ -125,7 +125,6 @@ public class Chicken extends EatingMob implements Runnable {
      * direction.
      *
      * @param newMove a list representing the next move for the chicken.
-     *                TODO nimmt das einene int newMove oder eine Liste??
      */
     private void setNewPosition(List<String> newMove) {
         //get positions

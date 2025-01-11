@@ -132,8 +132,6 @@ public class Square {
     /**
      *
      * @return the dominant type of MapObject for the ghost
-     TODO in ghost packen!
-
      */
     public String getPrimaryTypeForGhost() {
         if (type == MapObjectType.WALL) {

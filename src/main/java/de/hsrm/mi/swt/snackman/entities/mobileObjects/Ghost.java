@@ -12,7 +12,6 @@ public class Ghost extends Mob {
 
     private final PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
 
-    // TODO change constructors
     public Ghost(Square currentSquare, double x, double z, GameMap gameMap) {
         super(gameMap, GameConfig.GHOST_SPEED, GameConfig.GHOST_RADIUS, x, GameConfig.SNACKMAN_GROUND_LEVEL, z);
 

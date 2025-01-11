@@ -2,6 +2,8 @@ package de.hsrm.mi.swt.snackman.entities.mobileObjects;
 
 import de.hsrm.mi.swt.snackman.entities.map.GameMap;
 import de.hsrm.mi.swt.snackman.entities.map.Square;
+import de.hsrm.mi.swt.snackman.entities.mapObject.MapObjectType;
+import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken.Chicken;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken.Direction;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.SnackMan;
 import org.python.core.PyList;
@@ -185,8 +187,6 @@ public class ScriptGhost extends Mob implements Runnable {
     /**
      * Initializes Jython for executing the chicken's movement script.
      * Sets up the required Python environment and interpreter.
-     *
-     * todo adjust
      */
     public void initJython() {
         this.pythonInterpreter = new PythonInterpreter();
@@ -221,13 +221,13 @@ public class ScriptGhost extends Mob implements Runnable {
      */
     private void setNewPosition(int newMove) {
         //get positions
-        Direction walkingDirection = Direction.getDirection(String.valueOf(newMove));       // todo woroking?
+        Direction walkingDirection = Direction.getDirection(String.valueOf(newMove));
         log.debug("Walking direction is: {}", walkingDirection);
 
         this.lookingDirection = walkingDirection;
         Square oldPosition = this.gameMap.getSquareAtIndexXZ(this.ghostPosX, this.ghostPosZ);
         Square newPosition = walkingDirection.getNewPosition(this.gameMap, this.ghostPosX, this.ghostPosZ, walkingDirection);
-        propertyChangeSupport.firePropertyChange("scriptGhost", null, this);      // todo update in frontend + init in backend
+        propertyChangeSupport.firePropertyChange("scriptGhost", null, this);
 
         try {
             log.debug("Waiting " + WAITING_TIME + " sec before walking on next square.");
@@ -243,7 +243,7 @@ public class ScriptGhost extends Mob implements Runnable {
         this.setPosZ(newPosition.getIndexZ());
         oldPosition.removeMob(this);
         newPosition.addMob(this);
-        propertyChangeSupport.firePropertyChange("scriptGhost", null, this);      // todo update in frontend + init in backend
+        propertyChangeSupport.firePropertyChange("scriptGhost", null, this);
     }
 
     /**

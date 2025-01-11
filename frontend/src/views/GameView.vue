@@ -82,7 +82,6 @@ function animate() {
     const delta = (time - prevTime) / 1000
     try {
       //Sende and /topic/player/update
-      // TODO add player role for backend identification
       stompclient.publish({
         destination: `/topic/lobbies/${lobbydata.currentPlayer.joinedLobbyId!}/player/update`, headers: {},
         body: JSON.stringify(Object.assign({}, player.getInput(), {jump: player.getIsJumping()},

@@ -116,46 +116,6 @@ public class MapService {
 
                 square = new Square(x, z, new Spawnpoint(SpawnpointMobType.GHOST));
                 break;
-
-                /*
-
-                TODO add ghosts
-                            case 'G':
-                log.debug("Initialising ghost");
-                if (initialisedPlayers < AMOUNT_PLAYERS_FOR_GAME) {
-                    log.info("Initialising playerGhost");
-                    // init real players here aka Ghost
-                    square = new Square(MapObjectType.FLOOR, x, z);
-                    Ghost ghost = new Ghost(square, this);
-                    initialisedPlayers++;
-                    ghost.addPropertyChangeListener((PropertyChangeEvent evt) -> {
-                        if (evt.getPropertyName().equals("ghost")) {
-                            FrontendGhostMessageEvent messageEvent = new FrontendGhostMessageEvent(EventType.GHOST, ChangeType.UPDATE, (Ghost) evt.getNewValue());
-                            frontendMessageService.sendGhostEvent(messageEvent);
-                        }
-                    });
-                    FrontendGhostMessageEvent message = new FrontendGhostMessageEvent(EventType.GHOST, ChangeType.CREATE, ghost);
-                    frontendMessageService.sendGhostEvent(message);
-                    log.info("New player ghost is: {}", ghost);
-
-                } else {
-                    log.info("Initialising scriptGhost");
-                    square = new Square(MapObjectType.FLOOR, x, z);
-                    ScriptGhost newScriptGhost = new ScriptGhost(this, square, ScriptGhostDifficulty.EASY);
-                    Thread ghostThread = new Thread(newScriptGhost);
-                    ghostThread.start();
-
-                    newScriptGhost.addPropertyChangeListener((PropertyChangeEvent evt) -> {
-                        if (evt.getPropertyName().equals("scriptGhost")) {
-                            FrontendScriptGhostMessageEvent messageEvent = new FrontendScriptGhostMessageEvent(EventType.SCRIPT_GHOST,
-                                    ChangeType.UPDATE, (ScriptGhost) evt.getNewValue());
-
-                            frontendMessageService.sendScriptGhostEvent(messageEvent);
-                        }
-                    });
-                    log.info("New scriptGhost is: {}", newScriptGhost);
-                }
-                 */
             case 'S':
                 log.debug("Initialising snackman");
 
@@ -242,7 +202,6 @@ public class MapService {
 
         for (PlayerClient client : lobby.getMembers()) {
             switch (client.getRole()) {
-                // TODO change to spawn ghost instead of snackman
                 case GHOST:
                     log.info("Initialising playerGhost with spawnpoint {}", ghostSpawnSquares.get(ghostSpawnIndex));
                     double x = ghostSpawnSquares.get(ghostSpawnIndex).getIndexX() * GameConfig.SQUARE_SIZE + 0.5 * GameConfig.SQUARE_SIZE;

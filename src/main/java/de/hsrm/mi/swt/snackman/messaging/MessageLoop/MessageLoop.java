@@ -79,7 +79,6 @@ public class MessageLoop {
                     case Ghost ghost ->{
                         messages.add(new Message <> (EventEnum.GhostUpdate, GhostUpdateMessage.fromGhost(ghost, client)));
                     }
-                    // TODO add chicken here
                     default -> throw new IllegalStateException("Unexpected value: " + mob);
                 }
             }
@@ -98,7 +97,6 @@ public class MessageLoop {
                     messages.add(new Message<>(EventEnum.ScriptGhostUpdate, ScriptGhostDTO.fromScriptGhost(scriptGhost)));
                 }
             }
-            //TODO: Kollision Messages
 
             if(messages.isEmpty()){
                 return;

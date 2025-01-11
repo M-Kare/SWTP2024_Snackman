@@ -159,7 +159,6 @@ export const GameObjectRenderer = () => {
   }
 
   return {
-    // todo add snackman here??
     createSnackOnFloor,
     createChickenOnFloor,
     createFloorSquare,

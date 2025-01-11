@@ -1,1 +1,0 @@
-// TODO stomp von script_ghost and ghost
