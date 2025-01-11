@@ -17,10 +17,6 @@ public abstract class Mob {
     private double radius;
     private Quaterniond quat;
     private double speed;
-
-    @JsonIgnore
-    private GameMap gameMap;
-
     private Vector3d spawn;
     private  static long idCounter = 0;
 
@@ -32,7 +28,6 @@ public abstract class Mob {
      * @param radius     size of the mob
      */
     public Mob(GameMap gameMap, double speed, double radius) {
-        this.gameMap = gameMap;
         this.speed = speed;
         this.radius = radius;
         spawn = new Vector3d((gameMap.getGameMapSquares()[0].length / 2.0) * GameConfig.SQUARE_SIZE, GameConfig.SNACKMAN_GROUND_LEVEL,
@@ -45,7 +40,6 @@ public abstract class Mob {
     }
 
     public Mob(GameMap gameMap) {
-        this.gameMap = gameMap;
         position = new Vector3d();
         quat = new Quaterniond();
     }
@@ -63,7 +57,6 @@ public abstract class Mob {
     public Mob(GameMap gameMap, double speed, double radius, double posX, double posY, double posZ) {
         this.speed = speed;
         this.radius = radius;
-        this.gameMap = gameMap;
 
         spawn = new Vector3d(posX, posY, posZ);
         position = new Vector3d(spawn);
@@ -132,10 +125,6 @@ public abstract class Mob {
         setPositionWithIndexXZ(calcMapIndexOfCoordinate(x), calcMapIndexOfCoordinate(z));
     }
 
-    public Square getCurrentSquare() {
-        return this.gameMap.getSquareAtIndexXZ(calcMapIndexOfCoordinate(this.position.x), calcMapIndexOfCoordinate(this.position.z));
-    }
-
     public void setPositionWithIndexXZ(double x, double z){
         this.position.x = x;
         this.position.z = z;
@@ -155,7 +144,7 @@ public abstract class Mob {
      * @param r     input right pressed?
      * @param delta time since last update
      */
-    public void move(boolean f, boolean b, boolean l, boolean r, double delta) {
+    public void move(boolean f, boolean b, boolean l, boolean r, double delta, GameMap gameMap) {
         int result = 3;
         int moveDirZ = (f ? 1 : 0) - (b ? 1 : 0);
         int moveDirX = (r ? 1 : 0) - (l ? 1 : 0);
@@ -178,7 +167,7 @@ public abstract class Mob {
         double xNew = position.x + move.x;
         double zNew = position.z + move.z;
         try {
-            result = checkWallCollision(xNew, zNew);
+            result = checkWallCollision(xNew, zNew, gameMap);
         } catch (IndexOutOfBoundsException e) {
             respawn();
             return;
@@ -238,13 +227,13 @@ public abstract class Mob {
      * 2 = vertical collision
      * 3 = both / diagonal collision / corner
      */
-    public int checkWallCollision(double x, double z) throws IndexOutOfBoundsException {
+    public int checkWallCollision(double x, double z, GameMap gameMap) throws IndexOutOfBoundsException {
         if (gameMap.getSquareAtIndexXZ(calcMapIndexOfCoordinate(x), calcMapIndexOfCoordinate(z)).getType() == MapObjectType.WALL) {
             return 3;
         }
 
         int collisionCase = 0;
-        Square currentSquare = this.gameMap.getSquareAtIndexXZ(calcMapIndexOfCoordinate(x), calcMapIndexOfCoordinate(z));
+        Square currentSquare = gameMap.getSquareAtIndexXZ(calcMapIndexOfCoordinate(x), calcMapIndexOfCoordinate(z));
 
         double squareCenterX = currentSquare.getIndexX() * GameConfig.SQUARE_SIZE + GameConfig.SQUARE_SIZE / 2;
         double squareCenterZ = currentSquare.getIndexZ() * GameConfig.SQUARE_SIZE + GameConfig.SQUARE_SIZE / 2;
@@ -324,10 +313,6 @@ public abstract class Mob {
         return (int) (a / GameConfig.SQUARE_SIZE);
     }
 
-    public GameMap getGameMap() {
-        return gameMap;
-    }
-
     public Vector3d getSpawn() {
         return spawn;
     }
@@ -348,7 +333,6 @@ public abstract class Mob {
                 ", radius=" + radius +
                 ", quat=" + quat +
                 ", speed=" + speed +
-                ", gameMap=" + gameMap +
                 ", spawn=" + spawn +
                 '}';
     }

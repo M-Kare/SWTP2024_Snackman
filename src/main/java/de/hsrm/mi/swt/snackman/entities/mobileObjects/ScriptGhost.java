@@ -38,6 +38,7 @@ public class ScriptGhost extends Mob implements Runnable {
     private PythonInterpreter pythonInterpreter = null;
     private final Properties pythonProps = new Properties();
     private ScriptGhostDifficulty difficulty = ScriptGhostDifficulty.EASY;
+    private GameMap gameMap;
 
     public ScriptGhost() {
         super(null);
@@ -78,14 +79,14 @@ public class ScriptGhost extends Mob implements Runnable {
      */
     public synchronized List<String> getSquaresVisibleForGhost(Square currentPosition, Direction lookingDirection) {
         List<String> squares = new ArrayList<>();
-        squares.add(Direction.ONE_NORTH_ONE_WEST.get_one_North_one_West_Square(this.getGameMap(), currentPosition).getPrimaryTypeForGhost());
-        squares.add(Direction.ONE_NORTH.get_one_North_Square(this.getGameMap(), currentPosition).getPrimaryTypeForGhost());
-        squares.add(Direction.ONE_NORTH_ONE_EAST.get_one_North_one_East_Square(this.getGameMap(), currentPosition).getPrimaryTypeForGhost());
-        squares.add(Direction.ONE_EAST.get_one_East_Square(this.getGameMap(), currentPosition).getPrimaryTypeForGhost());
-        squares.add(Direction.ONE_SOUTH_TWO_EAST.get_one_South_one_East_Square(this.getGameMap(), currentPosition).getPrimaryTypeForGhost());
-        squares.add(Direction.ONE_SOUTH.get_one_South_Square(this.getGameMap(), currentPosition).getPrimaryTypeForGhost());
-        squares.add(Direction.ONE_SOUTH_ONE_WEST.get_one_South_one_West_Square(this.getGameMap(), currentPosition).getPrimaryTypeForGhost());
-        squares.add(Direction.ONE_WEST.get_one_West_Square(this.getGameMap(), currentPosition).getPrimaryTypeForGhost());
+        squares.add(Direction.ONE_NORTH_ONE_WEST.get_one_North_one_West_Square(this.gameMap, currentPosition).getPrimaryTypeForGhost());
+        squares.add(Direction.ONE_NORTH.get_one_North_Square(this.gameMap, currentPosition).getPrimaryTypeForGhost());
+        squares.add(Direction.ONE_NORTH_ONE_EAST.get_one_North_one_East_Square(this.gameMap, currentPosition).getPrimaryTypeForGhost());
+        squares.add(Direction.ONE_EAST.get_one_East_Square(this.gameMap, currentPosition).getPrimaryTypeForGhost());
+        squares.add(Direction.ONE_SOUTH_TWO_EAST.get_one_South_one_East_Square(this.gameMap, currentPosition).getPrimaryTypeForGhost());
+        squares.add(Direction.ONE_SOUTH.get_one_South_Square(this.gameMap, currentPosition).getPrimaryTypeForGhost());
+        squares.add(Direction.ONE_SOUTH_ONE_WEST.get_one_South_one_West_Square(this.gameMap, currentPosition).getPrimaryTypeForGhost());
+        squares.add(Direction.ONE_WEST.get_one_West_Square(this.gameMap, currentPosition).getPrimaryTypeForGhost());
         squares.add(lookingDirection.toString());
         return squares;
     }
@@ -111,7 +112,7 @@ public class ScriptGhost extends Mob implements Runnable {
         //initJython();
         while (isWalking) {
             // get 9 squares
-            Square currentPosition = this.getGameMap().getSquareAtIndexXZ(this.ghostPosX, this.ghostPosZ);
+            Square currentPosition = this.gameMap.getSquareAtIndexXZ(this.ghostPosX, this.ghostPosZ);
             List<String> squares = getSquaresVisibleForGhost(currentPosition, lookingDirection);
             log.debug("Squares ghost is seeing: {}", squares);
 
@@ -122,7 +123,7 @@ public class ScriptGhost extends Mob implements Runnable {
                 newMove = executeMovementSkript(squares);
             } else {
                 List<List<String>> pythonList = new ArrayList<>();
-                for (String[] row : this.getGameMap().getStringMap(this.id)) {
+                for (String[] row : this.gameMap.getStringMap(this.id)) {
                     pythonList.add(Arrays.asList(row));
                 }
                 newMove = executeMovementSkriptDifficult(pythonList);
@@ -220,8 +221,8 @@ public class ScriptGhost extends Mob implements Runnable {
         log.debug("Walking direction is: {}", walkingDirection);
 
         this.lookingDirection = walkingDirection;
-        Square oldPosition = this.getGameMap().getSquareAtIndexXZ(this.ghostPosX, this.ghostPosZ);
-        Square newPosition = walkingDirection.getNewPosition(this.getGameMap(), this.ghostPosX, this.ghostPosZ, walkingDirection);
+        Square oldPosition = this.gameMap.getSquareAtIndexXZ(this.ghostPosX, this.ghostPosZ);
+        Square newPosition = walkingDirection.getNewPosition(this.gameMap, this.ghostPosX, this.ghostPosZ, walkingDirection);
         propertyChangeSupport.firePropertyChange("scriptGhost", null, this);      // todo update in frontend + init in backend
 
         try {

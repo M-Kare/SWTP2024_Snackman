@@ -74,7 +74,7 @@ public class SnackMan extends EatingMob {
     }
 
     @Override
-    public void move(boolean forward, boolean backward, boolean left, boolean right, double delta) {
+    public void move(boolean forward, boolean backward, boolean left, boolean right, double delta, GameMap gameMap) {
         if (isSprinting) {
             if (sprintHandler.canSprint()) {
                 setSpeed(GameConfig.SNACKMAN_SPEED * GameConfig.SNACKMAN_SPRINT_MULTIPLIER);
@@ -87,9 +87,9 @@ public class SnackMan extends EatingMob {
             setSpeed(GameConfig.SNACKMAN_SPEED);
         }
 
-        Square oldSquare = this.getGameMap().getSquareAtIndexXZ(calcMapIndexOfCoordinate(super.getPosX()), calcMapIndexOfCoordinate(super.getPosZ()));
-        super.move(forward, backward, left, right, delta);
-        Square newSquare = this.getGameMap().getSquareAtIndexXZ(calcMapIndexOfCoordinate(super.getPosX()), calcMapIndexOfCoordinate(super.getPosZ()));
+        Square oldSquare = gameMap.getSquareAtIndexXZ(calcMapIndexOfCoordinate(super.getPosX()), calcMapIndexOfCoordinate(super.getPosZ()));
+        super.move(forward, backward, left, right, delta, gameMap);
+        Square newSquare = gameMap.getSquareAtIndexXZ(calcMapIndexOfCoordinate(super.getPosX()), calcMapIndexOfCoordinate(super.getPosZ()));
 
         if (!oldSquare.equals(newSquare)) {
             oldSquare.removeMob(this);

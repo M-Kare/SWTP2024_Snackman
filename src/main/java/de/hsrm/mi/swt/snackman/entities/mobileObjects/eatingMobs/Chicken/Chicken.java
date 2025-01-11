@@ -49,6 +49,7 @@ public class Chicken extends EatingMob implements Runnable {
     private PythonInterpreter pythonInterpreter = null;
     private Properties pythonProps = new Properties();
     private String fileName;
+    private GameMap gameMap;
 
     public Chicken() {
         super(null);
@@ -56,7 +57,7 @@ public class Chicken extends EatingMob implements Runnable {
         this.fileName = "ChickenMovementSkript";
     }
 
-    public Chicken(String fileName){
+    public Chicken(String fileName) {
         super(null);
         this.fileName = fileName;
         initJython();
@@ -65,6 +66,7 @@ public class Chicken extends EatingMob implements Runnable {
     public Chicken(Square initialPosition, GameMap gameMap) {
         super(gameMap);
         id = generateId();
+        this.gameMap = gameMap;
         this.chickenPosX = initialPosition.getIndexX();
         this.chickenPosZ = initialPosition.getIndexZ();
         initialPosition.addMob(this);
@@ -76,7 +78,7 @@ public class Chicken extends EatingMob implements Runnable {
         initTimer();
     }
 
-    public List<String> act(List<String> squares){
+    public List<String> act(List<String> squares) {
         List<String> result = executeMovementSkript(squares);
         return result;
     }
@@ -123,7 +125,7 @@ public class Chicken extends EatingMob implements Runnable {
      * direction.
      *
      * @param newMove a list representing the next move for the chicken.
-     TODO nimmt das einene int newMove oder eine Liste??
+     *                TODO nimmt das einene int newMove oder eine Liste??
      */
     private void setNewPosition(List<String> newMove) {
         //get positions
@@ -131,8 +133,8 @@ public class Chicken extends EatingMob implements Runnable {
         log.debug("Walking direction is: {}", walkingDirection);
 
         this.lookingDirection = walkingDirection;
-        Square oldPosition = super.getGameMap().getSquareAtIndexXZ(this.chickenPosX, this.chickenPosZ);
-        Square newPosition = walkingDirection.getNewPosition(super.getGameMap(), this.chickenPosX, this.chickenPosZ,
+        Square oldPosition = this.gameMap.getSquareAtIndexXZ(this.chickenPosX, this.chickenPosZ);
+        Square newPosition = walkingDirection.getNewPosition(this.gameMap, this.chickenPosX, this.chickenPosZ,
                 walkingDirection);
         propertyChangeSupport.firePropertyChange("chicken", null, this);
 
@@ -162,8 +164,8 @@ public class Chicken extends EatingMob implements Runnable {
         //initJython();
         while (isWalking) {
             // get 9 squares
-            Square currentPosition = super.getGameMap().getSquareAtIndexXZ(this.chickenPosX, this.chickenPosZ);
-            List<String> squares = getSquaresVisibleForChicken(getGameMap(), currentPosition, lookingDirection);
+            Square currentPosition = this.gameMap.getSquareAtIndexXZ(this.chickenPosX, this.chickenPosZ);
+            List<String> squares = getSquaresVisibleForChicken(this.gameMap, currentPosition, lookingDirection);
             log.debug("Squares chicken is seeing: {}", squares);
 
             if (!blockingPath) {
@@ -177,7 +179,7 @@ public class Chicken extends EatingMob implements Runnable {
             }
 
             // consume snack if present
-            currentPosition = super.getGameMap().getSquareAtIndexXZ(this.chickenPosX, this.chickenPosZ);
+            currentPosition = this.gameMap.getSquareAtIndexXZ(this.chickenPosX, this.chickenPosZ);
             if (currentPosition.getSnack().getSnackType() != SnackType.EMPTY && super.getKcal() < MAX_CALORIES && !currentPosition.getSnack().getSnackType().equals(SnackType.EGG)) {
                 log.debug("Snack being eaten at x {} z {}", this.chickenPosX, this.chickenPosZ);
                 consumeSnackOnSquare();
@@ -190,7 +192,7 @@ public class Chicken extends EatingMob implements Runnable {
      * If there is one that remove it from the square.
      */
     public void consumeSnackOnSquare() {
-        Square currentSquare = super.getGameMap().getSquareAtIndexXZ(this.chickenPosX, this.chickenPosZ);
+        Square currentSquare = this.gameMap.getSquareAtIndexXZ(this.chickenPosX, this.chickenPosZ);
         Snack snackOnSquare = currentSquare.getSnack();
 
         if (snackOnSquare.getSnackType() != SnackType.EMPTY) {
@@ -235,17 +237,17 @@ public class Chicken extends EatingMob implements Runnable {
         }
     }
 
-    public boolean squareIsBetweenWalls(int x, int z){
-        Square squareAbove = super.getGameMap().getSquareAtIndexXZ(x - 1, z);
-        Square squareBelow = super.getGameMap().getSquareAtIndexXZ(x + 1, z);
-        Square squareRight = super.getGameMap().getSquareAtIndexXZ(x, z + 1);
-        Square squareLeft = super.getGameMap().getSquareAtIndexXZ(x, z - 1);
+    public boolean squareIsBetweenWalls(int x, int z) {
+        Square squareAbove = this.gameMap.getSquareAtIndexXZ(x - 1, z);
+        Square squareBelow = this.gameMap.getSquareAtIndexXZ(x + 1, z);
+        Square squareRight = this.gameMap.getSquareAtIndexXZ(x, z + 1);
+        Square squareLeft = this.gameMap.getSquareAtIndexXZ(x, z - 1);
 
-        if((squareAbove.getType() == MapObjectType.WALL) && (squareBelow.getType() == MapObjectType.WALL)){
+        if ((squareAbove.getType() == MapObjectType.WALL) && (squareBelow.getType() == MapObjectType.WALL)) {
             return true;
         }
 
-        if((squareRight.getType() == MapObjectType.WALL) && (squareLeft.getType() == MapObjectType.WALL)){
+        if ((squareRight.getType() == MapObjectType.WALL) && (squareLeft.getType() == MapObjectType.WALL)) {
             return true;
         }
 
@@ -389,7 +391,7 @@ public class Chicken extends EatingMob implements Runnable {
     protected void layEgg() {
         if (super.getKcal() > 0) {
             timerRestarted = false;
-            Square currentSquare = getGameMap().getSquareAtIndexXZ(this.chickenPosX, this.chickenPosZ);
+            Square currentSquare = this.gameMap.getSquareAtIndexXZ(this.chickenPosX, this.chickenPosZ);
 
             // new egg with current chicken-calories * 1.5
             int eggCalories = (int) (super.getKcal() * 1.5);

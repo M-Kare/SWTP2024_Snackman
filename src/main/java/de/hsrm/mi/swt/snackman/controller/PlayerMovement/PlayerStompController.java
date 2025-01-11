@@ -26,7 +26,7 @@ public class PlayerStompController {
                     throw new IllegalStateException("Unexpected value: " + currentLobby.getClientMobMap().get(player.playerId()));
         };
         playerMob.setQuaternion(player.qX(), player.qY(), player.qZ(), player.qW());
-        playerMob.move(player.forward(), player.backward(), player.left(), player.right(), player.delta());
+        playerMob.move(player.forward(), player.backward(), player.left(), player.right(), player.delta(), currentLobby.getGameMap());
     }
 
     private SnackMan updateSnackman(PlayerToBackendDTO player, SnackMan snackman) {
