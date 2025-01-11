@@ -10,8 +10,6 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -29,8 +27,6 @@ public class LobbyManagerService {
     private final MapService mapService;
     private final Map<String, Lobby> lobbies = new HashMap<>();
     private final Map<String, PlayerClient> clients = new HashMap<>();
-
-    private final Logger logger = LoggerFactory.getLogger(LobbyManagerService.class);
 
     @Autowired
     public LobbyManagerService(MapService mapService) {
@@ -138,13 +134,9 @@ public class LobbyManagerService {
             throw new IllegalStateException("Not enough players to start the game");
         }
 
-        logger.info("Status of usedCustomMap {}", lobby.getUsedCustomMap());
-
         // If Admin want to play with custom map
         if(lobby.getUsedCustomMap()){
             String customMapName = String.format("SnackManMap_%s.txt", lobbyId);
-            
-            String newFilePath = "./extensions/map/" + customMapName;
 
             Path customMapPath = Paths.get("./extensions/map/" + customMapName).toAbsolutePath();
 
@@ -154,7 +146,6 @@ public class LobbyManagerService {
 
             GameMap newGameMap = mapService.createNewGameMap(lobbyId, customMapPath.toString());
             lobby.setGameMap(newGameMap);
-            logger.info("Play with new game map");
         }
 
         if (lobby.getGameMap() == null) {
