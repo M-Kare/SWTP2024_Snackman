@@ -49,7 +49,7 @@ public class ReadMazeService {
         return mazeAsCharArray;
     }
 
-    public static void generateNewMaze() {
+    public void generateNewMaze() {
         String mazeScriptPath = "./extensions/maze/Maze.py";
         try (PythonInterpreter localPythonInterpreter = new PythonInterpreter()) {
             localPythonInterpreter.execfile(mazeScriptPath);

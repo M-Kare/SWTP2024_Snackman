@@ -134,13 +134,7 @@ onMounted(async () => {
         player = new Player(renderer, playerData.posX, playerData.posY, playerData.posZ, playerData.radius,
           playerData.speed, playerData.sprintMultiplier)
       } else {
-        // let material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } )
-        // material.color = new THREE.Color(Math.random(), Math.random(), Math.random());
-        // let cube = new THREE.Mesh( new THREE.BoxGeometry( 1, 3, 1 ),  material);
         loadPlayerModel(it.playerId,SNACKMAN_TEXTURE);
-        // snackManModel.position.lerp(new THREE.Vector3(playerData.posX, playerData.posY, playerData.posZ), 0.5)
-        // scene.add(snackManModel);
-        // playerHashMap.set(it.playerId, snackManModel);
       }
     });
     gameMapStore.setOtherPlayers(playerHashMap)
