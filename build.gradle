@@ -18,14 +18,6 @@ java {
 	}
 }
 
-jar {
-    enabled = true
-}
-
-application {
-    mainClass = "de.hsrm.mi.swt.snackman.SnackmanApplication"
-}
-
 repositories {
 	mavenCentral()
 }
@@ -78,7 +70,6 @@ jacocoTestReport {
 
 
 // Frontend-Erstellung soll zusätzlich bei "./gradlew bootJar" ausgeführt werden
-/*
 task build_frontend {
      doLast {
 		// JS-Pakete in Vue-Projekt installieren
@@ -110,6 +101,5 @@ task clean_frontend {
     delete files("${projectDir}/bin/")
 }
 clean.dependsOn clean_frontend
-*/
 
 
