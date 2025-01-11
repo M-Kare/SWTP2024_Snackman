@@ -20,18 +20,16 @@ public class Ghost extends Mob {
     }
 
     public void scare(Square position, GameMap gameMap) {
-        //      for (Mob mob ; getCurrentSquare().getMobs())
         for (Mob mob : gameMap.getSquareAtIndexXZ(position.getIndexX(), position.getIndexZ()).getMobs()) {
-            if (mob instanceof SnackMan) scareSnackMan((SnackMan) mob);
-            else if (mob instanceof Chicken) scareChicken();
+            if (mob instanceof Chicken) scareChicken();
         }
     }
 
     private void scareChicken() {
-
+        // TODO VIVIEN!!
     }
 
-    private void scareSnackMan(SnackMan snackMan) {
+    public void scareSnackMan(SnackMan snackMan) {
         snackMan.loseKcal();
     }
 
@@ -40,7 +38,6 @@ public class Ghost extends Mob {
         Square oldSquare = gameMap.getSquareAtIndexXZ(calcMapIndexOfCoordinate(super.getPosX()), calcMapIndexOfCoordinate(super.getPosZ()));
         super.move(f, b, l, r, delta, gameMap);
         Square newSquare = gameMap.getSquareAtIndexXZ(calcMapIndexOfCoordinate(super.getPosX()), calcMapIndexOfCoordinate(super.getPosZ()));
-        //propertyChangeSupport.firePropertyChange("ghost", null, this); // ghost ändern
         scare(newSquare, gameMap);
         if (!oldSquare.equals(newSquare)) {
             oldSquare.removeMob(this);

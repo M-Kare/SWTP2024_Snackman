@@ -31,13 +31,4 @@ public class GameMapController {
         return ResponseEntity.ok(GameMapDTO.fromGameMap(lobbyManagerService.getGameMapByLobbyId(lobbyId)));
     }
 
-    /*
-    TODO change ghost
-    @GetMapping("/ghost")
-    public ResponseEntity<GhostDTO> getGhostPos(@RequestParam long id){
-        Ghost ghost = mapService.getGhost(id);
-        return ResponseEntity.ok(new GhostDTO(ghost.getId(), ghost.getPosX(), ghost.getPosY(), ghost.getPosZ(), ghost.getRadius(), GameConfig.GHOST_SPEED));
-    }*/
-
-
 }

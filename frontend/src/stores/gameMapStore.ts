@@ -15,7 +15,6 @@ import {EventType, type IMessageDTD} from './messaging/IMessageDTD';
 import type {ISnackmanUpdateDTD} from './messaging/ISnackmanUpdateDTD';
 import type {ISquareUpdateDTD} from './messaging/ISquareUpdateDTD';
 import {SnackType} from './Snack/ISnackDTD';
-import type {IGhost, IGhostDTD} from "@/stores/Ghost/IGhostDTD";
 import type {IScriptGhost, IScriptGhostDTD} from "@/stores/Ghost/IScriptGhostDTD";
 import type {IGhostUpdateDTD} from "@/stores/messaging/IGhostUpdateDTD";
 
@@ -44,7 +43,6 @@ export const useGameMapStore = defineStore('gameMap', () => {
     DEFAULT_WALL_HEIGHT: 0,
     gameMap: new Map<number, ISquare>(),
     chickens: [],
-    ghosts: [],
     scriptGhosts: []
   } as IGameMap);
 
@@ -66,10 +64,6 @@ export const useGameMapStore = defineStore('gameMap', () => {
       for (const chicken of response.chickens) {
         mapData.chickens.push(chicken as IChicken)
       }
-
-      /*for (const ghost of response.ghosts) {
-        mapData.ghosts.push(ghost as IGhost)
-      }*/
 
       for (const ghost of response.scriptGhosts) {
         mapData.scriptGhosts.push(ghost as IScriptGhost)
@@ -160,47 +154,10 @@ export const useGameMapStore = defineStore('gameMap', () => {
                 break;
               default:
                 console.log(mess.message)
-
-              // todo add ghst and script ghost update
             }
           }
         })
       }
-      //TODO funktioniert bereits, da squares einen property change listener haben?
-      /*
-              snackStompclient.subscribe(DEST_SQUARE, async message => {
-          const change: IFrontendMessageEvent = JSON.parse(message.body)
-
-          if (change.changeType == 'CREATE') {
-            const OFFSET = mapData.DEFAULT_SQUARE_SIDE_LENGTH / 2
-            const DEFAULT_SIDE_LENGTH = mapData.DEFAULT_SQUARE_SIDE_LENGTH
-
-            const square = change.square as ISquare
-            const currentSquareInPinia = mapData.gameMap.get(square.id)
-            const eggToAdd = gameObjectRenderer.createSnackOnFloor(
-              square.indexX * DEFAULT_SIDE_LENGTH + OFFSET,
-              square.indexZ * DEFAULT_SIDE_LENGTH + OFFSET,
-              DEFAULT_SIDE_LENGTH,
-              square.snack?.snackType,
-            )
-
-            currentSquareInPinia!.snack = square.snack
-            scene.add(eggToAdd)
-            setSnackMeshId(currentSquareInPinia!.id, eggToAdd.id)
-
-            mapData.gameMap.set(change.square.id, change.square as ISquare)
-          } else if (change.changeType == 'UPDATE') {
-            // TODO fix bug "Unhandled Promise Rejection: TypeError: null is not an object (evaluating 'mapData.gameMap.get(change.square.id).snack.meshId')"
-            if (mapData.gameMap.get(change.square.id)!.snack.meshId != null) {
-              const savedMeshId = mapData.gameMap.get(change.square.id)!.snack
-                .meshId
-
-              removeMeshFromScene(scene, savedMeshId)
-
-              mapData.gameMap.set(change.square.id, change.square as ISquare)
-            }
-          }
-       */
 
       stompclient.onDisconnect = () => {
         console.log('Stompclient disconnected.')
@@ -223,6 +180,20 @@ export const useGameMapStore = defineStore('gameMap', () => {
         updateLookingDirection(currentChicken, chickenUpdate)
       } else {
         updateWalkingDirection(currentChicken, chickenUpdate, DEFAULT_SIDE_LENGTH, OFFSET)
+      }
+    }
+  }
+
+  function updateScriptGhost(change: IScriptGhostDTD) {
+    const scriptGhostUpdate: IScriptGhostDTD = change
+    const currentScriptGhost = mapData.scriptGhosts.find(scriptGhost => scriptGhost.id == scriptGhostUpdate.id)
+    if (currentScriptGhost == undefined) {
+      console.error("A script ghost is undefined in pinia")
+    } else {
+      if (scriptGhostUpdate.scriptGhostPosX == currentScriptGhost!.scriptGhostPosX && scriptGhostUpdate.scriptGhostPosZ == currentScriptGhost!.scriptGhostPosZ) {
+        updateLookingDirectionScriptGhost(currentScriptGhost, scriptGhostUpdate)
+      } else {
+        updateWalkingDirectionScriptGhost(currentScriptGhost, scriptGhostUpdate, DEFAULT_SIDE_LENGTH, OFFSET)
       }
     }
   }
@@ -429,20 +400,10 @@ todo logic here for ghosts
   function updateWalkingDirectionScriptGhost(currentScriptGhost: IScriptGhost, scriptGhostUpdate: IScriptGhostDTD, DEFAULT_SIDE_LENGTH: number, OFFSET: number) {
     const scriptGhostMesh = scene.getObjectById(currentScriptGhost.meshId)
 
-    currentScriptGhost.ghostPosX = scriptGhostUpdate.ghostPosX
-    currentScriptGhost.ghostPosZ = scriptGhostUpdate.ghostPosZ
+    currentScriptGhost.scriptGhostPosX = scriptGhostUpdate.scriptGhostPosX
+    currentScriptGhost.scriptGhostPosZ = scriptGhostUpdate.scriptGhostPosZ
 
-    scriptGhostMesh!.position.set(currentScriptGhost.ghostPosX * DEFAULT_SIDE_LENGTH + OFFSET, 0, currentScriptGhost.ghostPosZ * DEFAULT_SIDE_LENGTH + OFFSET)
-  }
-
-  function updateGhost(currentGhost: IGhost, ghostUpdate: IGhostDTD, DEFAULT_SIDE_LENGTH: number, OFFSET: number) {
-    const ghostMesh = scene.getObjectById(currentGhost.meshId)
-
-    currentGhost.posX = ghostUpdate.posX
-    currentGhost.posZ = ghostUpdate.posZ
-    currentGhost.posY = ghostUpdate.posY
-
-    ghostMesh!.position.set(currentGhost.posX, currentGhost.posY, currentGhost.posZ)
+    scriptGhostMesh!.position.set(currentScriptGhost.scriptGhostPosX * DEFAULT_SIDE_LENGTH + OFFSET, 0, currentScriptGhost.scriptGhostPosZ * DEFAULT_SIDE_LENGTH + OFFSET)
   }
 
   function setSnackMeshId(squareId: number, meshId: number) {
@@ -454,12 +415,6 @@ todo logic here for ghosts
   function setChickenMeshId(meshId: number, chickenId: number) {
     const chicken = mapData.chickens.find(chicken => chicken.id === chickenId)
     if (chicken != undefined) chicken.meshId = meshId
-  }
-
-  function setGhostMeshId(meshId: number, ghostId: number) {
-    const ghost = mapData.ghosts.find(ghost => ghost.id === ghostId);
-    if (ghost != undefined)
-      ghost.meshId = meshId
   }
 
   function setScriptGhostMeshId(meshId: number, ghostId: number) {
@@ -489,7 +444,6 @@ todo logic here for ghosts
     setPlayer,
     setOtherPlayers,
     stompclient: stompclient,
-    setGhostMeshId,
     setScriptGhostMeshId,
   };
 })

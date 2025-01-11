@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public record GameMapDTO(int DEFAULT_SQUARE_SIDE_LENGTH, int DEFAULT_WALL_HEIGHT, List<SquareDTO> gameMap, List<ChickenDTO> chickens , List<GhostDTO> ghosts, List<ScriptGhostDTO> scriptGhosts) {
+public record GameMapDTO(int DEFAULT_SQUARE_SIDE_LENGTH, int DEFAULT_WALL_HEIGHT, List<SquareDTO> gameMap, List<ChickenDTO> chickens, List<ScriptGhostDTO> scriptGhosts) {
 
     public static GameMapDTO fromGameMap(GameMap gameMap) {
         List<SquareDTO> squareDTOs = Stream.of(gameMap.getGameMapSquares())
@@ -28,13 +28,6 @@ public record GameMapDTO(int DEFAULT_SQUARE_SIDE_LENGTH, int DEFAULT_WALL_HEIGHT
                         .map(chicken -> ChickenDTO.fromChicken((Chicken) chicken)))
                 .collect(Collectors.toList());
 
-        List<GhostDTO> ghostDTOS = Stream.of(gameMap.getGameMapSquares())
-                .flatMap(Stream::of)
-                .flatMap(square -> square.getMobs().stream()
-                        .filter(mob -> mob instanceof Ghost)
-                        .map(ghost -> GhostDTO.fromGhost((Ghost) ghost)))
-                .collect(Collectors.toList());
-
         List<ScriptGhostDTO> scriptGhostDTOS = Stream.of(gameMap.getGameMapSquares())
                 .flatMap(Stream::of)
                 .flatMap(square -> square.getMobs().stream()
@@ -42,7 +35,7 @@ public record GameMapDTO(int DEFAULT_SQUARE_SIDE_LENGTH, int DEFAULT_WALL_HEIGHT
                         .map(ghost -> ScriptGhostDTO.fromScriptGhost((ScriptGhost) ghost)))
                 .toList();
 
-        return new GameMapDTO(gameMap.getDEFAULT_SQUARE_SIDE_LENGTH(), gameMap.getDEFAULT_WALL_HEIGHT(), squareDTOs, chickenDTOs, ghostDTOS, scriptGhostDTOS);
+        return new GameMapDTO(gameMap.getDEFAULT_SQUARE_SIDE_LENGTH(), gameMap.getDEFAULT_WALL_HEIGHT(), squareDTOs, chickenDTOs, scriptGhostDTOS);
     }
 
 }

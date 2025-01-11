@@ -72,12 +72,6 @@ public class MessageLoop {
                     case Ghost ghost ->{
                         messages.add(new Message <> (EventEnum.GhostUpdate, GhostUpdateMessage.fromGhost(ghost, client)));
                     }
-                    /*
-                    case ScriptGhost scriptGhost ->{
-                        messages.add(new Message <> (EventEnum.ScriptGhostUpdate, ScriptGhostDTO.fromScriptGhost(scriptGhost)));
-                    }
-
-                     */
                     // TODO add chicken here
                     default -> throw new IllegalStateException("Unexpected value: " + mob);
                 }

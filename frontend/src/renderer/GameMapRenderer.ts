@@ -66,12 +66,6 @@ export const GameMapRenderer = () => {
         scene.add(wall)
       }
       if (square.type === MapObjectType.FLOOR) {
-        /*const squareToAdd = gameObjectRenderer.createFloorSquare(
-          square.indexX * DEFAULT_SIDE_LENGTH + OFFSET,
-          square.indexZ * DEFAULT_SIDE_LENGTH + OFFSET,
-          DEFAULT_SIDE_LENGTH,
-        )
-        scene.add(squareToAdd)*/
 
         if (square.snack != null && square.snack.snackType != SnackType.EMPTY) {
           const snackToAdd = gameObjectRenderer.createSnackOnFloor(
@@ -98,25 +92,12 @@ export const GameMapRenderer = () => {
       gameMapStore.setChickenMeshId(chickenToAdd.id, currentChicken.id)
     }
 
-    // add ghosts
-    // todo -> do not at ghost player is controlling -> correct??
-    /*for (let currentGhost of mapData.ghosts) {
-      const ghostToAdd = gameObjectRenderer.createGhostOnFloor(
-        currentGhost.posX * DEFAULT_SIDE_LENGTH + OFFSET,
-        currentGhost.posZ * DEFAULT_SIDE_LENGTH + OFFSET,
-        currentGhost.posY,
-        DEFAULT_SIDE_LENGTH
-      )
-      scene.add(ghostToAdd)
-
-      gameMapStore.setGhostMeshId(ghostToAdd.id, currentGhost.id)
-    }*/
-
+    console.log("GameMap data ", mapData)
     for (let currentGhost of mapData.scriptGhosts) {
-      console.log("Initialising script ghost with x {} y {}", currentGhost.ghostPosX, currentGhost.ghostPosZ)
+      console.log("Initialising script ghost with x {} y {}", currentGhost.scriptGhostPosX, currentGhost.scriptGhostPosZ)
       const scriptGhostToAdd = gameObjectRenderer.createGhostOnFloor(
-        currentGhost.ghostPosX * DEFAULT_SIDE_LENGTH + OFFSET,
-        currentGhost.ghostPosZ * DEFAULT_SIDE_LENGTH + OFFSET,
+        currentGhost.scriptGhostPosX * DEFAULT_SIDE_LENGTH + OFFSET,
+        currentGhost.scriptGhostPosZ * DEFAULT_SIDE_LENGTH + OFFSET,
         0,
         DEFAULT_SIDE_LENGTH
       )

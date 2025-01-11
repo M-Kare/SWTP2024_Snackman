@@ -8,7 +8,6 @@ export interface IGameMapDTD {
   DEFAULT_SQUARE_SIDE_LENGTH: number,
   gameMap: Array<ISquareDTD>,
   chickens: IChickenDTD[],
-  ghosts: IGhostDTD[],
   scriptGhosts: IScriptGhostDTD[]
 }
 
@@ -21,6 +20,5 @@ export interface IGameMap {
   DEFAULT_SQUARE_SIDE_LENGTH: number,
   gameMap: Map<number, ISquare>,
   chickens: IChicken[],
-  ghosts: IGhost[],
   scriptGhosts: IScriptGhost[]
 }
