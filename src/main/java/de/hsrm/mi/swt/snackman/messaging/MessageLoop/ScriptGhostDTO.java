@@ -1,4 +1,4 @@
-package de.hsrm.mi.swt.snackman.controller.Ghost;
+package de.hsrm.mi.swt.snackman.messaging.MessageLoop;
 
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.ScriptGhost;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken.Direction;
