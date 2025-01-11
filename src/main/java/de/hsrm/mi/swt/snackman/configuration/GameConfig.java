@@ -26,4 +26,7 @@ public class GameConfig {
     public static final int WAITING_TIME = 2000;
     public static final int MAX_KALORIEN = 3000;
     public static final String MAX_KALORIEN_MESSAGE = "Maximum calories reached!";
+
+    //GAME
+    public static final long PLAYING_TIME = 300000; // 5 mins
 }
