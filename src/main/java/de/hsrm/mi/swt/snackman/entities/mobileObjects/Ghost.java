@@ -13,8 +13,8 @@ public class Ghost extends Mob {
     private final PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
 
     // TODO change constructors
-    public Ghost(Square currentSquare, GameMap gameMap) {
-        super(gameMap, GameConfig.GHOST_SPEED, GameConfig.GHOST_RADIUS, (currentSquare.getIndexX() * GameConfig.SQUARE_SIZE + 0.5 * GameConfig.SQUARE_SIZE), GameConfig.SNACKMAN_GROUND_LEVEL, (currentSquare.getIndexZ() * GameConfig.SQUARE_SIZE + 0.5 * GameConfig.SQUARE_SIZE));
+    public Ghost(Square currentSquare, double x, double z, GameMap gameMap) {
+        super(gameMap, GameConfig.GHOST_SPEED, GameConfig.GHOST_RADIUS, x, GameConfig.SNACKMAN_GROUND_LEVEL, z);
 
         currentSquare.addMob(this);
     }
@@ -47,14 +47,6 @@ public class Ghost extends Mob {
             newSquare.addMob(this);
         }
 
-    }
-
-    @Override
-    public String toString() {
-        return "Ghost{" + "ghostId= " + super.getId() +
-                " ghostPositionX=" + super.getPosX() +
-                ", ghostPositionY=" + super.getPosY() +
-                ", ghostPositionZ=" + super.getPosZ() + " }";
     }
 
     public void addPropertyChangeListener(PropertyChangeListener listener) {

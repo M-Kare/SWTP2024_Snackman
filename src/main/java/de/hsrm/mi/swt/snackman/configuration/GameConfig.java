@@ -32,4 +32,5 @@ public class GameConfig {
     public static final double GHOST_RADIUS = 0.3;
     public static final int GHOST_SPEED = 10;
     public  static  final int GHOST_DAMAGE = 300;
+    public  static  final int AMOUNT_PLAYERS = 5;
 }

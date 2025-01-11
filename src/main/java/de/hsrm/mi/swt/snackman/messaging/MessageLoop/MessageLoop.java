@@ -125,4 +125,15 @@ public class MessageLoop {
             changedChicken.put(lobbyId, temp);
         }
     }
+
+    public void addScriptGhostToQueue(ScriptGhost scriptGhost, String lobbyId) {
+        // TODO
+        /*if(changedChicken.containsKey(lobbyId)){
+            changedChicken.get(lobbyId).add(scriptGhost);
+        } else {
+            List<Chicken> temp = new ArrayList<>();
+            temp.add(scriptGhost);
+            changedChicken.put(lobbyId, temp);
+        }*/
+    }
 }

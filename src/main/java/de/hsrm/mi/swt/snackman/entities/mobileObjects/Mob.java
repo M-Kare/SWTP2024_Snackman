@@ -67,9 +67,7 @@ public abstract class Mob {
 
         spawn = new Vector3d(posX, posY, posZ);
         position = new Vector3d(spawn);
-        setCurrentSquareWithIndex(position.x, position.z);
         quat = new Quaterniond();
-        setPositionWithIndexXZ(position.x, position.z);
         id = generateId();
     }
 
@@ -141,20 +139,6 @@ public abstract class Mob {
     public void setPositionWithIndexXZ(double x, double z){
         this.position.x = x;
         this.position.z = z;
-    }
-
-    /**
-     * Teleports player to given coordinates
-     *
-     * @param posX x-position
-     * @param posY y-position
-     * @param posZ z-position
-     */
-    public void move(double posX, double posY, double posZ) {
-        this.setPosX(posX);
-        this.setPosY(posY);
-        this.setPosZ(posZ);
-        this.setPositionWithIndexXZ(posX,posZ);
     }
 
     /**

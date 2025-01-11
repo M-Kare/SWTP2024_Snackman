@@ -67,9 +67,9 @@ export const useGameMapStore = defineStore('gameMap', () => {
         mapData.chickens.push(chicken as IChicken)
       }
 
-      for (const ghost of response.ghosts) {
+      /*for (const ghost of response.ghosts) {
         mapData.ghosts.push(ghost as IGhost)
-      }
+      }*/
 
       for (const ghost of response.scriptGhosts) {
         mapData.scriptGhosts.push(ghost as IScriptGhost)
