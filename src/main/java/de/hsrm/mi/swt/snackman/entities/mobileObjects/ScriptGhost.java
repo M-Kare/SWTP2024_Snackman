@@ -3,6 +3,7 @@ package de.hsrm.mi.swt.snackman.entities.mobileObjects;
 import de.hsrm.mi.swt.snackman.entities.map.GameMap;
 import de.hsrm.mi.swt.snackman.entities.map.Square;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken.Direction;
+import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.SnackMan;
 import org.python.core.PyList;
 import org.python.core.PyObject;
 import org.python.util.PythonInterpreter;
@@ -46,18 +47,21 @@ public class ScriptGhost extends Mob implements Runnable {
 
     public ScriptGhost(GameMap gameMap, ScriptGhostDifficulty difficulty) {
         super(gameMap);
+        this.gameMap = gameMap;
         this.difficulty = difficulty;
         initJython();
     }
 
     public ScriptGhost(GameMap gameMap, Square initialPosition, ScriptGhostDifficulty difficulty) {
         this(gameMap, initialPosition);
+        this.gameMap = gameMap;
         this.difficulty = difficulty;
         initJython();
     }
 
     public ScriptGhost(GameMap gameMap, Square initialPosition) {
         super(gameMap);
+        this.gameMap = gameMap;
         id = generateId();
         this.ghostPosX = initialPosition.getIndexX();
         this.ghostPosZ = initialPosition.getIndexZ();
@@ -253,6 +257,10 @@ public class ScriptGhost extends Mob implements Runnable {
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public void scareSnackMan(SnackMan snackMan) {
+        snackMan.loseKcal();
     }
 
     public long getId() {

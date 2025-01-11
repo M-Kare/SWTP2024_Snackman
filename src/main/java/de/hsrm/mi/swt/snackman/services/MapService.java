@@ -267,7 +267,7 @@ public class MapService {
             }
         }
 
-        /*int AMOUNT_SCRIPT_GHOSTS = GameConfig.AMOUNT_PLAYERS - lobby.getMembers().size();
+        int AMOUNT_SCRIPT_GHOSTS = GameConfig.AMOUNT_PLAYERS - lobby.getMembers().size();
         for (int i = 0; i < AMOUNT_SCRIPT_GHOSTS; i++) {
             log.info("Initialising scriptGhost");
             Square square = ghostSpawnSquares.get(ghostSpawnIndex);
@@ -275,7 +275,7 @@ public class MapService {
             ScriptGhost newScriptGhost = new ScriptGhost(lobby.getGameMap(), square, ScriptGhostDifficulty.EASY);
 
             Thread ghostThread = new Thread(newScriptGhost);
-            //ghostThread.start();
+            ghostThread.start();
             ghostSpawnIndex++;
 
             newScriptGhost.addPropertyChangeListener((PropertyChangeEvent evt) -> {
@@ -285,7 +285,6 @@ public class MapService {
             });
             log.info("New scriptGhost is: {}", newScriptGhost);
         }
-         */
 
     }
 

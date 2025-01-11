@@ -152,6 +152,10 @@ export const useGameMapStore = defineStore('gameMap', () => {
                 const chickenUpdate: IChickenDTD = mess.message
                 updateChicken(chickenUpdate)
                 break;
+              case EventType.ScriptGhostUpdate:
+                const scriptGhostUpdate: IScriptGhostDTD = mess.message
+                updateScriptGhost(scriptGhostUpdate)
+                break;
               default:
                 console.log(mess.message)
             }

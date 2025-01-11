@@ -2,6 +2,10 @@ package de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs;
 
 import de.hsrm.mi.swt.snackman.entities.map.GameMap;
 import de.hsrm.mi.swt.snackman.entities.mechanics.SprintHandler;
+import de.hsrm.mi.swt.snackman.entities.mobileObjects.Ghost;
+import de.hsrm.mi.swt.snackman.entities.mobileObjects.Mob;
+import de.hsrm.mi.swt.snackman.entities.mobileObjects.ScriptGhost;
+import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken.Chicken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -9,6 +13,8 @@ import de.hsrm.mi.swt.snackman.configuration.GameConfig;
 import de.hsrm.mi.swt.snackman.entities.map.Square;
 import de.hsrm.mi.swt.snackman.entities.mapObject.snack.Snack;
 import de.hsrm.mi.swt.snackman.entities.mapObject.snack.SnackType;
+
+import java.util.stream.Stream;
 
 public class SnackMan extends EatingMob {
     private final Logger log = LoggerFactory.getLogger(SnackMan.class);
@@ -32,7 +38,6 @@ public class SnackMan extends EatingMob {
         super(gameMap, speed, radius, posX, posY, posZ);
     }
 
-    // TODO check if snackman kcal reducing correctly
     public void loseKcal() {
         // Calorsies reduced by 300 if Ghost hit
         setKcal(getKcal() - GameConfig.GHOST_DAMAGE);
@@ -94,6 +99,14 @@ public class SnackMan extends EatingMob {
         if (!oldSquare.equals(newSquare)) {
             oldSquare.removeMob(this);
             newSquare.addMob(this);
+        }
+
+        for (Mob mob : newSquare.getMobs()) {
+            if (mob instanceof Ghost) {
+                ((Ghost) mob).scareSnackMan(this);
+            } else if (mob instanceof ScriptGhost) {
+                ((ScriptGhost) mob).scareSnackMan(this);
+            }
         }
     }
 

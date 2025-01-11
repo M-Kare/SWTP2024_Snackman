@@ -44,6 +44,8 @@ public class MessageLoop {
 
     private Map<String, List<Chicken>> changedChicken = new HashMap<>();
 
+    private Map<String, List<ScriptGhost>> changedScriptGhosts = new HashMap<>();
+
     @Scheduled(fixedRate=50)
     public void messageLoop(){
         List<Lobby> lobbys = lobbyService.getAllLobbies();
@@ -57,8 +59,13 @@ public class MessageLoop {
             List<Message> messages = new ArrayList<>();
             List<Square> squareQueue = changedSquares.get(lobby.getLobbyId());
             changedSquares.remove(lobby.getLobbyId());
+
             List<Chicken> chickenQueue = changedChicken.get(lobby.getLobbyId());
             changedChicken.remove(lobby.getLobbyId());
+
+            List<ScriptGhost> scriptGhostQueue = changedScriptGhosts.get(lobby.getLobbyId());
+            changedScriptGhosts.remove(lobby.getLobbyId());
+
             for(String client : lobby.getClientMobMap().keySet()){
                 Mob mob = lobby.getClientMobMap().get(client);
 
@@ -84,6 +91,11 @@ public class MessageLoop {
             if(chickenQueue != null){
                 for(Chicken chicken : chickenQueue){
                     messages.add(new Message<>(EventEnum.ChickenUpdate, ChickenUpdateMessage.fromChicken(chicken)));
+                }
+            }
+            if(scriptGhostQueue != null){
+                for(ScriptGhost scriptGhost : scriptGhostQueue){
+                    messages.add(new Message<>(EventEnum.ScriptGhostUpdate, ScriptGhostDTO.fromScriptGhost(scriptGhost)));
                 }
             }
             //TODO: Kollision Messages
@@ -121,13 +133,12 @@ public class MessageLoop {
     }
 
     public void addScriptGhostToQueue(ScriptGhost scriptGhost, String lobbyId) {
-        // TODO
-        /*if(changedChicken.containsKey(lobbyId)){
-            changedChicken.get(lobbyId).add(scriptGhost);
+        if(changedScriptGhosts.containsKey(lobbyId)){
+            changedScriptGhosts.get(lobbyId).add(scriptGhost);
         } else {
-            List<Chicken> temp = new ArrayList<>();
+            List<ScriptGhost> temp = new ArrayList<>();
             temp.add(scriptGhost);
-            changedChicken.put(lobbyId, temp);
-        }*/
+            changedScriptGhosts.put(lobbyId, temp);
+        }
     }
 }
