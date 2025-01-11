@@ -125,7 +125,7 @@ public class GameMapController {
             }
         
             lobby.setUsedCustomMap(usedCustomMap);
-            // log.info(lobbyId + " have the staus of used custom map: " + usedCustomMap.toString());
+            log.info(lobbyId + " have the staus of used custom map: " + usedCustomMap.toString());
 
             return ResponseEntity.ok().build();
         } catch (Exception e) {

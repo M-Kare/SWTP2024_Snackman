@@ -315,22 +315,27 @@
      * @param {string} lobbyId - The unique identifier of the lobby.
      * @param {boolean} usedCustomMap - Indicates whether a custom map is used (true) or not (false). 
     */
-    const changeUsedMapStatus = async (lobbyId: string, usedCustomMap: boolean) => {
-        fetch('/api/change-used-map-status', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ lobbyId, usedCustomMap })
-        })
-        .then(response => {
+    const changeUsedMapStatus = async (lobbyId: string, usedCustomMap: boolean): Promise<string> => {
+        try {
+            const response = await fetch('/api/change-used-map-status', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ lobbyId, usedCustomMap })
+            });
+
             if (!response.ok) {
-                console.error('Error change the used map status:', response.text());
+                const errorText = await response.text();
+                console.error('Error changing the used map status:', errorText);
+                throw new Error(`Failed to change map status: ${errorText}`);
             }
-        })
-        .catch(error => {
-            console.error('Error change the used map status:', error);
-        });
+
+            return "done";
+        } catch (error) {
+            console.error('Error changing the used map status:', error);
+            throw error;
+        }
     }
 
     watchEffect(() => {
@@ -453,8 +458,10 @@
         }
 
         if(playerId === lobby.value.adminClient.playerId){
-            await changeUsedMapStatus(lobbyId, usedCustomMap.value);
-            await lobbiesStore.startGame(lobby.value.lobbyId);
+            const status = await changeUsedMapStatus(lobbyId, usedCustomMap.value);
+            if (status === "done"){
+                await lobbiesStore.startGame(lobby.value.lobbyId);
+            }
         } else {
             showPopUp.value = true;
             darkenBackground.value = true;
