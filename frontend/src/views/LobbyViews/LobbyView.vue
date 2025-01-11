@@ -629,7 +629,7 @@
   gap: 25px;
   justify-content: center;
   align-items: center;
-  font-size: 3rem;
+  font-size: 2rem;
   color: #fff;
   z-index: 3;
 }
@@ -637,12 +637,12 @@
 .map-importiren{
   position: absolute;
   right: 20px;
-  top: 150px;
+  top: 100px;
   z-index: 3;
 }
 
 .map-list{
-    font-size: 2rem;
+    font-size: 1.5rem;
     margin-top: 30px;
     gap: 25px;
     justify-content: center;
@@ -653,7 +653,7 @@
     width: 20px;
     height: 20px;
     transform: scale(1.5);
-    margin-right: 10px; 
+    margin-right: 15px; 
 }
 
 .input-feld{
@@ -662,7 +662,7 @@
 
 .feedback-message {
     margin-top: 30px;
-    font-size: 2rem;
+    font-size: 1.5rem;
     font-weight: bold;
     padding: 10px 20px;
     border-radius: 5px;

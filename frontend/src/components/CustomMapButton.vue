@@ -19,8 +19,8 @@
 
 <style>
 .outside-toggle-switch {
-    width: 7rem;
-    height: 3.5rem;
+    width: 6rem;
+    height: 3rem;
     padding: 0.25rem;
     display: flex;
     align-items: center;
@@ -33,8 +33,8 @@
 }
 
 .inside-toggle-switch {
-    width: 3rem;
-    height: 3rem;
+    width: 2.5rem;
+    height: 2.5rem;
     background-color: white;
     border-radius: 50%;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
@@ -42,6 +42,6 @@
 }
 
 .inside-toggle-switch.checked {
-    transform: translateX(3.5rem);
+    transform: translateX(3rem);
 }
 </style>
