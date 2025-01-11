@@ -48,6 +48,8 @@ class ChickenTest {
             System.out.println("No file to delete");
         }
         SnackmanApplication.checkAndCopyResources();
+        assert Files.exists(workFolder.resolve("chicken"));
+        assert Files.exists(workFolder.resolve("chicken/ChickenMovementSkript.py"));
     }
 
     @AfterAll
@@ -60,6 +62,9 @@ class ChickenTest {
 
     @BeforeEach
     void setUp() {
+        if(!Files.exists(workFolder.resolve("chicken/ChickenMovementSkript.py"))){
+            SnackmanApplication.checkAndCopyResources();
+        }
         char[][] mockMazeData = new char[][] {
                 {'#', '#', '#'},
                 {'#', '.', '#'},
