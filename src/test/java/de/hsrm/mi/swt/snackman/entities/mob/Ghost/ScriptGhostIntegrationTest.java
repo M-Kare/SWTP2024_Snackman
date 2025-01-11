@@ -1,7 +1,6 @@
 package de.hsrm.mi.swt.snackman.entities.mob.Ghost;
 
 import de.hsrm.mi.swt.snackman.SnackmanApplication;
-import de.hsrm.mi.swt.snackman.entities.mobileObjects.ScriptGhost;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -12,8 +11,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
@@ -50,24 +48,18 @@ public class ScriptGhostIntegrationTest {
     }
 
     @Test
-    void testChickenMovement() {
+    void testScriptGhostMovement() {
         try (PythonInterpreter pyInterp = new PythonInterpreter()) {
             pyInterp.exec("import sys");
             pyInterp.exec("sys.path.append('./extensions/ghost/')");
 
-            String mapAroundChicken = "'W', 'W', 'W', 'L', 'W', " +
-                    "'SM', 'L', 'W', 'L', 'L'," +
-                    "'L', 'L', 'H', 'W', 'L'," +
-                    "'L', 'L', 'W', 'L', 'L', " +
-                    "'L', 'W', 'L', 'W', 'L', '0'";
+            String mapAroundScriptGhost = "'L', 'L', 'W', 'W', 'W', 'W', 'W', 'W', '0'";
             pyInterp.exec("from GhostMovementSkript import choose_next_square");
-            pyInterp.exec("result = choose_next_square([" + mapAroundChicken + "])");
+            pyInterp.exec("result = choose_next_square([" + mapAroundScriptGhost + "])");
 
             String result = pyInterp.get("result").toString();
 
-            String expectedResult = "['X', 'X', 'X', ' ', 3]";
-            assertEquals(expectedResult, result,
-                    "The Python script should correctly determine the next move (' ').");
+            assertEquals("0", result,"The Python script should correctly determine the next move (' ').");
         }
     }
 }

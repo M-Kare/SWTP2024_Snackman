@@ -171,7 +171,7 @@ public class ScriptGhost extends Mob implements Runnable {
         try {
             log.debug("Running python ghost script with: {}", pythonList.toString());
 
-            PyObject func = pythonInterpreter.get("choose_next_move");
+            PyObject func = pythonInterpreter.get("choose_next_square");
             PyObject result = func.__call__(new PyList(pythonList));
 
             return Integer.parseInt(result.toString());

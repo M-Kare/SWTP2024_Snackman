@@ -3,14 +3,10 @@ package de.hsrm.mi.swt.snackman.entities.mob.Ghost;
 import de.hsrm.mi.swt.snackman.SnackmanApplication;
 import de.hsrm.mi.swt.snackman.entities.map.GameMap;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.ScriptGhost;
-import de.hsrm.mi.swt.snackman.entities.mobileObjects.ScriptGhostDifficulty;
-import de.hsrm.mi.swt.snackman.services.MapService;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.python.util.PythonInterpreter;
 import org.springframework.util.FileSystemUtils;
 
@@ -18,8 +14,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -62,23 +56,18 @@ public class SmartScriptGhostIntegrationTest {
     }
 
     @Test
-    void testChickenMovement() {
+    void testGhostMovement() {
         try (PythonInterpreter pyInterp = new PythonInterpreter()) {
             pyInterp.exec("import sys");
             pyInterp.exec("sys.path.append('./extensions/ghost/')");
 
-            String mapAroundChicken = "'W', 'W', 'W', 'L', 'W', " +
-                    "'SM', 'L', 'W', 'L', 'L'," +
-                    "'L', 'L', 'H', 'W', 'L'," +
-                    "'L', 'L', 'W', 'L', 'L', " +
-                    "'L', 'W', 'L', 'W', 'L', '0'";
-            pyInterp.exec("from SmartGhostMovementSkript import choose_next_move");
-            pyInterp.exec("result = choose_next_square([" + mapAroundChicken + "])");
+            String mapAroundGhost = "'L', 'L', 'W', 'W', 'W', 'W', 'W', 'W', '0'";
+            pyInterp.exec("from SmartGhostMovementSkript import choose_next_square");
+            pyInterp.exec("result = choose_next_square([" + mapAroundGhost + "])");
 
             String result = pyInterp.get("result").toString();
 
-            String expectedResult = "['X', 'X', 'X', ' ', 3]";
-            assertEquals(expectedResult, result,
+            assertEquals(0, result,
                     "The Python script should correctly determine the next move (' ').");
         }
     }

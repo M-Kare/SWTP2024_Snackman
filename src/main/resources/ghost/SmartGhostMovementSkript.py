@@ -35,7 +35,7 @@ CHICKEN = 'C'
 SNACKMAN = 'M'
 INVALID = 'X'
 
-def choose_next_move(labyrinth):
+def choose_next_square(labyrinth):
     """
     Chooses the next move for the ghost.
     :param labyrinth: Which the ghost can see
