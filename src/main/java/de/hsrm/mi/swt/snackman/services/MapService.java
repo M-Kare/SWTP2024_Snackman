@@ -1,80 +1,59 @@
 package de.hsrm.mi.swt.snackman.services;
 
 import java.beans.PropertyChangeEvent;
-import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken.Chicken;
-import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken.Direction;
-import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.SnackMan;
-import de.hsrm.mi.swt.snackman.messaging.*;
-import org.python.util.PythonInterpreter;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import de.hsrm.mi.swt.snackman.configuration.GameConfig;
+import de.hsrm.mi.swt.snackman.entities.lobby.Lobby;
+import de.hsrm.mi.swt.snackman.entities.lobby.PlayerClient;
 import de.hsrm.mi.swt.snackman.entities.map.GameMap;
+import de.hsrm.mi.swt.snackman.entities.map.Spawnpoint;
+import de.hsrm.mi.swt.snackman.entities.map.SpawnpointMobType;
 import de.hsrm.mi.swt.snackman.entities.map.Square;
 import de.hsrm.mi.swt.snackman.entities.mapObject.MapObjectType;
 import de.hsrm.mi.swt.snackman.entities.mapObject.snack.Snack;
 import de.hsrm.mi.swt.snackman.entities.mapObject.snack.SnackType;
-
-import java.util.ArrayList;
-import java.util.List;
-import de.hsrm.mi.swt.snackman.messaging.*;
+import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken.Chicken;
+import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.SnackMan;
+import de.hsrm.mi.swt.snackman.messaging.MessageLoop.MessageLoop;
 
 /**
  * Service class for managing the game map
- * This class is responsible for loading and providing access to the game map
- * data
+ * This class is responsible for loading and providing access to the game map data
  */
 @Service
 public class MapService {
 
+    private final ReadMazeService readMazeService;
+    private final MessageLoop messageLoop;
+
     Logger log = LoggerFactory.getLogger(MapService.class);
-    private FrontendMessageService frontendMessageService;
-    private ReadMazeService readMazeService;
-    private String filePath;
-    private char[][] mazeData;
-    private GameMap gameMap;
-    private SnackMan snackman;
 
     /**
      * Constructs a new MapService
      * Initializes the maze data by reading from a file and creates a Map object
      */
     @Autowired
-    public MapService(FrontendMessageService frontendMessageService, ReadMazeService readMazeService) {
-        this(frontendMessageService, readMazeService, "./extensions/map/Maze.txt");
+    public MapService(ReadMazeService readMazeService, @Lazy MessageLoop messageLoop) {
+        this.readMazeService = readMazeService;
+        this.messageLoop = messageLoop;
     }
 
-    public MapService(FrontendMessageService frontendMessageService, ReadMazeService readMazeService,
-                      String filePath) {
-        this.frontendMessageService = frontendMessageService;
-        this.filePath = filePath;
-        this.readMazeService = readMazeService;
+    public GameMap createNewGameMap(String lobbyId, String filePath) {
+        readMazeService.generateNewMaze();
+        char[][] mazeData = readMazeService.readMazeFromFile(filePath);
+        return convertMazeDataGameMap(lobbyId, mazeData);
+    }
 
-        generateNewMaze();
-
-        this.mazeData = readMazeService.readMazeFromFile(this.filePath);
-        if (this.mazeData == null) {
-            throw new IllegalStateException("Maze data cannot be null. Check your ReadMazeService.");
-        }
-
-        gameMap = convertMazeDataGameMap(this.mazeData);
-        snackman = new SnackMan(this, GameConfig.SNACKMAN_SPEED, GameConfig.SNACKMAN_RADIUS);
-
-        snackman.addPropertyChangeListener(event -> {
-            if (event.getPropertyName().equals("currentCalories")) {
-                int newCalories = (int) event.getNewValue();
-                String message = newCalories == snackman.getMAXKCAL() ? "Maximum calories reached!" : "";
-                System.out.println("Listener initilized");
-
-                FrontendMessageCaloriesEvent messageEvent = new FrontendMessageCaloriesEvent(EventType.CALORIES, ChangeType.UPDATE, newCalories, message);
-
-                frontendMessageService.sendUpdateCaloriesEvent(messageEvent);
-            }
-        });
-
+    public GameMap createNewGameMap(String lobbyId) {
+        return createNewGameMap(lobbyId, "./extensions/map/Maze.txt");
     }
 
     /**
@@ -82,14 +61,14 @@ public class MapService {
      *
      * @param mazeData the char array representing the maze
      */
-    public GameMap convertMazeDataGameMap(char[][] mazeData) {
-
+    public GameMap convertMazeDataGameMap(String lobbyId,
+                                           char[][] mazeData) {
         Square[][] squaresBuildingMap = new Square[mazeData.length][mazeData[0].length];
 
         for (int x = 0; x < mazeData.length; x++) {
             for (int z = 0; z < mazeData[0].length; z++) {
                 try {
-                    Square squareToAdd = createSquare(mazeData[x][z], x, z);
+                    Square squareToAdd = createSquare(lobbyId, mazeData[x][z], x, z);
 
                     squaresBuildingMap[x][z] = squareToAdd;
                 } catch (IllegalArgumentException e) {
@@ -101,22 +80,6 @@ public class MapService {
         return new GameMap(squaresBuildingMap);
     }
 
-    //TODO Maze.py map größe als Argumente herein reichen statt in der python-file selbst zu hinterlegen
-
-    /**
-     * Generates a new Maze and saves it in a Maze.txt file
-     */
-    public void generateNewMaze() {
-        String mazeScriptPath = "./extensions/maze/Maze.py";
-        try (PythonInterpreter localPythonInterpreter = new PythonInterpreter()) {
-            localPythonInterpreter.execfile(mazeScriptPath);
-            localPythonInterpreter.exec("main()");
-        } catch (Exception e) {
-            log.error("Failed to execute maze generation script", e);
-        }
-    }
-    
-
     /**
      * Creates a Square by given indexes
      *
@@ -125,73 +88,48 @@ public class MapService {
      * @param z      index
      * @return a created Square
      */
-    public Square createSquare(char symbol, int x, int z) {
+    private Square createSquare(String lobbyId, char symbol, int x, int z) {
         Square square;
 
         switch (symbol) {
-            case '#': {
+            case '#':
                 square = new Square(MapObjectType.WALL, x, z);
                 break;
-            }
-            case ' ': {
+            case ' ':
                 square = new Square(MapObjectType.FLOOR, x, z);
-                addRandomSnackToSquare(square);
+                double emptyOrNot = Math.random();
+                if (emptyOrNot <= GameConfig.SNACK_SPAWN_RATE) {
+                    addRandomSnackToSquare(square);
+                } else {
+                    square.setSnack(new Snack(SnackType.EMPTY));
+                }
 
                 square.addPropertyChangeListener((PropertyChangeEvent evt) -> {
                     if (evt.getPropertyName().equals("square")) {
-                        FrontendMessageEvent messageEvent = new FrontendMessageEvent(EventType.SNACK, ChangeType.UPDATE,
-                                (Square) evt.getNewValue());
-
-                        frontendMessageService.sendEvent(messageEvent);
+                        messageLoop.addSquareToQueue((Square) evt.getNewValue(), lobbyId);
                     }
                 });
                 break;
-            }
             case 'C':
+
                 log.debug("Initialising chicken");
-                square = new Square(MapObjectType.FLOOR, x, z);
-                Chicken newChicken = new Chicken(square, this);
-                Thread chickenThread = new Thread(newChicken);
-                chickenThread.start();
+                square = new Square(x, z, new Spawnpoint(SpawnpointMobType.CHICKEN));
 
-                newChicken.addPropertyChangeListener((PropertyChangeEvent evt) -> {
-                    if (evt.getPropertyName().equals("chicken")) {
-                        FrontendChickenMessageEvent messageEvent = new FrontendChickenMessageEvent(EventType.CHICKEN,
-                                ChangeType.UPDATE, (Chicken) evt.getNewValue());
-
-                        frontendMessageService.sendChickenEvent(messageEvent);
-                    }
-                });
                 break;
-            default: {
+            case 'G':
+                log.debug("Initialising ghost");
+
+                square = new Square(x, z, new Spawnpoint(SpawnpointMobType.GHOST));
+                break;
+            case 'S':
+                log.debug("Initialising snackman");
+
+                square = new Square(x, z, new Spawnpoint(SpawnpointMobType.SNACKMAN));
+                break;
+            default:
                 square = new Square(MapObjectType.FLOOR, x, z);
-            }
         }
-
         return square;
-    }
-
-    /**
-     * @param currentPosition  the square the chicken is standing on top of
-     * @param lookingDirection
-     * @return a list of 8 square which are around the current square + the
-     * direction the chicken is looking in the order:
-     * northwest_square, north_square, northeast_square, east_square,
-     * southeast_square, south_square, southwest_square, west_square,
-     * direction
-     */
-    public synchronized List<String> getSquaresVisibleForChicken(Square currentPosition, Direction lookingDirection) {
-        List<String> squares = new ArrayList<>();
-        squares.add(Direction.NORTH_WEST.getNorthWestSquare(this, currentPosition).getPrimaryType());
-        squares.add(Direction.NORTH.getNorthSquare(this, currentPosition).getPrimaryType());
-        squares.add(Direction.NORTH_EAST.getNorthEastSquare(this, currentPosition).getPrimaryType());
-        squares.add(Direction.EAST.getEastSquare(this, currentPosition).getPrimaryType());
-        squares.add(Direction.SOUTH_EAST.getSouthEastSquare(this, currentPosition).getPrimaryType());
-        squares.add(Direction.SOUTH.getSouthSquare(this, currentPosition).getPrimaryType());
-        squares.add(Direction.SOUTH_WEST.getSouthWestSquare(this, currentPosition).getPrimaryType());
-        squares.add(Direction.WEST.getWestSquare(this, currentPosition).getPrimaryType());
-        squares.add(lookingDirection.toString());
-        return squares;
     }
 
     /**
@@ -202,33 +140,113 @@ public class MapService {
     public void addRandomSnackToSquare(Square square) {
         if (square.getType() == MapObjectType.FLOOR) {
             SnackType randomSnackType = SnackType.getRandomSnack();
-
             square.setSnack(new Snack(randomSnackType));
         }
     }
 
-    public GameMap getGameMap() {
-        return gameMap;
-    }
+    /**
+     * Goes trough the map and checks if it's a spawnpoint and sets a Mob
+     *
+     * @param gameMap where the mobs should spawn
+     * @param lobby of the mobs
+     */
+    public void spawnMobs(GameMap gameMap, Lobby lobby) {
+        List<Square> ghostSpawnSquares = new ArrayList<>();
+        List<Square> snackmanSpawnSquares = new ArrayList<>();
 
-    public Square getSquareAtIndexXZ(int x, int z) {
-        return gameMap.getSquareAtIndexXZ(x, z);
-    }
+        for (int i = 0; i < gameMap.getGameMapSquares().length; i++) {
+            for (int j = 0; j < gameMap.getGameMapSquares()[i].length; j++) {
+                Square currentSquare = gameMap.getGameMapSquares()[i][j];
+                Spawnpoint spawnpoint = currentSquare.getSpawnpoint();
+                if (spawnpoint != null) {
+                    SpawnpointMobType spawnpointMobType = spawnpoint.spawnpointMobType();
+                    switch (spawnpointMobType) {
+                        case SpawnpointMobType.CHICKEN:
 
-    public void printGameMap() {
-        Square[][] gameMap = this.gameMap.getGameMap();
+                            Chicken newChicken = new Chicken(currentSquare, gameMap);
 
-        for (int x = 0; x < gameMap.length; x++) {
-            log.info("x");
-            for (int z = 0; z < gameMap[x].length; z++) {
-                Square square = gameMap[x][z];
-                log.info(square.getPrimaryType());
+                            Thread chickenThread = new Thread(newChicken);
+                            chickenThread.start();
+
+                            newChicken.addPropertyChangeListener((PropertyChangeEvent evt) -> {
+                                if (evt.getPropertyName().equals("chicken")) {
+                                    messageLoop.addChickenToQueue((Chicken) evt.getNewValue(), lobby.getLobbyId());
+                                }
+                            });
+                            break;
+                        case SpawnpointMobType.GHOST:
+                            ghostSpawnSquares.add(currentSquare);
+                            break;
+                        case SpawnpointMobType.SNACKMAN:
+                            snackmanSpawnSquares.add(currentSquare);
+                            break;
+                    }
+
+                }
+
             }
-            log.info("");
+        }
+
+        placeMobsOnMap(lobby, ghostSpawnSquares, snackmanSpawnSquares);
+    }
+
+    /**
+     *
+     * @param lobby where the Mobs should spawn
+     * @param ghostSpawnSquares list of spawnpoints of ghosts
+     * @param snackmanSpawnSquares list of spawnpoints of snackmans
+     */
+    private void placeMobsOnMap(Lobby lobby, List<Square> ghostSpawnSquares, List<Square> snackmanSpawnSquares) {
+        int ghostSpawnIndex = 0;
+        int snackmanSpawnIndex = 0;
+        Square temp;
+
+        for (PlayerClient client : lobby.getMembers()) {
+            switch (client.getRole()) {
+                // TODO change to spawn ghost instead of snackman
+                case GHOST:
+                    if (ghostSpawnIndex >= ghostSpawnSquares.size()) {
+                        ghostSpawnIndex = 0;
+                    }
+                    temp = ghostSpawnSquares.get(ghostSpawnIndex);
+                    lobby.getClientMobMap().put(client.getPlayerId(),
+                            new SnackMan(lobby.getGameMap(), calcCenterPositionFromMapIndex(temp.getIndexX()),
+                                    GameConfig.SNACKMAN_GROUND_LEVEL,
+                                    calcCenterPositionFromMapIndex(temp.getIndexZ())));
+                    ghostSpawnIndex++;
+                    break;
+                case SNACKMAN:
+                    if (snackmanSpawnIndex >= snackmanSpawnSquares.size()) {
+                        snackmanSpawnIndex = 0;
+                    }
+                    temp = snackmanSpawnSquares.get(snackmanSpawnIndex);
+                    SnackMan snackMan = new SnackMan(lobby.getGameMap(), calcCenterPositionFromMapIndex(temp.getIndexX()), GameConfig.SNACKMAN_GROUND_LEVEL, calcCenterPositionFromMapIndex(temp.getIndexZ()));
+                    lobby.getClientMobMap().put(client.getPlayerId(), snackMan);
+                    snackmanSpawnIndex++;
+                    break;
+            }
         }
     }
 
-    public SnackMan getSnackMan() {
-        return snackman;
+    public double calcCenterPositionFromMapIndex(int index) {
+        return (index * GameConfig.SQUARE_SIZE) + (GameConfig.SQUARE_SIZE / 2);
+    }
+
+    public void respawnSnacks(GameMap map) {
+        for (int i = 0; i < map.getGameMapSquares().length; i++) {
+            for (int j = 0; j < map.getGameMapSquares()[0].length; j++) {
+                Square square = map.getSquareAtIndexXZ(i, j);
+                if (square.getType() == MapObjectType.FLOOR) {
+                    double rand = Math.random();
+                    if (rand <= GameConfig.SNACK_SPAWN_RATE) {
+                        addRandomSnackToSquare(square);
+                    } else {
+                        square.setSnack(new Snack(SnackType.EMPTY));
+                    }
+                } else {
+                    continue;
+                }
+            }
+        }
     }
 }
