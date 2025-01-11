@@ -102,12 +102,6 @@ public class MapService {
                 } else {
                     square.setSnack(new Snack(SnackType.EMPTY));
                 }
-
-                square.addPropertyChangeListener((PropertyChangeEvent evt) -> {
-                    if (evt.getPropertyName().equals("square")) {
-                        messageLoop.addSquareToQueue((Square) evt.getNewValue(), lobbyId);
-                    }
-                });
                 break;
             case 'C':
 
@@ -170,6 +164,14 @@ public class MapService {
             default:
                 square = new Square(MapObjectType.FLOOR, x, z);
         }
+
+        square.addPropertyChangeListener((PropertyChangeEvent evt) -> {
+            if (evt.getPropertyName().equals("square")) {
+                log.info("Square changed {}", evt);
+                messageLoop.addSquareToQueue((Square) evt.getNewValue(), lobbyId);
+            }
+        });
+
         return square;
     }
 

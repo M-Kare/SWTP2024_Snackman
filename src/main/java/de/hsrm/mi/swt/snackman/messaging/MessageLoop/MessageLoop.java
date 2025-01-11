@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import de.hsrm.mi.swt.snackman.controller.Square.SquareDTO;
 import de.hsrm.mi.swt.snackman.entities.map.GameMap;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.Ghost;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.ScriptGhost;
@@ -83,7 +84,7 @@ public class MessageLoop {
             }
             if(squareQueue != null){
                 for(Square square : squareQueue){
-                    messages.add(new Message<>(EventEnum.SquareUpdate, new SquareUpdateMessage(square)));
+                    messages.add(new Message<>(EventEnum.SquareUpdate, new SquareUpdateMessage(SquareDTO.fromSquare(square))));
                 }
             }
             if(chickenQueue != null){

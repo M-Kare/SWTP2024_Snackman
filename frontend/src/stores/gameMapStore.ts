@@ -143,6 +143,7 @@ export const useGameMapStore = defineStore('gameMap', () => {
                   otherPlayers.get(ghostUpdate.playerId)?.position.lerp(ghostUpdate.position, 0.3)
                   otherPlayers.get(ghostUpdate.playerId)?.setRotationFromQuaternion(ghostUpdate.rotation)
                 }
+                break;
               case EventType.SquareUpdate:
                 const squareUpdate: ISquareUpdateDTD = mess.message
                 if (squareUpdate.square.snack.snackType == SnackType.EMPTY) {
