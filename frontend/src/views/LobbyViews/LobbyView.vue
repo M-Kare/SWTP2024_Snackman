@@ -62,7 +62,7 @@
   </PopUp>
 
   <PopUp v-if="showPopUp" class="popup-box" @hidePopUp="hidePopUp">
-    <p class="info-heading">- Can't start the game -</p>
+    <p class="info-heading">Can't start the game</p>
     <p class="info-text">{{ infoText }}</p>
   </PopUp>
 
@@ -357,7 +357,7 @@ function moveToMouse(element: HTMLElement) {
 
 .info-text {
   font-size: 1.8rem;
-  padding: 1.2rem;
+  padding: 1.2rem 0;
 }
 
 .item-row {
