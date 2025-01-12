@@ -97,7 +97,7 @@ public class GameMapController {
     }
 
     /**
-     * Deletes the uploaded map file associated with a given lobby ID.
+     * Deletes the map file associated with a given lobby ID.
      * This method is invoked when a lobby no longer exists, and the map file
      * for that lobby needs to be deleted from the server.
      * @param requestBody A map containing the lobbyId
@@ -109,11 +109,15 @@ public class GameMapController {
     @DeleteMapping("/deleteMap")
     public ResponseEntity<Void> deleteUploadedMap(@RequestParam("lobbyId") String lobbyId){
         try {
-            String fileName = String.format("SnackManMap_%s.txt", lobbyId);
-            Path filePath = Paths.get("./extensions/map/" + fileName).toAbsolutePath();
+            String customMapName = String.format("SnackManMap_%s.txt", lobbyId);
+            Path customMapPath = Paths.get("./extensions/map/" + customMapName).toAbsolutePath();
 
-            if (Files.exists(filePath)) {
-                Files.delete(filePath);
+            String lastMapName = String.format("LastMap_%s.txt", lobbyId);
+            Path lastMapPath = Paths.get("./extensions/map/" + lastMapName).toAbsolutePath();
+
+            if (Files.exists(customMapPath) || Files.exists(lastMapPath)) {
+                Files.delete(customMapPath);
+                Files.delete(lastMapPath);
                 return ResponseEntity.ok().build();
             } else {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
