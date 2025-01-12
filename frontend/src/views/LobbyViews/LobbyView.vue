@@ -28,7 +28,7 @@
                     class="player-list-items">
 
                     <div class="player-name">
-                        {{ member.playerName }}
+                        {{ member.playerName.replace(/"/g, '') }} <!-- replace all " in String using RegEx modifier /g (find all) -->
                     </div>
 
                     <div class="player-character">
