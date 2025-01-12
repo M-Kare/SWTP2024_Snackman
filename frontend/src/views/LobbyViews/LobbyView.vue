@@ -1,24 +1,12 @@
 <template>
   <MenuBackground></MenuBackground>
-  <h1 class="title">{{ lobby?.name || 'Lobby Name' }}</h1>
-  <div class="outer-box">
-    <SmallNavButton
-      id="menu-back-button"
-      class="small-nav-buttons"
-      @click="leaveLobby"
-    >
-      Leave Lobby
-    </SmallNavButton>
-    <SmallNavButton
-      id="start-game-button"
-      class="small-nav-buttons"
-      @click="startGame"
-    >
-      Start Game
-    </SmallNavButton>
+  <div id="individual-outer-box-size" class="outer-box">
+    <div class="item-row">
+      <h1 class="title">{{ lobby?.name || 'Lobby Name' }}</h1>
 
-    <div id="player-count">
-      {{ playerCount }} / {{ maxPlayerCount }} Players
+      <div id="player-count">
+        {{ playerCount }} / {{ maxPlayerCount }} Player
+      </div>
     </div>
 
     <div class="inner-box">
@@ -34,27 +22,31 @@
         </li>
       </ul>
     </div>
-    <SmallNavButton
-      id="menu-back-button"
-      class="small-nav-buttons"
-      @click="leaveLobby"
-    >
-      Leave Lobby
-    </SmallNavButton>
-    <SmallNavButton
-      id="start-game-button"
-      class="small-nav-buttons"
-      @click="startGame"
-    >
-      Start Game
-    </SmallNavButton>
-    <SmallNavButton
-      id="copyToClip"
-      class="small-nav-buttons"
-      @click="copyToClip()"
-    >
-      Copy Link
-    </SmallNavButton>
+    <div class="item-row">
+      <SmallNavButton
+        id="menu-back-button"
+        class="small-nav-buttons"
+        @click="leaveLobby"
+      >
+        Leave Lobby
+      </SmallNavButton>
+      <div id="button-pair">
+        <SmallNavButton
+          id="copyToClip"
+          class="small-nav-buttons"
+          @click="copyToClip()"
+        >
+          Copy Link
+        </SmallNavButton>
+        <SmallNavButton
+          id="start-game-button"
+          class="small-nav-buttons"
+          @click="startGame"
+        >
+          Start Game
+        </SmallNavButton>
+      </div>
+    </div>
   </div>
 
   <div v-if="darkenBackground" id="darken-background"></div>
@@ -82,11 +74,11 @@ import MenuBackground from '@/components/MenuBackground.vue'
 import SmallNavButton from '@/components/SmallNavButton.vue'
 import PopUp from '@/components/PopUp.vue'
 
-import { useRoute, useRouter } from 'vue-router'
-import { computed, onMounted, ref, watchEffect } from 'vue'
-import { useLobbiesStore } from '@/stores/Lobby/lobbiesstore'
-import type { IPlayerClientDTD } from '@/stores/Lobby/IPlayerClientDTD'
-import type { ILobbyDTD } from '@/stores/Lobby/ILobbyDTD'
+import {useRoute, useRouter} from 'vue-router'
+import {computed, onMounted, ref, watchEffect} from 'vue'
+import {useLobbiesStore} from '@/stores/Lobby/lobbiesstore'
+import type {IPlayerClientDTD} from '@/stores/Lobby/IPlayerClientDTD'
+import type {ILobbyDTD} from '@/stores/Lobby/ILobbyDTD'
 
 const router = useRouter()
 const route = useRoute()
@@ -137,7 +129,7 @@ watchEffect(() => {
         console.log('Game has started! Redirecting to GameView...')
         router.push({
           name: 'GameView',
-          query: { role: lobbiesStore.lobbydata.currentPlayer.role },
+          query: {role: lobbiesStore.lobbydata.currentPlayer.role},
         })
         console.log(
           'Navigating to GameView with role:',
@@ -145,7 +137,7 @@ watchEffect(() => {
         )
       }
     } else if (lobbyLoaded) {
-      router.push({ name: 'LobbyListView' })
+      router.push({name: 'LobbyListView'})
     }
   }
 })
@@ -191,7 +183,7 @@ const joinLobby = async (lobby: ILobbyDTD) => {
 
     if (joinedLobby) {
       console.log('Successfully joined lobby', joinedLobby.name)
-      router.push({ name: 'LobbyView', params: { lobbyId: lobby.lobbyId } })
+      router.push({name: 'LobbyView', params: {lobbyId: lobby.lobbyId}})
     }
   } catch (error: any) {
     console.error('Error:', error)
@@ -200,7 +192,7 @@ const joinLobby = async (lobby: ILobbyDTD) => {
 }
 
 function backToLobbyListView() {
-  router.push({ name: 'LobbyListView' })
+  router.push({name: 'LobbyListView'})
 }
 
 /**
@@ -227,7 +219,7 @@ const leaveLobby = async () => {
   }
 
   await lobbiesStore.leaveLobby(lobby.value.lobbyId, playerId)
-  router.push({ name: 'LobbyListView' })
+  router.push({name: 'LobbyListView'})
 }
 
 /**
@@ -289,27 +281,17 @@ function moveToMouse(element: HTMLElement) {
 
 <style scoped>
 .title {
-  position: absolute;
-  top: 3rem;
-  left: 50%;
-  transform: translateX(-50%);
   font-size: 3rem;
   font-weight: bold;
-  color: #fff;
-  text-align: center;
+  color: var(--background-for-text-color);
+  text-align: left;
 }
 
-.outer-box {
-  position: absolute;
-  top: 30%;
-  left: 50%;
-  transform: translateX(-50%);
+#individual-outer-box-size {
   width: 70vw;
   max-width: 1000px;
-  height: 35rem;
-  max-height: 45rem;
-  background: rgba(255, 255, 255, 60%);
-  border-radius: 0.5rem;
+  height: 40rem;
+  max-height: 50rem;
 }
 
 #infoBox {
@@ -322,14 +304,10 @@ function moveToMouse(element: HTMLElement) {
 }
 
 #player-count {
-  top: 1%;
-  left: 50%;
-  transform: translateX(-50%);
-  text-align: center;
-  font-size: 1.8rem;
+  font-size: 3rem;
   font-weight: bold;
-  color: #000000;
-  padding: 1rem;
+  color: var(--background-for-text-color);
+  text-align: right;
 }
 
 .hidden {
@@ -344,7 +322,6 @@ function moveToMouse(element: HTMLElement) {
   transform: translateX(-50%);
   width: 90%;
   height: auto;
-  background: rgba(255, 255, 255, 70%);
   border-radius: 0.3rem;
   color: #000000;
 }
@@ -358,25 +335,19 @@ function moveToMouse(element: HTMLElement) {
   margin: 0;
   padding: 0;
   width: 100%;
+  min-height: 350px;
 }
 
 .player-list-items {
   display: flex;
   justify-content: space-between;
-  border: 0.5px solid black;
-  border-radius: 0.2rem;
+  background: var(--background-for-text-color);
+  border: 4px solid var(--primary-text-color);
+  border-radius: 0.1rem;
+  box-shadow: 4px 3px 0 var(--primary-text-color);
   font-size: 1.2rem;
-  padding: 0.5rem;
-  margin: 0.6rem;
-}
-
-#copyToClip {
-  top: 3%;
-  right: 1.5%;
-  width: 8%;
-  height: 3rem;
-  font-size: 0.8rem;
-  padding: 0;
+  padding: 0.5rem 0.8rem;
+  margin: 0.4rem 0;
 }
 
 .info-heading {
@@ -389,27 +360,20 @@ function moveToMouse(element: HTMLElement) {
   padding: 1.2rem;
 }
 
-#menu-back-button {
-  left: 5%;
+.item-row {
+  padding: 2rem 3rem;
+  display: flex;
+  justify-content: space-between;
 }
 
-#start-game-button {
-  right: 5%;
+#button-pair {
+  display: flex;
+  gap: 20px;
 }
 
 #menu-back-button:hover,
+#copyToClip:hover,
 #start-game-button:hover {
   box-shadow: 0px 0px 35px 5px rgba(255, 255, 255, 0.5);
-}
-
-#darken-background {
-  z-index: 1;
-  position: fixed;
-  top: 0;
-  width: 100vw;
-  height: 100vh;
-  background: rgba(0, 0, 0, 50%);
-
-  transition: background 0.3s ease;
 }
 </style>
