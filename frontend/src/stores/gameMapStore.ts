@@ -24,7 +24,7 @@ import {SnackType} from './Snack/ISnackDTD';
  */
 export const useGameMapStore = defineStore('gameMap', () => {
   const protocol = window.location.protocol.replace('http', 'ws')
-  const wsurl = `${protocol}//${window.location.host}/stompbroker`
+  const wsurl = `${protocol}//${window.location.host}/ws`
   let stompclient = new Client({brokerURL: wsurl})
   let chickenStompclient: Client
   const scene = new THREE.Scene()
