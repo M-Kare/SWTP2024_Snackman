@@ -4,7 +4,12 @@
             <label>
                 
                 Please enter your name:
-                <input v-model.trim="playerName" type="text" maxlength="16" autofocus>
+                <input
+                    v-model.trim="playerName"
+                    type="text"
+                    maxlength="16"
+                    placeholder="max. 16 characters"
+                    autofocus>
             </label>
             <p
                 id="error-message"
@@ -28,18 +33,14 @@
     import SmallNavButton from '@/components/SmallNavButton.vue';
     import { ref } from 'vue';
     import { useLobbiesStore } from '@/stores/Lobby/lobbiesstore';
-    import type { IPlayerClientDTD } from '@/stores/Lobby/IPlayerClientDTD';
 
     const lobbiesStore = useLobbiesStore();
-    const currentPlayer = lobbiesStore.lobbydata.currentPlayer as IPlayerClientDTD;
     
     const playerName = ref('');
     const errorMessage = ref('');
 
-    // TODO needed?
-    const emit = defineEmits<(event: 'savePlayerName', value: string) => void>()
+    const emit = defineEmits<(event: 'hidePlayerNameForm') => void>()
 
-    // TODO implement, look up how lobbies are created & saved
     /**
      * Saves the name of a player.
      * Validates the admin client and playerName before attempting to save the playerName.
@@ -52,7 +53,19 @@
      * @returns {void}
      */
     const savePlayerName = async () => {
-        
+        if (!playerName.value.trim()) {
+            errorMessage.value = "Playername can't be empty";
+            return;
+        }
+
+        try {
+            lobbiesStore.createPlayer(playerName.value);
+            errorMessage.value = "";
+
+            emit('hidePlayerNameForm');
+        } catch (error) {
+            console.error("Error saving playername", error);
+        }
     }
 
 </script>
