@@ -8,7 +8,7 @@
     <div :style="getBackgroundStyle" class="Calories-Overlay" v-if="lobbydata.currentPlayer.role == 'SNACKMAN'">
       <div class="overlayContent">
         <img alt="calories" class="calories-icon" src="@/assets/calories.svg"/>
-        <p v-if="currentCalories < MAXCALORIES">{{ currentCalories }}kcal</p>
+        <p v-if="currentCalories < MAX_CALORIES">{{ currentCalories }}kcal</p>
         <p v-else>{{ caloriesMessage }}</p>
       </div>
     </div>
@@ -25,9 +25,9 @@ import {useGameMapStore} from '@/stores/gameMapStore';
 import type {IGameMap} from '@/stores/IGameMapDTD';
 import {useLobbiesStore} from '@/stores/Lobby/lobbiesstore';
 import type {IPlayerClientDTD} from "@/stores/Lobby/IPlayerClientDTD";
-import {GLTFLoader} from 'three/examples/jsm/Addons.js'
-import {useRouter, useRoute} from 'vue-router';
+import {useRoute} from 'vue-router';
 import { GLTFLoader } from 'three/examples/jsm/Addons.js'
+import type {IPlayerDTD} from "@/stores/Player/IPlayerDTD";
 
 const {lobbydata} = useLobbiesStore();
 const gameMapStore = useGameMapStore()
@@ -41,10 +41,9 @@ const route = useRoute();
 const stompclient = gameMapStore.stompclient
 
 //Reaktive Calories Variable
-const MAXCALORIES = 3000
+const MAX_CALORIES = ref(3000)
 let currentCalories = ref()
 let caloriesMessage = ref('')
-const playerRole = ref(route.query.role || ''); // Player role from the URL query
 
 const SNACKMAN_TEXTURE: string = 'src/assets/kirby.glb'
 let snackManModel: THREE.Group<THREE.Object3DEventMap>
@@ -61,8 +60,6 @@ const sprintData = reactive({
   isCooldown: false,
 })
 
-let sprintInCooldown = false;
-
 // camera setup
 let camera: THREE.PerspectiveCamera
 
@@ -77,7 +74,6 @@ function animate() {
   currentCalories.value = player.getCalories()
   fps = 1 / clock.getDelta()
   player.updatePlayer()
-  checkIfGameEnd()
 
   if (counter >= fps / targetHz) {
     const time = performance.now()
@@ -139,7 +135,8 @@ onMounted(async () => {
 
   clients = lobbydata.lobbies.find((elem) => elem.lobbyId === lobbydata.currentPlayer.joinedLobbyId)?.members!
   console.log(clients)
-  const playerData = await fetchSnackManFromBackend(lobbydata.currentPlayer.joinedLobbyId!, lobbydata.currentPlayer.playerId);
+  const playerData: IPlayerDTD = await fetchSnackManFromBackend(lobbydata.currentPlayer.joinedLobbyId!, lobbydata.currentPlayer.playerId);
+  MAX_CALORIES.value = playerData.maxCalories
 
   clients.forEach(it => {
     if (it.playerId === lobbydata.currentPlayer.playerId) {
@@ -244,9 +241,8 @@ function stopCooldownFill() {
 
 // Kalorien-Overlay Fill berrechnen
 const getBackgroundStyle = computed(() => {
-  const maxCalories = 3000
   //Prozent berechnen
-  const percentage = Math.min(currentCalories.value / maxCalories, 1)
+  const percentage = Math.min(currentCalories.value / MAX_CALORIES.value, 1)
 
   const color = `linear-gradient(to right, #EEC643 ${percentage * 100}%, #5E4A08 ${percentage * 100}%)`
 
