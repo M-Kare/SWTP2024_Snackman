@@ -100,7 +100,9 @@
     const route = useRoute();
     const lobbiesStore = useLobbiesStore();
 
-    let lobby = computed(() => lobbiesStore.lobbydata.lobbies.find(l => l.lobbyId === route.params.lobbyId));
+    const lobbyUrl = route.params.lobbyId
+    let lobbyLoaded = false
+    let lobby = computed(() => lobbiesStore.lobbydata.lobbies.find(l => l.lobbyId === lobbyUrl));
     const members = computed(() => lobby.value?.members || [] as Array<IPlayerClientDTD>);
     const playerCount = computed(() => members.value.length);
     const maxPlayerCount = ref(5);
@@ -129,13 +131,11 @@
     }
 
     watchEffect(() => {
-        if (lobbiesStore.lobbydata) {
-            const lobbyId = route.params.lobbyId as string;
+        if (lobbiesStore.lobbydata && lobbiesStore.lobbydata.lobbies) {
 
-            const updatedLobby = lobbiesStore.lobbydata.lobbies.find(l => l.lobbyId === lobbyId);
-            console.log("Updated Lobby in Lobby-View", updatedLobby)
-
+            const updatedLobby = lobbiesStore.lobbydata.lobbies.find(l => l.lobbyId === lobbyUrl);
             if (updatedLobby) {
+                lobbyLoaded = true
                 console.log("Gamestarted in Lobby-View", updatedLobby.gameStarted)
                 if (updatedLobby.gameStarted){
                     console.log('Game has started! Redirecting to GameView...');
@@ -146,7 +146,7 @@
                     console.log('Navigating to GameView with role:', lobbiesStore.lobbydata.currentPlayer.role);
                 }
             }
-            else {
+            else if(lobbyLoaded){
                 router.push({ name: 'LobbyListView' });
             }
         }
