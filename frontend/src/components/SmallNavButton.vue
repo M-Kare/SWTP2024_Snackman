@@ -13,7 +13,7 @@
   position: inherit;
   font-size: 1.2rem;
   width: auto;
-  padding: 1rem;
+  padding: 0.8rem 1rem;
   height: auto;
   text-align: center;
   cursor: pointer;
