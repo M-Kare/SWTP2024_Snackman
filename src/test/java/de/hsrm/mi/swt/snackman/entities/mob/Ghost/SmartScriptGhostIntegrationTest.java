@@ -22,19 +22,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * Integration tests for Ghost movement logic with Jython and Java integration.
  * This class ensures that the 'Ghost' Java class correctly interacts with
  * the 'SmartGhostMovementSkript.py' Python logic.
- *
- * todo fix tests
  */
 public class SmartScriptGhostIntegrationTest {
 
     @Mock
     private GameMap gameMap;
     private ScriptGhost scriptGhost;
-
-    /**
-     * Verifies that the Chicken can interact with the Python script directly,
-     * using a Jython interpreter and chooses the correct empty square (" ").
-     */
 
     private static final Path workFolder = Paths.get("./extensions").toAbsolutePath();
 
@@ -55,17 +48,21 @@ public class SmartScriptGhostIntegrationTest {
         }
     }
 
+    /**
+     * Verifies that the Script Ghost can interact with the Python script directly,
+     * using a Jython interpreter and returns a result.
+     */
     @Test
     void testGhostMovement() {
         try (PythonInterpreter pyInterp = new PythonInterpreter()) {
             pyInterp.exec("import sys");
             pyInterp.exec("sys.path.append('./extensions/ghost/')");
 
-            String mapAroundGhost = "'L', 'L', 'W', 'W', 'W', 'W', 'W', 'W', '0'";
+            String mapAroundGhost = "'L', 'M', 'L', 'G', 'L', 'L', 'L', 'L', '0'";
             pyInterp.exec("from SmartGhostMovementSkript import choose_next_square");
             pyInterp.exec("result = choose_next_square([" + mapAroundGhost + "])");
 
-            String result = pyInterp.get("result").toString();
+            int result = Integer.parseInt(pyInterp.get("result").toString());
 
             assertEquals(0, result,
                     "The Python script should correctly determine the next move (' ').");

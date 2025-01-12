@@ -18,8 +18,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * Integration tests for Ghost movement logic with Jython and Java integration.
  * This class ensures that the 'Ghost' Java class correctly interacts with
  * the 'GhostMovementSkript.py' Python logic.
- *
- * todo fix tests
  */
 public class ScriptGhostIntegrationTest {
 
