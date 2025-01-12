@@ -1,23 +1,20 @@
 package de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs;
 
+import de.hsrm.mi.swt.snackman.configuration.GameConfig;
 import de.hsrm.mi.swt.snackman.entities.map.GameMap;
+import de.hsrm.mi.swt.snackman.entities.map.Square;
+import de.hsrm.mi.swt.snackman.entities.mapObject.snack.Snack;
+import de.hsrm.mi.swt.snackman.entities.mapObject.snack.SnackType;
 import de.hsrm.mi.swt.snackman.entities.mechanics.SprintHandler;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.Ghost;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.Mob;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.ScriptGhost;
-import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken.Chicken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import de.hsrm.mi.swt.snackman.configuration.GameConfig;
-import de.hsrm.mi.swt.snackman.entities.map.Square;
-import de.hsrm.mi.swt.snackman.entities.mapObject.snack.Snack;
-import de.hsrm.mi.swt.snackman.entities.mapObject.snack.SnackType;
-
-import java.util.stream.Stream;
-
 public class SnackMan extends EatingMob {
     private final Logger log = LoggerFactory.getLogger(SnackMan.class);
+    private final int GAME_FINISH_BECAUSE_OF_TOO_FEW_CKAL = -1;
     private boolean isJumping = false;
     private double velocityY = 0.0;
     private boolean isSprinting = false;
@@ -38,9 +35,11 @@ public class SnackMan extends EatingMob {
         super(gameMap, speed, radius, posX, posY, posZ);
     }
 
-    public void loseKcal() {
+    public void isScaredFromGhost() {
         // Calorsies reduced by 300 if Ghost hit
-        setKcal(getKcal() - GameConfig.GHOST_DAMAGE);
+        if (super.getKcal() > GameConfig.GHOST_DAMAGE) {
+            setKcal(getKcal() - GameConfig.GHOST_DAMAGE);
+        } else super.setKcal(GAME_FINISH_BECAUSE_OF_TOO_FEW_CKAL);
     }
 
     //JUMPING
@@ -101,11 +100,10 @@ public class SnackMan extends EatingMob {
             newSquare.addMob(this);
         }
 
+        // when snackman runs into a ghost
         for (Mob mob : newSquare.getMobs()) {
-            if (mob instanceof Ghost) {
-                ((Ghost) mob).scareSnackMan(this);
-            } else if (mob instanceof ScriptGhost) {
-                ((ScriptGhost) mob).scareSnackMan(this);
+            if (mob instanceof Ghost || mob instanceof ScriptGhost) {
+                this.isScaredFromGhost();
             }
         }
     }

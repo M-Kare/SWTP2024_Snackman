@@ -1,28 +1,22 @@
 package de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken;
 
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
-import java.util.Random;
-import java.util.Timer;
-import java.util.TimerTask;
-
+import de.hsrm.mi.swt.snackman.configuration.GameConfig;
 import de.hsrm.mi.swt.snackman.entities.map.GameMap;
+import de.hsrm.mi.swt.snackman.entities.map.Square;
+import de.hsrm.mi.swt.snackman.entities.mapObject.MapObjectType;
+import de.hsrm.mi.swt.snackman.entities.mapObject.snack.Snack;
+import de.hsrm.mi.swt.snackman.entities.mapObject.snack.SnackType;
+import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.EatingMob;
 import org.python.core.PyList;
 import org.python.core.PyObject;
 import org.python.util.PythonInterpreter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import de.hsrm.mi.swt.snackman.configuration.GameConfig;
-import de.hsrm.mi.swt.snackman.entities.map.Square;
-import de.hsrm.mi.swt.snackman.entities.mapObject.MapObjectType;
-import de.hsrm.mi.swt.snackman.entities.mapObject.snack.Snack;
-import de.hsrm.mi.swt.snackman.entities.mapObject.snack.SnackType;
-import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.EatingMob;
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
+import java.nio.file.Paths;
+import java.util.*;
 
 /**
  * Represents a chicken entity in the game, capable of moving around the map,
@@ -31,9 +25,12 @@ import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.EatingMob;
 public class Chicken extends EatingMob implements Runnable {
 
     private static long idCounter = 0;
-    private long id;
     private final PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
     private final Logger log = LoggerFactory.getLogger(Chicken.class);
+    private final int WAITING_TIME = GameConfig.WAITING_TIME;  // in ms
+    private final int MAX_CALORIES = GameConfig.MAX_KALORIEN;
+    private final int CALORIES_PER_SIXTH = (MAX_CALORIES / 6);
+    private long id;
     private Thickness thickness = Thickness.THIN;
     private int chickenPosX, chickenPosZ;
     private Direction lookingDirection;
@@ -41,9 +38,6 @@ public class Chicken extends EatingMob implements Runnable {
     private boolean isWalking;
     private boolean blockingPath = false;
     private boolean isScared = false;
-    private final int WAITING_TIME = GameConfig.WAITING_TIME;  // in ms
-    private final int MAX_CALORIES = GameConfig.MAX_KALORIEN;
-    private final int CALORIES_PER_SIXTH = (MAX_CALORIES / 6);
     private Timer eggLayingTimer;
     // python
     private PythonInterpreter pythonInterpreter = null;
@@ -78,11 +72,19 @@ public class Chicken extends EatingMob implements Runnable {
         initTimer();
     }
 
+    /**
+     * Method to generate the next id of a new Chicken. It is synchronized because of thread-safety.
+     *
+     * @return the next incremented id
+     */
+    protected synchronized static long generateId() {
+        return idCounter++;
+    }
+
     public List<String> act(List<String> squares) {
         List<String> result = executeMovementSkript(squares);
         return result;
     }
-
 
     /**
      * Converts a Python list to a Java list.
@@ -97,15 +99,6 @@ public class Chicken extends EatingMob implements Runnable {
         }
         log.debug("Python script result is {}", javaList);
         return javaList;
-    }
-
-    /**
-     * Method to generate the next id of a new Chicken. It is synchronized because of thread-safety.
-     *
-     * @return the next incremented id
-     */
-    protected synchronized static long generateId() {
-        return idCounter++;
     }
 
     public void addPropertyChangeListener(PropertyChangeListener listener) {
@@ -416,18 +409,14 @@ public class Chicken extends EatingMob implements Runnable {
      */
     public void addEggToSquare(Square square, Snack laidEgg) {
         square.setSnack(laidEgg);
-        log.debug("{} kcal egg add to square {} and square {}", laidEgg.getCalories(), square.getId(), square.getId());
-    }
-
-    public boolean isScared() {
-        return isScared;
     }
 
     /**
      * Sets the chicken to be scared and restarts the timer with a delay
      */
-    public void setScared(boolean scared) {
+    public void isScaredFromGhost(boolean scared) {
         this.isScared = scared;
+        layEgg();
         startNewTimer();
     }
 

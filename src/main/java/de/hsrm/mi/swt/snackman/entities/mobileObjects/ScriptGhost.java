@@ -2,7 +2,6 @@ package de.hsrm.mi.swt.snackman.entities.mobileObjects;
 
 import de.hsrm.mi.swt.snackman.entities.map.GameMap;
 import de.hsrm.mi.swt.snackman.entities.map.Square;
-import de.hsrm.mi.swt.snackman.entities.mapObject.MapObjectType;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken.Chicken;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken.Direction;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.SnackMan;
@@ -30,16 +29,16 @@ import java.util.Properties;
 public class ScriptGhost extends Mob implements Runnable {
 
     private static long idCounter = 0;
-    private long id;
     private final PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
     private final Logger log = LoggerFactory.getLogger(ScriptGhost.class);
+    private final int WAITING_TIME = 2000;  // in ms
+    private final Properties pythonProps = new Properties();
+    private long id;
     private Direction lookingDirection;
     private boolean isWalking;
-    private final int WAITING_TIME = 2000;  // in ms
     private int ghostPosX, ghostPosZ;
     // python
     private PythonInterpreter pythonInterpreter = null;
-    private final Properties pythonProps = new Properties();
     private ScriptGhostDifficulty difficulty = ScriptGhostDifficulty.EASY;
     private GameMap gameMap;
 
@@ -75,6 +74,15 @@ public class ScriptGhost extends Mob implements Runnable {
     }
 
     /**
+     * Method to generate the next id of a new ScriptGhost. It is synchronized because of thread-safety.
+     *
+     * @return the next incremented id
+     */
+    protected synchronized static long generateId() {
+        return idCounter++;
+    }
+
+    /**
      * @param currentPosition  the square the ghost is standing on top of
      * @param lookingDirection
      * @return a list of 8 square which are around the current square + the
@@ -102,15 +110,6 @@ public class ScriptGhost extends Mob implements Runnable {
     }
 
     /**
-     * Method to generate the next id of a new ScriptGhost. It is synchronized because of thread-safety.
-     *
-     * @return the next incremented id
-     */
-    protected synchronized static long generateId() {
-        return idCounter++;
-    }
-
-    /**
      * Contains the movement logic for the ghost. The ghost calculates its next
      * moves and updates its position.
      */
@@ -125,7 +124,7 @@ public class ScriptGhost extends Mob implements Runnable {
             log.debug("Current position is x {} z {}", this.ghostPosX, this.ghostPosZ);
 
             int newMove = 0;
-            if(this.difficulty == ScriptGhostDifficulty.EASY) {
+            if (this.difficulty == ScriptGhostDifficulty.EASY) {
                 newMove = executeMovementSkript(squares);
             } else {
                 List<List<String>> pythonList = new ArrayList<>();
@@ -156,8 +155,6 @@ public class ScriptGhost extends Mob implements Runnable {
      */
     public int executeMovementSkript(List<String> squares) {
         try {
-            log.debug("Running python ghost script with: {}", squares.toString());
-
             PyObject func = pythonInterpreter.get("choose_next_square");
             PyObject result = func.__call__(new PyList(squares));
 
@@ -171,8 +168,6 @@ public class ScriptGhost extends Mob implements Runnable {
 
     public int executeMovementSkriptDifficult(List<List<String>> pythonList) {
         try {
-            log.debug("Running python ghost script with: {}", pythonList.toString());
-
             PyObject func = pythonInterpreter.get("choose_next_square");
             PyObject result = func.__call__(new PyList(pythonList));
 
@@ -193,7 +188,6 @@ public class ScriptGhost extends Mob implements Runnable {
 
         try {
             String scriptPath = Paths.get("extensions/ghost/GhostMovementSkript.py").normalize().toAbsolutePath().toString();
-            log.debug("Resolved script path: {}", scriptPath);
 
             // Get the directory of the script (without the .)
             String scriptDir = Paths.get(scriptPath).getParent().toString();
@@ -222,15 +216,12 @@ public class ScriptGhost extends Mob implements Runnable {
     private void setNewPosition(int newMove) {
         //get positions
         Direction walkingDirection = Direction.getDirection(String.valueOf(newMove));
-        log.debug("Walking direction is: {}", walkingDirection);
-
         this.lookingDirection = walkingDirection;
         Square oldPosition = this.gameMap.getSquareAtIndexXZ(this.ghostPosX, this.ghostPosZ);
         Square newPosition = walkingDirection.getNewPosition(this.gameMap, this.ghostPosX, this.ghostPosZ, walkingDirection);
         propertyChangeSupport.firePropertyChange("scriptGhost", null, this);
 
         try {
-            log.debug("Waiting " + WAITING_TIME + " sec before walking on next square.");
             Thread.sleep(WAITING_TIME);
         } catch (InterruptedException e) {
             log.error(e.getMessage());
@@ -243,7 +234,29 @@ public class ScriptGhost extends Mob implements Runnable {
         this.setPosZ(newPosition.getIndexZ());
         oldPosition.removeMob(this);
         newPosition.addMob(this);
+        scaresEverythingThatCouldBeEncountered(newPosition, gameMap);
         propertyChangeSupport.firePropertyChange("scriptGhost", null, this);
+    }
+
+    /**
+     * when moving, the ghost scares everything that gets in its way
+     *
+     * @param currentPosition current position
+     * @param gameMap         gamemap
+     */
+    private void scaresEverythingThatCouldBeEncountered(Square currentPosition, GameMap gameMap) {
+        for (Mob mob : gameMap.getSquareAtIndexXZ(currentPosition.getIndexX(), currentPosition.getIndexZ()).getMobs()) {
+            switch (mob) {
+                case SnackMan snackMan:
+                    snackMan.isScaredFromGhost();
+                    break;
+                case Chicken chicken:
+                    chicken.isScaredFromGhost(true);
+                    break;
+                default:
+                    break;
+            }
+        }
     }
 
     /**
@@ -257,10 +270,6 @@ public class ScriptGhost extends Mob implements Runnable {
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    public void scareSnackMan(SnackMan snackMan) {
-        snackMan.loseKcal();
     }
 
     public long getId() {
