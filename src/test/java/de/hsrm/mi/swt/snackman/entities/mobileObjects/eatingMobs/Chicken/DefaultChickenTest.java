@@ -49,12 +49,9 @@ class DefaultChickenTest {
                                                     "L", "W", "L", "W", "L",
                                                     "L", "W", "L", "W", "L", "0");
 
-        List<String> result = chicken.act(visibleEnvironment);
+        int result = chicken.act(visibleEnvironment);
 
-        //int chosenDirectionIndex = Integer.parseInt(result.get(12));
-        int chosenDirectionIndex = Integer.parseInt(result.get(result.size() - 1));
-
-        assertEquals(" ", result.get(chosenDirectionIndex),
+        assertEquals(" ", result,
                 "The Chicken should move to the empty space (' ') matching its new direction.");
     }
 
@@ -68,14 +65,11 @@ class DefaultChickenTest {
                                                     "L", "L", "L", "L", "L",
                                                     "L", "W", "L", "W", "L", "0");
 
-        List<String> result = chicken.act(visibleEnvironment);
+        int result = chicken.act(visibleEnvironment);
 
-        //int chosenDirectionIndex = Integer.parseInt(result.get(12));
-        int chosenDirectionIndex = Integer.parseInt(result.get(result.size() - 1));
+        //assertTrue(Integer.parseInt(result.get(result.size() - 1)) != 0, "New ChickenIndex must not be the Index with the Ghost");
 
-        assertTrue(Integer.parseInt(result.get(result.size() - 1)) != 0, "New ChickenIndex must not be the Index with the Ghost");
-
-        assertEquals(" ", result.get(chosenDirectionIndex),
+        assertEquals(" ", result,
                 "The Chicken should move to the empty space (' ') matching its new direction.");
     }
 
@@ -89,11 +83,9 @@ class DefaultChickenTest {
                                                     "L", "L", "L", "L", "L",
                                                     "L", "W", "L", "W", "L", "0");
 
-        List<String> result = chicken.act(visibleEnvironment);
+        int result = chicken.act(visibleEnvironment);
 
-        int chosenDirectionIndex = Integer.parseInt(result.get(result.size() - 1));
-
-        assertEquals(" ", result.get(chosenDirectionIndex),
+        assertEquals(" ", result,
                 "The Chicken should move to the empty space (' ') matching its new direction.");
     }
 
@@ -107,11 +99,9 @@ class DefaultChickenTest {
                                                     "L", "L", "L", "L", "L",
                                                     "L", "W", "L", "W", "L", "0");
 
-        List<String> result = chicken.act(visibleEnvironment);
+        int result = chicken.act(visibleEnvironment);
 
-        int chosenDirectionIndex = Integer.parseInt(result.getLast());
-
-        assertEquals(" ", result.get(chosenDirectionIndex),
+        assertEquals(" ", result,
                 "The Chicken should move to the empty space (' ') matching its new direction.");
     }
 
@@ -125,11 +115,9 @@ class DefaultChickenTest {
                                                     "L", "L", "L", "L", "L",
                                                     "L", "W", "L", "W", "L", "0");
 
-        List<String> result = chicken.act(visibleEnvironment);
+        int result = chicken.act(visibleEnvironment);
 
-        int chosenDirectionIndex = Integer.parseInt(result.get(result.size() - 1));
-
-        assertEquals(" ", result.get(chosenDirectionIndex),
+        assertEquals(" ", result,
                 "The Chicken should move to the empty space (' ') matching its new direction.");
     }
 
@@ -143,11 +131,9 @@ class DefaultChickenTest {
                                                     "L", "G", "S", "W", "L",
                                                     "L", "W", "L", "W", "L", "0");
 
-        List<String> result = chicken.act(visibleEnvironment);
+        int result = chicken.act(visibleEnvironment);
 
-        int chosenDirectionIndex = Integer.parseInt(result.get(result.size() - 1));
-
-        assertEquals(" ", result.get(chosenDirectionIndex),
+        assertEquals(" ", result,
                 "The Chicken should move to the empty space (' ') matching its new direction.");
     }
     
@@ -161,11 +147,9 @@ class DefaultChickenTest {
                                                     "L", "L", "L", "L", "L",
                                                     "L", "W", "L", "W", "L", "0");
 
-        List<String> result = chicken.act(visibleEnvironment);
+        int result = chicken.act(visibleEnvironment);
 
-        int chosenDirectionIndex = Integer.parseInt(result.get(result.size() - 1));
-
-        assertEquals(" ", result.get(chosenDirectionIndex),
+        assertEquals(" ", result,
                 "The Chicken should move to the empty space (' ') matching its new direction.");
     }
 }

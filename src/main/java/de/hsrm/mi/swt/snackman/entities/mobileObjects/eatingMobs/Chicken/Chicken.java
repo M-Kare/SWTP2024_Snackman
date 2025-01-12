@@ -62,13 +62,13 @@ public class Chicken extends EatingMob implements Runnable {
         initJython();
     }
 
-    public Chicken(Square initialPosition, GameMap gameMap) {
+    public Chicken(Square initialPosition, GameMap gameMap, String fileName) {
         super(gameMap);
         id = generateId();
         this.chickenPosX = initialPosition.getIndexX();
         this.chickenPosZ = initialPosition.getIndexZ();
         initialPosition.addMob(this);
-        this.fileName = "ChickenMovementSkript";
+        this.fileName = fileName;
         this.isWalking = true;
         this.lookingDirection = Direction.getRandomDirection();
         // log.info("Chicken looking direction is {}", lookingDirection);
@@ -76,8 +76,8 @@ public class Chicken extends EatingMob implements Runnable {
         initTimer();
     }
 
-    public List<String> act(List<String> squares){
-        List<String> result = executeMovementSkript(squares);
+    public int act(List<String> squares){
+        int result = executeMovementSkript(squares);
         return result;
     }
 
@@ -124,9 +124,9 @@ public class Chicken extends EatingMob implements Runnable {
      *
      * @param newMove a list representing the next move for the chicken.
      */
-    private void setNewPosition(List<String> newMove) {
+    private void setNewPosition(int newMove) {
         //get positions
-        Direction walkingDirection = Direction.getDirection(newMove.getLast());
+        Direction walkingDirection = Direction.getDirection(newMove);
         log.debug("Walking direction is: {}", walkingDirection);
 
         this.lookingDirection = walkingDirection;
@@ -168,7 +168,7 @@ public class Chicken extends EatingMob implements Runnable {
             if (!blockingPath) {
                 log.debug("Current position is x {} z {}", this.chickenPosX, this.chickenPosZ);
 
-                List<String> newMove = act(squares);
+                int newMove = act(squares);
 
                 // set new square you move to
                 setNewPosition(newMove);
@@ -258,7 +258,7 @@ public class Chicken extends EatingMob implements Runnable {
         this.pythonInterpreter = new PythonInterpreter();
 
         try {
-            String scriptPath = Paths.get("extensions/chicken/ChickenMovementSkript.py").normalize().toAbsolutePath().toString();
+            String scriptPath = Paths.get("extensions/chicken/" + fileName + ".py").normalize().toAbsolutePath().toString();
             log.debug("Resolved script path: {}", scriptPath);
 
             // Get the directory of the script (without the .)
@@ -276,7 +276,7 @@ public class Chicken extends EatingMob implements Runnable {
             log.error("Error initializing ChickenMovementSkript.py: ", ex);
             ex.printStackTrace();
         }
-        this.pythonInterpreter.exec("from ChickenMovementSkript import choose_next_square");
+        this.pythonInterpreter.exec("from " + fileName +" import choose_next_square");
     }
 
     /**
@@ -286,24 +286,19 @@ public class Chicken extends EatingMob implements Runnable {
      * @param squares a list of squares visible from the chicken's current position.
      * @return a list of moves resulting from the Python script's execution.
      */
-    public List<String> executeMovementSkript(List<String> squares) {
+    public int executeMovementSkript(List<String> squares) {
         try {
             log.debug("Running python chicken script with: {}", squares.toString());
             PyObject func = pythonInterpreter.get("choose_next_square");
             PyObject result = func.__call__(new PyList(squares));
 
-            if (result instanceof PyList) {
-                PyList pyList = (PyList) result;
-                log.debug("Python chicken script return: {}", pyList);
-                return convertPythonList(pyList);
-            }
+            return result.asInt();
 
-            throw new Exception("Python chicken script did not load.");
         } catch (Exception ex) {
             log.error("Error while executing chicken python script: ", ex);
             ex.printStackTrace();
         }
-        return squares;
+        return 0;
     }
 
     // /**
