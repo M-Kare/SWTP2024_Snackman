@@ -61,7 +61,7 @@ public class LobbyController {
             PlayerClient client = lobbyManagerService.findClientByClientId(creatorUuid);
 
             try {
-                  Lobby newLobby = lobbyManagerService.createLobby(name, client);
+                  Lobby newLobby = lobbyManagerService.createLobby(name, client, lobbyManagerService.getMessageLoop());
                   messagingTemplate.convertAndSend("/topic/lobbies", lobbyManagerService.getAllLobbies());
                   logger.info("Creating lobby with name: {} and creatorUuid: {}", name, creatorUuid);
                   

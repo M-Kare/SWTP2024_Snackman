@@ -1,12 +1,20 @@
 package de.hsrm.mi.swt.snackman.entities.lobby;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.util.*;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import de.hsrm.mi.swt.snackman.configuration.GameConfig;
 import de.hsrm.mi.swt.snackman.entities.map.GameMap;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.Mob;
+import de.hsrm.mi.swt.snackman.entities.mobileObjects.ScriptGhost;
+import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.SnackMan;
+import de.hsrm.mi.swt.snackman.messaging.MessageLoop.MessageLoop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Lazy;
 
 /**
  * Represents a lobby where players can gather to play a game together.
@@ -27,8 +35,9 @@ public class Lobby {
     private long gameStartTime;
     private long endTime;
     private final Logger log = LoggerFactory.getLogger(Lobby.class);
+    private MessageLoop messageLoop;
 
-    public Lobby(String lobbyId, String name, PlayerClient adminClient, GameMap gameMap) {
+    public Lobby(String lobbyId, String name, PlayerClient adminClient, GameMap gameMap, MessageLoop messageLoop) {
         this.lobbyId = lobbyId;
         this.gameMap = gameMap;
         this.name = name;
@@ -37,6 +46,7 @@ public class Lobby {
         this.members = new ArrayList<>();
         this.members.add(adminClient);
         this.clientMobMap = new TreeMap<>();
+        this.messageLoop = messageLoop;
         initTimer();
     }
 
@@ -80,16 +90,32 @@ public class Lobby {
     /**
      * Ends the game by ending the playing time timer
      * and determining who won the game.
+     *
      * @param winningRole the role winning the game
      */
     public void endGame(ROLE winningRole) {
         log.info("The role {} has won the game.", winningRole);
-        this.isGameFinished = true;
         this.endTime = System.currentTimeMillis();
         this.timePlayed = (endTime - this.gameStartTime) / 1000;
-        if(this.timePlayed > (GameConfig.PLAYING_TIME / 1000))
+        if (this.timePlayed > (GameConfig.PLAYING_TIME / 1000))
             this.timePlayed = GameConfig.PLAYING_TIME / 1000;
         this.winningRole = winningRole;
+        SnackMan snackMan = getSnackman();
+
+        if(snackMan != null) {
+            GameEnd gameEnd = new GameEnd(winningRole, this.timePlayed, snackMan.getKcal());
+            setGameFinished(true, gameEnd);
+        }
+    }
+
+    public SnackMan getSnackman() {
+        return Arrays.stream(this.gameMap.getGameMapSquares())
+                .flatMap(Arrays::stream)
+                .flatMap(square -> square.getMobs().stream())
+                .filter(mob -> mob instanceof SnackMan)
+                .map(mob -> (SnackMan) mob)
+                .findFirst()
+                .orElse(null);
     }
 
     public SortedMap<String, Mob> getClientMobMap() {
@@ -110,9 +136,12 @@ public class Lobby {
 
     public void setGameStarted() {
         this.isGameStarted = true;
-        if (isGameStarted) {
-            setTimeSinceLastSnackSpawn(System.currentTimeMillis());
-        }
+        setTimeSinceLastSnackSpawn(System.currentTimeMillis());
+    }
+
+    public void setGameFinished(boolean gameFinished, GameEnd gameEnd) {
+        this.isGameFinished = gameFinished;
+        messageLoop.addGameEndToQueue(gameEnd, lobbyId);
     }
 
     public List<PlayerClient> getMembers() {
