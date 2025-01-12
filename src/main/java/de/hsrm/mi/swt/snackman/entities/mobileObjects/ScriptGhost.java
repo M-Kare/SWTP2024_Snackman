@@ -2,6 +2,7 @@ package de.hsrm.mi.swt.snackman.entities.mobileObjects;
 
 import de.hsrm.mi.swt.snackman.entities.map.GameMap;
 import de.hsrm.mi.swt.snackman.entities.map.Square;
+import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken.Chicken;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken.Direction;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.SnackMan;
 import org.python.core.PyList;
@@ -74,6 +75,15 @@ public class ScriptGhost extends Mob implements Runnable {
     }
 
     /**
+     * Method to generate the next id of a new ScriptGhost. It is synchronized because of thread-safety.
+     *
+     * @return the next incremented id
+     */
+    protected synchronized static long generateId() {
+        return idCounter++;
+    }
+
+    /**
      * @param currentPosition  the square the ghost is standing on top of
      * @param lookingDirection
      * @return a list of 8 square which are around the current square + the
@@ -98,15 +108,6 @@ public class ScriptGhost extends Mob implements Runnable {
 
     public void addPropertyChangeListener(PropertyChangeListener listener) {
         this.propertyChangeSupport.addPropertyChangeListener(listener);
-    }
-
-    /**
-     * Method to generate the next id of a new ScriptGhost. It is synchronized because of thread-safety.
-     *
-     * @return the next incremented id
-     */
-    protected synchronized static long generateId() {
-        return idCounter++;
     }
 
     /**
@@ -233,15 +234,12 @@ public class ScriptGhost extends Mob implements Runnable {
     private void setNewPosition(int newMove) {
         //get positions
         Direction walkingDirection = Direction.getDirection(String.valueOf(newMove));
-        log.debug("Walking direction is: {}", walkingDirection);
-
         this.lookingDirection = walkingDirection;
         Square oldPosition = this.gameMap.getSquareAtIndexXZ(this.ghostPosX, this.ghostPosZ);
         Square newPosition = walkingDirection.getNewPosition(this.gameMap, this.ghostPosX, this.ghostPosZ, walkingDirection);
         propertyChangeSupport.firePropertyChange("scriptGhost", null, this);
 
         try {
-            log.debug("Waiting " + WAITING_TIME + " sec before walking on next square.");
             Thread.sleep(WAITING_TIME);
         } catch (InterruptedException e) {
             log.error(e.getMessage());
@@ -254,7 +252,29 @@ public class ScriptGhost extends Mob implements Runnable {
         this.setPosZ(newPosition.getIndexZ());
         oldPosition.removeMob(this);
         newPosition.addMob(this);
+        scaresEverythingThatCouldBeEncountered(newPosition, gameMap);
         propertyChangeSupport.firePropertyChange("scriptGhost", null, this);
+    }
+
+    /**
+     * when moving, the ghost scares everything that gets in its way
+     *
+     * @param currentPosition current position
+     * @param gameMap         gamemap
+     */
+    private void scaresEverythingThatCouldBeEncountered(Square currentPosition, GameMap gameMap) {
+        for (Mob mob : gameMap.getSquareAtIndexXZ(currentPosition.getIndexX(), currentPosition.getIndexZ()).getMobs()) {
+            switch (mob) {
+                case SnackMan snackMan:
+                    snackMan.isScaredFromGhost();
+                    break;
+                case Chicken chicken:
+                    chicken.isScaredFromGhost(true);
+                    break;
+                default:
+                    break;
+            }
+        }
     }
 
     /**
@@ -268,10 +288,6 @@ public class ScriptGhost extends Mob implements Runnable {
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    public void scareSnackMan(SnackMan snackMan) {
-        snackMan.loseKcal();
     }
 
     public long getId() {

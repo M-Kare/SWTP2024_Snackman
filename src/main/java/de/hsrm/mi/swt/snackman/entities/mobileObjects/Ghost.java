@@ -5,6 +5,7 @@ import de.hsrm.mi.swt.snackman.entities.map.GameMap;
 import de.hsrm.mi.swt.snackman.entities.map.Square;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken.Chicken;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.SnackMan;
+
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 
@@ -18,18 +19,25 @@ public class Ghost extends Mob {
         currentSquare.addMob(this);
     }
 
-    public void scare(Square position, GameMap gameMap) {
+    /**
+     * when moving, the ghost scares everything that gets in its way
+     *
+     * @param position current position
+     * @param gameMap  gamemap
+     */
+    public void scaresEverythingThatCouldBeEncountered(Square position, GameMap gameMap) {
         for (Mob mob : gameMap.getSquareAtIndexXZ(position.getIndexX(), position.getIndexZ()).getMobs()) {
-            if (mob instanceof Chicken) scareChicken();
+            switch (mob) {
+                case SnackMan snackMan:
+                    snackMan.isScaredFromGhost();
+                    break;
+                case Chicken chicken:
+                    chicken.isScaredFromGhost(true);
+                    break;
+                default:
+                    break;
+            }
         }
-    }
-
-    private void scareChicken() {
-        // TODO VIVIEN!!
-    }
-
-    public void scareSnackMan(SnackMan snackMan) {
-        snackMan.loseKcal();
     }
 
     @Override
@@ -37,7 +45,7 @@ public class Ghost extends Mob {
         Square oldSquare = gameMap.getSquareAtIndexXZ(calcMapIndexOfCoordinate(super.getPosX()), calcMapIndexOfCoordinate(super.getPosZ()));
         super.move(f, b, l, r, delta, gameMap);
         Square newSquare = gameMap.getSquareAtIndexXZ(calcMapIndexOfCoordinate(super.getPosX()), calcMapIndexOfCoordinate(super.getPosZ()));
-        scare(newSquare, gameMap);
+        scaresEverythingThatCouldBeEncountered(newSquare, gameMap);
         if (!oldSquare.equals(newSquare)) {
             oldSquare.removeMob(this);
             newSquare.addMob(this);
