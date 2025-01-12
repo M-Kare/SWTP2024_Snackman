@@ -147,6 +147,9 @@
                     console.log('Navigating to GameView with role:', lobbiesStore.lobbydata.currentPlayer.role);
                 }
             }
+            else {
+                router.push({ name: 'LobbyListView' });
+            }
         }
     });
 

@@ -27,6 +27,13 @@ public class GameConfig {
     public static final int MAX_KALORIEN = 3000;
     public static final String MAX_KALORIEN_MESSAGE = "Maximum calories reached!";
 
+    //GHOST
+    public static final int GHOST_GROUND_LEVEL = 2;
+    public static final double GHOST_RADIUS = 0.3;
+    public static final int GHOST_SPEED = 10;
+    public  static  final int GHOST_DAMAGE = 300;
+    public  static  final int AMOUNT_PLAYERS = 5;
+
     //GAME
     public static final long PLAYING_TIME = 300000; // 5 mins
 }

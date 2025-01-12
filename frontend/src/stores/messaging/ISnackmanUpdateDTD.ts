@@ -1,6 +1,6 @@
 import * as THREE from "three";
 
-export interface IMobUpdateDTD {
+export interface ISnackmanUpdateDTD {
   calories: number,
   position: THREE.Vector3,
   rotation: THREE.Quaternion,

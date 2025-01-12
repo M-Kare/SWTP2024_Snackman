@@ -12,9 +12,11 @@ import {GameObjectRenderer} from "@/renderer/GameObjectRenderer";
 import {useLobbiesStore} from "@/stores/Lobby/lobbiesstore";
 import {Player} from '@/components/Player';
 import {EventType, type IMessageDTD} from './messaging/IMessageDTD';
-import type {IMobUpdateDTD} from './messaging/IMobUpdateDTD';
+import type {ISnackmanUpdateDTD} from './messaging/ISnackmanUpdateDTD';
 import type {ISquareUpdateDTD} from './messaging/ISquareUpdateDTD';
 import {SnackType} from './Snack/ISnackDTD';
+import type {IScriptGhost, IScriptGhostDTD} from "@/stores/Ghost/IScriptGhostDTD";
+import type {IGhostUpdateDTD} from "@/stores/messaging/IGhostUpdateDTD";
 
 /**
  * Defines the pinia store used for saving the map from
@@ -26,7 +28,6 @@ export const useGameMapStore = defineStore('gameMap', () => {
   const protocol = window.location.protocol.replace('http', 'ws')
   const wsurl = `${protocol}//${window.location.host}/stompbroker`
   let stompclient = new Client({brokerURL: wsurl})
-  let chickenStompclient: Client
   const scene = new THREE.Scene()
   const gameObjectRenderer = GameObjectRenderer()
   const {lobbydata} = useLobbiesStore()
@@ -42,11 +43,11 @@ export const useGameMapStore = defineStore('gameMap', () => {
     DEFAULT_WALL_HEIGHT: 0,
     gameMap: new Map<number, ISquare>(),
     chickens: [],
-  } as IGameMap)
+    scriptGhosts: []
+  } as IGameMap);
 
   async function initGameMap() {
     try {
-
       const response: IGameMapDTD = await fetchGameMapDataFromBackend(lobbydata.currentPlayer.joinedLobbyId!)
       mapData.DEFAULT_SQUARE_SIDE_LENGTH = response.DEFAULT_SQUARE_SIDE_LENGTH
       mapData.DEFAULT_WALL_HEIGHT = response.DEFAULT_WALL_HEIGHT
@@ -54,13 +55,16 @@ export const useGameMapStore = defineStore('gameMap', () => {
       OFFSET = mapData.DEFAULT_SQUARE_SIDE_LENGTH / 2
       DEFAULT_SIDE_LENGTH = mapData.DEFAULT_SQUARE_SIDE_LENGTH
 
-
       for (const square of response.gameMap) {
         mapData.gameMap.set(square.id, square as ISquare)
       }
 
       for (const chicken of response.chickens) {
         mapData.chickens.push(chicken as IChicken)
+      }
+
+      for (const ghost of response.scriptGhosts) {
+        mapData.scriptGhosts.push(ghost as IScriptGhost)
       }
     } catch (reason) {
       throw reason //Throw again to pass to execution function
@@ -87,8 +91,8 @@ export const useGameMapStore = defineStore('gameMap', () => {
           const content: Array<IMessageDTD> = JSON.parse(message.body)
           for (const mess of content) {
             switch (mess.event) {
-              case EventType.MobUpdate:
-                const mobUpdate: IMobUpdateDTD = mess.message
+              case EventType.SnackManUpdate:
+                const mobUpdate: ISnackmanUpdateDTD = mess.message
                 if (mobUpdate.playerId === lobbydata.currentPlayer.playerId) {
                   if (player == undefined) {
                     continue;
@@ -100,7 +104,7 @@ export const useGameMapStore = defineStore('gameMap', () => {
                   player.sprintData.isSprinting = mobUpdate.isSprinting
                   player.sprintData.isCooldown = mobUpdate.isInCooldown
 
-                  if(mobUpdate.message != null){
+                  if (mobUpdate.message != null) {
                     player.message.value = mobUpdate.message
                   }
 
@@ -111,6 +115,24 @@ export const useGameMapStore = defineStore('gameMap', () => {
                   }
                   otherPlayers.get(mobUpdate.playerId)?.position.lerp(mobUpdate.position, 0.3)
                   otherPlayers.get(mobUpdate.playerId)?.setRotationFromQuaternion(mobUpdate.rotation)
+                }
+                break;
+
+              case EventType.GhostUpdate:
+                const ghostUpdate: IGhostUpdateDTD = mess.message
+                if (ghostUpdate.playerId === lobbydata.currentPlayer.playerId) {
+                  if (player == undefined) {
+                    continue;
+                  }
+
+                  player.setPosition(ghostUpdate.position);
+                  break;
+                } else {
+                  if (otherPlayers == undefined || otherPlayers.size == 0) {
+                    continue;
+                  }
+                  otherPlayers.get(ghostUpdate.playerId)?.position.lerp(ghostUpdate.position, 0.3)
+                  otherPlayers.get(ghostUpdate.playerId)?.setRotationFromQuaternion(ghostUpdate.rotation)
                 }
                 break;
               case EventType.SquareUpdate:
@@ -127,47 +149,16 @@ export const useGameMapStore = defineStore('gameMap', () => {
                 const chickenUpdate: IChickenDTD = mess.message
                 updateChicken(chickenUpdate)
                 break;
+              case EventType.ScriptGhostUpdate:
+                const scriptGhostUpdate: IScriptGhostDTD = mess.message
+                updateScriptGhost(scriptGhostUpdate)
+                break;
               default:
                 console.log(mess.message)
             }
           }
         })
       }
-      //TODO funktioniert bereits, da squares einen property change listener haben?
-      /*
-              snackStompclient.subscribe(DEST_SQUARE, async message => {
-          const change: IFrontendMessageEvent = JSON.parse(message.body)
-
-          if (change.changeType == 'CREATE') {
-            const OFFSET = mapData.DEFAULT_SQUARE_SIDE_LENGTH / 2
-            const DEFAULT_SIDE_LENGTH = mapData.DEFAULT_SQUARE_SIDE_LENGTH
-
-            const square = change.square as ISquare
-            const currentSquareInPinia = mapData.gameMap.get(square.id)
-            const eggToAdd = gameObjectRenderer.createSnackOnFloor(
-              square.indexX * DEFAULT_SIDE_LENGTH + OFFSET,
-              square.indexZ * DEFAULT_SIDE_LENGTH + OFFSET,
-              DEFAULT_SIDE_LENGTH,
-              square.snack?.snackType,
-            )
-
-            currentSquareInPinia!.snack = square.snack
-            scene.add(eggToAdd)
-            setSnackMeshId(currentSquareInPinia!.id, eggToAdd.id)
-
-            mapData.gameMap.set(change.square.id, change.square as ISquare)
-          } else if (change.changeType == 'UPDATE') {
-            // TODO fix bug "Unhandled Promise Rejection: TypeError: null is not an object (evaluating 'mapData.gameMap.get(change.square.id).snack.meshId')"
-            if (mapData.gameMap.get(change.square.id)!.snack.meshId != null) {
-              const savedMeshId = mapData.gameMap.get(change.square.id)!.snack
-                .meshId
-
-              removeMeshFromScene(scene, savedMeshId)
-
-              mapData.gameMap.set(change.square.id, change.square as ISquare)
-            }
-          }
-       */
 
       stompclient.onDisconnect = () => {
         console.log('Stompclient disconnected.')
@@ -190,6 +181,20 @@ export const useGameMapStore = defineStore('gameMap', () => {
         updateLookingDirection(currentChicken, chickenUpdate)
       } else {
         updateWalkingDirection(currentChicken, chickenUpdate, DEFAULT_SIDE_LENGTH, OFFSET)
+      }
+    }
+  }
+
+  function updateScriptGhost(change: IScriptGhostDTD) {
+    const scriptGhostUpdate: IScriptGhostDTD = change
+    const currentScriptGhost = mapData.scriptGhosts.find(scriptGhost => scriptGhost.id == scriptGhostUpdate.id)
+    if (currentScriptGhost == undefined) {
+      console.error("A script ghost is undefined in pinia")
+    } else {
+      if (scriptGhostUpdate.scriptGhostPosX == currentScriptGhost!.scriptGhostPosX && scriptGhostUpdate.scriptGhostPosZ == currentScriptGhost!.scriptGhostPosZ) {
+        updateLookingDirectionScriptGhost(currentScriptGhost, scriptGhostUpdate)
+      } else {
+        updateWalkingDirectionScriptGhost(currentScriptGhost, scriptGhostUpdate, DEFAULT_SIDE_LENGTH, OFFSET)
       }
     }
   }
@@ -261,13 +266,28 @@ export const useGameMapStore = defineStore('gameMap', () => {
     currentChicken.lookingDirection = chickenUpdate.lookingDirection
     switch (
       currentChicken.lookingDirection // rotates the chicken depending on what its looking direction is
-    ) {
+      ) {
       case Direction.NORTH || Direction.SOUTH:
         chickenMesh!.setRotationFromEuler(new THREE.Euler(0))
         break
       case Direction.EAST || Direction.WEST:
         chickenMesh!.setRotationFromEuler(new THREE.Euler(Math.PI / 2))
         break
+    }
+  }
+
+  function updateLookingDirectionScriptGhost(currentScriptGhost: IScriptGhost, scriptGhostUpdate: IScriptGhostDTD) {
+    console.log("ScriptGhost looking direction updated")
+    const scriptGhostMesh = scene.getObjectById(currentScriptGhost.meshId)
+
+    currentScriptGhost.lookingDirection = scriptGhostUpdate.lookingDirection
+    switch (currentScriptGhost.lookingDirection) {
+      case Direction.NORTH || Direction.SOUTH:
+        scriptGhostMesh!.setRotationFromEuler(new THREE.Euler(0))
+        break;
+      case Direction.EAST || Direction.WEST:
+        scriptGhostMesh!.setRotationFromEuler(new THREE.Euler(Math.PI / 2))
+        break;
     }
   }
 
@@ -290,6 +310,15 @@ export const useGameMapStore = defineStore('gameMap', () => {
     )
   }
 
+  function updateWalkingDirectionScriptGhost(currentScriptGhost: IScriptGhost, scriptGhostUpdate: IScriptGhostDTD, DEFAULT_SIDE_LENGTH: number, OFFSET: number) {
+    const scriptGhostMesh = scene.getObjectById(currentScriptGhost.meshId)
+
+    currentScriptGhost.scriptGhostPosX = scriptGhostUpdate.scriptGhostPosX
+    currentScriptGhost.scriptGhostPosZ = scriptGhostUpdate.scriptGhostPosZ
+
+    scriptGhostMesh!.position.set(currentScriptGhost.scriptGhostPosX * DEFAULT_SIDE_LENGTH + OFFSET, 0, currentScriptGhost.scriptGhostPosZ * DEFAULT_SIDE_LENGTH + OFFSET)
+  }
+
   function setSnackMeshId(squareId: number, meshId: number) {
     const square = mapData.gameMap.get(squareId)
     if (square != undefined && square.snack.snackType != SnackType.EMPTY)
@@ -299,6 +328,12 @@ export const useGameMapStore = defineStore('gameMap', () => {
   function setChickenMeshId(meshId: number, chickenId: number) {
     const chicken = mapData.chickens.find(chicken => chicken.id === chickenId)
     if (chicken != undefined) chicken.meshId = meshId
+  }
+
+  function setScriptGhostMeshId(meshId: number, ghostId: number) {
+    const ghost = mapData.scriptGhosts.find(ghost => ghost.id === ghostId);
+    if (ghost != undefined)
+      ghost.meshId = meshId
   }
 
   function removeMeshFromScene(scene: Scene, meshId: number) {
@@ -321,6 +356,7 @@ export const useGameMapStore = defineStore('gameMap', () => {
     getScene,
     setPlayer,
     setOtherPlayers,
-    stompclient: stompclient
+    stompclient: stompclient,
+    setScriptGhostMeshId,
   };
 })

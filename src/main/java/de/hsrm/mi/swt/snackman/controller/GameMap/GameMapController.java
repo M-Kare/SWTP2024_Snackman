@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import de.hsrm.mi.swt.snackman.services.LobbyManagerService;
-import de.hsrm.mi.swt.snackman.services.MapService;
 
 /**
  * REST Controller for handling map-related API requests
@@ -24,7 +23,7 @@ public class GameMapController {
     @Autowired
     private LobbyManagerService lobbyManagerService;
 
-    Logger log = LoggerFactory.getLogger(MapService.class);
+    Logger log = LoggerFactory.getLogger(GameMapController.class);
 
 
     @GetMapping("/lobby/{lobbyId}/game-map")
@@ -32,4 +31,5 @@ public class GameMapController {
         log.debug("Get GameMap");
         return ResponseEntity.ok(GameMapDTO.fromGameMap(lobbyManagerService.getGameMapByLobbyId(lobbyId)));
     }
+
 }

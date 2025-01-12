@@ -1,5 +1,6 @@
 package de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs;
 
+import de.hsrm.mi.swt.snackman.configuration.GameConfig;
 import de.hsrm.mi.swt.snackman.entities.map.GameMap;
 import de.hsrm.mi.swt.snackman.configuration.GameConfig;
 import de.hsrm.mi.swt.snackman.entities.map.Square;
@@ -59,11 +60,12 @@ public abstract class EatingMob extends Mob {
     }
 
     @Override
-    public void move(boolean f, boolean b, boolean l, boolean r, double delta) {
-        super.move(f, b, l, r, delta);
+    public void move(boolean f, boolean b, boolean l, boolean r, double delta, GameMap gameMap) {
+        super.move(f, b, l, r, delta, gameMap);
 
-        if (getCurrentSquare().getSnack().getSnackType() != SnackType.EMPTY)
-            consumeSnackOnSquare(getCurrentSquare());
+        Square currentSquare = gameMap.getSquareAtIndexXZ(calcMapIndexOfCoordinate(this.getPosX()), calcMapIndexOfCoordinate(this.getPosZ()));
+        if (currentSquare.getSnack().getSnackType() != SnackType.EMPTY)
+            consumeSnackOnSquare(currentSquare);
     }
 
     /**
