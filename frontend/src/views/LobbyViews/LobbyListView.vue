@@ -231,16 +231,16 @@ onMounted(async () => {
 }
 
 .small-nav-buttons {
-  bottom: 3%;
+  bottom: 4%;
   font-weight: bold;
 }
 
 #menu-back-button {
-  left: 5%;
+  left: 3%;
 }
 
 #show-lobby-creation-button {
-  right: 5%;
+  right: 3%;
 }
 
 #menu-back-button:hover,
