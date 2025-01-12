@@ -17,6 +17,8 @@ import type {ISquareUpdateDTD} from './messaging/ISquareUpdateDTD';
 import {SnackType} from './Snack/ISnackDTD';
 import type {IScriptGhost, IScriptGhostDTD} from "@/stores/Ghost/IScriptGhostDTD";
 import type {IGhostUpdateDTD} from "@/stores/messaging/IGhostUpdateDTD";
+import {useRouter} from "vue-router";
+import type {IGameEndDTD} from "@/stores/GameEnd/IGameEndDTD";
 
 /**
  * Defines the pinia store used for saving the map from
@@ -36,7 +38,7 @@ export const useGameMapStore = defineStore('gameMap', () => {
   let otherPlayers: Map<String, THREE.Mesh>
   let OFFSET: number
   let DEFAULT_SIDE_LENGTH: number
-
+  const router = useRouter();
 
   const mapData = reactive({
     DEFAULT_SQUARE_SIDE_LENGTH: 0,
@@ -91,6 +93,10 @@ export const useGameMapStore = defineStore('gameMap', () => {
           const content: Array<IMessageDTD> = JSON.parse(message.body)
           for (const mess of content) {
             switch (mess.event) {
+              case EventType.GameEnd:
+                const gameEndUpdate: IGameEndDTD = mess.message
+                endGame(gameEndUpdate)
+                break;
               case EventType.SnackManUpdate:
                 const mobUpdate: ISnackmanUpdateDTD = mess.message
                 if (mobUpdate.playerId === lobbydata.currentPlayer.playerId) {
@@ -165,6 +171,31 @@ export const useGameMapStore = defineStore('gameMap', () => {
       }
 
       stompclient.activate()
+    }
+  }
+
+  function endGame(gameEndUpdate: IGameEndDTD){
+    console.log("GameEnd view wird aufgerufen mit", gameEndUpdate)
+    if (gameEndUpdate.role == "SNACKMAN") {
+      // Navigate to GameEndView with "SnackMan Wins"
+      router.push({
+        name: 'GameEnd',
+        query: {
+          winningRole: gameEndUpdate.role,
+          timePlayed: gameEndUpdate.timePlayed,
+          kcalCollected: gameEndUpdate.kcalCollected
+        }
+      })
+    } else {
+      // Navigate to GameEndView with "Ghosts Win"
+      router.push({
+        name: 'GameEnd',
+        query: {
+          winningRole: gameEndUpdate.role,
+          timePlayed: gameEndUpdate.timePlayed,
+          kcalCollected: gameEndUpdate.kcalCollected
+        }
+      })
     }
   }
 

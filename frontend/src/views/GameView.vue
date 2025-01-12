@@ -242,29 +242,6 @@ function stopCooldownFill() {
   }
 }
 
-//TODO because it's muliplayer now it has to be checked in the backend that snackman won
-function checkIfGameEnd(){
-  if (player.getCalories() >= maxCalories) {
-    // Navigate to GameEndView with "SnackMan Wins"
-    router.push({
-      name: 'GameEnd',
-      query: {
-        role: playerRole.value,
-        result: playerRole.value === 'SNACKMAN' ? 'Gewonnen' : 'Verloren',
-      }
-    });
-  } else if (player.getCalories() < 0) {
-    // Navigate to GameEndView with "Ghosts Win"
-    router.push({
-      name: 'GameEnd',
-      query: {
-        role: playerRole.value,
-        result: playerRole.value === 'GHOST' ? 'Gewonnen' : 'Verloren',
-      }
-    });
-  }
-}
-
 // Kalorien-Overlay Fill berrechnen
 const getBackgroundStyle = computed(() => {
   const maxCalories = 3000

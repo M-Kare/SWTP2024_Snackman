@@ -10,6 +10,7 @@
           v-if="errorMessage">
         {{ errorMessage }}
       </p>
+      <p>Gespielte Zeit: {{ playedTime }}</p>
     </form>
 
     <SmallNavButton
@@ -43,6 +44,10 @@ const emit = defineEmits<{
   (event: 'entryCreated'): void;
 }>()
 
+const props = defineProps<{
+  playedTime: string
+}>()
+
 /**
  * Emits an event to cancel the new leaderboard entry creation process.
  *
@@ -70,11 +75,10 @@ const createNewLeaderboardEntry = async () => {
     return;
   }
 
-  // TODO replace default data here
   const today = new Date()
   const data: LeaderboardEntry = {
     name: yourName.value,
-    duration: "00:00",
+    duration: props.playedTime,
     releaseDate: today.toISOString().slice(0, 10)
   }
 
