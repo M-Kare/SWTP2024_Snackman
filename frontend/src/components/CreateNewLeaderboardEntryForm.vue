@@ -1,6 +1,6 @@
 <template>
   <div id="form-box">
-    <h1 id="title"> New Leaderboard entry</h1>
+    <h1 id="title">New Leaderboard entry</h1>
 
     <form id="form" @submit.prevent="createNewLeaderboardEntry">
       <label>Enter your name: </label>
@@ -124,7 +124,6 @@ const createNewLeaderboardEntry = async () => {
 #form {
   position: inherit;
   top: 35%;
-  left: 5%;
   width: 100%;
   font-size: 1.5rem;
   font-weight: bold;
@@ -133,7 +132,7 @@ const createNewLeaderboardEntry = async () => {
 
 #form > input {
   font-size: 1.2rem;
-  width: 90%;
+  width: 70%;
   height: 2rem;
   margin-top: 0.2rem;
   margin-bottom: 2rem;
