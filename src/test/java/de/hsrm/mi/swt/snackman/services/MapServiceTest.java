@@ -95,7 +95,7 @@ class MapServiceTest {
         };
         GameMap gameMap = mapService.convertMazeDataGameMap("1", mockMazeData);
         Square currentSquare = gameMap.getGameMapSquares()[1][1]; // Assuming it's a floor square
-        Chicken chicken = new Chicken(currentSquare, gameMap);
+        Chicken chicken = new Chicken(currentSquare, gameMap, "ChickenMovementSkript");
 
         List<String> visibleSquares = chicken.getSquaresVisibleForChicken(gameMap, currentSquare, Direction.ONE_NORTH);
 
@@ -123,7 +123,7 @@ class MapServiceTest {
         };
         GameMap gameMap = mapService.convertMazeDataGameMap("1", mockMazeData);
         Square currentSquare = gameMap.getGameMapSquares()[1][1]; // Assuming it's a floor square
-        Chicken chicken = new Chicken(currentSquare, gameMap);
+        Chicken chicken = new Chicken(currentSquare, gameMap, "ChickenMovementSkript");
 
         Square square = new Square(MapObjectType.FLOOR, 0, 0);
         Snack egg = new Snack(SnackType.EGG);
@@ -146,7 +146,7 @@ class MapServiceTest {
         };
         GameMap gameMap = mapService.convertMazeDataGameMap("1", mockMazeData);
         Square currentSquare = gameMap.getGameMapSquares()[1][1]; // Assuming it's a floor square
-        Chicken chicken = new Chicken(currentSquare, gameMap);
+        Chicken chicken = new Chicken(currentSquare, gameMap, "ChickenMovementSkript");
 
         Square square = new Square(MapObjectType.FLOOR, 0, 0);
         Snack egg = null;
@@ -207,6 +207,15 @@ class MapServiceTest {
         Assertions.assertTrue(clientMobs.get("04").getCurrentSquare() == testMap[0][0]);
         Assertions.assertTrue(clientMobs.get("05").getCurrentSquare() == testMap[2][1]);
         Assertions.assertTrue(clientMobs.get("06").getCurrentSquare() == testMap[1][1]);
+    }
+
+    @Test
+    void randomeChickenSkriptLoad(){
+
+        String skriptName = mapService.loadChickenScripts();
+
+        Assertions.assertTrue(skriptName.equals("ChickenMovementSkript")  || skriptName.equals("TalaChickenMovementSkript"), skriptName);
+
     }
 
 }
