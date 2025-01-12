@@ -1,6 +1,6 @@
 <template>
   <MenuBackground></MenuBackground>
-  <div class="outer-box">
+  <div id="individual-outer-box-size" class="outer-box">
     <h1 class="title">Lobbies</h1>
     <SmallNavButton
       id="menu-back-button"
@@ -57,11 +57,11 @@ import SmallNavButton from '@/components/SmallNavButton.vue'
 import CreateLobbyForm from '@/components/CreateLobbyForm.vue'
 import PopUp from '@/components/PopUp.vue'
 
-import { useRouter } from 'vue-router'
-import { computed, onMounted, ref } from 'vue'
-import { useLobbiesStore } from '@/stores/Lobby/lobbiesstore'
-import type { ILobbyDTD } from '@/stores/Lobby/ILobbyDTD'
-import type { IPlayerClientDTD } from '@/stores/Lobby/IPlayerClientDTD'
+import {useRouter} from 'vue-router'
+import {computed, onMounted, ref} from 'vue'
+import {useLobbiesStore} from '@/stores/Lobby/lobbiesstore'
+import type {ILobbyDTD} from '@/stores/Lobby/ILobbyDTD'
+import type {IPlayerClientDTD} from '@/stores/Lobby/IPlayerClientDTD'
 
 const router = useRouter()
 const lobbiesStore = useLobbiesStore()
@@ -85,7 +85,7 @@ const hidePopUp = () => {
 }
 
 const backToMainMenu = () => {
-  router.push({ name: 'MainMenu' })
+  router.push({name: 'MainMenu'})
 }
 
 const showCreateLobbyForm = () => {
@@ -124,7 +124,7 @@ const joinLobby = async (lobby: ILobbyDTD) => {
 
     if (joinedLobby) {
       console.log('Successfully joined lobby', joinedLobby.name)
-      router.push({ name: 'LobbyView', params: { lobbyId: lobby.lobbyId } })
+      router.push({name: 'LobbyView', params: {lobbyId: lobby.lobbyId}})
     }
   } catch (error: any) {
     console.error('Error:', error)
@@ -166,32 +166,10 @@ onMounted(async () => {
   text-align: center;
 }
 
-.outer-box {
-  position: absolute;
-  top: 20%;
-  left: 50%;
-  transform: translateX(-50%);
+#individual-outer-box-size {
   width: 70%;
   max-width: 1000px;
   height: 65%;
-  background-image: url('@/assets/background-design-lobbies.png');
-  background-size: cover;
-  background-position: center;
-
-  border: var(--background-for-text-color) solid 4px;
-  border-radius: 0.5rem;
-  box-shadow: 10px 8px 0 var(--background-for-text-color);
-}
-
-.outer-box::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: #000000dd;
-  border-radius: 0.5rem;
 }
 
 .inner-box {

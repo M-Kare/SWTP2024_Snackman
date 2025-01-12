@@ -83,5 +83,30 @@ body {
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+}
 
+.outer-box {
+    position: absolute;
+    top: 20%;
+    left: 50%;
+    transform: translateX(-50%);
+
+    background-image: url('@/assets/background-design-lobbies.png');
+    background-size: cover;
+    background-position: center;
+
+    border: var(--background-for-text-color) solid 4px;
+    border-radius: 0.5rem;
+    box-shadow: 10px 8px 0 var(--background-for-text-color);
+}
+
+.outer-box::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #000000dd;
+    border-radius: 0.5rem;
 }
