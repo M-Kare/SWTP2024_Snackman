@@ -7,13 +7,14 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
+import de.hsrm.mi.swt.snackman.entities.map.GameMap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import de.hsrm.mi.swt.snackman.entities.lobby.Lobby;
 import de.hsrm.mi.swt.snackman.entities.lobby.PlayerClient;
 import de.hsrm.mi.swt.snackman.entities.lobby.ROLE;
-import de.hsrm.mi.swt.snackman.entities.map.GameMap;
 
 /**
  * Service for managing lobbies and clients in the application.
@@ -24,6 +25,7 @@ public class LobbyManagerService {
     private final MapService mapService;
     private final Map<String, Lobby> lobbies = new HashMap<>();
     private final Map<String, PlayerClient> clients = new HashMap<>();
+    private final Logger log = LoggerFactory.getLogger(LobbyManagerService.class);
 
     @Autowired
     public LobbyManagerService(MapService mapService) {
@@ -58,7 +60,7 @@ public class LobbyManagerService {
 
         //TODO change to SessionId
         var uuid = UUID.randomUUID().toString();
-        GameMap gameMap = mapService.createNewGameMap(uuid);
+        GameMap gameMap = this.mapService.createNewGameMap(uuid);
 
         Lobby lobby = new Lobby(uuid, name, admin, gameMap);
 
@@ -93,7 +95,6 @@ public class LobbyManagerService {
         }
 
         PlayerClient newJoiningClient = findClientByClientId(playerId);
-        // Set role: Admin remains SNACKMAN, others become GHOST
         if (!lobby.getAdminClientId().equals(playerId)) {
             newJoiningClient.setRole(ROLE.GHOST);
         }
@@ -131,6 +132,7 @@ public class LobbyManagerService {
             throw new IllegalStateException("Not enough players to start the game");
         }
 
+        log.info("Starting lobby {}", lobby);
         mapService.spawnMobs(lobby.getGameMap(), lobby);
         lobby.setGameStarted(true);
     }

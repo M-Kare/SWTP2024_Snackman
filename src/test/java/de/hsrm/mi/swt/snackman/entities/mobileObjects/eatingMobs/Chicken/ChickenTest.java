@@ -104,6 +104,12 @@ class ChickenTest {
     // void testStartNewTimer_ReplacesExistingTimer() throws NoSuchFieldException, IllegalAccessException {
     //     Square square = new Square(MapObjectType.FLOOR, 0, 0);
     //     Chicken chicken = new Chicken(square, gameMap);
+    /*
+    @GitBlame wir nennen keine Namen
+    @Test
+    void testStartNewTimer_ReplacesExistingTimer() throws NoSuchFieldException, IllegalAccessException {
+        Square square = new Square(MapObjectType.FLOOR, 0, 0);
+        Chicken chicken = new Chicken(square, gameMap);
 
     //     // Set up an initial timer
     //     Timer initialTimer = new Timer();
@@ -165,6 +171,11 @@ class ChickenTest {
     //     Assertions.assertEquals(expectedScaredState, chicken.isScared(),
     //             "Expected scared state: " + expectedScaredState + ", Actual: " + chicken.isScared());
     // }
+        System.out.println("Final scared state: " + chicken.isScared());
+        Assertions.assertEquals(expectedScaredState, chicken.isScared(),
+                "Expected scared state: " + expectedScaredState + ", Actual: " + chicken.isScared());
+    }
+     */
 
 
     // @Test
