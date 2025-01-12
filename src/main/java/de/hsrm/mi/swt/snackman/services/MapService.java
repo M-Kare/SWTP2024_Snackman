@@ -228,7 +228,7 @@ public class MapService {
 
         int AMOUNT_SCRIPT_GHOSTS = GameConfig.AMOUNT_PLAYERS - lobby.getMembers().size();
         for (int i = 0; i < AMOUNT_SCRIPT_GHOSTS; i++) {
-            log.info("Initialising scriptGhost");
+            log.info("Initialising scriptGhost {}", i);
             Square square = ghostSpawnSquares.get(ghostSpawnIndex);
 
             ScriptGhost newScriptGhost = new ScriptGhost(lobby.getGameMap(), square, ScriptGhostDifficulty.EASY);

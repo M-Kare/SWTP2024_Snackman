@@ -51,8 +51,6 @@ public class PlayerStompController {
                 .orElseThrow(() -> new IllegalStateException("Kein Snackman gefunden"));
     }
 
-
-
     private SnackMan updateSnackman(PlayerToBackendDTO player, SnackMan snackman, Lobby currentLobby) {
         if (player.jump()) {
             if (player.doubleJump()) {

@@ -97,6 +97,10 @@ public class ScriptGhost extends Mob implements Runnable {
         return squares;
     }
 
+    /**
+     * TODO add javadoc
+     * @param listener
+     */
     public void addPropertyChangeListener(PropertyChangeListener listener) {
         this.propertyChangeSupport.addPropertyChangeListener(listener);
     }
