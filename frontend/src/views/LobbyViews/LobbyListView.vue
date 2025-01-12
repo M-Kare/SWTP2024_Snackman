@@ -30,7 +30,7 @@
           </div>
 
           <div class="playercount">
-            {{ lobby.members.length }} / {{ MAX_PLAYER_COUNT }}
+            {{ lobby.members.length }} / {{ MAX_PLAYER_COUNT }} Spieler
           </div>
         </li>
       </ul>
@@ -156,13 +156,10 @@ onMounted(async () => {
 }
 
 .title {
-  position: absolute;
-  top: 3rem;
-  left: 50%;
-  transform: translateX(-50%);
+  padding: 1.5rem 0 1rem 0;
   font-size: 3rem;
   font-weight: bold;
-  color: #fff;
+  color: var(--background-for-text-color);
   text-align: center;
 }
 
@@ -173,14 +170,15 @@ onMounted(async () => {
 }
 
 .inner-box {
-  position: absolute;
-  top: 5%;
+  position: relative;
+  margin-top: 1vh;
+  margin-bottom: 1vh;
   left: 50%;
   transform: translateX(-50%);
   width: 90%;
   max-height: 80%;
-  background: rgba(255, 255, 255, 70%);
   border-radius: 0.3rem;
+  color: var(--primary-text-color);
   overflow-y: scroll;
 }
 
@@ -196,16 +194,17 @@ onMounted(async () => {
 .lobby-list-items {
   display: flex;
   justify-content: space-between;
-  border: 0.5px solid black;
-  border-radius: 0.2rem;
+  background: var(--background-for-text-color);
+  border: 4px solid var(--primary-text-color);
+  border-radius: 0.1rem;
+  box-shadow: 4px 3px 0 var(--primary-text-color);
   font-size: 1.2rem;
-  color: #000000;
-  padding: 0.5rem;
-  margin: 1rem;
+  padding: 0.5rem 0.8rem;
+  margin: 0.7rem 0;
 }
 
 .lobby-list-items:hover {
-  background-color: rgba(0, 0, 0, 0.5);
+  cursor: pointer;
 }
 
 .small-nav-buttons {
@@ -234,16 +233,5 @@ onMounted(async () => {
 .info-text {
   font-size: 1.8rem;
   padding: 1.2rem;
-}
-
-#darken-background {
-  z-index: 1;
-  position: fixed;
-  top: 0;
-  width: 100vw;
-  height: 100vh;
-  background: rgba(0, 0, 0, 50%);
-
-  transition: background 0.3s ease;
 }
 </style>

@@ -310,10 +310,6 @@ function moveToMouse(element: HTMLElement) {
   text-align: right;
 }
 
-.hidden {
-  display: none;
-}
-
 .inner-box {
   position: relative;
   margin-top: 1vh;
@@ -323,7 +319,7 @@ function moveToMouse(element: HTMLElement) {
   width: 90%;
   height: auto;
   border-radius: 0.3rem;
-  color: #000000;
+  color: var(--primary-text-color);
 }
 
 .inner-box > ul {
@@ -348,6 +344,10 @@ function moveToMouse(element: HTMLElement) {
   font-size: 1.2rem;
   padding: 0.5rem 0.8rem;
   margin: 0.4rem 0;
+}
+
+.player-list-items:hover {
+  cursor: pointer;
 }
 
 .info-heading {
