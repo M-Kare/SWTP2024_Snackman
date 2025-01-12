@@ -86,6 +86,7 @@ const showCreateNewLeaderboardEntryForm = () => {
 const hideCreateNewLeaderboardEntryForm = () => {
   showCreateNewLeaderboardEntry.value = false
   alreadyEntered.value = true
+  showLeaderboard() // show leaderboard after creating a new entry in it
 }
 
 const backToMainMenu = () => {
@@ -110,17 +111,20 @@ function formatTime(seconds: number): string {
   text-align: center;
   color: #fff;
   background-color: black;
-  height: 100vh;
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  padding: 2rem;
+  box-sizing: border-box;
 }
 
 .result-title {
-  font-size: 8rem;
-  font-weight: bold;
+  font-size: clamp(3rem, 8vw, 8rem);
+  line-height: 1.2;
   margin-bottom: 1rem;
+  font-weight: bold;
 }
 
 .end-reason {

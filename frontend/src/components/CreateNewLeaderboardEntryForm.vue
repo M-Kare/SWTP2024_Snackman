@@ -10,7 +10,7 @@
           v-if="errorMessage">
         {{ errorMessage }}
       </p>
-      <p>Gespielte Zeit: {{ playedTime }}</p>
+      <p>Played time: {{ playedTime }} minutes</p>
     </form>
 
     <SmallNavButton
@@ -71,7 +71,7 @@ const cancelNewLeaderboardEntryCreation = () => {
  */
 const createNewLeaderboardEntry = async () => {
   if (!yourName.value.trim()) {
-    errorMessage.value = "Your name name cannot be empty";
+    errorMessage.value = "Your name cannot be empty";
     return;
   }
 
@@ -86,7 +86,7 @@ const createNewLeaderboardEntry = async () => {
     emit('entryCreated')
     await leaderboardStore.addNewLeaderboardEntry(data)
     cancelNewLeaderboardEntryCreation()
-  } catch (error: any){
+  } catch (error){
     console.error('Error:', error);
     alert("Error creating new leaderboard entry!");
   }

@@ -109,6 +109,7 @@ table {
 th,
 td {
   padding: 5px;
+  text-align: left;
 }
 
 .table-container {
