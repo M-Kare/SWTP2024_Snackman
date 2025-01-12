@@ -171,7 +171,7 @@ class MapServiceTest {
      * Map:
      * 	Ghost	Ghost		Empty
      * 	Empty	SnackMan	Empty
-     * 	Empty	SnackMan	Empty
+     * 	Empty	Ghost	Empty
      */
     public void spawnLocationTest() {
         Square[][] testMap = {
@@ -190,7 +190,7 @@ class MapServiceTest {
         testClient02.setRole(ROLE.GHOST);
         testClient03.setRole(ROLE.GHOST);
         testClient04.setRole(ROLE.GHOST);
-        testClient05.setRole(ROLE.SNACKMAN);
+        testClient05.setRole(ROLE.GHOST);
 
         Lobby testLobby = new Lobby("1", "testLobby", testClient01, gameMap);
         testLobby.getMembers().add(testClient02);
@@ -201,20 +201,20 @@ class MapServiceTest {
         mapService.spawnMobs(gameMap, testLobby);
         SortedMap<String, Mob> clientMobs = testLobby.getClientMobMap();
 
-        Assertions.assertTrue(clientMobs.get("01").getPosition().x == testMap[1][1].getIndexX());
-        Assertions.assertTrue(clientMobs.get("01").getPosition().z == testMap[1][1].getIndexZ());
+        Assertions.assertTrue(clientMobs.get("01").calcMapIndexOfCoordinate(clientMobs.get("01").getPosition().x) == testMap[1][1].getIndexX());
+        Assertions.assertTrue(clientMobs.get("01").calcMapIndexOfCoordinate(clientMobs.get("01").getPosition().z) == testMap[1][1].getIndexZ());
 
-        Assertions.assertTrue(clientMobs.get("02").getPosition().x == testMap[1][1].getIndexX());
-        Assertions.assertTrue(clientMobs.get("02").getPosition().z == testMap[1][1].getIndexZ());
+        Assertions.assertTrue(clientMobs.get("02").calcMapIndexOfCoordinate(clientMobs.get("02").getPosition().x) == testMap[0][0].getIndexX());
+        Assertions.assertTrue(clientMobs.get("02").calcMapIndexOfCoordinate(clientMobs.get("02").getPosition().z) == testMap[0][0].getIndexZ());
 
-        Assertions.assertTrue(clientMobs.get("03").getPosition().x == testMap[1][1].getIndexX());
-        Assertions.assertTrue(clientMobs.get("03").getPosition().z == testMap[1][1].getIndexZ());
+        Assertions.assertTrue(clientMobs.get("03").calcMapIndexOfCoordinate(clientMobs.get("03").getPosition().x) == testMap[0][1].getIndexX());
+        Assertions.assertTrue(clientMobs.get("03").calcMapIndexOfCoordinate(clientMobs.get("03").getPosition().z) == testMap[0][1].getIndexZ());
 
-        Assertions.assertTrue(clientMobs.get("04").getPosition().x == testMap[1][1].getIndexX());
-        Assertions.assertTrue(clientMobs.get("04").getPosition().z == testMap[1][1].getIndexZ());
+        Assertions.assertTrue(clientMobs.get("04").calcMapIndexOfCoordinate(clientMobs.get("04").getPosition().x) == testMap[0][2].getIndexX());
+        Assertions.assertTrue(clientMobs.get("04").calcMapIndexOfCoordinate(clientMobs.get("04").getPosition().z) == testMap[0][2].getIndexZ());
 
-        Assertions.assertTrue(clientMobs.get("05").getPosition().x == testMap[1][1].getIndexX());
-        Assertions.assertTrue(clientMobs.get("05").getPosition().z == testMap[1][1].getIndexZ());
+        Assertions.assertTrue(clientMobs.get("05").calcMapIndexOfCoordinate(clientMobs.get("05").getPosition().x) == testMap[2][1].getIndexX());
+        Assertions.assertTrue(clientMobs.get("05").calcMapIndexOfCoordinate(clientMobs.get("05").getPosition().z) == testMap[2][1].getIndexZ());
 
     }
 
