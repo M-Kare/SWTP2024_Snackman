@@ -4,8 +4,8 @@
     <div v-if="darkenBackground" id="darken-background"></div>
 
     <PlayerNameForm
-      v-if="showPopUp"
-      @hidePopUp="hidePopUp"
+      v-if="showPlayerNameForm && !playerNameSaved"
+      @hidePlayerNameForm="hidePlayerNameForm"
       >
     </PlayerNameForm>
 
@@ -26,15 +26,15 @@
   import { useRouter } from 'vue-router';
   import { useLobbiesStore } from '@/stores/Lobby/lobbiesstore';
 
-  // const initialPopUpShown = ref(false);
-  const darkenBackground = ref(false);
-  const showPopUp = ref(false);
-
   const router = useRouter();
   const lobbiesStore = useLobbiesStore();
 
-  const hidePopUp = () => {
-        showPopUp.value = false;
+  const playerNameSaved = lobbiesStore.lobbydata.currentPlayer.playerName;
+  const darkenBackground = ref(false);
+  const showPlayerNameForm = ref(false);
+
+  const hidePlayerNameForm = () => {
+        showPlayerNameForm.value = false;
         darkenBackground.value = false;
   }
 
@@ -52,9 +52,10 @@
   }
   
   onMounted(() => {
-    darkenBackground.value = true;
-    console.log("darkenBackground - ", darkenBackground)
-    showPopUp.value = true;
+    if (!playerNameSaved) {
+      darkenBackground.value = true;
+      showPlayerNameForm.value = true;
+    }
   })
 
 </script>
