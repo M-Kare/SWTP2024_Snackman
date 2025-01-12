@@ -16,15 +16,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Integration tests for Ghost movement logic with Jython and Java integration.
- * This class ensures that the 'Ghost' Java class correctly interacts with
+ * This class ensures that the 'ScriptGhost' Java class correctly interacts with
  * the 'GhostMovementSkript.py' Python logic.
  */
 public class ScriptGhostIntegrationTest {
-
-    /**
-     * Verifies that the Chicken can interact with the Python script directly,
-     * using a Jython interpreter and chooses the correct empty square (" ").
-     */
 
     private static final Path workFolder = Paths.get("./extensions").toAbsolutePath();
 
@@ -45,6 +40,10 @@ public class ScriptGhostIntegrationTest {
         }
     }
 
+    /**
+     * Verifies that the Script Ghost can interact with the Python script directly,
+     * using a Jython interpreter.
+     */
     @Test
     void testScriptGhostMovement() {
         try (PythonInterpreter pyInterp = new PythonInterpreter()) {

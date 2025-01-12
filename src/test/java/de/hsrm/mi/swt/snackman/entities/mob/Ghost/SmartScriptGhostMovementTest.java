@@ -50,7 +50,7 @@ public class SmartScriptGhostMovementTest {
 
     /**
      * Tests if the ghost moves north as determined by the Python script.
-     * <p>
+     *
      * Simulates a maze configuration where moving north is the optimal move.
      */
     @Test
@@ -73,7 +73,7 @@ public class SmartScriptGhostMovementTest {
 
     /**
      * Tests if the ghost moves east as determined by the Python script.
-     * <p>
+     *
      * Simulates a maze configuration where moving east is the optimal move.
      */
     @Test
@@ -96,7 +96,7 @@ public class SmartScriptGhostMovementTest {
 
     /**
      * Tests if the ghost moves south as determined by the Python script.
-     * <p>
+     *
      * Simulates a maze configuration where moving south is the optimal move.
      */
     @Test
@@ -119,7 +119,7 @@ public class SmartScriptGhostMovementTest {
 
     /**
      * Tests if the ghost moves west as determined by the Python script.
-     * <p>
+     *
      * Simulates a maze configuration where moving west is the optimal move.
      */
     @Test
