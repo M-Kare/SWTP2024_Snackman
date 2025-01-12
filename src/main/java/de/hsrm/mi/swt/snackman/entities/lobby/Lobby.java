@@ -5,6 +5,8 @@ import java.util.*;
 import de.hsrm.mi.swt.snackman.configuration.GameConfig;
 import de.hsrm.mi.swt.snackman.entities.map.GameMap;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.Mob;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Represents a lobby where players can gather to play a game together.
@@ -19,12 +21,12 @@ public class Lobby {
     private SortedMap<String, Mob> clientMobMap;
     private long timeSinceLastSnackSpawn;
     private Timer gameTimer;
-    private long playingTime = GameConfig.PLAYING_TIME;
     private long timePlayed = 0;
     private boolean isGameFinished = false;
     private ROLE winningRole;
     private long gameStartTime;
     private long endTime;
+    private final Logger log = LoggerFactory.getLogger(Lobby.class);
 
     public Lobby(String lobbyId, String name, PlayerClient adminClient, GameMap gameMap) {
         this.lobbyId = lobbyId;
@@ -62,20 +64,31 @@ public class Lobby {
             }
         };
 
-        gameTimer.schedule(task, playingTime);
+        gameTimer.schedule(task, GameConfig.PLAYING_TIME);
     }
 
+    /**
+     * Starts the game by starting the playing timer
+     * and saving when the game started.
+     */
     public void startGame() {
-        setGameStarted(true);
+        setGameStarted();
         startNewGameTimer();
         this.gameStartTime = System.currentTimeMillis();
     }
 
-    private void endGame(ROLE winningRole) {
+    /**
+     * Ends the game by ending the playing time timer
+     * and determining who won the game.
+     * @param winningRole the role winning the game
+     */
+    public void endGame(ROLE winningRole) {
+        log.info("The role {} has won the game.", winningRole);
         this.isGameFinished = true;
         this.endTime = System.currentTimeMillis();
         this.timePlayed = (endTime - this.gameStartTime) / 1000;
-        // TODO if > 5 min dann auf 5 minuten setzen
+        if(this.timePlayed > (GameConfig.PLAYING_TIME / 1000))
+            this.timePlayed = GameConfig.PLAYING_TIME / 1000;
         this.winningRole = winningRole;
     }
 
@@ -95,8 +108,8 @@ public class Lobby {
         return isGameStarted;
     }
 
-    public void setGameStarted(boolean isGameStarted) {
-        this.isGameStarted = isGameStarted;
+    public void setGameStarted() {
+        this.isGameStarted = true;
         if (isGameStarted) {
             setTimeSinceLastSnackSpawn(System.currentTimeMillis());
         }
