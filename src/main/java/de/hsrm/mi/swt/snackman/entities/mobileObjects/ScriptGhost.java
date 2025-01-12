@@ -233,7 +233,7 @@ public class ScriptGhost extends Mob implements Runnable {
      */
     private void setNewPosition(int newMove) {
         //get positions
-        Direction walkingDirection = Direction.getDirection(String.valueOf(newMove));
+        Direction walkingDirection = Direction.getDirection(newMove);
         this.lookingDirection = walkingDirection;
         Square oldPosition = this.gameMap.getSquareAtIndexXZ(this.ghostPosX, this.ghostPosZ);
         Square newPosition = walkingDirection.getNewPosition(this.gameMap, this.ghostPosX, this.ghostPosZ, walkingDirection);
