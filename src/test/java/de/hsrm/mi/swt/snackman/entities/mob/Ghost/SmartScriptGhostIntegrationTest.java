@@ -33,9 +33,9 @@ public class SmartScriptGhostIntegrationTest {
 
     @BeforeAll
     static void fileSetUp() {
-        try{
+        try {
             tearDownAfter();
-        }catch(Exception e){
+        } catch (Exception e) {
             System.out.println("No file to delete");
         }
         SnackmanApplication.checkAndCopyResources();

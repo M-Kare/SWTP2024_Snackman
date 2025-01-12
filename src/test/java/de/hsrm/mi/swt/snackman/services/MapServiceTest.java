@@ -17,8 +17,10 @@ import de.hsrm.mi.swt.snackman.entities.mobileObjects.Mob;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken.Chicken;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,14 +40,13 @@ class MapServiceTest {
     @Autowired
     private MapService mapService;
 
-
     private static final Path workFolder = Paths.get("./extensions").toAbsolutePath();
 
     @BeforeAll
     static void fileSetUp() {
-        try{
+        try {
             tearDownAfter();
-        }catch(Exception e){
+        } catch (Exception e) {
             System.out.println("No file to delete");
         }
         SnackmanApplication.checkAndCopyResources();
@@ -58,7 +59,7 @@ class MapServiceTest {
         }
     }
 
-	@Test
+    @Test
     void testMapServiceInitialization() {
         // Ensure mapService is properly initialized
         assertNotNull(mapService);
@@ -176,7 +177,7 @@ class MapServiceTest {
     public void spawnLocationTest() {
         Square[][] testMap = {
                 {new Square(0, 0, new Spawnpoint(SpawnpointMobType.GHOST)), new Square(0, 1, new Spawnpoint(SpawnpointMobType.GHOST)),
-                new Square(0, 2, new Spawnpoint(SpawnpointMobType.GHOST))},
+                        new Square(0, 2, new Spawnpoint(SpawnpointMobType.GHOST))},
                 {new Square(1, 0), new Square(1, 1, new Spawnpoint(SpawnpointMobType.SNACKMAN)), new Square(1, 2)},
                 {new Square(2, 0), new Square(2, 1, new Spawnpoint(SpawnpointMobType.GHOST)), new Square(2, 2)}};
         GameMap gameMap = new GameMap(testMap);

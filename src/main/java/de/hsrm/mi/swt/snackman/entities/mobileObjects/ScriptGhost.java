@@ -197,9 +197,9 @@ public class ScriptGhost extends Mob implements Runnable {
      */
     public void initJython() {
         this.pythonInterpreter = new PythonInterpreter();
+        String scriptPath = "";
 
         try {
-            String scriptPath = "";
             if(this.difficulty == ScriptGhostDifficulty.EASY) {
                 scriptPath = Paths.get("extensions/ghost/GhostMovementSkript.py").normalize().toAbsolutePath().toString();
             } else {
@@ -211,18 +211,20 @@ public class ScriptGhost extends Mob implements Runnable {
             String scriptDir = Paths.get(scriptPath).getParent().toString();
             this.pythonInterpreter.exec("import sys");
             this.pythonInterpreter.exec(String.format("sys.path.append('%s')", scriptDir.replace("\\", "\\\\")));
-
             // Log sys.path to ensure it's correct
             this.pythonInterpreter.exec("import sys; print(sys.path)");
-
             // Execute the Python script
             this.pythonInterpreter.execfile(scriptPath);
 
         } catch (Exception ex) {
-            log.error("Error initializing GhostMovementSkript.py: ", ex);
-            ex.printStackTrace();
+            log.error("Error initializing {} exception is: ", scriptPath, ex);
         }
-        this.pythonInterpreter.exec("from GhostMovementSkript import choose_next_square");
+
+        if(this.difficulty == ScriptGhostDifficulty.EASY) {
+            this.pythonInterpreter.exec("from GhostMovementSkript import choose_next_square");
+        } else {
+            this.pythonInterpreter.exec("from SmartGhostMovementSkript import choose_next_square");
+        }
     }
 
     /**

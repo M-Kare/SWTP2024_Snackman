@@ -30,9 +30,9 @@ public class ScriptGhostIntegrationTest {
 
     @BeforeAll
     static void fileSetUp() {
-        try{
+        try {
             tearDownAfter();
-        }catch(Exception e){
+        } catch (Exception e) {
             System.out.println("No file to delete");
         }
         SnackmanApplication.checkAndCopyResources();
@@ -57,7 +57,7 @@ public class ScriptGhostIntegrationTest {
 
             String result = pyInterp.get("result").toString();
 
-            assertEquals("0", result,"The Python script should correctly determine the next move (' ').");
+            assertEquals("0", result, "The Python script should correctly determine the next move (' ').");
         }
     }
 }
