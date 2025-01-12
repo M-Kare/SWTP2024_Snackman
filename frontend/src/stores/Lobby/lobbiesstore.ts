@@ -122,7 +122,7 @@ export const useLobbiesStore = defineStore('lobbiesstore', () =>{
      * Starts the STOMP client for real-time lobby updates.
      */
     async function startLobbyLiveUpdate(){
-        const protocol = window.location.protocol.replace('http', 'ws')
+        const protocol = 'ws'
         const wsurl = `${protocol}//${window.location.host}/stompbroker`
         stompclient = new Client({ brokerURL: wsurl })
 
