@@ -44,33 +44,35 @@ public class ScriptGhost extends Mob implements Runnable {
     private GameMap gameMap;
 
     public ScriptGhost() {
-        super(null);
+        super();
+        this.difficulty = ScriptGhostDifficulty.EASY;
+        this.lookingDirection = Direction.getRandomDirection();
+        initJython();
     }
 
     public ScriptGhost(GameMap gameMap, ScriptGhostDifficulty difficulty) {
-        super(gameMap);
+        super();
         this.gameMap = gameMap;
         this.difficulty = difficulty;
+        this.lookingDirection = Direction.getRandomDirection();
         initJython();
     }
 
     public ScriptGhost(GameMap gameMap, Square initialPosition, ScriptGhostDifficulty difficulty) {
         this(gameMap, initialPosition);
-        this.gameMap = gameMap;
-        this.difficulty = difficulty;
-        initJython();
+        //this.difficulty = difficulty;     // todo giving every ghost its own difficulty
     }
 
     public ScriptGhost(GameMap gameMap, Square initialPosition) {
-        super(gameMap);
+        super();
+        this.difficulty = ScriptGhostDifficulty.getRandomScriptGhostDifficulty();
         this.gameMap = gameMap;
         id = generateId();
         this.ghostPosX = initialPosition.getIndexX();
         this.ghostPosZ = initialPosition.getIndexZ();
         initialPosition.addMob(this);
-
         this.isWalking = true;
-        this.lookingDirection = Direction.ONE_NORTH; // todo choose random
+        this.lookingDirection = Direction.getRandomDirection();
         initJython();
     }
 
@@ -115,36 +117,41 @@ public class ScriptGhost extends Mob implements Runnable {
      * moves and updates its position.
      */
     protected void move() {
-        //initJython();
         while (isWalking) {
             // get 9 squares
             Square currentPosition = this.gameMap.getSquareAtIndexXZ(this.ghostPosX, this.ghostPosZ);
             List<String> squares = getSquaresVisibleForGhost(currentPosition, lookingDirection);
             log.debug("Squares ghost is seeing: {}", squares);
-
             log.debug("Current position is x {} z {}", this.ghostPosX, this.ghostPosZ);
 
-            int newMove = 0;
-            if(this.difficulty == ScriptGhostDifficulty.EASY) {
-                newMove = executeMovementSkript(squares);
-            } else {
-                List<List<String>> pythonList = new ArrayList<>();
-                for (String[] row : this.gameMap.getStringMap(this.id)) {
-                    pythonList.add(Arrays.asList(row));
+            if (standingOnSameSquareAsSnackman()) {
+                int newMove = 0;
+                if (this.difficulty == ScriptGhostDifficulty.EASY) {
+                    newMove = executeMovementSkript(squares);
+                } else {
+                    List<List<String>> pythonList = new ArrayList<>();
+                    for (String[] row : this.gameMap.getStringMap(this.id)) {
+                        pythonList.add(Arrays.asList(row));
+                    }
+                    newMove = executeMovementSkriptDifficult(pythonList);
                 }
-                newMove = executeMovementSkriptDifficult(pythonList);
+
+                if (difficulty == ScriptGhostDifficulty.EASY) {
+                    pythonInterpreter.exec("from GhostMovementSkript import choose_next_square");
+                } else {
+                    pythonInterpreter.exec("from SmartGhostMovementSkript import choose_next_square");
+                }
+
+                // set new square to move to
+                setNewPosition(newMove);
+                log.debug("New position is x {} z {}", this.ghostPosX, this.ghostPosZ);
             }
 
-            if (difficulty == ScriptGhostDifficulty.EASY) {
-                pythonInterpreter.exec("from GhostMovementSkript import choose_next_square");
-            } else {
-                pythonInterpreter.exec("from SmartGhostMovementSkript import choose_next_square");
-            }
-
-            // set new square to move to
-            setNewPosition(newMove);
-            log.debug("New position is x {} z {}", this.ghostPosX, this.ghostPosZ);
         }
+    }
+
+    private boolean standingOnSameSquareAsSnackman(){
+        return this.gameMap.getSquareAtIndexXZ(this.ghostPosX, this.ghostPosZ).getMobs().stream().noneMatch(mob -> mob instanceof SnackMan);
     }
 
     /**
@@ -180,8 +187,8 @@ public class ScriptGhost extends Mob implements Runnable {
         } catch (Exception ex) {
             log.error("Error while executing ghost python script: ", ex);
             ex.printStackTrace();
+            return 0;
         }
-        return 0;
     }
 
     /**
@@ -192,7 +199,12 @@ public class ScriptGhost extends Mob implements Runnable {
         this.pythonInterpreter = new PythonInterpreter();
 
         try {
-            String scriptPath = Paths.get("extensions/ghost/GhostMovementSkript.py").normalize().toAbsolutePath().toString();
+            String scriptPath = "";
+            if(this.difficulty == ScriptGhostDifficulty.EASY) {
+                scriptPath = Paths.get("extensions/ghost/GhostMovementSkript.py").normalize().toAbsolutePath().toString();
+            } else {
+                scriptPath = Paths.get("extensions/ghost/SmartGhostMovementSkript.py").normalize().toAbsolutePath().toString();
+            }
             log.debug("Resolved script path: {}", scriptPath);
 
             // Get the directory of the script (without the .)

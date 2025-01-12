@@ -39,7 +39,7 @@ public abstract class Mob {
         id = generateId();
     }
 
-    public Mob(GameMap gameMap) {
+    public Mob() {
         position = new Vector3d();
         quat = new Quaterniond();
     }

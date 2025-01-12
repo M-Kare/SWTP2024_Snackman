@@ -52,19 +52,19 @@ public class Chicken extends EatingMob implements Runnable {
     private GameMap gameMap;
 
     public Chicken() {
-        super(null);
+        super();
         initJython();
         this.fileName = "ChickenMovementSkript";
     }
 
     public Chicken(String fileName) {
-        super(null);
+        super();
         this.fileName = fileName;
         initJython();
     }
 
     public Chicken(Square initialPosition, GameMap gameMap) {
-        super(gameMap);
+        super();
         id = generateId();
         this.gameMap = gameMap;
         this.chickenPosX = initialPosition.getIndexX();

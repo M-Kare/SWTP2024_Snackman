@@ -121,7 +121,7 @@ public class Square {
         if (type == MapObjectType.WALL) {
             return "W";
         } else if (type == MapObjectType.FLOOR) {
-            if(this.mobs.stream().anyMatch(mob -> mob instanceof Ghost)) return "G";
+            if(this.mobs.stream().anyMatch(mob -> mob instanceof Ghost || mob instanceof ScriptGhost)) return "G";
             else if(this.mobs.stream().anyMatch(mob -> mob instanceof SnackMan)) return "SM";
             else if(this.mobs.stream().anyMatch(mob -> mob instanceof Chicken)) return "C";
             else if(this.snack != null && !this.snack.getSnackType().equals(SnackType.EGG)) return "S";     // eats all snacks except for eggs
