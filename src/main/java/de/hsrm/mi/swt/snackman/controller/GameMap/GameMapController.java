@@ -2,6 +2,7 @@ package de.hsrm.mi.swt.snackman.controller.GameMap;
 
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -51,6 +52,7 @@ public class GameMapController {
      * @param file uploaded File
      * @param lobbyId lobbyId, where upload custom map
      * @return ResponseEntity: file is uploaded sucessfully or 
+     *          400 (Bad Request) file is not valid
      *          409 (Conflict) status of an error occurs during the upload process
      */
     @PostMapping("/upload")
@@ -60,10 +62,30 @@ public class GameMapController {
                 return ResponseEntity.badRequest().body("Invalid file type. Only .txt files are allowed.");
             }
 
+            // Check File-Content
+            String fileContent = new String(file.getBytes(), StandardCharsets.UTF_8);
+            String validPattern = "^[SGCo#\\s]*$";
+            
+            if (!fileContent.matches(validPattern)) {
+                return ResponseEntity.badRequest().body(
+                    "The map file is only allowed to contain the following characters: S, G, C, o, #, and spaces."
+                );
+            }
+
+            // Check the number of Position for Snackman and Ghost
+            long countS = fileContent.chars().filter(ch -> ch == 'S').count();
+            long countG = fileContent.chars().filter(ch -> ch == 'G').count();
+
+            if (countS != 1) {
+                return ResponseEntity.badRequest().body("The map file must contain exactly one 'S'.");
+            }
+            if (countG != 4) {
+                return ResponseEntity.badRequest().body("The map file must contain exactly four 'G's.");
+            }
+
+            // Save File
             Path uploadPath = Paths.get("./extensions/map").toAbsolutePath();
-
             String fileName = String.format("SnackManMap_%s.txt", lobbyId);
-
             Path filePath = uploadPath.resolve(fileName);
 
             Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);

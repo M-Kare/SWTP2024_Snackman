@@ -215,21 +215,7 @@
         if (input.files && input.files.length > 0) {
             const file = input.files[0];
             if (file.name.endsWith('.txt')) {
-                const reader = new FileReader();
-                reader.onload = () => {
-                    const fileContent = reader.result as string;
-                    const validPattern = /^[SGCo#\s]*$/;
-
-                    if (validPattern.test(fileContent)){
-                        uploadFileToServer(file, lobbyId);
-                    } else {
-                        showPopUp.value = true;
-                        darkenBackground.value = true;
-                        infoHeading.value = "- File Map is not valid -"
-                        infoText.value = "The map file is only allowed to contain the following characters: \nS, G, C, o, #, and spaces."
-                    }
-                };
-                reader.readAsText(file);
+                uploadFileToServer(file, lobbyId);
             } else {
                 showPopUp.value = true;
                 darkenBackground.value = true;
@@ -244,16 +230,17 @@
      * @param file - new custom map in file .txt
      * @param lobbyId - The unique identifier of the lobby.
      */
-    const uploadFileToServer = (file: File, lobbyId: string) => {
+    const uploadFileToServer = async (file: File, lobbyId: string) => {
         const formData = new FormData();
         formData.append('file', file);
         formData.append('lobbyId', lobbyId);
 
-        fetch('/api/upload', {
-            method: 'POST',
-            body: formData
-        })
-        .then(response => {
+        try {
+            const response = await fetch('/api/upload', {
+                method: 'POST',
+                body: formData
+            });
+
             if (response.ok) {
                 // Success feedback
                 feedbackMessage.value = 'Map saved';
@@ -273,14 +260,19 @@
                 // Failure feedback
                 feedbackMessage.value = 'Map not saved';
                 feedbackClass.value = 'error';
+
+                const errorMessage = await response.text();
+                showPopUp.value = true;
+                darkenBackground.value = true;
+                infoHeading.value = "- File Map is not valid -";
+                infoText.value = errorMessage;
             }
-        })
-        .catch(error => {
+        } catch (error) {
             console.error('Error uploading file:', error);
             // Failure feedback
             feedbackMessage.value = 'Map not saved';
             feedbackClass.value = 'error';
-        });
+        }
 
         // Clear feedback after 3 seconds
         setTimeout(() => {
