@@ -53,7 +53,7 @@ public class MapService {
     }
 
     public GameMap createNewGameMap(String lobbyId, String filePath) {
-        saveLastMapFile(filePath);
+        saveLastMapFile(lobbyId, filePath);
         readMazeService.generateNewMaze();
         char[][] mazeData = readMazeService.readMazeFromFile(filePath);
         return convertMazeDataGameMap(lobbyId, mazeData);
@@ -263,13 +263,10 @@ public class MapService {
      * Save the last map in LastMap.txt in Game-Beginn, for later to download.
      * @param filePath path of last map file
      */
-    private void saveLastMapFile(String filePath) {
+    private void saveLastMapFile(String lobbyId, String filePath) {
         Path source = Paths.get(filePath).toAbsolutePath();
-
-        // TODO: save map with lobbyId for download the right map of lobby
-        // String lastMapName = String.format("LastMap_%s.txt", lobbyId);
-        
-        Path lastMapPath = Paths.get("./extensions/map/LastMap.txt").toAbsolutePath();
+        String fileName = String.format("LastMap_%s.txt", lobbyId);
+        Path lastMapPath = Paths.get("./extensions/map/" + fileName).toAbsolutePath();
 
         try {
             if (!Files.exists(lastMapPath)) {

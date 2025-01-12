@@ -18,7 +18,7 @@
         </SmallNavButton>
 
         <div id="player-count">
-                {{ playerCount }} / {{ maxPlayerCount }} Players
+                {{ playerCount }} / {{ MAX_PLAYER_COUNT }} Players
         </div>
 
         <div class="inner-box">
@@ -105,7 +105,6 @@
     let lobby = computed(() => lobbiesStore.lobbydata.lobbies.find(l => l.lobbyId === lobbyUrl));
     const members = computed(() => lobby.value?.members || [] as Array<IPlayerClientDTD>);
     const playerCount = computed(() => members.value.length);
-    const maxPlayerCount = ref(5);
 
     const darkenBackground = ref(false);
     const showPopUp = ref(false);
@@ -120,7 +119,7 @@
     const mouseInfoBox = ref(document.getElementById("infoBox"))
 
 
-    const MAX_PLAYER_COUNT = 4;
+    const MAX_PLAYER_COUNT = 5;
 
     const TIP_TOP_DIST = 30;
     const TIP_SIDE_DIST = 20;
@@ -139,7 +138,10 @@
                 if (updatedLobby.gameStarted){
                     router.push({ 
                         name: 'GameView', 
-                        query: { role: lobbiesStore.lobbydata.currentPlayer.role } 
+                        query: { 
+                            role: lobbiesStore.lobbydata.currentPlayer.role,
+                            lobby: lobbiesStore.lobbydata.currentPlayer.joinedLobbyId,
+                        } 
                     });
                 }
             }

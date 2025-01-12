@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import de.hsrm.mi.swt.snackman.services.LobbyManagerService;
@@ -47,12 +48,10 @@ public class GameMapController {
      *         - HTTP 409 (Conflict) if an error occurs during the process.
      */
     @GetMapping("/download")
-    public ResponseEntity<Resource> downloadMap(){
-        
-        // TODO: download map with the lobbyId
-
+    public ResponseEntity<Resource> downloadMap(@RequestParam("lobbyId") String lobbyId){
         try{
-            Path filePath = Paths.get("./extensions/map/LastMap.txt").toAbsolutePath();
+            String fileName = String.format("LastMap_%s.txt", lobbyId);
+            Path filePath = Paths.get("./extensions/map/" + fileName).toAbsolutePath();
             Resource resource = new UrlResource(filePath.toUri());
 
             if(!resource.exists()){

@@ -22,6 +22,7 @@ const router = useRouter();
 // Read player role and game result from query parameters (undefined if not provided)
 const gameResult = route.query.result || '-';
 const playerRole = route.query.role || '-';
+const lobbyId = route.query.lobby || '-';
 
 // Compute the game reason dynamically or display '-' if no data is available
 const gameReason = computed(() => {
@@ -47,7 +48,12 @@ const feedbackClass = ref('');
     
 const downloadMap = async () => {
   try{
-      const response = await fetch(`/api/download`);
+      const response = await fetch(`/api/download?lobbyId=${lobbyId}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+      });
 
       if(!response.ok) throw new Error('Failed to download map.');
 
