@@ -33,7 +33,7 @@
 <script setup lang="ts">
     import SmallNavButton from '@/components/SmallNavButton.vue';
     import { useRouter } from 'vue-router';
-    import { computed, onMounted, ref } from 'vue';
+    import { ref } from 'vue';
     import { useLobbiesStore } from '@/stores/Lobby/lobbiesstore';
     import type { IPlayerClientDTD } from '@/stores/Lobby/IPlayerClientDTD';
 

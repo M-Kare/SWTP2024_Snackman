@@ -174,29 +174,21 @@ export const useGameMapStore = defineStore('gameMap', () => {
     }
   }
 
-  function endGame(gameEndUpdate: IGameEndDTD){
-    console.log("GameEnd view wird aufgerufen mit", gameEndUpdate)
-    if (gameEndUpdate.role == "SNACKMAN") {
-      // Navigate to GameEndView with "SnackMan Wins"
-      router.push({
-        name: 'GameEnd',
-        query: {
-          winningRole: gameEndUpdate.role,
-          timePlayed: gameEndUpdate.timePlayed,
-          kcalCollected: gameEndUpdate.kcalCollected
-        }
-      })
-    } else {
-      // Navigate to GameEndView with "Ghosts Win"
-      router.push({
-        name: 'GameEnd',
-        query: {
-          winningRole: gameEndUpdate.role,
-          timePlayed: gameEndUpdate.timePlayed,
-          kcalCollected: gameEndUpdate.kcalCollected
-        }
-      })
-    }
+  /**
+   * Handles the end of a game and navigates to the GameEnd view with relevant details.
+   *
+   * @param gameEndUpdate - Contains the details about the game end, including the winning role,
+   *                        the time played, and the calories collected during the game.
+   */
+  function endGame(gameEndUpdate: IGameEndDTD) {
+    router.push({
+      name: 'GameEnd',
+      query: {
+        winningRole: gameEndUpdate.role,
+        timePlayed: gameEndUpdate.timePlayed,
+        kcalCollected: gameEndUpdate.kcalCollected
+      }
+    })
   }
 
   function updateChicken(change: IChickenDTD) {

@@ -1,6 +1,8 @@
 package de.hsrm.mi.swt.snackman.entities.lobby;
 
-//TODO javadoc
+/**
+ * Data Transfer Object (DTO) representing the end state of a game session.
+ */
 public record GameEndDTO(ROLE role, long timePlayed, int kcalCollected) {
     public static GameEndDTO fromGameEnd(GameEnd gameEnd){
         return new GameEndDTO(gameEnd.getRole(), gameEnd.getTimePlayed(), gameEnd.getKcalCollected());

@@ -35,5 +35,5 @@ public class GameConfig {
     public  static  final int AMOUNT_PLAYERS = 5;
 
     //GAME
-    public static final long PLAYING_TIME = 300000; // 5 mins
+    public static final long PLAYING_TIME = 300000; // 5 mins = 300.000 milisecs
 }

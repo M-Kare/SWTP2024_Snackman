@@ -34,7 +34,6 @@ import {useRoute, useRouter} from 'vue-router'
 import CreateNewLeaderboardEntryForm from "@/components/CreateNewLeaderboardEntryForm.vue"
 import Leaderboard from "@/components/Leaderboard.vue";
 import {useLobbiesStore} from "@/stores/Lobby/lobbiesstore";
-import type {IPlayerClientDTD} from "@/stores/Lobby/IPlayerClientDTD";
 
 const route = useRoute()
 const router = useRouter()
@@ -43,7 +42,7 @@ const showLeaderboardPopUp = ref(false)
 const alreadyEntered = ref(false)
 const {lobbydata} = useLobbiesStore()
 
-// Read player role and game result from query parameters (undefined if not provided)
+// Read player role and game result from query parameters
 const winningRole = (route.query.winningRole as string) || '-'
 const playedTime = (route.query.timePlayed as unknown as number) || 0
 const formatedPlayedTime = formatTime(playedTime)
@@ -56,11 +55,13 @@ if (winningRole == "SNACKMAN") {
   gameResult.value = "Die Geister haben gewonnen."
 }
 
-// Compute the game reason dynamically or display '-' if no data is available
+/**
+ * Computes the reason for the game's result based on the winning role and game conditions.
+ */
 const gameReason = computed(() => {
   if (winningRole === 'SNACKMAN') {
     return 'SnackMan hat das Kalorienziel erreicht!'
-  } else if (winningRole === "GHOST" && kcalCollected < 0) {
+  } else if (winningRole === 'GHOST' && kcalCollected < 0) {
     return 'Die Geister haben SnackMan auf negative Kalorien gebracht!'
   }
   return 'Die Zeit ist abgelaufen und SnackMan hat nicht genügend Kalorien gesammelt!'
@@ -91,6 +92,11 @@ const backToMainMenu = () => {
   router.push({name: 'MainMenu'})
 }
 
+/**
+ * Formats the time in seconds into a string in the format `MM:SS`.
+ * @param {number} seconds - The time in seconds to be formatted.
+ * @returns {string} The formatted time string.
+ */
 function formatTime(seconds: number): string {
   const minutes = Math.floor(seconds / 60);
   const remainingSeconds = seconds % 60;

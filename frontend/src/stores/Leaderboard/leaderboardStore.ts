@@ -18,6 +18,12 @@ export const useLeaderboardStore = defineStore('leaderboard', () => {
         leaderboardEntries: []
     } as Leaderboard)
 
+  /**
+   * Initializes the leaderboard store by fetching leaderboard data from the backend.
+   * The fetched leaderboard entries are saved in the store's state.
+   *
+   * @throws {Error} Throws an error if fetching leaderboard data fails.
+   */
     async function initLeaderboardStore() {
         try {
             const response: LeaderboardDTD = await fetchLeaderboardDataFromBackend()
@@ -33,6 +39,13 @@ export const useLeaderboardStore = defineStore('leaderboard', () => {
         }
     }
 
+  /**
+   * Starts the leaderboard update process via WebSocket connection.
+   * This establishes a connection to the STOMP broker and listens for real-time updates
+   * to leaderboard entries, updating the store's state upon receiving new messages.
+   *
+   * @throws {Error} Throws an error if WebSocket or STOMP client connection fails.
+   */
     async function startLeaderboardUpdate() {
         const protocol = window.location.protocol.replace('http', 'ws')
         const wsurl = `${protocol}//${window.location.host}/stompbroker`
@@ -67,6 +80,13 @@ export const useLeaderboardStore = defineStore('leaderboard', () => {
         }
     }
 
+  /**
+   * Adds a new leaderboard entry to the backend by sending a POST request.
+   *
+   * @param {LeaderboardEntry} data - The leaderboard entry data to be added.
+   *
+   * @throws {Error} Throws an error if the POST request fails.
+   */
     async function addNewLeaderboardEntry(data: LeaderboardEntry) {
         const url = 'api/leaderboard/new/entry'
 
@@ -86,6 +106,11 @@ export const useLeaderboardStore = defineStore('leaderboard', () => {
         }
     }
 
+  /**
+   * Sorts the leaderboard entries based on their duration, release date, and name.
+   * The leaderboard is sorted in ascending order of duration first, followed by release date,
+   * and finally by name.
+   */
     function sortLeaderboard() {
         leaderboard.leaderboardEntries.sort((a, b) => {
             const durationComparison = a.duration.localeCompare(b.duration);

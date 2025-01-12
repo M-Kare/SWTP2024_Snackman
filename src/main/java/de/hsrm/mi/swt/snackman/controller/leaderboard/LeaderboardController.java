@@ -14,6 +14,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * REST controller for handling leaderboard-related operations.
+ * Provides endpoints to retrieve and update leaderboard data.
+ */
 @Controller
 @RequestMapping("/api/leaderboard")
 public class LeaderboardController {
@@ -22,6 +26,11 @@ public class LeaderboardController {
     @Autowired
     private LeaderboardService leaderboardService;
 
+    /**
+     * Retrieves the current leaderboard as a DTO.
+     *
+     * @return a {@link ResponseEntity} containing the leaderboard data
+     */
     @GetMapping("")
     public ResponseEntity<LeaderboardDTO> getLeaderboard() {
         logger.info("Retrieving the leaderboard: {}", leaderboardService.getLeaderboardAsDTO());
@@ -29,6 +38,12 @@ public class LeaderboardController {
         return ResponseEntity.ok(leaderboardService.getLeaderboardAsDTO());
     }
 
+    /**
+     * Creates a new leaderboard entry based on the provided request body.
+     *
+     * @param requestBody a map containing the "name", "duration", and "releaseDate" of the new entry
+     * @return a {@link ResponseEntity} indicating the operation's success
+     */
     @PostMapping("/new/entry")
     public ResponseEntity<Void> createNewLeaderboardEntry(@RequestBody Map<String, String> requestBody) {
         String name = requestBody.get("name");

@@ -1,6 +1,9 @@
 package de.hsrm.mi.swt.snackman.entities.lobby;
 
-//TODO javadoc
+/**
+ * Represents the end state of a game session, including role, time played,
+ * and the calories the snackman collected during the game.
+ */
 public class GameEnd {
     private ROLE role;
     private long timePlayed;

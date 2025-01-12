@@ -72,6 +72,12 @@ public class Square {
         return idCounter++;
     }
 
+    /**
+     * Adds a {@link PropertyChangeListener} to this object.
+     * The listener will be notified whenever a bound property changes.
+     *
+     * @param listener the {@link PropertyChangeListener} to be added
+     */
     public void addPropertyChangeListener(PropertyChangeListener listener) {
         this.propertyChangeSupport.addPropertyChangeListener(listener);
     }

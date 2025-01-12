@@ -1,20 +1,13 @@
 package de.hsrm.mi.swt.snackman.entities.lobby;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
 import java.util.*;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import de.hsrm.mi.swt.snackman.configuration.GameConfig;
 import de.hsrm.mi.swt.snackman.entities.map.GameMap;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.Mob;
-import de.hsrm.mi.swt.snackman.entities.mobileObjects.ScriptGhost;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.SnackMan;
 import de.hsrm.mi.swt.snackman.messaging.MessageLoop.MessageLoop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.Lazy;
 
 /**
  * Represents a lobby where players can gather to play a game together.
@@ -108,6 +101,12 @@ public class Lobby {
         }
     }
 
+    /**
+     * Retrieves the first {@link SnackMan} instance found on the game map.
+     * The method searches through all squares of the game map, checking each square's mobs for a {@link SnackMan}.
+     *
+     * @return the first {@link SnackMan} instance found, or null if no SnackMan is present
+     */
     public SnackMan getSnackman() {
         return Arrays.stream(this.gameMap.getGameMapSquares())
                 .flatMap(Arrays::stream)
@@ -134,11 +133,23 @@ public class Lobby {
         return isGameStarted;
     }
 
+    /**
+     * Marks the game as started by setting the {@code isGameStarted} flag to {@code true}.
+     * Also sets the time of the last snack spawn to the current system time.
+     */
     public void setGameStarted() {
         this.isGameStarted = true;
         setTimeSinceLastSnackSpawn(System.currentTimeMillis());
     }
 
+    /**
+     * Marks the game as finished and processes the end state of the game.
+     * Updates the {@code isGameFinished} flag and adds the provided {@link GameEnd} object
+     * to the message queue for processing.
+     *
+     * @param gameFinished {@code true} to mark the game as finished, {@code false} otherwise
+     * @param gameEnd the {@link GameEnd} object representing the final state of the game
+     */
     public void setGameFinished(boolean gameFinished, GameEnd gameEnd) {
         this.isGameFinished = gameFinished;
         messageLoop.addGameEndToQueue(gameEnd, lobbyId);
