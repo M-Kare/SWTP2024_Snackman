@@ -2,8 +2,6 @@ package de.hsrm.mi.swt.snackman.entities.mobileObjects;
 
 import de.hsrm.mi.swt.snackman.entities.map.GameMap;
 import de.hsrm.mi.swt.snackman.entities.map.Square;
-import de.hsrm.mi.swt.snackman.entities.mapObject.MapObjectType;
-import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken.Chicken;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken.Direction;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.SnackMan;
 import org.python.core.PyList;
@@ -11,7 +9,6 @@ import org.python.core.PyObject;
 import org.python.util.PythonInterpreter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.nio.file.Paths;
