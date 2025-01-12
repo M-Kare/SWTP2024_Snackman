@@ -20,16 +20,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class SmartScriptGhostMovementTest {
 
-    @Mock
-    private GameMap gameMap;
-    private ScriptGhost scriptGhost;
-
-    @BeforeEach
-    void setUp() {
-        MockitoAnnotations.openMocks(this);
-        scriptGhost = new ScriptGhost(gameMap, ScriptGhostDifficulty.DIFFICULT);
-    }
-
     /**
      * Tests if the ghost moves north as determined by the Python script.
      *
@@ -37,6 +27,9 @@ public class SmartScriptGhostMovementTest {
      */
     @Test
     public void testGhostWalkNorth() {
+        ScriptGhost scriptGhost = new ScriptGhost(null, ScriptGhostDifficulty.DIFFICULT);
+        scriptGhost.initJython();
+
         List<List<String>> lab = Arrays.asList(
                 Arrays.asList("W", "W", "W", "W", "W", "W", "W", "W", "W", "W", "W", "W", "W", "W", "W"),
                 Arrays.asList("W", "M", "L", "L", "W", "L", "L", "L", "L", "L", "L", "L", "L", "L", "W"),
@@ -58,6 +51,9 @@ public class SmartScriptGhostMovementTest {
      */
     @Test
     public void testGhostWalkEast() {
+        ScriptGhost scriptGhost = new ScriptGhost(null, ScriptGhostDifficulty.DIFFICULT);
+        scriptGhost.initJython();
+
         List<List<String>> lab = Arrays.asList(
                 Arrays.asList("W", "W", "W", "W", "W", "W", "W", "W", "W", "W", "W", "W", "W", "W", "W"),
                 Arrays.asList("W", "G", "M", "L", "W", "L", "L", "L", "L", "L", "L", "L", "L", "L", "W"),
@@ -79,6 +75,9 @@ public class SmartScriptGhostMovementTest {
      */
     @Test
     public void testGhostWalkSouth() {
+        ScriptGhost scriptGhost = new ScriptGhost(null, ScriptGhostDifficulty.DIFFICULT);
+        scriptGhost.initJython();
+
         List<List<String>> lab = Arrays.asList(
                 Arrays.asList("W", "W", "W", "W", "W", "W", "W", "W", "W", "W", "W", "W", "W", "W", "W"),
                 Arrays.asList("W", "G", "L", "L", "W", "L", "L", "L", "L", "L", "L", "L", "L", "L", "W"),
@@ -100,6 +99,9 @@ public class SmartScriptGhostMovementTest {
      */
     @Test
     public void testGhostWalkWest() {
+        ScriptGhost scriptGhost = new ScriptGhost(null, ScriptGhostDifficulty.DIFFICULT);
+        scriptGhost.initJython();
+
         List<List<String>> lab = Arrays.asList(
                 Arrays.asList("W", "W", "W", "W", "W", "W", "W", "W", "W", "W", "W", "W", "W", "W", "W"),
                 Arrays.asList("W", "M", "G", "L", "W", "L", "L", "L", "L", "L", "L", "L", "L", "L", "W"),
