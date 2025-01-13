@@ -274,7 +274,7 @@ public class Chicken extends EatingMob implements Runnable {
             this.pythonInterpreter.execfile(scriptPath);
 
         } catch (Exception ex) {
-            log.error("Error initializing ChickenMovementSkript.py: ", ex);
+            log.error("Error initializing {}: ", this.fileName, ex);
             ex.printStackTrace();
         }
         this.pythonInterpreter.exec("from " + fileName +" import choose_next_square");
@@ -285,7 +285,7 @@ public class Chicken extends EatingMob implements Runnable {
      * next move.
      *
      * @param squares a list of squares visible from the chicken's current position.
-     * @return a list of moves resulting from the Python script's execution.
+     * @return the movement direction as int resulting from the Python script's execution.
      */
     public int executeMovementSkript(List<String> squares) {
         try {
@@ -294,7 +294,6 @@ public class Chicken extends EatingMob implements Runnable {
             PyObject result = func.__call__(new PyList(squares));
 
             return result.asInt();
-
         } catch (Exception ex) {
             log.error("Error while executing chicken python script: ", ex);
             ex.printStackTrace();
