@@ -81,9 +81,10 @@ import type {IPlayerClientDTD} from '@/stores/Lobby/IPlayerClientDTD'
 import type {ILobbyDTD} from '@/stores/Lobby/ILobbyDTD'
 
 const router = useRouter()
+const route = useRoute()
 const lobbiesStore = useLobbiesStore()
 
-const lobbyUrl = router.params.lobbyId
+const lobbyUrl = route.params.lobbyId
 let lobbyLoaded = false
 const lobby = computed(() =>
   lobbiesStore.lobbydata.lobbies.find(l => l.lobbyId === lobbyUrl),
