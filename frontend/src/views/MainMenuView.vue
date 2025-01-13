@@ -6,40 +6,27 @@
   Buttons will be merged later on,
   right now we need a fast entry into the game to test things (Singpleplayer-Button)
    -->
-  <MainMenuButton class="menu-button" id="singleplayer-button" @click="startSingleplayer">Singleplayer</MainMenuButton>
-  <MainMenuButton class="menu-button" id="multiplayer-button" @click="showLobbies">Multiplayer</MainMenuButton>
-  <MainMenuButton class="menu-button" id="leaderboard-button" @click="showLeaderboard">Leaderboard</MainMenuButton>
-
-  <Leaderboard
-    v-if="showLeaderboardPopUp"
-    :show="showLeaderboardPopUp"
-    @close="hideLeaderboard"
-  />
+  <MainMenuButton id="singleplayer-button" class="menu-button" @click="startSingleplayer">Singleplayer</MainMenuButton>
+  <MainMenuButton id="multiplayer-button" class="menu-button" @click="showLobbies">Multiplayer</MainMenuButton>
+  <MainMenuButton id="leaderboard-button" class="menu-button" @click="showLeaderboard">Leaderboard</MainMenuButton>
 
 </template>
 
-<script setup lang="ts">
+<script lang="ts" setup>
 import {useLobbiesStore} from '@/stores/Lobby/lobbiesstore'
 import MainMenuButton from '@/components/MainMenuButton.vue'
 import MenuBackground from '@/components/MenuBackground.vue'
 import {useRouter} from 'vue-router'
-import {ref} from "vue"
-import Leaderboard from "@/components/Leaderboard.vue"
 
 const router = useRouter()
 const lobbiesStore = useLobbiesStore()
-const showLeaderboardPopUp = ref(false)
 
 const showLobbies = () => {
   router.push({name: 'LobbyListView'})
 }
 
 const showLeaderboard = () => {
-  showLeaderboardPopUp.value = true
-}
-
-const hideLeaderboard = () => {
-  showLeaderboardPopUp.value = false
+  router.push({name: 'Leaderboard'})
 }
 
 const startSingleplayer = () => {

@@ -1,4 +1,5 @@
 <template>
+  <LeaderboardBackground></LeaderboardBackground>
   <div id="individual-outer-box-size" class="outer-box">
     <h1 class="info-heading"> Leaderboard </h1>
     <div class="table-container">
@@ -25,7 +26,7 @@
       <SmallNavButton
         id="menu-back-button"
         class="small-nav-buttons"
-        @click="$emit('close')"
+        @click=backToMainMenu
       >
         Back to main menu
       </SmallNavButton>
@@ -44,8 +45,15 @@
 import {useLeaderboardStore} from "@/stores/Leaderboard/leaderboardStore";
 import {computed, onMounted} from "vue";
 import SmallNavButton from "@/components/SmallNavButton.vue";
+import {useRouter} from 'vue-router';
+import LeaderboardBackground from "@/components/LeaderboardBackground.vue";
 
 const leaderboardStore = useLeaderboardStore()
+const router = useRouter();
+
+const backToMainMenu = () => {
+  router.push({name: 'MainMenu'});
+};
 
 /**
  * Load the leaderboard data and initialize stomp message updates.
@@ -56,20 +64,9 @@ onMounted(async () => {
 })
 
 const leaderboardEntries = computed(() => leaderboardStore.leaderboard.leaderboardEntries);
-
-defineProps({
-  show: {
-    type: Boolean,
-    required: true
-  }
-})
-
-defineEmits(['close'])
 </script>
 
 <style scoped>
-
-
 .info-heading {
   font-size: 3rem;
   font-weight: bold;
