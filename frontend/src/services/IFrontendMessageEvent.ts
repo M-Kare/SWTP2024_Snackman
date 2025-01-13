@@ -1,12 +1,12 @@
+import {LeaderboardEntryDTD} from "@/stores/Leaderboard/LeaderboardDTD";
+import {EventType} from "@/stores/messaging/IMessageDTD";
 
-export interface IFrontendLeaderboardMessageEvent{
+export interface IFrontendLeaderboardMessageEvent {
   eventType: EventType,
-  changeType: ChangeType,
   leaderboardEntries: LeaderboardEntryDTD[],
 }
 
-export interface IFrontendLeaderboardEntryMessageEvent{
+export interface IFrontendLeaderboardEntryMessageEvent {
   eventType: EventType,
-  changeType: ChangeType,
   leaderboardEntry: LeaderboardEntryDTD,
 }
