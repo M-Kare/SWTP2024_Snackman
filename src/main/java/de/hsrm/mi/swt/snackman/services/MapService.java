@@ -149,6 +149,7 @@ public class MapService {
             square.setSnack(new Snack(randomSnackType));
         }
     }
+
     protected String loadChickenScripts() {
         String name = Paths.get("extensions/chicken/").normalize().toAbsolutePath().toString();
         File folder = new File(name);
@@ -167,7 +168,7 @@ public class MapService {
 
         return filenames.get(randomeFileNumber);
     }
-    
+
 
     /**
      * Goes trough the map and checks if it's a spawnpoint and sets a Mob
@@ -187,8 +188,7 @@ public class MapService {
                     SpawnpointMobType spawnpointMobType = spawnpoint.spawnpointMobType();
                     switch (spawnpointMobType) {
                         case SpawnpointMobType.CHICKEN:
-
-                            Chicken newChicken = new Chicken(currentSquare, gameMap, loadChickenScripts());
+                            Chicken newChicken = new Chicken(currentSquare, gameMap);
 
                             Thread chickenThread = new Thread(newChicken);
                             chickenThread.start();
@@ -250,7 +250,7 @@ public class MapService {
 
         int AMOUNT_SCRIPT_GHOSTS = GameConfig.AMOUNT_PLAYERS - lobby.getMembers().size();
         for (int i = 0; i < AMOUNT_SCRIPT_GHOSTS; i++) {
-            log.info("Initialising scriptGhost");
+            log.info("Initialising scriptGhost {}", i);
             Square square = ghostSpawnSquares.get(ghostSpawnIndex);
 
             ScriptGhost newScriptGhost = new ScriptGhost(lobby.getGameMap(), square, ScriptGhostDifficulty.EASY);
@@ -294,20 +294,5 @@ public class MapService {
     public SnackMan getSnackMan() {
         return null; //snackman;
     }
-
-    /*public Ghost getGhost(long id) {
-        Square[][] squares = this.gameMap.getGameMap();
-        for (Square square[] : squares) {
-            for (Square square1 : square) {
-                for (Mob mob :  square1.getMobs()){
-                    if (mob.getId() == id  && mob instanceof  Ghost){
-                        return (Ghost) mob;
-                    }
-                }
-              //  return (Ghost) square1.getMobs().stream().filter(mob -> mob.getId() == id && mob instanceof Ghost); // kein filter sondern ein find hier sodass man den ersten geist zurück bekommt
-            }
-        }
-        return null;
-    }*/
 
 }

@@ -47,3 +47,5 @@ Maze.txt
 
 extensions/
 *.dylib
+mini-maze.txt
+leaderboard.txt

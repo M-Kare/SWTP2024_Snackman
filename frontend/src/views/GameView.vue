@@ -8,7 +8,7 @@
     <div :style="getBackgroundStyle" class="Calories-Overlay" v-if="lobbydata.currentPlayer.role == 'SNACKMAN'">
       <div class="overlayContent">
         <img alt="calories" class="calories-icon" src="@/assets/calories.svg"/>
-        <p v-if="currentCalories < MAXCALORIES">{{ currentCalories }}kcal</p>
+        <p v-if="currentCalories < MAX_CALORIES">{{ currentCalories }}kcal</p>
         <p v-else>{{ caloriesMessage }}</p>
       </div>
     </div>
@@ -18,18 +18,18 @@
 <script lang="ts" setup>
 import {computed, onMounted, onUnmounted, reactive, ref, watch} from 'vue'
 import * as THREE from 'three'
-import {Player} from '@/components/Player';
-import {fetchSnackManFromBackend} from '@/services/SnackManInitService';
-import {GameMapRenderer} from '@/renderer/GameMapRenderer';
-import {useGameMapStore} from '@/stores/gameMapStore';
-import type {IGameMap} from '@/stores/IGameMapDTD';
-import {useLobbiesStore} from '@/stores/Lobby/lobbiesstore';
+import { Player } from '@/components/Player';
+import { fetchSnackManFromBackend } from '@/services/SnackManInitService';
+import { GameMapRenderer } from '@/renderer/GameMapRenderer';
+import { useGameMapStore } from '@/stores/gameMapStore';
+import type { IGameMap } from '@/stores/IGameMapDTD';
+import { useLobbiesStore } from '@/stores/Lobby/lobbiesstore';
 import type {IPlayerClientDTD} from "@/stores/Lobby/IPlayerClientDTD";
-import {GLTFLoader} from 'three/examples/jsm/Addons.js'
-import {useRouter, useRoute} from 'vue-router';
+import { GLTFLoader } from 'three/examples/jsm/Addons.js'
+import { useRouter, useRoute } from 'vue-router';
 import type { IPlayerDTD } from '@/stores/Player/IPlayerDTD';
 
-const {lobbydata} = useLobbiesStore();
+const { lobbydata } = useLobbiesStore();
 const gameMapStore = useGameMapStore()
 gameMapStore.startGameMapLiveUpdate()
 
@@ -42,7 +42,7 @@ const stompclient = gameMapStore.stompclient
 let playerData: IPlayerDTD
 
 //Reaktive Calories Variable
-const MAXCALORIES = 20000
+const MAX_CALORIES = ref(20000)
 let currentCalories = ref()
 let caloriesMessage = ref('')
 const playerRole = ref(route.query.role || ''); // Player role from the URL query
@@ -62,8 +62,6 @@ const sprintData = reactive({
   isCooldown: false,
 })
 
-let sprintInCooldown = false;
-
 // camera setup
 let camera: THREE.PerspectiveCamera
 
@@ -78,6 +76,7 @@ function animate() {
   currentCalories.value = player.getCalories()
   fps = 1 / clock.getDelta()
   player.updatePlayer()
+
   if (counter >= fps / targetHz) {
     const time = performance.now()
     const delta = (time - prevTime) / 1000
@@ -123,23 +122,17 @@ onMounted(async () => {
 
   clients = lobbydata.lobbies.find((elem) => elem.lobbyId === lobbydata.currentPlayer.joinedLobbyId)?.members!
   console.log(clients)
-  const playerData = await fetchSnackManFromBackend(lobbydata.currentPlayer.joinedLobbyId!, lobbydata.currentPlayer.playerId);
+  playerData = await fetchSnackManFromBackend(lobbydata.currentPlayer.joinedLobbyId!, lobbydata.currentPlayer.playerId);
+  MAX_CALORIES.value = playerData.maxCalories
 
   clients.forEach(it => {
     if (it.playerId === lobbydata.currentPlayer.playerId) {
       // that's you
       player = new Player(renderer, playerData.posX, playerData.posY, playerData.posZ, playerData.radius,
         playerData.speed, playerData.sprintMultiplier)
-      console.log("player data {}", player)
-
     } else {
       // other players that are not you
-      let material = new THREE.MeshBasicMaterial({color: 0x00ff00})
-      material.color = new THREE.Color(Math.random(), Math.random(), Math.random());
-      let cube = new THREE.Mesh(new THREE.BoxGeometry(1, 3, 1), material);
-      cube.position.lerp(new THREE.Vector3(playerData.posX, playerData.posY, playerData.posZ), 0.5)
-      scene.add(cube);
-      playerHashMap.set(it.playerId, cube);
+      loadPlayerModel(it.playerId, SNACKMAN_TEXTURE);
     }
   });
   gameMapStore.setOtherPlayers(playerHashMap)
@@ -177,7 +170,7 @@ async function loadPlayerModel(playerId: string, texture: string) {
     snackManModel = gltf.scene
     snackManModel.scale.set(1, 1, 1)
     scene.add(snackManModel)
-    snackManModel.position.lerp(new THREE.Vector3(playerData.posX, playerData.posY-2, playerData.posZ), 0.5)
+    snackManModel.position.lerp(new THREE.Vector3(playerData.posX, playerData.posY - 2, playerData.posZ), 0.5)
     playerHashMap.set(playerId, snackManModel);
     // optional offset for thirdPersonView
     // snackManModel.position.set(0, -1.55, -5);
@@ -242,7 +235,7 @@ function stopCooldownFill() {
 // Kalorien-Overlay Fill berrechnen
 const getBackgroundStyle = computed(() => {
   //Prozent berechnen
-  const percentage = Math.min(currentCalories.value / MAXCALORIES, 1)
+  const percentage = Math.min(currentCalories.value / MAX_CALORIES.value, 1)
 
   const color = `linear-gradient(to right, #EEC643 ${percentage * 100}%, #5E4A08 ${percentage * 100}%)`
 

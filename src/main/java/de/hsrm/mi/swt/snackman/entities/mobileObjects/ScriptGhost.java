@@ -106,6 +106,12 @@ public class ScriptGhost extends Mob implements Runnable {
         return squares;
     }
 
+    /**
+     * Adds a {@link PropertyChangeListener} to this object.
+     * The listener will be notified whenever a bound property changes.
+     *
+     * @param listener the {@link PropertyChangeListener} to be added
+     */
     public void addPropertyChangeListener(PropertyChangeListener listener) {
         this.propertyChangeSupport.addPropertyChangeListener(listener);
     }
@@ -148,7 +154,7 @@ public class ScriptGhost extends Mob implements Runnable {
         }
     }
 
-    private boolean standingOnSameSquareAsSnackman(){
+    protected boolean standingOnSameSquareAsSnackman(){
         return this.gameMap.getSquareAtIndexXZ(this.ghostPosX, this.ghostPosZ).getMobs().stream().noneMatch(mob -> mob instanceof SnackMan);
     }
 
@@ -304,6 +310,10 @@ public class ScriptGhost extends Mob implements Runnable {
 
     public Direction getLookingDirection() {
         return lookingDirection;
+    }
+
+    public void setDifficulty(ScriptGhostDifficulty difficulty) {
+        this.difficulty = difficulty;
     }
 
     @Override

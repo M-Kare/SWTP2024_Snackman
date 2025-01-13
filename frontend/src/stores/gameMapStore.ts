@@ -17,6 +17,8 @@ import type {ISquareUpdateDTD} from './messaging/ISquareUpdateDTD';
 import {SnackType} from './Snack/ISnackDTD';
 import type {IScriptGhost, IScriptGhostDTD} from "@/stores/Ghost/IScriptGhostDTD";
 import type {IGhostUpdateDTD} from "@/stores/messaging/IGhostUpdateDTD";
+import {useRouter} from "vue-router";
+import type {IGameEndDTD} from "@/stores/GameEnd/IGameEndDTD";
 
 /**
  * Defines the pinia store used for saving the map from
@@ -26,7 +28,7 @@ import type {IGhostUpdateDTD} from "@/stores/messaging/IGhostUpdateDTD";
  */
 export const useGameMapStore = defineStore('gameMap', () => {
   const protocol = window.location.protocol.replace('http', 'ws')
-  const wsurl = `${protocol}//${window.location.host}/stompbroker`
+  const wsurl = `${protocol}//${window.location.host}/ws`
   let stompclient = new Client({brokerURL: wsurl})
   const scene = new THREE.Scene()
   const gameObjectRenderer = GameObjectRenderer()
@@ -36,7 +38,7 @@ export const useGameMapStore = defineStore('gameMap', () => {
   let otherPlayers: Map<String, THREE.Group<THREE.Object3DEventMap>>
   let OFFSET: number
   let DEFAULT_SIDE_LENGTH: number
-
+  const router = useRouter();
 
   const mapData = reactive({
     DEFAULT_SQUARE_SIDE_LENGTH: 0,
@@ -91,6 +93,10 @@ export const useGameMapStore = defineStore('gameMap', () => {
           const content: Array<IMessageDTD> = JSON.parse(message.body)
           for (const mess of content) {
             switch (mess.event) {
+              case EventType.GameEnd:
+                const gameEndUpdate: IGameEndDTD = mess.message
+                endGame(gameEndUpdate)
+                break;
               case EventType.SnackManUpdate:
                 const mobUpdate: ISnackmanUpdateDTD = mess.message
                 if (mobUpdate.playerId === lobbydata.currentPlayer.playerId) {
@@ -167,6 +173,23 @@ export const useGameMapStore = defineStore('gameMap', () => {
 
       stompclient.activate()
     }
+  }
+
+  /**
+   * Handles the end of a game and navigates to the GameEnd view with relevant details.
+   *
+   * @param gameEndUpdate - Contains the details about the game end, including the winning role,
+   *                        the time played, and the calories collected during the game.
+   */
+  function endGame(gameEndUpdate: IGameEndDTD) {
+    router.push({
+      name: 'GameEnd',
+      query: {
+        winningRole: gameEndUpdate.role,
+        timePlayed: gameEndUpdate.timePlayed,
+        kcalCollected: gameEndUpdate.kcalCollected
+      }
+    })
   }
 
   function updateChicken(change: IChickenDTD) {
