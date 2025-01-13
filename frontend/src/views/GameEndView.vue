@@ -6,9 +6,8 @@
     <p class="end-reason">SnackMan hat {{ kcalCollected }} Kalorien gesammelt!</p>
     <MainMenuButton class="menu-button" @click="backToMainMenu">Zurück zum Hauptmenü
     </MainMenuButton>
-    <MainMenuButton class="menu-button" @click="showLeaderboard">Leaderboard</MainMenuButton>
     <MainMenuButton class="menu-button" @click="showCreateNewLeaderboardEntryForm"
-                    v-if="!alreadyEntered && lobbydata.currentPlayer.role == 'SNACKMAN'">Create new leaderboard entry
+                    v-if="!alreadyEntered && lobbydata.currentPlayer.role == 'SNACKMAN' && winningRole == 'SNACKMAN'">Create new leaderboard entry
     </MainMenuButton>
 
     <Leaderboard
