@@ -1,4 +1,4 @@
-package de.hsrm.mi.swt.snackman.entities.mob.Ghost;
+package de.hsrm.mi.swt.snackman.entities.mobileObjects;
 
 import de.hsrm.mi.swt.snackman.SnackmanApplication;
 import org.junit.jupiter.api.AfterAll;

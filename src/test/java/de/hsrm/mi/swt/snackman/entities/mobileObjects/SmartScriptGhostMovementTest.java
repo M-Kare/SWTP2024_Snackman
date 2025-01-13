@@ -1,9 +1,7 @@
-package de.hsrm.mi.swt.snackman.entities.mob.Ghost;
+package de.hsrm.mi.swt.snackman.entities.mobileObjects;
 
 import de.hsrm.mi.swt.snackman.SnackmanApplication;
 import de.hsrm.mi.swt.snackman.entities.map.GameMap;
-import de.hsrm.mi.swt.snackman.entities.mobileObjects.ScriptGhost;
-import de.hsrm.mi.swt.snackman.entities.mobileObjects.ScriptGhostDifficulty;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
