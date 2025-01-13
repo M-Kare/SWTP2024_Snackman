@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import de.hsrm.mi.swt.snackman.services.LobbyManagerService;
-import de.hsrm.mi.swt.snackman.services.MapService;
 
 /**
  * REST Controller for handling map-related API requests
@@ -34,11 +33,13 @@ public class GameMapController {
 
     Logger log = LoggerFactory.getLogger(GameMapController.class);
 
+
     @GetMapping("/lobby/{lobbyId}/game-map")
     public ResponseEntity<GameMapDTO> getGameMap(@PathVariable("lobbyId") String lobbyId) {
         log.debug("Get GameMap");
         return ResponseEntity.ok(GameMapDTO.fromGameMap(lobbyManagerService.getGameMapByLobbyId(lobbyId)));
     }
+
 
     /**
      * Downloads the last map file as "SnackManMap.txt".

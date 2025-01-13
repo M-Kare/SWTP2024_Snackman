@@ -2,10 +2,8 @@ package de.hsrm.mi.swt.snackman;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
 import java.io.IOException;
 import java.nio.file.*;
-
 import org.junit.jupiter.api.AfterEach;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -42,7 +40,8 @@ class SnackmanApplicationTest {
         assertTrue(Files.exists(workFolder.resolve("chicken")));
         assertTrue(Files.exists(workFolder.resolve("map")));
 
-        assertTrue(Files.exists(workFolder.resolve("ghost/placeholder.txt")));
+        assertTrue(Files.exists(workFolder.resolve("ghost/GhostMovementSkript.py")));
+        assertTrue(Files.exists(workFolder.resolve("ghost/SmartGhostMovementSkript.py")));
         assertTrue(Files.exists(workFolder.resolve("chicken/ChickenMovementSkript.py")));
         assertTrue(Files.exists(workFolder.resolve("maze/Maze.py")));
     }
@@ -63,7 +62,8 @@ class SnackmanApplicationTest {
         assertTrue(Files.exists(workFolder.resolve("map")));
 
         // Verify new files are copied without overwriting existing ones
-        assertTrue(Files.exists(workFolder.resolve("ghost/placeholder.txt")));
+        assertTrue(Files.exists(workFolder.resolve("ghost/GhostMovementSkript.py")));
+        assertTrue(Files.exists(workFolder.resolve("ghost/SmartGhostMovementSkript.py")));
         assertTrue(Files.exists(workFolder.resolve("chicken/ChickenMovementSkript.py")));
         assertTrue(Files.exists(workFolder.resolve("chicken/file1.txt")));
         assertTrue(Files.exists(workFolder.resolve("maze/Maze.py")));

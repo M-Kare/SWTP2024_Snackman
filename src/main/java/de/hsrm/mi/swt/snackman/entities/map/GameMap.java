@@ -36,7 +36,7 @@ public class GameMap {
     }
 
     public Square getSquareAtIndexXZ(int x, int z) {
-        if((x < 0 | x >= gameMapSquares.length) | z < 0 | z >= gameMapSquares[0].length){
+        if((x < 0 || x >= gameMapSquares.length) || z < 0 || z >= gameMapSquares[0].length){
             return new Square(MapObjectType.WALL, 0, 0); //returns pseudo-Suare Wall, because its out of hameMap
         }
 
@@ -45,5 +45,19 @@ public class GameMap {
 
     public void setGameMap(Square square, int x, int y){
         gameMapSquares[x][y] = square;
+    }
+
+    public String[][] getStringMap(long ghostId){
+        int rows = gameMapSquares.length;
+        int cols = gameMapSquares[0].length;
+        String[][] result = new String[rows][cols];
+
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                result[i][j] = gameMapSquares[i][j].getPrimaryTypeForGhostWithHighDifficulty(ghostId);
+            }
+        }
+
+        return result;
     }
 }

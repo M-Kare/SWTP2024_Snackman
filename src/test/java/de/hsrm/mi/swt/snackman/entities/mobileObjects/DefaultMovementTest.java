@@ -1,5 +1,7 @@
 package de.hsrm.mi.swt.snackman.entities.mobileObjects;
 
+import de.hsrm.mi.swt.snackman.entities.map.GameMap;
+import de.hsrm.mi.swt.snackman.services.MapService;
 import org.joml.Quaterniond;
 import org.joml.Vector3d;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -8,22 +10,24 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import de.hsrm.mi.swt.snackman.configuration.GameConfig;
-import de.hsrm.mi.swt.snackman.entities.map.GameMap;
 import de.hsrm.mi.swt.snackman.entities.map.Square;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.SnackMan;
+import org.mockito.Mock;
 
 class DefaultMovementTest {
     
     private SnackMan snackman;
+
+    private GameMap gameMap;
 
     @BeforeEach
     public void setup(){
         Square[][] emptyMap = { {new Square(0,0), new Square(0,1), new Square(0,2)},
                                 {new Square(1,0), new Square(1,1), new Square(1,2)}, 
                                 {new Square(2,0), new Square(2,1), new Square(2,2)} };
-        GameMap gameMap = new GameMap(emptyMap);
+        this.gameMap = new GameMap(emptyMap);
 
-        snackman = new SnackMan(gameMap, 10, 0.3);
+        snackman = new SnackMan(gameMap, 10, 0.3, 1.5 * GameConfig.SQUARE_SIZE,1,1.5 * GameConfig.SQUARE_SIZE);
     }
 
 
@@ -42,7 +46,7 @@ class DefaultMovementTest {
         double startPosX = snackman.getPosX();
         double startPosY = snackman.getPosY();
         double startPosZ = snackman.getPosZ();
-        snackman.move(true, false, false, false, 0.1);
+        snackman.move(true, false, false, false, 0.1, this.gameMap);
         assertTrue(startPosX == snackman.getPosX());
         assertTrue(startPosY == snackman.getPosY());
         assertTrue(startPosZ > snackman.getPosZ());
@@ -54,7 +58,7 @@ class DefaultMovementTest {
         double startPosX = snackman.getPosX();
         double startPosY = snackman.getPosY();
         double startPosZ = snackman.getPosZ();
-        snackman.move(false, true, false, false, 0.1);
+        snackman.move(false, true, false, false, 0.1, this.gameMap);
         assertTrue(startPosX == snackman.getPosX());
         assertTrue(startPosY == snackman.getPosY());
         assertTrue(startPosZ < snackman.getPosZ());
@@ -66,7 +70,7 @@ class DefaultMovementTest {
         double startPosX = snackman.getPosX();
         double startPosY = snackman.getPosY();
         double startPosZ = snackman.getPosZ();
-        snackman.move(false, false, true, false, 0.1);
+        snackman.move(false, false, true, false, 0.1, this.gameMap);
         assertTrue(startPosX > snackman.getPosX());
         assertTrue(startPosY == snackman.getPosY());
         assertTrue(startPosZ == snackman.getPosZ());
@@ -78,7 +82,7 @@ class DefaultMovementTest {
         double startPosX = snackman.getPosX();
         double startPosY = snackman.getPosY();
         double startPosZ = snackman.getPosZ();
-        snackman.move(false, false, false, true, 0.1);
+        snackman.move(false, false, false, true, 0.1, this.gameMap);
         assertTrue(startPosX < snackman.getPosX());
         assertTrue(startPosY == snackman.getPosY());
         assertTrue(startPosZ == snackman.getPosZ());
@@ -93,7 +97,7 @@ class DefaultMovementTest {
         Quaterniond rotation = new Quaterniond();
         rotation.rotateAxis(Math.toRadians(90) ,new Vector3d(0,1,0));
         snackman.setQuaternion(rotation.x,rotation.y, rotation.z, rotation.w);
-        snackman.move(true, false, false, false, 0.1);
+        snackman.move(true, false, false, false, 0.1, this.gameMap);
         assertTrue(startPosX > snackman.getPosX());
         assertTrue(startPosY == snackman.getPosY());
         assertTrue(startPosZ == snackman.getPosZ());
@@ -108,23 +112,10 @@ class DefaultMovementTest {
         Quaterniond rotation = new Quaterniond();
         rotation.rotateAxis(Math.toRadians(90) ,new Vector3d(0,1,0));
         snackman.setQuaternion(rotation.x,rotation.y, rotation.z, rotation.w);
-        snackman.move(false, false, true, false, 0.1);
+        snackman.move(false, false, true, false, 0.1, this.gameMap);
         assertTrue(startPosX == snackman.getPosX());
         assertTrue(startPosY == snackman.getPosY());
         assertTrue(startPosZ < snackman.getPosZ());
     }
-    
-    // @Test
-    // // Tests if moving out of the map results in a respawn
-    // //TODO: Geht davon aus das Spawn in der Mitte der Map -> tatsächlichen Spawnpunkt nehmen, sobald MapService/GameMap SnackMan Spawnpunkt kennt
-    // void outOfMapEqualsRespawn(){
-    //     int mapSize = mockMapService.getGameMap().getGameMap().length * GameConfig.SQUARE_SIZE;
-    //     double spawnPosX = snackman.getPosX();
-    //     double spawnPosY = snackman.getPosY();
-    //     double spawnPosZ = snackman.getPosZ();
-    //     snackman.move(snackman.getPosX()+mapSize, snackman.getPosY(), snackman.getPosZ());
-    //     assertEquals(spawnPosX, snackman.getPosX());
-    //     assertEquals(spawnPosY, snackman.getPosY());
-    //     assertEquals(spawnPosZ, snackman.getPosZ());
-    // }
+
 }
