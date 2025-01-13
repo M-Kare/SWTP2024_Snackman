@@ -1,5 +1,10 @@
 package de.hsrm.mi.swt.snackman;
 
+import de.hsrm.mi.swt.snackman.services.LeaderboardService;
+import de.hsrm.mi.swt.snackman.services.MapService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
@@ -14,6 +19,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class SnackmanApplication {
     static Logger log = Logger.getLogger(SnackmanApplication.class.getName());
+
+	@Autowired
+	private LeaderboardService leaderboardService;
 
     public static void main(String[] args) {
         checkAndCopyResources();

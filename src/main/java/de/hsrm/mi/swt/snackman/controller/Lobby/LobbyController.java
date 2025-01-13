@@ -58,12 +58,10 @@ public class LobbyController {
                   return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
             }
 
-
-            //PlayerClient client = lobbyManagerService.getClient(name, creatorUuid);
             PlayerClient client = lobbyManagerService.findClientByClientId(creatorUuid);
 
             try {
-                  Lobby newLobby = lobbyManagerService.createLobby(name, client);
+                  Lobby newLobby = lobbyManagerService.createLobby(name, client, lobbyManagerService.getMessageLoop());
                   messagingTemplate.convertAndSend("/topic/lobbies", lobbyManagerService.getAllLobbies());
                   logger.info("Creating lobby with name: {} and creatorUuid: {}", name, creatorUuid);
                   
@@ -77,7 +75,7 @@ public class LobbyController {
       /**
        * Create a new player client with a name
        * 
-       * @param requestBody the player's name
+       * @param name the player's name
        * @return  the newly created {@link PlayerClient} object
        */
       @PostMapping("/create/player")
@@ -174,7 +172,6 @@ public class LobbyController {
             }
 
             lobbyManagerService.startGame(lobbyId);
-            //messagingTemplate.convertAndSend("/topic/lobbies/" + lobbyId, lobbyManagerService.findLobbyByUUID(lobbyId));
             messagingTemplate.convertAndSend("/topic/lobbies", lobbyManagerService.getAllLobbies());
             return ResponseEntity.ok().build();
       }

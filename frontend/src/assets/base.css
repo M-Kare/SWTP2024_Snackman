@@ -1,7 +1,15 @@
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+/* colors for implement final wireframes */
+:root {
+  --primary-text-color: #000000;
+  --secondary-text-color: #cecece;
+  --background-for-text-color: #ffffff;
+  --background-for-popup-color: #232323;
+  --primary-highlight-color: #ebaf2f;
+  --accent-color: #c11818;
+  --primary-sprint-bar-color: #19cc33;
+  --secondary-sprint-bar-color: #075fa6;
+
+  --font-main: 'Barlow', sans-serif;
 }
 
 @font-face {
@@ -11,55 +19,98 @@
   font-weight: 400;
 }
 
-/* Variables */
-:root {
-  --black: #000000;
-  --popup-background: #232323;
-  --white: #FFFFFF;
-  --grey: #CECECE;
-  --primary: #EBAF2F;
-  --red: #C11818;
-  --sprint-bar-green: #19CC33;
-  --sprint-bar-blue: #075FA6;
-
-  --font-main: 'Barlow', sans-serif;
-
-  --h1-size: 6vw;
-  --h2-size: 4.5vw;
-  --h3-size: 3.5vw;
-  --h4-size: 2.5vw;
-  --p-size: 1.5vw;
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  position: relative;
+  font-weight: normal;
 }
 
 body {
+  min-height: 100vh;
   font-family: var(--font-main);
   color: var(--white);
   background-color: var(--black);
-  line-height: 1.5;
+  transition:
+    color 0.5s,
+    background-color 0.5s;
+  line-height: 1.6;
+  font-family:
+    'Barlow',
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    Roboto,
+    Oxygen,
+    Ubuntu,
+    Cantarell,
+    'Fira Sans',
+    'Droid Sans',
+    'Helvetica Neue',
+    sans-serif;
+  font-size: 15px;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-h1, h2, h3, h4, p {
+h1,
+h2,
+h3,
+h4,
+p {
   margin-bottom: 1rem;
   font-family: var(--font-main);
 }
 
 h1 {
-  font-size: var(--h1-size);
+  font-size: 80px;
 }
 
 h2 {
-  font-size: var(--h2-size);
+  font-size: 60px;
 }
 
 h3 {
-  font-size: var(--h3-size);
+  font-size: 50px;
 }
 
 h4 {
-  font-size: var(--h4-size);
+  font-size: 40px;
 }
 
-p, .copy, .text {
-  font-size: var(--p-size);
+p,
+.copy,
+.text {
+  font-size: 24px;
   color: var(--white);
+}
+
+.outer-box {
+  position: absolute;
+  top: 20%;
+  left: 50%;
+  transform: translateX(-50%);
+
+  background-image: url('@/assets/background-design-lobbies.png');
+  background-size: cover;
+  background-position: center;
+
+  border: var(--background-for-text-color) solid 4px;
+  border-radius: 0.5rem;
+  box-shadow: 10px 8px 0 var(--background-for-text-color);
+}
+
+.outer-box::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #000000dd;
+  border-radius: 0.5rem;
 }
