@@ -1,21 +1,13 @@
 <!-- Refactor later on to ShowLobbyButton -->
 <template>
-    <button class="main-menu-button" @click="handleClick">
+    <button class="main-menu-button">
       <slot></slot>
     </button>
 </template>
-  
+
 <script setup lang="ts">
-  import { useRouter } from 'vue-router';
-
-  const router = useRouter();
-
-  const handleClick = () => {
-    router.push({name: 'GameView'});
-  };
-
 </script>
-  
+
 <style scoped>
 .main-menu-button {
   position: relative;

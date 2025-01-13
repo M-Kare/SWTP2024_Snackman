@@ -10,13 +10,16 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
+import de.hsrm.mi.swt.snackman.entities.map.GameMap;
+import de.hsrm.mi.swt.snackman.messaging.MessageLoop.MessageLoop;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
-
 import de.hsrm.mi.swt.snackman.entities.lobby.Lobby;
 import de.hsrm.mi.swt.snackman.entities.lobby.PlayerClient;
 import de.hsrm.mi.swt.snackman.entities.lobby.ROLE;
-import de.hsrm.mi.swt.snackman.entities.map.GameMap;
 
 /**
  * Service for managing lobbies and clients in the application.
@@ -27,10 +30,13 @@ public class LobbyManagerService {
     private final MapService mapService;
     private final Map<String, Lobby> lobbies = new HashMap<>();
     private final Map<String, PlayerClient> clients = new HashMap<>();
+    private final Logger log = LoggerFactory.getLogger(LobbyManagerService.class);
+    private final MessageLoop messageLoop;
 
     @Autowired
-    public LobbyManagerService(MapService mapService) {
+    public LobbyManagerService(MapService mapService, @Lazy MessageLoop messageLoop) {
         this.mapService = mapService;
+        this.messageLoop = messageLoop;
     }
 
     /**
@@ -54,17 +60,16 @@ public class LobbyManagerService {
      * @return The lobby created
      * @throws LobbyAlreadyExistsException
      */
-    public Lobby createLobby(String name, PlayerClient admin) throws LobbyAlreadyExistsException {
+    public Lobby createLobby(String name, PlayerClient admin, MessageLoop messageLoop) throws LobbyAlreadyExistsException {
         if (lobbies.values().stream().anyMatch(lobby -> lobby.getName().equals(name))) {
             throw new LobbyAlreadyExistsException("Lobby name already exists");
         }
 
         //TODO change to SessionId
         var uuid = UUID.randomUUID().toString();
-        GameMap gameMap = mapService.createNewGameMap(uuid);
+        GameMap gameMap = this.mapService.createNewGameMap(uuid);
 
-        Lobby lobby = new Lobby(uuid, name, admin, gameMap);
-
+        Lobby lobby = new Lobby(uuid, name, admin, gameMap, messageLoop);
         admin.setRole(ROLE.SNACKMAN);
 
         lobbies.put(lobby.getLobbyId(), lobby);
@@ -96,7 +101,6 @@ public class LobbyManagerService {
         }
 
         PlayerClient newJoiningClient = findClientByClientId(playerId);
-        // Set role: Admin remains SNACKMAN, others become GHOST
         if (!lobby.getAdminClientId().equals(playerId)) {
             newJoiningClient.setRole(ROLE.GHOST);
         }
@@ -154,8 +158,9 @@ public class LobbyManagerService {
             throw new IllegalStateException("Game map is not set. Unable to start the game.");
         }
 
+        log.info("Starting lobby {}", lobby);
+        lobby.startGame();
         mapService.spawnMobs(lobby.getGameMap(), lobby);
-        lobby.setGameStarted(true);
     }
 
     /**
@@ -188,15 +193,11 @@ public class LobbyManagerService {
         }
     }
 
-    public List<String> getAllClients() {
-        List<String> playerIds = new ArrayList<>();
-        for (PlayerClient client : clients.values()) {
-            playerIds.add(client.getPlayerId());
-        }
-        return playerIds;
-    }
-
     public GameMap getGameMapByLobbyId(String lobbyId) {
         return lobbies.get(lobbyId).getGameMap();
+    }
+
+    public MessageLoop getMessageLoop() {
+        return messageLoop;
     }
 }

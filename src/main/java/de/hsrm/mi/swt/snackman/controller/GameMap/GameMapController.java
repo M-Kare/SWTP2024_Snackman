@@ -41,11 +41,13 @@ public class GameMapController {
 
     Logger log = LoggerFactory.getLogger(GameMapController.class);
 
+
     @GetMapping("/lobby/{lobbyId}/game-map")
     public ResponseEntity<GameMapDTO> getGameMap(@PathVariable("lobbyId") String lobbyId) {
         log.debug("Get GameMap");
         return ResponseEntity.ok(GameMapDTO.fromGameMap(lobbyManagerService.getGameMapByLobbyId(lobbyId)));
     }
+
 
     /**
      * Upload custom map and save in folder "./extensions/map"

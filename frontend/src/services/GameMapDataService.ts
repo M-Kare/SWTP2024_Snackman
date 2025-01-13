@@ -10,5 +10,5 @@ export async function fetchGameMapDataFromBackend(lobbyId: string): Promise<IGam
   if (!response.ok) {
     throw new Error(`HTTP error! status: ${response.status}`)
   }
-  return await response.json()
+  return await response.json() as IGameMapDTD
 }

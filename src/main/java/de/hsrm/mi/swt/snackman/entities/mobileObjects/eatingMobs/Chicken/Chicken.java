@@ -10,6 +10,7 @@ import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import de.hsrm.mi.swt.snackman.entities.map.GameMap;
 import org.python.core.PyList;
 import org.python.core.PyObject;
 import org.python.util.PythonInterpreter;
@@ -17,7 +18,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.hsrm.mi.swt.snackman.configuration.GameConfig;
-import de.hsrm.mi.swt.snackman.entities.map.GameMap;
 import de.hsrm.mi.swt.snackman.entities.map.Square;
 import de.hsrm.mi.swt.snackman.entities.mapObject.MapObjectType;
 import de.hsrm.mi.swt.snackman.entities.mapObject.snack.Snack;
@@ -33,38 +33,40 @@ public class Chicken extends EatingMob implements Runnable {
     private static long idCounter = 0;
     private final PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
     private final Logger log = LoggerFactory.getLogger(Chicken.class);
+    private final int WAITING_TIME = GameConfig.WAITING_TIME;  // in ms
+    private final int MAX_CALORIES = GameConfig.MAX_KALORIEN;
+    private final int CALORIES_PER_SIXTH = (MAX_CALORIES / 6);
     private long id;
+    private Thickness thickness = Thickness.THIN;
     private int chickenPosX, chickenPosZ;
+    private Direction lookingDirection;
     private boolean timerRestarted = false;
     private boolean isWalking;
     private boolean blockingPath = false;
     private boolean isScared = false;
-    private final int WAITING_TIME = GameConfig.WAITING_TIME;  // in ms
-    private final int MAX_CALORIES = GameConfig.MAX_KALORIEN;
-    private final int CALORIES_PER_SIXTH = (MAX_CALORIES / 6);
     private Timer eggLayingTimer;
     // python
     private PythonInterpreter pythonInterpreter = null;
     private Properties pythonProps = new Properties();
     private String fileName;
-    private Thickness thickness = Thickness.THIN;
-    private Direction lookingDirection;
+    private GameMap gameMap;
 
     public Chicken() {
-        super(null);
+        super();
         initJython();
         this.fileName = "ChickenMovementSkript";
     }
 
-    public Chicken(String fileName){
-        super(null);
+    public Chicken(String fileName) {
+        super();
         this.fileName = fileName;
         initJython();
     }
 
     public Chicken(Square initialPosition, GameMap gameMap) {
-        super(gameMap);
+        super();
         id = generateId();
+        this.gameMap = gameMap;
         this.chickenPosX = initialPosition.getIndexX();
         this.chickenPosZ = initialPosition.getIndexZ();
         initialPosition.addMob(this);
@@ -76,11 +78,10 @@ public class Chicken extends EatingMob implements Runnable {
         initTimer();
     }
 
-    public List<String> act(List<String> squares){
+    public List<String> act(List<String> squares) {
         List<String> result = executeMovementSkript(squares);
         return result;
     }
-
 
     /**
      * Converts a Python list to a Java list.
@@ -98,14 +99,20 @@ public class Chicken extends EatingMob implements Runnable {
     }
 
     /**
-     * Method to generate the next id of a new Square. It is synchronized because of thread-safety.
+     * Method to generate the next id of a new Chicken. It is synchronized because of thread-safety.
      *
      * @return the next incremented id
      */
-    private synchronized static long generateId() {
+    protected synchronized static long generateId() {
         return idCounter++;
     }
 
+    /**
+     * Adds a {@link PropertyChangeListener} to this object.
+     * The listener will be notified whenever a bound property changes.
+     *
+     * @param listener the {@link PropertyChangeListener} to be added
+     */
     public void addPropertyChangeListener(PropertyChangeListener listener) {
         this.propertyChangeSupport.addPropertyChangeListener(listener);
     }
@@ -130,8 +137,8 @@ public class Chicken extends EatingMob implements Runnable {
         log.debug("Walking direction is: {}", walkingDirection);
 
         this.lookingDirection = walkingDirection;
-        Square oldPosition = super.getGameMap().getSquareAtIndexXZ(this.chickenPosX, this.chickenPosZ);
-        Square newPosition = walkingDirection.getNewPosition(super.getGameMap(), this.chickenPosX, this.chickenPosZ,
+        Square oldPosition = this.gameMap.getSquareAtIndexXZ(this.chickenPosX, this.chickenPosZ);
+        Square newPosition = walkingDirection.getNewPosition(this.gameMap, this.chickenPosX, this.chickenPosZ,
                 walkingDirection);
         propertyChangeSupport.firePropertyChange("chicken", null, this);
 
@@ -161,8 +168,8 @@ public class Chicken extends EatingMob implements Runnable {
         //initJython();
         while (isWalking) {
             // get 9 squares
-            Square currentPosition = super.getGameMap().getSquareAtIndexXZ(this.chickenPosX, this.chickenPosZ);
-            List<String> squares = getSquaresVisibleForChicken(getGameMap(), currentPosition, lookingDirection);
+            Square currentPosition = this.gameMap.getSquareAtIndexXZ(this.chickenPosX, this.chickenPosZ);
+            List<String> squares = getSquaresVisibleForChicken(this.gameMap, currentPosition, lookingDirection);
             log.debug("Squares chicken is seeing: {}", squares);
 
             if (!blockingPath) {
@@ -176,19 +183,20 @@ public class Chicken extends EatingMob implements Runnable {
             }
 
             // consume snack if present
-            currentPosition = super.getGameMap().getSquareAtIndexXZ(this.chickenPosX, this.chickenPosZ);
+            currentPosition = this.gameMap.getSquareAtIndexXZ(this.chickenPosX, this.chickenPosZ);
             if (currentPosition.getSnack().getSnackType() != SnackType.EMPTY && super.getKcal() < MAX_CALORIES && !currentPosition.getSnack().getSnackType().equals(SnackType.EGG)) {
                 log.debug("Snack being eaten at x {} z {}", this.chickenPosX, this.chickenPosZ);
                 consumeSnackOnSquare();
             }
         }
     }
+
     /**
      * Collects the snack on the square if there is one.
      * If there is one that remove it from the square.
      */
     public void consumeSnackOnSquare() {
-        Square currentSquare = super.getGameMap().getSquareAtIndexXZ(this.chickenPosX, this.chickenPosZ);
+        Square currentSquare = this.gameMap.getSquareAtIndexXZ(this.chickenPosX, this.chickenPosZ);
         Snack snackOnSquare = currentSquare.getSnack();
 
         if (snackOnSquare.getSnackType() != SnackType.EMPTY) {
@@ -233,17 +241,17 @@ public class Chicken extends EatingMob implements Runnable {
         }
     }
 
-    public boolean squareIsBetweenWalls(int x, int z){
-        Square squareAbove = getGameMap().getSquareAtIndexXZ(x - 1, z);
-        Square squareBelow = getGameMap().getSquareAtIndexXZ(x + 1, z);
-        Square squareRight = getGameMap().getSquareAtIndexXZ(x, z + 1);
-        Square squareLeft = getGameMap().getSquareAtIndexXZ(x, z - 1);
+    public boolean squareIsBetweenWalls(int x, int z) {
+        Square squareAbove = this.gameMap.getSquareAtIndexXZ(x - 1, z);
+        Square squareBelow = this.gameMap.getSquareAtIndexXZ(x + 1, z);
+        Square squareRight = this.gameMap.getSquareAtIndexXZ(x, z + 1);
+        Square squareLeft = this.gameMap.getSquareAtIndexXZ(x, z - 1);
 
-        if((squareAbove.getType() == MapObjectType.WALL) && (squareBelow.getType() == MapObjectType.WALL)){
+        if ((squareAbove.getType() == MapObjectType.WALL) && (squareBelow.getType() == MapObjectType.WALL)) {
             return true;
         }
 
-        if((squareRight.getType() == MapObjectType.WALL) && (squareLeft.getType() == MapObjectType.WALL)){
+        if ((squareRight.getType() == MapObjectType.WALL) && (squareLeft.getType() == MapObjectType.WALL)) {
             return true;
         }
 
@@ -305,32 +313,6 @@ public class Chicken extends EatingMob implements Runnable {
         }
         return squares;
     }
-
-    // /**
-    //  * Adjusts the chicken's thickness state, cycling through predefined values,
-    //  * and updates its path-blocking status accordingly.
-    //  */
-    // private void incrementThickness() {
-    //     switch (this.thickness) {
-    //         case Thickness.THIN:
-    //             this.thickness = Thickness.SLIGHTLY_THICK;
-    //             break;
-    //         case Thickness.SLIGHTLY_THICK:
-    //             this.thickness = Thickness.MEDIUM;
-    //             break;
-    //         case Thickness.MEDIUM:
-    //             this.thickness = Thickness.HEAVY;
-    //             break;
-    //         case Thickness.HEAVY:
-    //             this.thickness = Thickness.VERY_HEAVY;
-    //             blockingPath = true;
-    //             break;
-    //         case Thickness.VERY_HEAVY:
-    //             this.thickness = Thickness.THIN;
-    //             blockingPath = true;
-    //             break;
-    //     }
-    // }
 
     public boolean getBlockingPath() {
         return this.blockingPath;
@@ -413,7 +395,7 @@ public class Chicken extends EatingMob implements Runnable {
     protected void layEgg() {
         if (super.getKcal() > 0) {
             timerRestarted = false;
-            Square currentSquare = getGameMap().getSquareAtIndexXZ(this.chickenPosX, this.chickenPosZ);
+            Square currentSquare = this.gameMap.getSquareAtIndexXZ(this.chickenPosX, this.chickenPosZ);
 
             // new egg with current chicken-calories * 1.5
             int eggCalories = (int) (super.getKcal() * 1.5);
@@ -439,19 +421,25 @@ public class Chicken extends EatingMob implements Runnable {
      */
     public void addEggToSquare(Square square, Snack laidEgg) {
         square.setSnack(laidEgg);
-        log.debug("{} kcal egg add to square {} and square {}", laidEgg.getCalories(), square.getId(), square.getId());
-    }
-
-    public boolean isScared() {
-        return isScared;
     }
 
     /**
      * Sets the chicken to be scared and restarts the timer with a delay
      */
-    public void setScared(boolean scared) {
+    public void isScaredFromGhost(boolean scared) {
         this.isScared = scared;
+        layEgg();
         startNewTimer();
+    }
+
+    // For Testing
+    public boolean isScared(){
+        return this.isScared;
+    }
+
+    // For Testing
+    public void setScared(boolean b){
+        this.isScared = b;
     }
 
     public boolean wasTimerRestarted() {

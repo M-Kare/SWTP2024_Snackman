@@ -413,4 +413,21 @@ export class Player {
   public setCalories(cal: number): void {
     this.calories = cal;
   }
+
+
+  getPosX(): number {
+    return this.currentSquare.indexX;
+  }
+  getPosZ(): number {
+    return this.currentSquare.indexZ;
+  }
+
+  getCameraPosition(): { x: number; y: number; z: number } {
+    return {
+      x: this.camera.position.x,
+      y: this.camera.position.y,
+      z: this.camera.position.z,
+    };
+  }
+
 }
