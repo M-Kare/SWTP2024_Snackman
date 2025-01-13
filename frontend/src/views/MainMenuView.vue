@@ -10,10 +10,7 @@
     </PlayerNameForm>
 
     <h1 class="title">Snackman</h1>
-    <!-- TODO / REMOVE COMMENT
-    Buttons will be merged later on,
-    right now we need a fast entry into the game to test things (Singpleplayer-Button)
-     -->
+    
     <MainMenuButton class="menu-button" id="singleplayer-button" @click="startSingleplayer">Singleplayer</MainMenuButton>
     <MainMenuButton class="menu-button" id="multiplayer-button" @click="showLobbies">Multiplayer</MainMenuButton>
 </template>
