@@ -122,7 +122,7 @@ onMounted(async () => {
 
   clients = lobbydata.lobbies.find((elem) => elem.lobbyId === lobbydata.currentPlayer.joinedLobbyId)?.members!
   console.log(clients)
-  playerData: IPlayerDTD = await fetchSnackManFromBackend(lobbydata.currentPlayer.joinedLobbyId!, lobbydata.currentPlayer.playerId);
+  playerData = await fetchSnackManFromBackend(lobbydata.currentPlayer.joinedLobbyId!, lobbydata.currentPlayer.playerId);
   MAX_CALORIES.value = playerData.maxCalories
 
   clients.forEach(it => {
