@@ -289,13 +289,14 @@ public class Chicken extends EatingMob implements Runnable {
      */
     public int executeMovementSkript(List<String> squares) {
         try {
-            log.debug("Running python chicken script with: {}", squares.toString());
+            log.info("Running python chicken {} script with: {} and {}", this.id, squares.toString(), this.fileName);
             PyObject func = pythonInterpreter.get("choose_next_square");
             PyObject result = func.__call__(new PyList(squares));
+            log.info("Result {} of chicken {}:", Integer.parseInt(result.toString()), this.id);
 
-            return result.asInt();
+            return Integer.parseInt(result.toString());
         } catch (Exception ex) {
-            log.error("Error while executing chicken python script: ", ex);
+            log.error("Error while executing chicken {} with id {} python script: ", this.fileName, this.id, ex);
             ex.printStackTrace();
             return 0;
         }
@@ -457,11 +458,15 @@ public class Chicken extends EatingMob implements Runnable {
         squares.add(Direction.ONE_NORTH.get_one_North_Square(gameMap, currentPosition).getPrimaryType());
         squares.add(Direction.ONE_NORTH_ONE_EAST.get_one_North_one_East_Square(gameMap, currentPosition).getPrimaryType());
         squares.add(Direction.ONE_NORTH_TWO_EAST.get_one_North_two_East_Square(gameMap, currentPosition).getPrimaryType());
+
         squares.add(Direction.TWO_WEST.get_two_West_Square(gameMap, currentPosition).getPrimaryType());
         squares.add(Direction.ONE_WEST.get_one_West_Square(gameMap, currentPosition).getPrimaryType());
+
         squares.add(Direction.CHICKEN.get_Chicken_Square(gameMap, currentPosition).getPrimaryType());
+
         squares.add(Direction.ONE_EAST.get_one_East_Square(gameMap, currentPosition).getPrimaryType());
         squares.add(Direction.TWO_EAST.get_two_East_Square(gameMap, currentPosition).getPrimaryType());
+
         squares.add(Direction.ONE_SOUTH_TWO_WEST.get_one_South_two_West_Square(gameMap, currentPosition).getPrimaryType());
         squares.add(Direction.ONE_SOUTH_ONE_WEST.get_one_South_one_West_Square(gameMap, currentPosition).getPrimaryType());
         squares.add(Direction.ONE_SOUTH.get_one_South_Square(gameMap, currentPosition).getPrimaryType());
