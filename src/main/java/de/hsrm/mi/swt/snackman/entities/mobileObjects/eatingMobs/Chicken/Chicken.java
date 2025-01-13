@@ -180,6 +180,9 @@ public class Chicken extends EatingMob implements Runnable {
                 // set new square you move to
                 setNewPosition(newMove);
                 log.debug("New position is x {} z {}", this.chickenPosX, this.chickenPosZ);
+            }else{
+                Square chickensAktSquare = this.gameMap.getSquareAtIndexXZ(chickenPosX, chickenPosZ);
+                chickensAktSquare.setType(MapObjectType.WALL);                
             }
 
             // consume snack if present
@@ -210,8 +213,11 @@ public class Chicken extends EatingMob implements Runnable {
                     if (squareIsBetweenWalls(this.chickenPosX, this.chickenPosZ)) {
                         new Thread(() -> {
                             try {
+                                
                                 blockingPath = true;
                                 Thread.sleep(10000);
+                                Square chickensAktSquare = this.gameMap.getSquareAtIndexXZ(chickenPosX, chickenPosZ);
+                                chickensAktSquare.setType(MapObjectType.FLOOR);
                                 blockingPath = false;
                                 layEgg();
                             } catch (InterruptedException e) {
@@ -239,6 +245,14 @@ public class Chicken extends EatingMob implements Runnable {
 
             currentSquare.setSnack(new Snack(SnackType.EMPTY));
         }
+    }
+
+    public void setScared(boolean j){
+        this.isScared = j;
+    }
+
+    public boolean isScared(){
+        return this.isScared;
     }
 
     public boolean squareIsBetweenWalls(int x, int z) {
