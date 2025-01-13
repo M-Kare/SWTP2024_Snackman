@@ -4,7 +4,7 @@ import { Client } from '@stomp/stompjs';
 import type { ILobbyDTD } from './ILobbyDTD';
 import type { IPlayerClientDTD } from './IPlayerClientDTD';
 
-const wsurl = `ws://${window.location.host}/stompbroker`
+// const wsurl = `ws://${window.location.host}/stompbroker`
 const DEST = '/topic/lobbies'
 
 export const useLobbiesStore = defineStore('lobbiesstore', () =>{
@@ -122,7 +122,8 @@ export const useLobbiesStore = defineStore('lobbiesstore', () =>{
      * Starts the STOMP client for real-time lobby updates.
      */
     async function startLobbyLiveUpdate(){
-
+        const protocol = window.location.protocol.replace('http', 'ws')
+        const wsurl = `${protocol}//${window.location.host}/ws`
         stompclient = new Client({ brokerURL: wsurl })
 
         if(stompclient && stompclient.active){

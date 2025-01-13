@@ -19,7 +19,7 @@ public class GameConfig {
     public static final double GRAVITY = -20;
 
     //LOBBY
-    public static final int TIME_FOR_SNACKS_TO_RESPAWN = 200000000;
+    public static final int TIME_FOR_SNACKS_TO_RESPAWN = 30000;
     public static final double SNACK_SPAWN_RATE = 1;
 
     //Chicken

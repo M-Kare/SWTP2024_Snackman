@@ -165,7 +165,7 @@ public class MapService {
                     SpawnpointMobType spawnpointMobType = spawnpoint.spawnpointMobType();
                     switch (spawnpointMobType) {
                         case SpawnpointMobType.CHICKEN:
-
+/*
                             Chicken newChicken = new Chicken(currentSquare, gameMap);
 
                             Thread chickenThread = new Thread(newChicken);
@@ -175,7 +175,7 @@ public class MapService {
                                 if (evt.getPropertyName().equals("chicken")) {
                                     messageLoop.addChickenToQueue((Chicken) evt.getNewValue(), lobby.getLobbyId());
                                 }
-                            });
+                            });*/
                             break;
                         case SpawnpointMobType.GHOST:
                             ghostSpawnSquares.add(currentSquare);
