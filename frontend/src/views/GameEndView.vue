@@ -23,17 +23,17 @@
       @entryCreated="hideCreateNewLeaderboardEntryForm">
     </CreateNewLeaderboardEntryForm>
 
-      <MapButton class="map-exportieren-button" @click="downloadMap">Map exportieren</MapButton>
-      <div v-if="feedbackMessage" :class="['feedback-message', feedbackClass]">
-        {{ feedbackMessage }}
-      </div>
+    <MapButton class="map-exportieren-button" @click="downloadMap">Map exportieren</MapButton>
+    <div v-if="feedbackMessage" :class="['feedback-message', feedbackClass]">
+      {{ feedbackMessage }}
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import MainMenuButton from '@/components/MainMenuButton.vue'
 import MapButton from '@/components/MapButton.vue';
-import {computed, ref, ref} from 'vue'
+import {computed, ref} from 'vue'
 import {useRoute, useRouter} from 'vue-router'
 import CreateNewLeaderboardEntryForm from "@/components/CreateNewLeaderboardEntryForm.vue"
 import Leaderboard from "@/components/Leaderboard.vue";
@@ -47,7 +47,7 @@ const alreadyEntered = ref(false)
 const {lobbydata} = useLobbiesStore()
 
 // Read player role and game result from query parameters
-const lobbyId = route.query.lobby || '-';
+const lobbyId = (route.query.lobby as string) || '-';
 const winningRole = (route.query.winningRole as string) || '-'
 const playedTime = (route.query.timePlayed as unknown as number) || 0
 const formatedPlayedTime = formatTime(playedTime)

@@ -7,7 +7,7 @@
         <div id="player-count">
                 {{ playerCount }} / {{ MAX_PLAYER_COUNT }} Players
         </div>
-
+    </div>
     <div class="inner-box">
       <ul>
         <li v-for="member in members" class="player-list-items">
