@@ -55,9 +55,9 @@ public class MapService {
     }
 
     public GameMap createNewGameMap(String lobbyId, String filePath) {
-        saveLastMapFile(lobbyId, filePath);
         readMazeService.generateNewMaze();
         char[][] mazeData = readMazeService.readMazeFromFile(filePath);
+        saveLastMapFile(lobbyId, filePath);
         return convertMazeDataGameMap(lobbyId, mazeData);
     }
 
