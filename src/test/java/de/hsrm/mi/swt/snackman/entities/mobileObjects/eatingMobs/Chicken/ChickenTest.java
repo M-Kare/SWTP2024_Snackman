@@ -57,7 +57,7 @@ class ChickenTest {
 
     @BeforeEach
     void setUp() {
-        if (!Files.exists(workFolder.resolve("chicken/ChickenMovementSkript.py"))) {
+        if (!Files.exists(workFolder.resolve("chicken/ChickenMovementSkript"))) {
             SnackmanApplication.checkAndCopyResources();
         }
         char[][] mockMazeData = new char[][] {
