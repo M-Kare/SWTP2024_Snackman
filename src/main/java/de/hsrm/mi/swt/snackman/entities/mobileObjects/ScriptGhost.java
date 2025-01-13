@@ -176,8 +176,8 @@ public class ScriptGhost extends Mob implements Runnable {
         } catch (Exception ex) {
             log.error("Error while executing ghost python script: ", ex);
             ex.printStackTrace();
+            return 0;
         }
-        return 0;
     }
 
     public int executeMovementSkriptDifficult(List<List<String>> pythonList) {
@@ -189,7 +189,7 @@ public class ScriptGhost extends Mob implements Runnable {
 
             return Integer.parseInt(result.toString());
         } catch (Exception ex) {
-            log.error("Error while executing ghost python script: ", ex);
+            log.error("Error while executing difficult ghost python script: ", ex);
             ex.printStackTrace();
             return 0;
         }
