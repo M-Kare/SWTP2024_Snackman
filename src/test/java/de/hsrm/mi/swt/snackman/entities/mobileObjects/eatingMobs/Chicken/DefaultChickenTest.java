@@ -49,7 +49,7 @@ class DefaultChickenTest {
                                                     "L", "W", "L", "W", "L",
                                                     "L", "W", "L", "W", "L", "0");
 
-        int result = chicken.act(visibleEnvironment);
+        int result = chicken.executeMovementSkript(visibleEnvironment);
 
         assertEquals(" ", result,
                 "The Chicken should move to the empty space (' ') matching its new direction.");
@@ -65,7 +65,7 @@ class DefaultChickenTest {
                                                     "L", "L", "L", "L", "L",
                                                     "L", "W", "L", "W", "L", "0");
 
-        int result = chicken.act(visibleEnvironment);
+        int result = chicken.executeMovementSkript(visibleEnvironment);
 
         //assertTrue(Integer.parseInt(result.get(result.size() - 1)) != 0, "New ChickenIndex must not be the Index with the Ghost");
 
@@ -83,7 +83,7 @@ class DefaultChickenTest {
                                                     "L", "L", "L", "L", "L",
                                                     "L", "W", "L", "W", "L", "0");
 
-        int result = chicken.act(visibleEnvironment);
+        int result = chicken.executeMovementSkript(visibleEnvironment);
 
         assertEquals(" ", result,
                 "The Chicken should move to the empty space (' ') matching its new direction.");
@@ -99,7 +99,7 @@ class DefaultChickenTest {
                                                     "L", "L", "L", "L", "L",
                                                     "L", "W", "L", "W", "L", "0");
 
-        int result = chicken.act(visibleEnvironment);
+        int result = chicken.executeMovementSkript(visibleEnvironment);
 
         assertEquals(" ", result,
                 "The Chicken should move to the empty space (' ') matching its new direction.");
@@ -115,7 +115,7 @@ class DefaultChickenTest {
                                                     "L", "L", "L", "L", "L",
                                                     "L", "W", "L", "W", "L", "0");
 
-        int result = chicken.act(visibleEnvironment);
+        int result = chicken.executeMovementSkript(visibleEnvironment);
 
         assertEquals(" ", result,
                 "The Chicken should move to the empty space (' ') matching its new direction.");
@@ -131,7 +131,7 @@ class DefaultChickenTest {
                                                     "L", "G", "S", "W", "L",
                                                     "L", "W", "L", "W", "L", "0");
 
-        int result = chicken.act(visibleEnvironment);
+        int result = chicken.executeMovementSkript(visibleEnvironment);
 
         assertEquals(" ", result,
                 "The Chicken should move to the empty space (' ') matching its new direction.");
@@ -147,7 +147,7 @@ class DefaultChickenTest {
                                                     "L", "L", "L", "L", "L",
                                                     "L", "W", "L", "W", "L", "0");
 
-        int result = chicken.act(visibleEnvironment);
+        int result = chicken.executeMovementSkript(visibleEnvironment);
 
         assertEquals(" ", result,
                 "The Chicken should move to the empty space (' ') matching its new direction.");

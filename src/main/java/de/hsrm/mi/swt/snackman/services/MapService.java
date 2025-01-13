@@ -188,7 +188,7 @@ public class MapService {
                     SpawnpointMobType spawnpointMobType = spawnpoint.spawnpointMobType();
                     switch (spawnpointMobType) {
                         case SpawnpointMobType.CHICKEN:
-                            Chicken newChicken = new Chicken(currentSquare, gameMap);
+                            Chicken newChicken = new Chicken(currentSquare, gameMap, loadChickenScripts());
 
                             Thread chickenThread = new Thread(newChicken);
                             chickenThread.start();

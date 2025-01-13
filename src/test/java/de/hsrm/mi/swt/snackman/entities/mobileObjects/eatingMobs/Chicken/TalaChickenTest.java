@@ -12,7 +12,7 @@ public class TalaChickenTest {
         Chicken chicken = new Chicken("TalaChickenMovementSkript");
 
         List<String> visibleEnvironment = List.of("W", "W", "W", "L", "W", "L", "W", "L", "0");
-        List<String> result = chicken.act(visibleEnvironment);
+        List<String> result = chicken.executeMovementSkript(visibleEnvironment);
 
         int chosenDirectionIndex = Integer.parseInt(result.get(result.size() - 1));
 
@@ -34,7 +34,7 @@ public class TalaChickenTest {
                                                     "W", "W", "W", "L", "L", "W", "W", "W", "W",
                                                     "W", "W", "W", "W", "L", "W", "W", "W", "W");
 
-        List<String> result = chicken.act(visibleEnvironment);
+        List<String> result = chicken.executeMovementSkript(visibleEnvironment);
 
         boolean istFreierIndexVorhanden = result.contains(" ");
         assertEquals(true, istFreierIndexVorhanden, "Empty element, but Snackman is not reachable : "+ result);
@@ -56,7 +56,7 @@ public class TalaChickenTest {
                                                 "W", "L", "W", "L", "L", "L", "W", "L", "W",
                                                 "W", "L", "W", "L", "W", "W", "W", "L", "W");
 
-        List<String> result = chicken.act(visibleEnvironment);
+        List<String> result = chicken.executeMovementSkript(visibleEnvironment);
         boolean istFreierIndexVorhanden = result.contains(" ");
         assertEquals(true, istFreierIndexVorhanden, "Empty element, but Snackman is not reachable : "+ result);
 

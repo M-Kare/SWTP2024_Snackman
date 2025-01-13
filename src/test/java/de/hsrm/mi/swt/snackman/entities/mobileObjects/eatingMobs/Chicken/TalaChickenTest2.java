@@ -20,7 +20,7 @@ public class TalaChickenTest2 {
                                                     "L", "W", "W", "W", "L",
                                                     "L", "W", "L", "W", "L");
 
-        int result = chicken.act(visibleEnvironment);
+        int result = chicken.executeMovementSkript(visibleEnvironment);
 
         assertEquals( 0 , result,
                 "The Chicken should move to the empty space (' ') matching its new direction.");
@@ -36,7 +36,7 @@ public class TalaChickenTest2 {
                                                     "L", "W", "W", "W", "L",
                                                     "L", "W", "L", "W", "L");
 
-        int result = chicken.act(visibleEnvironment);
+        int result = chicken.executeMovementSkript(visibleEnvironment);
 
         assertEquals( 1 , result,
                 "The Chicken should move to the empty space (' ') matching its new direction.");
@@ -52,7 +52,7 @@ public class TalaChickenTest2 {
                                                     "L", "W", "L", "W", "L",
                                                     "L", "W", "L", "W", "L");
 
-        int result = chicken.act(visibleEnvironment);
+        int result = chicken.executeMovementSkript(visibleEnvironment);
 
         assertEquals( 2 , result,
                 "The Chicken should move to the empty space (' ') matching its new direction.");
@@ -68,7 +68,7 @@ public class TalaChickenTest2 {
                                                     "L", "W", "W", "W", "L",
                                                     "L", "W", "L", "W", "L");
 
-        int result = chicken.act(visibleEnvironment);
+        int result = chicken.executeMovementSkript(visibleEnvironment);
 
         assertEquals( 3 , result,
                 "The Chicken should move to the empty space (' ') matching its new direction.");
@@ -84,7 +84,7 @@ public class TalaChickenTest2 {
                                                     "L", "L", "L", "L", "L",
                                                     "L", "W", "L", "W", "L");
 
-        int result = chicken.act(visibleEnvironment);
+        int result = chicken.executeMovementSkript(visibleEnvironment);
 
         assertEquals( 0 , result,
                 "The Chicken should move to the empty space (' ') matching its new direction.");
@@ -100,7 +100,7 @@ public class TalaChickenTest2 {
                                                     "L", "L", "L", "L", "L",
                                                     "L", "W", "L", "W", "L");
 
-        int result = chicken.act(visibleEnvironment);
+        int result = chicken.executeMovementSkript(visibleEnvironment);
 
         assertEquals( 1 , result,
                 "The Chicken should move to the empty space (' ') matching its new direction.");
@@ -116,7 +116,7 @@ public class TalaChickenTest2 {
                                                     "L", "L", "SM", "L", "L",
                                                     "L", "W", "L", "W", "L");
 
-        int result = chicken.act(visibleEnvironment);
+        int result = chicken.executeMovementSkript(visibleEnvironment);
 
         assertEquals( 2 , result,
                 "The Chicken should move to the empty space (' ') matching its new direction.");
@@ -132,7 +132,7 @@ public class TalaChickenTest2 {
                                                     "L", "L", "L", "L", "L",
                                                     "L", "W", "L", "W", "L");
 
-        int result = chicken.act(visibleEnvironment);
+        int result = chicken.executeMovementSkript(visibleEnvironment);
 
         assertEquals( 3 , result,
                 "The Chicken should move to the empty space (' ') matching its new direction.");
@@ -148,7 +148,7 @@ public class TalaChickenTest2 {
                                                     "L", "L", "L", "L", "L",
                                                     "L", "W", "L", "W", "L");
 
-        int result = chicken.act(visibleEnvironment);
+        int result = chicken.executeMovementSkript(visibleEnvironment);
 
         assertEquals( 2 , result,
                 "The Chicken should move to the empty space (' ') matching its new direction.");
@@ -164,7 +164,7 @@ public class TalaChickenTest2 {
                                                     "L", "L", "L", "L", "L",
                                                     "L", "W", "L", "W", "L");
 
-        int result = chicken.act(visibleEnvironment);
+        int result = chicken.executeMovementSkript(visibleEnvironment);
 
         assertEquals( 3 , result,
                 "The Chicken should move to the empty space (' ') matching its new direction.");
@@ -180,7 +180,7 @@ public class TalaChickenTest2 {
                                                     "L", "L", "G", "L", "L",
                                                     "L", "W", "L", "W", "L");
 
-        int result = chicken.act(visibleEnvironment);
+        int result = chicken.executeMovementSkript(visibleEnvironment);
 
         assertEquals( 0 , result,
                 "The Chicken should move to the empty space (' ') matching its new direction.");
@@ -196,7 +196,7 @@ public class TalaChickenTest2 {
                                                     "L", "L", "L", "L", "L",
                                                     "L", "W", "L", "W", "L");
 
-        int result = chicken.act(visibleEnvironment);
+        int result = chicken.executeMovementSkript(visibleEnvironment);
 
         assertEquals( 1 , result,
                 "The Chicken should move to the empty space (' ') matching its new direction.");

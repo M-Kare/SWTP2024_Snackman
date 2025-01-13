@@ -61,7 +61,7 @@ public class Chicken extends EatingMob implements Runnable {
         initJython();
     }
 
-    public Chicken(Square initialPosition, GameMap gameMap) {
+    public Chicken(Square initialPosition, GameMap gameMap, String fileName) {
         super();
         id = generateId();
         this.gameMap = gameMap;
@@ -71,14 +71,9 @@ public class Chicken extends EatingMob implements Runnable {
         this.fileName = fileName;
         this.isWalking = true;
         this.lookingDirection = Direction.getRandomDirection();
-        // log.info("Chicken looking direction is {}", lookingDirection);
+        log.debug("Chicken looking direction is {}", lookingDirection);
         initJython();
         initTimer();
-    }
-
-    public int act(List<String> squares){
-        int result = executeMovementSkript(squares);
-        return result;
     }
 
     /**
@@ -173,7 +168,7 @@ public class Chicken extends EatingMob implements Runnable {
             if (!blockingPath) {
                 log.debug("Current position is x {} z {}", this.chickenPosX, this.chickenPosZ);
 
-                int newMove = act(squares);
+                int newMove = executeMovementSkript(squares);
 
                 // set new square you move to
                 setNewPosition(newMove);
