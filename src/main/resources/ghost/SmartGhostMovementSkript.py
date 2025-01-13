@@ -45,8 +45,6 @@ def choose_next_square(labyrinth):
     ghost_position = find_ghost_position(labyrinth)   # (x, z)
     snackman_position = find_snackman_position(labyrinth)    # (x, z)
 
-    print("original list with ghost and snackman position: ", labyrinth, ghost_position, snackman_position)
-
     return choose_next_square_finding_snackman(labyrinth, ghost_position, snackman_position)
 
 def find_snackman_position(maze):

@@ -50,14 +50,10 @@ def choose_next_square(squares_liste):
 
     solution_liste = [north_square, east_square, south_square, west_square]
 
-    print("original list: ", solution_liste, direction)
-
     # make sure you cannot walk into a wall
     solution_liste = eliminate_walls(solution_liste)
     # Ghosts and Snacks are treated as if they are empty squares
     solution_liste = mark_snack_and_ghost_as_empty(solution_liste)
-
-    print("changed list: ", solution_liste, direction)
 
     if seeing_snackman(solution_liste):
         return add_walking_direction(choose_target_square(solution_liste, SNACKMAN, direction))

@@ -45,13 +45,9 @@ def choose_next_square(squares_liste):
     solution_liste = [one_North_square, one_East_square, one_South_square, one_West_square]
     direction = int(squares_liste[len(squares_liste) - 1])
 
-    print("original list: ", solution_liste)
-
     # make sure you cannot walk into a wall
     solution_liste = eliminate_walls_as_options(solution_liste)
     solution_liste = eliminate_snackman_as_option(solution_liste)
-
-    print("changed list: ", solution_liste)
 
     # make sure you do not walk into a ghost
     if all_squares_have(solution_liste, GHOST):
