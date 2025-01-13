@@ -35,7 +35,8 @@ const router = createRouter({
     {
       path: '/Leaderboard',
       name: 'Leaderboard',
-      component: LeaderboardView
+      component: LeaderboardView,
+      props: true
     },
     {
       path: '/GameEnd',

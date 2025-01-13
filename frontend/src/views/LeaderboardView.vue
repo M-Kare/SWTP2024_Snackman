@@ -1,24 +1,24 @@
 <template>
   <LeaderboardBackground></LeaderboardBackground>
   <div id="individual-outer-box-size" class="outer-box">
-    <h1 class="info-heading"> Leaderboard </h1>
+    <h1 class="info-heading">Leaderboard</h1>
     <div class="table-container">
       <table>
         <thead>
-        <tr>
-          <td></td>
-          <td>Name</td>
-          <td>Date</td>
-          <td>Duration</td>
-        </tr>
+          <tr>
+            <td></td>
+            <td>Name</td>
+            <td>Date</td>
+            <td>Duration</td>
+          </tr>
         </thead>
         <tbody>
-        <tr v-for="(entry, index) in leaderboardEntries">
-          <td>{{ index + 1 }}</td>
-          <td>{{ entry.name }}</td>
-          <td>{{ entry.releaseDate }}</td>
-          <td>{{ entry.duration }}</td>
-        </tr>
+          <tr v-for="(entry, index) in leaderboardEntries">
+            <td>{{ index + 1 }}</td>
+            <td>{{ entry.name }}</td>
+            <td>{{ entry.releaseDate }}</td>
+            <td>{{ entry.duration }}</td>
+          </tr>
         </tbody>
       </table>
     </div>
@@ -26,7 +26,7 @@
       <SmallNavButton
         id="menu-back-button"
         class="small-nav-buttons"
-        @click=backToMainMenu
+        @click="backToMainMenu"
       >
         Back to main menu
       </SmallNavButton>
@@ -39,31 +39,72 @@
       </SmallNavButton>
     </div>
   </div>
+  <img
+    id="snackman"
+    :src="
+      gameResult === 'SNACKMAN'
+        ? '/src/assets/characters/kirby.png'
+        : '/src/assets/characters/kirby-monochrome.png'
+    "
+    alt="representation of snackman"
+    class="character-image"
+  />
+  <img
+    id="ghost"
+    :src="
+      gameResult === 'GHOST'
+        ? '/src/assets/characters/ghost.png'
+        : '/src/assets/characters/ghost-monochrome.png'
+    "
+    alt="representation of ghost"
+    class="character-image"
+  />
 </template>
 
 <script lang="ts" setup>
-import {useLeaderboardStore} from "@/stores/Leaderboard/leaderboardStore";
-import {computed, onMounted} from "vue";
-import SmallNavButton from "@/components/SmallNavButton.vue";
-import {useRouter} from 'vue-router';
-import LeaderboardBackground from "@/components/LeaderboardBackground.vue";
+import { useLeaderboardStore } from '@/stores/Leaderboard/leaderboardStore'
+import { computed, onMounted, ref } from 'vue'
+import SmallNavButton from '@/components/SmallNavButton.vue'
+import { useRouter } from 'vue-router'
+import LeaderboardBackground from '@/components/LeaderboardBackground.vue'
 
 const leaderboardStore = useLeaderboardStore()
-const router = useRouter();
+const router = useRouter()
+const gameResult = ref<'SNACKMAN' | 'GHOST' | null>(null)
 
 const backToMainMenu = () => {
-  router.push({name: 'MainMenu'});
-};
+  router.push({ name: 'MainMenu' })
+}
+
+const mapExport = () => {
+  // TODO add logic for max export
+}
 
 /**
- * Load the leaderboard data and initialize stomp message updates.
+ * Load the leaderboard data, initialize stomp message updates and look for winner
  */
 onMounted(async () => {
   await leaderboardStore.initLeaderboardStore()
   await leaderboardStore.startLeaderboardUpdate()
+
+  const winningRole = router.params.winningRole
+
+  switch (winningRole) {
+    case 'SNACKMAN':
+      gameResult.value = 'SNACKMAN'
+      break
+    case 'GHOST':
+      gameResult.value = 'GHOST'
+      break
+    default:
+      gameResult.value = null
+      break
+  }
 })
 
-const leaderboardEntries = computed(() => leaderboardStore.leaderboard.leaderboardEntries);
+const leaderboardEntries = computed(
+  () => leaderboardStore.leaderboard.leaderboardEntries,
+)
 </script>
 
 <style scoped>
@@ -127,7 +168,7 @@ tbody tr td {
   padding: 5px 10px;
   background: var(--background-for-text-color);
   box-shadow: 10px 8px 0 var(--primary-text-color);
-  color: var(--primary-text-color)
+  color: var(--primary-text-color);
 }
 
 tr td:first-child,
@@ -178,4 +219,19 @@ tr td:not(:first-child):not(:last-child) {
   box-shadow: 0 0 35px 5px rgba(255, 255, 255, 0.5);
 }
 
+.character-image {
+  position: absolute;
+  bottom: 3%;
+  width: 250px;
+  height: auto;
+  z-index: 10;
+}
+
+#snackman {
+  left: 3%;
+}
+
+#ghost {
+  right: 3%;
+}
 </style>

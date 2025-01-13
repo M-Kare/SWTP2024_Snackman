@@ -74,17 +74,16 @@ import MenuBackground from '@/components/MenuBackground.vue'
 import SmallNavButton from '@/components/SmallNavButton.vue'
 import PopUp from '@/components/PopUp.vue'
 
-import {useRoute, useRouter} from 'vue-router'
+import {useRouter} from 'vue-router'
 import {computed, onMounted, ref, watchEffect} from 'vue'
 import {useLobbiesStore} from '@/stores/Lobby/lobbiesstore'
 import type {IPlayerClientDTD} from '@/stores/Lobby/IPlayerClientDTD'
 import type {ILobbyDTD} from '@/stores/Lobby/ILobbyDTD'
 
 const router = useRouter()
-const route = useRoute()
 const lobbiesStore = useLobbiesStore()
 
-const lobbyUrl = route.params.lobbyId
+const lobbyUrl = router.params.lobbyId
 let lobbyLoaded = false
 const lobby = computed(() =>
   lobbiesStore.lobbydata.lobbies.find(l => l.lobbyId === lobbyUrl),

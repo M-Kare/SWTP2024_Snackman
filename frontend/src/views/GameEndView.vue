@@ -61,7 +61,10 @@ const gameReason = computed(() => {
 })
 
 const showLeaderboard = () => {
-  router.push({name: 'Leaderboard'})
+  router.push({
+    name: 'Leaderboard',
+    query: {winningRole: winningRole}
+  })
 }
 
 const cancelNewLeaderboardEntryCreation = () => {
