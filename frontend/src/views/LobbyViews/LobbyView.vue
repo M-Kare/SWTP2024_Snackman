@@ -57,7 +57,7 @@
     @click="backToLobbyListView()"
     @hidePopUp="hidePopUp"
   >
-    <p class="info-heading">- {{ infoHeading }} -</p>
+    <p class="info-heading">{{ infoHeading }}</p>
     <p class="info-text">{{ infoText }}</p>
   </PopUp>
 

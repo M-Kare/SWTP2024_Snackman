@@ -40,7 +40,7 @@
   <div v-if="darkenBackground" id="darken-background"></div>
 
   <PopUp v-if="showPopUp" class="popup-box" @hidePopUp="hidePopUp">
-    <p class="info-heading">- Lobby full -</p>
+    <p class="info-heading">Lobby full</p>
     <p class="info-text">Please choose or create another one!</p>
   </PopUp>
 
