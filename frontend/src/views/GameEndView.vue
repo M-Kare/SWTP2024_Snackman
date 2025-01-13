@@ -47,7 +47,7 @@ const alreadyEntered = ref(false)
 const {lobbydata} = useLobbiesStore()
 
 // Read player role and game result from query parameters
-const lobbyId = (route.query.lobby as string) || '-';
+const lobbyId = (route.query.lobbyId as string) || '-';
 const winningRole = (route.query.winningRole as string) || '-'
 const playedTime = (route.query.timePlayed as unknown as number) || 0
 const formatedPlayedTime = formatTime(playedTime)

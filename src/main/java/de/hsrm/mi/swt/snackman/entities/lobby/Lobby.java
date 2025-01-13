@@ -97,7 +97,7 @@ public class Lobby {
         SnackMan snackMan = getSnackman();
 
         if(snackMan != null) {
-            GameEnd gameEnd = new GameEnd(winningRole, this.timePlayed, snackMan.getKcal());
+            GameEnd gameEnd = new GameEnd(winningRole, this.timePlayed, snackMan.getKcal(), this.lobbyId);
             setGameFinished(true, gameEnd);
         }
     }
