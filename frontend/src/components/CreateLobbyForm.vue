@@ -27,12 +27,12 @@
   </div>
 </template>
 
-<script lang="ts" setup>
-import SmallNavButton from '@/components/SmallNavButton.vue'
-import { useRouter } from 'vue-router'
-import { ref } from 'vue'
-import { useLobbiesStore } from '@/stores/Lobby/lobbiesstore'
-import type { IPlayerClientDTD } from '@/stores/Lobby/IPlayerClientDTD'
+<script setup lang="ts">
+    import SmallNavButton from '@/components/SmallNavButton.vue';
+    import { useRouter } from 'vue-router';
+    import { ref } from 'vue';
+    import { useLobbiesStore } from '@/stores/Lobby/lobbiesstore';
+    import type { IPlayerClientDTD } from '@/stores/Lobby/IPlayerClientDTD';
 
 const router = useRouter()
 const lobbiesStore = useLobbiesStore()

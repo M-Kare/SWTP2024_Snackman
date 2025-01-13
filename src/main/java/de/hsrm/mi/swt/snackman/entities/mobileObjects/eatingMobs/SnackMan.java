@@ -1,14 +1,20 @@
 package de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs;
 
+import de.hsrm.mi.swt.snackman.entities.map.GameMap;
 import de.hsrm.mi.swt.snackman.entities.mechanics.SprintHandler;
+import de.hsrm.mi.swt.snackman.entities.mobileObjects.Ghost;
+import de.hsrm.mi.swt.snackman.entities.mobileObjects.Mob;
+import de.hsrm.mi.swt.snackman.entities.mobileObjects.ScriptGhost;
+import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken.Chicken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.hsrm.mi.swt.snackman.configuration.GameConfig;
-import de.hsrm.mi.swt.snackman.entities.map.GameMap;
 import de.hsrm.mi.swt.snackman.entities.map.Square;
 import de.hsrm.mi.swt.snackman.entities.mapObject.snack.Snack;
 import de.hsrm.mi.swt.snackman.entities.mapObject.snack.SnackType;
+
+import java.util.stream.Stream;
 
 public class SnackMan extends EatingMob {
     private final Logger log = LoggerFactory.getLogger(SnackMan.class);
@@ -17,15 +23,13 @@ public class SnackMan extends EatingMob {
     private boolean isSprinting = false;
     private SprintHandler sprintHandler = new SprintHandler();
 
-    public SnackMan(GameMap gameMap) {
-        //TODO add Snackman id to match client
-        this(gameMap, GameConfig.SNACKMAN_SPEED, GameConfig.SNACKMAN_RADIUS);
-    }
-
-    public SnackMan(GameMap gameMap, double posX, double posY, double posZ) {
+    public SnackMan(GameMap gameMap, Square currentSquare, double posX, double posY, double posZ) {
         this(gameMap, GameConfig.SNACKMAN_SPEED, GameConfig.SNACKMAN_RADIUS, posX, posY, posZ);
+
+        currentSquare.addMob(this);
     }
 
+    // only for tests??
     public SnackMan(GameMap gameMap, double speed, double radius) {
         super(gameMap, speed, radius);
     }
@@ -34,21 +38,26 @@ public class SnackMan extends EatingMob {
         super(gameMap, speed, radius, posX, posY, posZ);
     }
 
+    public void loseKcal() {
+        // Calorsies reduced by 300 if Ghost hit
+        setKcal(getKcal() - GameConfig.GHOST_DAMAGE);
+    }
+
     //JUMPING
     public void jump() {
         if (!isJumping && getKcal() >= 100) {
-                this.velocityY = GameConfig.JUMP_STRENGTH;
-                this.isJumping = true;
-                setKcal(getKcal() - 100);
-            }
+            this.velocityY = GameConfig.JUMP_STRENGTH;
+            this.isJumping = true;
+            setKcal(getKcal() - 100);
+        }
 
     }
 
     public void doubleJump() {
         if (isJumping && getKcal() >= 100) {
-                this.velocityY += GameConfig.DOUBLEJUMP_STRENGTH;
-                setKcal(getKcal() - 100);
-            }
+            this.velocityY += GameConfig.DOUBLEJUMP_STRENGTH;
+            setKcal(getKcal() - 100);
+        }
 
     }
 
@@ -70,7 +79,7 @@ public class SnackMan extends EatingMob {
     }
 
     @Override
-    public void move(boolean forward, boolean backward, boolean left, boolean right, double delta) {
+    public void move(boolean forward, boolean backward, boolean left, boolean right, double delta, GameMap gameMap) {
         if (isSprinting) {
             if (sprintHandler.canSprint()) {
                 setSpeed(GameConfig.SNACKMAN_SPEED * GameConfig.SNACKMAN_SPRINT_MULTIPLIER);
@@ -83,7 +92,22 @@ public class SnackMan extends EatingMob {
             setSpeed(GameConfig.SNACKMAN_SPEED);
         }
 
-        super.move(forward, backward, left, right, delta);
+        Square oldSquare = gameMap.getSquareAtIndexXZ(calcMapIndexOfCoordinate(super.getPosX()), calcMapIndexOfCoordinate(super.getPosZ()));
+        super.move(forward, backward, left, right, delta, gameMap);
+        Square newSquare = gameMap.getSquareAtIndexXZ(calcMapIndexOfCoordinate(super.getPosX()), calcMapIndexOfCoordinate(super.getPosZ()));
+
+        if (!oldSquare.equals(newSquare)) {
+            oldSquare.removeMob(this);
+            newSquare.addMob(this);
+        }
+
+        for (Mob mob : newSquare.getMobs()) {
+            if (mob instanceof Ghost) {
+                ((Ghost) mob).scareSnackMan(this);
+            } else if (mob instanceof ScriptGhost) {
+                ((ScriptGhost) mob).scareSnackMan(this);
+            }
+        }
     }
 
     public int getSprintTimeLeft() {

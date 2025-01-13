@@ -4,6 +4,7 @@ import os
 #returns next free(not a Wall) adjacent field
 def search_free_field_adjacent(maze, x, y):
     print(x, y)
+
     if maze[x + 1][y + 1] != '#':
         return (x + 1, y + 1)
     elif maze[x][y+1] != '#':
@@ -42,7 +43,7 @@ def generate_spawn_chicken(maze):
             result = search_free_field_adjacent(maze, random1, random2)
             if result is None:
                 continue
-            random1, random2 = result 
+            random1, random2 = result
             maze[random1][random2] = 'C'
 
     return maze
