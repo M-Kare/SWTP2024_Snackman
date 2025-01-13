@@ -6,13 +6,22 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.util.FileSystemUtils;
+
+import de.hsrm.mi.swt.snackman.services.ReadMazeService;
 
 @SpringBootTest
 class MazeTest {
     
+    @Autowired
+    ReadMazeService mazeService;
+
     private static final String MAZE_FILE_PATH = "./extensions/map/Maze.txt";
     private static final Path workFolder = Paths.get("./extensions").toAbsolutePath();
 
@@ -24,6 +33,8 @@ class MazeTest {
             System.out.println("No file to delete");
         }   
         SnackmanApplication.checkAndCopyResources();
+        assert Files.exists(workFolder.resolve("maze"));
+        assert Files.exists(workFolder.resolve("map"));
     }
 
     @AfterAll
@@ -35,19 +46,22 @@ class MazeTest {
 
     @Test
     void mazeExists() {
+        mazeService.generateNewMaze();
         Path filePath = Paths.get(MAZE_FILE_PATH);
         Assertions.assertTrue(Files.exists(filePath), "The Maze.txt file does not exist!");
     }
 
     @Test
     void mazeHasContent() {
+        mazeService.generateNewMaze();
         List<String> maze = readMazeFile();
 
         Assertions.assertFalse(maze.isEmpty(), "The Maze.txt file is empty!");
     }
 
-    @Test
+    @Test 
     void mazeHasDefinedCharacters() {
+        mazeService.generateNewMaze();
         List<String> maze = readMazeFile();
 
         for (int i = 0; i < maze.size(); i++) {

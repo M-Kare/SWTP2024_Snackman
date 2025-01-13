@@ -19,7 +19,7 @@ public class StompWebMessageBrokerConfiguration implements WebSocketMessageBroke
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/stompbroker")
+        registry.addEndpoint("/ws")
                 .setAllowedOrigins("*");
     }
 }

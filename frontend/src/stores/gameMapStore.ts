@@ -26,14 +26,14 @@ import type {IGhostUpdateDTD} from "@/stores/messaging/IGhostUpdateDTD";
  */
 export const useGameMapStore = defineStore('gameMap', () => {
   const protocol = window.location.protocol.replace('http', 'ws')
-  const wsurl = `${protocol}//${window.location.host}/stompbroker`
+  const wsurl = `${protocol}//${window.location.host}/ws`
   let stompclient = new Client({brokerURL: wsurl})
   const scene = new THREE.Scene()
   const gameObjectRenderer = GameObjectRenderer()
   const {lobbydata} = useLobbiesStore()
   const CHICKEN_MOVEMENT_SPEED = 0.1    // step size of the interpolation: between 0 and 1
   let player: Player
-  let otherPlayers: Map<String, THREE.Mesh>
+  let otherPlayers: Map<String, THREE.Group<THREE.Object3DEventMap>>
   let OFFSET: number
   let DEFAULT_SIDE_LENGTH: number
 
@@ -113,8 +113,9 @@ export const useGameMapStore = defineStore('gameMap', () => {
                   if (otherPlayers == undefined || otherPlayers.size == 0) {
                     continue;
                   }
-                  otherPlayers.get(mobUpdate.playerId)?.position.lerp(mobUpdate.position, 0.3)
                   otherPlayers.get(mobUpdate.playerId)?.setRotationFromQuaternion(mobUpdate.rotation)
+                  //TODO adjust player height
+                  otherPlayers.get(mobUpdate.playerId)?.position.lerp(new THREE.Vector3( mobUpdate.position.x, mobUpdate.position.y - 2, mobUpdate.position.z), 0.3)
                 }
                 break;
 
@@ -217,7 +218,7 @@ export const useGameMapStore = defineStore('gameMap', () => {
     player = p
   }
 
-  function setOtherPlayers(other: Map<String, THREE.Mesh>) {
+  function setOtherPlayers(other: Map<String, THREE.Group<THREE.Object3DEventMap>>) {
     otherPlayers = other
   }
 

@@ -18,30 +18,32 @@
 <script lang="ts" setup>
 import {computed, onMounted, onUnmounted, reactive, ref, watch} from 'vue'
 import * as THREE from 'three'
-import {Player} from '@/components/Player';
-import {fetchSnackManFromBackend} from '@/services/SnackManInitService';
-import {GameMapRenderer} from '@/renderer/GameMapRenderer';
-import {useGameMapStore} from '@/stores/gameMapStore';
-import type {IGameMap} from '@/stores/IGameMapDTD';
-import {useLobbiesStore} from '@/stores/Lobby/lobbiesstore';
+import { Player } from '@/components/Player';
+import { fetchSnackManFromBackend } from '@/services/SnackManInitService';
+import { GameMapRenderer } from '@/renderer/GameMapRenderer';
+import { useGameMapStore } from '@/stores/gameMapStore';
+import type { IGameMap } from '@/stores/IGameMapDTD';
+import { useLobbiesStore } from '@/stores/Lobby/lobbiesstore';
 import type {IPlayerClientDTD} from "@/stores/Lobby/IPlayerClientDTD";
-import {GLTFLoader} from 'three/examples/jsm/Addons.js'
-import {useRouter, useRoute} from 'vue-router';
+import { GLTFLoader } from 'three/examples/jsm/Addons.js'
+import { useRouter, useRoute } from 'vue-router';
+import type { IPlayerDTD } from '@/stores/Player/IPlayerDTD';
 
-const {lobbydata} = useLobbiesStore();
+const { lobbydata } = useLobbiesStore();
 const gameMapStore = useGameMapStore()
 gameMapStore.startGameMapLiveUpdate()
 
 const targetHz = 30
 let clients: Array<IPlayerClientDTD>;
-let playerHashMap = new Map<String, THREE.Mesh>()
+let playerHashMap = new Map<String, THREE.Group<THREE.Object3DEventMap>>()
 
+const router = useRouter();
 const route = useRoute();
 const stompclient = gameMapStore.stompclient
-// stompclient.activate()
+let playerData: IPlayerDTD
 
 //Reaktive Calories Variable
-const MAXCALORIES = 3000
+const MAXCALORIES = 20000
 let currentCalories = ref()
 let caloriesMessage = ref('')
 const playerRole = ref(route.query.role || ''); // Player role from the URL query
@@ -56,10 +58,10 @@ let scene: THREE.Scene
 let prevTime = performance.now()
 
 const sprintData = reactive({
-  sprintTimeLeft: 100, // percentage (0-100)
-  isSprinting: false,
-  isCooldown: false,
-})
+    sprintTimeLeft: 100, // percentage (0-100)
+    isSprinting: false,
+    isCooldown: false,
+  })
 
 let sprintInCooldown = false;
 
@@ -86,7 +88,7 @@ function animate() {
         destination: `/topic/lobbies/${lobbydata.currentPlayer.joinedLobbyId!}/player/update`, headers: {},
         body: JSON.stringify(Object.assign({}, player.getInput(), {jump: player.getIsJumping()},
           {doubleJump: player.getIsDoubleJumping()},
-          {sprinting: player.isSprinting},
+          { sprinting: player.isSprinting },
           {
             qX: player.getCamera().quaternion.x,
             qY: player.getCamera().quaternion.y,
@@ -105,24 +107,9 @@ function animate() {
   renderer.render(scene, camera)
 }
 
-// initially loads the playerModel & attaches playerModel to playerCamera
-function loadPlayerModel(texture: string) {
-  const loader = new GLTFLoader()
-  loader.load(texture, gltf => {
-    snackManModel = gltf.scene
-
-    snackManModel.scale.set(1, 1, 1)
-    // rotation in radians (Bogenmaß), 180° doesnt work as intended
-    snackManModel.rotation.y = Math.PI
-    // optional offset for thirdPersonView
-    // snackManModel.position.set(0, -1.55, -5);
-    player.getCamera().add(snackManModel)
-  })
-}
-
 onMounted(async () => {
   // for rendering the scene, create gameMap in 3d and change window size
-  const {initRenderer, createGameMap, getScene} = GameMapRenderer()
+  const { initRenderer, createGameMap, getScene } = GameMapRenderer()
   scene = getScene()
   renderer = initRenderer(canvasRef.value)
   //Add gameMap
@@ -135,30 +122,23 @@ onMounted(async () => {
     console.error('Error when retrieving the gameMap:', error)
   }
 
-  clients = lobbydata.lobbies.find((elem) => elem.lobbyId === lobbydata.currentPlayer.joinedLobbyId)?.members!
-  console.log(clients)
-  const playerData = await fetchSnackManFromBackend(lobbydata.currentPlayer.joinedLobbyId!, lobbydata.currentPlayer.playerId);
-
-  clients.forEach(it => {
-    if (it.playerId === lobbydata.currentPlayer.playerId) {
+    clients = lobbydata.lobbies.find((elem)=>elem.lobbyId===lobbydata.currentPlayer.joinedLobbyId)?.members!
+    console.log(clients)
+    playerData = await
+    fetchSnackManFromBackend(lobbydata.currentPlayer.joinedLobbyId!, lobbydata.currentPlayer.playerId);
+    clients.forEach(it => {
       // that's you
-      player = new Player(renderer, playerData.posX, playerData.posY, playerData.posZ, playerData.radius,
-        playerData.speed, playerData.sprintMultiplier)
-      console.log("player data {}", player)
-
-    } else {
-      // other players that are not you
-      let material = new THREE.MeshBasicMaterial({color: 0x00ff00})
-      material.color = new THREE.Color(Math.random(), Math.random(), Math.random());
-      let cube = new THREE.Mesh(new THREE.BoxGeometry(1, 3, 1), material);
-      cube.position.lerp(new THREE.Vector3(playerData.posX, playerData.posY, playerData.posZ), 0.5)
-      scene.add(cube);
-      playerHashMap.set(it.playerId, cube);
-    }
-  });
-  gameMapStore.setOtherPlayers(playerHashMap)
-  gameMapStore.setPlayer(player)
-  caloriesMessage = player.message
+      if(it.playerId === lobbydata.currentPlayer.playerId){
+        player = new Player(renderer, playerData.posX, playerData.posY, playerData.posZ, playerData.radius,
+          playerData.speed, playerData.sprintMultiplier)
+      } else {
+        // other players that are not you
+        loadPlayerModel(it.playerId,SNACKMAN_TEXTURE);
+      }
+    });
+    gameMapStore.setOtherPlayers(playerHashMap)
+    gameMapStore.setPlayer(player)
+    caloriesMessage = player.message
 
   watch(player.sprintData, (newSprintData) => {
     sprintData.isSprinting = player.sprintData.isSprinting
@@ -179,12 +159,25 @@ onMounted(async () => {
   camera = player.getCamera()
   scene.add(player.getControls().object)
 
-  loadPlayerModel(SNACKMAN_TEXTURE)
-
   renderer.render(scene, camera)
   renderer.setAnimationLoop(animate)
   window.addEventListener('resize', resizeCallback)
 })
+
+// initially loads the playerModel & attaches playerModel to playerCamera
+async function loadPlayerModel(playerId: string, texture: string) {
+  const loader = new GLTFLoader()
+  loader.load(texture, gltf => {
+    snackManModel = gltf.scene
+    snackManModel.scale.set(1, 1, 1)
+    scene.add(snackManModel)
+    snackManModel.position.lerp(new THREE.Vector3(playerData.posX, playerData.posY-2, playerData.posZ), 0.5)
+    playerHashMap.set(playerId, snackManModel);
+    // optional offset for thirdPersonView
+    // snackManModel.position.set(0, -1.55, -5);
+    // player.getCamera().add(snackManModel)
+  })
+}
 
 onUnmounted(() => {
   renderer.setAnimationLoop(null)
@@ -242,9 +235,8 @@ function stopCooldownFill() {
 
 // Kalorien-Overlay Fill berrechnen
 const getBackgroundStyle = computed(() => {
-  const maxCalories = 3000
   //Prozent berechnen
-  const percentage = Math.min(currentCalories.value / maxCalories, 1)
+  const percentage = Math.min(currentCalories.value / MAXCALORIES, 1)
 
   const color = `linear-gradient(to right, #EEC643 ${percentage * 100}%, #5E4A08 ${percentage * 100}%)`
 
