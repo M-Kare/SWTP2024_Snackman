@@ -72,7 +72,7 @@ class ChickenTest {
     void testLayEgg_ChickenThicknessAndKcalReset() {
         Square square = new Square(MapObjectType.FLOOR, 0, 0);
 
-        Chicken chicken = new Chicken(square, gameMap);
+        Chicken chicken = new Chicken(square, gameMap, "ChickenMovementSkript");
         chicken.setKcal(3000);
         chicken.setThickness(Thickness.HEAVY);
 
@@ -86,7 +86,7 @@ class ChickenTest {
     @Test
     void testLayEgg_ChickenThicknessAndKcalReset_caseIfChickenHasNoKcal() {
         Square square = new Square(MapObjectType.FLOOR, 0, 0);
-        Chicken chicken = new Chicken(square, gameMap);
+        Chicken chicken = new Chicken(square, gameMap, "ChickenMovementSkript");
 
         chicken.layEgg();
 
@@ -98,7 +98,7 @@ class ChickenTest {
     @Test
     void testStartNewTimer_ReplacesExistingTimer() throws NoSuchFieldException, IllegalAccessException {
         Square square = new Square(MapObjectType.FLOOR, 0, 0);
-        Chicken chicken = new Chicken(square, gameMap);
+        Chicken chicken = new Chicken(square, gameMap, "ChickenMovementSkript");
 
         // Set up an initial timer
         Timer initialTimer = new Timer();
@@ -122,7 +122,7 @@ class ChickenTest {
     })
     void testStartNewTimer_ScaredStateAffectsDelay(boolean initialScaredState, boolean expectedScaredState) throws InterruptedException {
         Square square = new Square(MapObjectType.FLOOR, 0, 0);
-        Chicken chicken = new Chicken(square, gameMap);
+        Chicken chicken = new Chicken(square, gameMap, "ChickenMovementSkript");
         chicken.setKcal(2800);
 
         System.out.println("Initial scared state: " + initialScaredState);
@@ -170,7 +170,7 @@ class ChickenTest {
         square.setType(MapObjectType.FLOOR);
         square.setSnack(snack);
 
-        Chicken chicken = new Chicken(square, gameMap);
+        Chicken chicken = new Chicken(square, gameMap, "ChickenMovementSkript");
 
         chicken.consumeSnackOnSquare();
         Assertions.assertEquals(Thickness.THIN, chicken.getThickness());

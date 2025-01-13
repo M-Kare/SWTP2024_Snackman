@@ -478,4 +478,11 @@ public class Chicken extends EatingMob implements Runnable {
         return squares;
     }
 
+    public void setScared(boolean scared) {
+        isScared = scared;
+    }
+
+    public boolean isScared() {
+        return isScared;
+    }
 }
