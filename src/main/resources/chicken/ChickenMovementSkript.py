@@ -174,8 +174,7 @@ def add_walking_direction(original_liste):
     """
     new_liste = [original_liste[0]] + original_liste[1:]
     first_empty_index = next((i for i, x in enumerate(new_liste) if x == " "), None)
-    result = new_liste + [first_empty_index]
-    return result
+    return first_empty_index
 
 
 def all_squares_have_snack(original_liste):
