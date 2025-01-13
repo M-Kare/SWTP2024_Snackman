@@ -21,12 +21,29 @@
         </tbody>
       </table>
     </div>
+    <div id="button-pair">
+      <SmallNavButton
+        id="menu-back-button"
+        class="small-nav-buttons"
+        @click="$emit('close')"
+      >
+        Back to main menu
+      </SmallNavButton>
+      <SmallNavButton
+        id="export-map-button"
+        class="small-nav-buttons"
+        @click="mapExport"
+      >
+        Export map
+      </SmallNavButton>
+    </div>
   </div>
 </template>
 
 <script lang="ts" setup>
 import {useLeaderboardStore} from "@/stores/Leaderboard/leaderboardStore";
 import {computed, onMounted} from "vue";
+import SmallNavButton from "@/components/SmallNavButton.vue";
 
 const leaderboardStore = useLeaderboardStore()
 
@@ -52,14 +69,16 @@ defineEmits(['close'])
 
 <style scoped>
 
+
 .info-heading {
   font-size: 3rem;
   font-weight: bold;
   color: var(--background-for-text-color);
-  text-align: left;
+  text-align: center;
 }
 
 #individual-outer-box-size {
+  top: 10%;
   width: 70vw;
   max-width: 1000px;
   height: 40rem;
@@ -148,6 +167,18 @@ tr td:not(:first-child):not(:last-child) {
 .table-container {
   max-height: 400px;
   overflow-y: auto;
+}
+
+#button-pair {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  padding-top: 6%;
+}
+
+#menu-back-button:hover,
+#export-map-button:hover {
+  box-shadow: 0 0 35px 5px rgba(255, 255, 255, 0.5);
 }
 
 </style>
