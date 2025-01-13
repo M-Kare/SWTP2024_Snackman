@@ -148,7 +148,7 @@ public class ScriptGhost extends Mob implements Runnable {
         }
     }
 
-    private boolean standingOnSameSquareAsSnackman(){
+    protected boolean standingOnSameSquareAsSnackman(){
         return this.gameMap.getSquareAtIndexXZ(this.ghostPosX, this.ghostPosZ).getMobs().stream().noneMatch(mob -> mob instanceof SnackMan);
     }
 
@@ -304,6 +304,10 @@ public class ScriptGhost extends Mob implements Runnable {
 
     public Direction getLookingDirection() {
         return lookingDirection;
+    }
+
+    public void setDifficulty(ScriptGhostDifficulty difficulty) {
+        this.difficulty = difficulty;
     }
 
     @Override
