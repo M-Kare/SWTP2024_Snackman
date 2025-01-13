@@ -143,8 +143,10 @@ public class LobbyManagerService {
             if (!Files.exists(customMapPath)) {
                 throw new IllegalStateException("Custom map file not found: " + customMapPath);
             }
-
+            // TODO: check customMap one more time before start game, is there enough G for Ghost
+            
             GameMap newGameMap = mapService.createNewGameMap(lobbyId, customMapPath.toString());
+
             lobby.setGameMap(newGameMap);
         }
 
