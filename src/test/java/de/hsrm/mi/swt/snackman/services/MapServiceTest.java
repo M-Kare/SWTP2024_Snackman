@@ -15,6 +15,7 @@ import de.hsrm.mi.swt.snackman.entities.map.Spawnpoint;
 import de.hsrm.mi.swt.snackman.entities.map.SpawnpointMobType;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.Mob;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken.Chicken;
+import de.hsrm.mi.swt.snackman.messaging.MessageLoop.MessageLoop;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 
@@ -41,6 +42,8 @@ class MapServiceTest {
     private MapService mapService;
 
     private static final Path workFolder = Paths.get("./extensions").toAbsolutePath();
+    @Autowired
+    private MessageLoop messageLoop;
 
     @BeforeAll
     static void fileSetUp() {
@@ -193,7 +196,7 @@ class MapServiceTest {
         testClient04.setRole(ROLE.GHOST);
         testClient05.setRole(ROLE.GHOST);
 
-        Lobby testLobby = new Lobby("1", "testLobby", testClient01, gameMap);
+        Lobby testLobby = new Lobby("1", "testLobby", testClient01, gameMap, messageLoop);
         testLobby.getMembers().add(testClient02);
         testLobby.getMembers().add(testClient03);
         testLobby.getMembers().add(testClient04);

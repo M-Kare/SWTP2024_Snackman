@@ -1,22 +1,28 @@
 package de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken;
 
-import de.hsrm.mi.swt.snackman.configuration.GameConfig;
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Properties;
+import java.util.Random;
+import java.util.Timer;
+import java.util.TimerTask;
+
 import de.hsrm.mi.swt.snackman.entities.map.GameMap;
-import de.hsrm.mi.swt.snackman.entities.map.Square;
-import de.hsrm.mi.swt.snackman.entities.mapObject.MapObjectType;
-import de.hsrm.mi.swt.snackman.entities.mapObject.snack.Snack;
-import de.hsrm.mi.swt.snackman.entities.mapObject.snack.SnackType;
-import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.EatingMob;
 import org.python.core.PyList;
 import org.python.core.PyObject;
 import org.python.util.PythonInterpreter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
-import java.nio.file.Paths;
-import java.util.*;
+import de.hsrm.mi.swt.snackman.configuration.GameConfig;
+import de.hsrm.mi.swt.snackman.entities.map.Square;
+import de.hsrm.mi.swt.snackman.entities.mapObject.MapObjectType;
+import de.hsrm.mi.swt.snackman.entities.mapObject.snack.Snack;
+import de.hsrm.mi.swt.snackman.entities.mapObject.snack.SnackType;
+import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.EatingMob;
 
 /**
  * Represents a chicken entity in the game, capable of moving around the map,
@@ -72,15 +78,6 @@ public class Chicken extends EatingMob implements Runnable {
         initTimer();
     }
 
-    /**
-     * Method to generate the next id of a new Chicken. It is synchronized because of thread-safety.
-     *
-     * @return the next incremented id
-     */
-    protected synchronized static long generateId() {
-        return idCounter++;
-    }
-
     public List<String> act(List<String> squares) {
         List<String> result = executeMovementSkript(squares);
         return result;
@@ -101,6 +98,21 @@ public class Chicken extends EatingMob implements Runnable {
         return javaList;
     }
 
+    /**
+     * Method to generate the next id of a new Chicken. It is synchronized because of thread-safety.
+     *
+     * @return the next incremented id
+     */
+    protected synchronized static long generateId() {
+        return idCounter++;
+    }
+
+    /**
+     * Adds a {@link PropertyChangeListener} to this object.
+     * The listener will be notified whenever a bound property changes.
+     *
+     * @param listener the {@link PropertyChangeListener} to be added
+     */
     public void addPropertyChangeListener(PropertyChangeListener listener) {
         this.propertyChangeSupport.addPropertyChangeListener(listener);
     }

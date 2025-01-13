@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Map;
 
 import de.hsrm.mi.swt.snackman.controller.Square.SquareDTO;
+import de.hsrm.mi.swt.snackman.entities.lobby.GameEnd;
+import de.hsrm.mi.swt.snackman.entities.lobby.GameEndDTO;
 import de.hsrm.mi.swt.snackman.entities.map.GameMap;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.Ghost;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.ScriptGhost;
@@ -46,6 +48,8 @@ public class MessageLoop {
 
     private Map<String, List<ScriptGhost>> changedScriptGhosts = new HashMap<>();
 
+    private Map<String, List<GameEnd>> changedGameEnd = new HashMap<>();
+
     @Scheduled(fixedRate=50)
     public void messageLoop(){
         List<Lobby> lobbys = lobbyService.getAllLobbies();
@@ -57,6 +61,7 @@ public class MessageLoop {
                 continue;
             }
             List<Message> messages = new ArrayList<>();
+
             List<Square> squareQueue = changedSquares.get(lobby.getLobbyId());
             changedSquares.remove(lobby.getLobbyId());
 
@@ -66,6 +71,14 @@ public class MessageLoop {
             List<ScriptGhost> scriptGhostQueue = changedScriptGhosts.get(lobby.getLobbyId());
             changedScriptGhosts.remove(lobby.getLobbyId());
 
+            List<GameEnd> gameEndQueue = changedGameEnd.get(lobby.getLobbyId());
+            changedGameEnd.remove(lobby.getLobbyId());
+
+            if(gameEndQueue != null){
+                for(GameEnd gameEnd : gameEndQueue){
+                    messages.add(new Message<>(EventEnum.GameEnd, GameEndDTO.fromGameEnd(gameEnd)));
+                }
+            }
             for(String client : lobby.getClientMobMap().keySet()){
                 Mob mob = lobby.getClientMobMap().get(client);
 
@@ -137,6 +150,16 @@ public class MessageLoop {
             List<ScriptGhost> temp = new ArrayList<>();
             temp.add(scriptGhost);
             changedScriptGhosts.put(lobbyId, temp);
+        }
+    }
+
+    public void addGameEndToQueue(GameEnd gameEnd, String lobbyId) {
+        if(changedGameEnd.containsKey(lobbyId)){
+            changedGameEnd.get(lobbyId).add(gameEnd);
+        } else {
+            List<GameEnd> temp = new ArrayList<>();
+            temp.add(gameEnd);
+            changedGameEnd.put(lobbyId, temp);
         }
     }
 }
