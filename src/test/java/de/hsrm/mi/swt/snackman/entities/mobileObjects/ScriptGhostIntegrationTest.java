@@ -1,12 +1,9 @@
-package de.hsrm.mi.swt.snackman.entities.mob.Ghost;
+package de.hsrm.mi.swt.snackman.entities.mobileObjects;
 
 import de.hsrm.mi.swt.snackman.SnackmanApplication;
-import de.hsrm.mi.swt.snackman.entities.map.GameMap;
-import de.hsrm.mi.swt.snackman.entities.mobileObjects.ScriptGhost;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.python.util.PythonInterpreter;
 import org.springframework.util.FileSystemUtils;
 
@@ -16,33 +13,21 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Integration tests for Ghost movement logic with Jython and Java integration.
- * This class ensures that the 'Ghost' Java class correctly interacts with
- * the 'SmartGhostMovementSkript.py' Python logic.
- *
- * todo fix tests
+ * This class ensures that the 'ScriptGhost' Java class correctly interacts with
+ * the 'GhostMovementSkript.py' Python logic.
  */
-public class SmartScriptGhostIntegrationTest {
-
-    @Mock
-    private GameMap gameMap;
-    private ScriptGhost scriptGhost;
-
-    /**
-     * Verifies that the Chicken can interact with the Python script directly,
-     * using a Jython interpreter and chooses the correct empty square (" ").
-     */
+public class ScriptGhostIntegrationTest {
 
     private static final Path workFolder = Paths.get("./extensions").toAbsolutePath();
 
     @BeforeAll
     static void fileSetUp() {
-        try{
+        try {
             tearDownAfter();
-        }catch(Exception e){
+        } catch (Exception e) {
             System.out.println("No file to delete");
         }
         SnackmanApplication.checkAndCopyResources();
@@ -55,20 +40,23 @@ public class SmartScriptGhostIntegrationTest {
         }
     }
 
+    /**
+     * Verifies that the Script Ghost can interact with the Python script directly,
+     * using a Jython interpreter.
+     */
     @Test
-    void testGhostMovement() {
+    void testScriptGhostMovement() {
         try (PythonInterpreter pyInterp = new PythonInterpreter()) {
             pyInterp.exec("import sys");
             pyInterp.exec("sys.path.append('./extensions/ghost/')");
 
-            String mapAroundGhost = "'L', 'L', 'W', 'W', 'W', 'W', 'W', 'W', '0'";
-            pyInterp.exec("from SmartGhostMovementSkript import choose_next_square");
-            pyInterp.exec("result = choose_next_square([" + mapAroundGhost + "])");
+            String mapAroundScriptGhost = "'L', 'L', 'W', 'W', 'W', 'W', 'W', 'W', '0'";
+            pyInterp.exec("from GhostMovementSkript import choose_next_square");
+            pyInterp.exec("result = choose_next_square([" + mapAroundScriptGhost + "])");
 
             String result = pyInterp.get("result").toString();
 
-            assertEquals(0, result,
-                    "The Python script should correctly determine the next move (' ').");
+            assertEquals("0", result, "The Python script should correctly determine the next move (' ').");
         }
     }
 }

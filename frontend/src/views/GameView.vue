@@ -18,18 +18,18 @@
 <script lang="ts" setup>
 import {computed, onMounted, onUnmounted, reactive, ref, watch} from 'vue'
 import * as THREE from 'three'
-import {Player} from '@/components/Player';
-import type {IPlayerDTD} from '@/stores/Player/IPlayerDTD';
-import {fetchSnackManFromBackend} from '@/services/SnackManInitService';
-import {GameMapRenderer} from '@/renderer/GameMapRenderer';
-import {useGameMapStore} from '@/stores/gameMapStore';
-import type {IGameMap} from '@/stores/IGameMapDTD';
-import {useLobbiesStore} from '@/stores/Lobby/lobbiesstore';
+import { Player } from '@/components/Player';
+import { fetchSnackManFromBackend } from '@/services/SnackManInitService';
+import { GameMapRenderer } from '@/renderer/GameMapRenderer';
+import { useGameMapStore } from '@/stores/gameMapStore';
+import type { IGameMap } from '@/stores/IGameMapDTD';
+import { useLobbiesStore } from '@/stores/Lobby/lobbiesstore';
 import type {IPlayerClientDTD} from "@/stores/Lobby/IPlayerClientDTD";
-import {GLTFLoader} from 'three/examples/jsm/Addons.js'
-import {useRouter, useRoute} from 'vue-router';
+import { GLTFLoader } from 'three/examples/jsm/Addons.js'
+import { useRouter, useRoute } from 'vue-router';
+import type { IPlayerDTD } from '@/stores/Player/IPlayerDTD';
 
-const {lobbydata} = useLobbiesStore();
+const { lobbydata } = useLobbiesStore();
 const gameMapStore = useGameMapStore()
 gameMapStore.startGameMapLiveUpdate()
 
@@ -122,14 +122,16 @@ onMounted(async () => {
 
   clients = lobbydata.lobbies.find((elem) => elem.lobbyId === lobbydata.currentPlayer.joinedLobbyId)?.members!
   console.log(clients)
-  const playerData: IPlayerDTD = await fetchSnackManFromBackend(lobbydata.currentPlayer.joinedLobbyId!, lobbydata.currentPlayer.playerId);
+  playerData = await fetchSnackManFromBackend(lobbydata.currentPlayer.joinedLobbyId!, lobbydata.currentPlayer.playerId);
   MAX_CALORIES.value = playerData.maxCalories
 
   clients.forEach(it => {
     if (it.playerId === lobbydata.currentPlayer.playerId) {
+      // that's you
       player = new Player(renderer, playerData.posX, playerData.posY, playerData.posZ, playerData.radius,
         playerData.speed, playerData.sprintMultiplier)
     } else {
+      // other players that are not you
       loadPlayerModel(it.playerId, SNACKMAN_TEXTURE);
     }
   });

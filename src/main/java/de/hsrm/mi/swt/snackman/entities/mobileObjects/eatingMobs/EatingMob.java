@@ -27,8 +27,8 @@ public abstract class EatingMob extends Mob {
         super(gameMap, speed, radius, posX, posY, posZ);
     }
 
-    public EatingMob(GameMap gameMap) {
-        super(gameMap);
+    public EatingMob() {
+        super();
     }
 
     public void setKcal(int value) {

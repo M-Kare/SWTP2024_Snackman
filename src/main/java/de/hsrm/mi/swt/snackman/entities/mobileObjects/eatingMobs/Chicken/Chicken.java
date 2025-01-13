@@ -31,9 +31,12 @@ import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.EatingMob;
 public class Chicken extends EatingMob implements Runnable {
 
     private static long idCounter = 0;
-    private long id;
     private final PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
     private final Logger log = LoggerFactory.getLogger(Chicken.class);
+    private final int WAITING_TIME = GameConfig.WAITING_TIME;  // in ms
+    private final int MAX_CALORIES = GameConfig.MAX_KALORIEN;
+    private final int CALORIES_PER_SIXTH = (MAX_CALORIES / 6);
+    private long id;
     private Thickness thickness = Thickness.THIN;
     private int chickenPosX, chickenPosZ;
     private Direction lookingDirection;
@@ -41,9 +44,6 @@ public class Chicken extends EatingMob implements Runnable {
     private boolean isWalking;
     private boolean blockingPath = false;
     private boolean isScared = false;
-    private final int WAITING_TIME = GameConfig.WAITING_TIME;  // in ms
-    private final int MAX_CALORIES = GameConfig.MAX_KALORIEN;
-    private final int CALORIES_PER_SIXTH = (MAX_CALORIES / 6);
     private Timer eggLayingTimer;
     // python
     private PythonInterpreter pythonInterpreter = null;
@@ -52,19 +52,19 @@ public class Chicken extends EatingMob implements Runnable {
     private GameMap gameMap;
 
     public Chicken() {
-        super(null);
+        super();
         initJython();
         this.fileName = "ChickenMovementSkript";
     }
 
     public Chicken(String fileName) {
-        super(null);
+        super();
         this.fileName = fileName;
         initJython();
     }
 
     public Chicken(Square initialPosition, GameMap gameMap) {
-        super(gameMap);
+        super();
         id = generateId();
         this.gameMap = gameMap;
         this.chickenPosX = initialPosition.getIndexX();
@@ -82,7 +82,6 @@ public class Chicken extends EatingMob implements Runnable {
         List<String> result = executeMovementSkript(squares);
         return result;
     }
-
 
     /**
      * Converts a Python list to a Java list.
@@ -422,18 +421,14 @@ public class Chicken extends EatingMob implements Runnable {
      */
     public void addEggToSquare(Square square, Snack laidEgg) {
         square.setSnack(laidEgg);
-        log.debug("{} kcal egg add to square {} and square {}", laidEgg.getCalories(), square.getId(), square.getId());
-    }
-
-    public boolean isScared() {
-        return isScared;
     }
 
     /**
      * Sets the chicken to be scared and restarts the timer with a delay
      */
-    public void setScared(boolean scared) {
+    public void isScaredFromGhost(boolean scared) {
         this.isScared = scared;
+        layEgg();
         startNewTimer();
     }
 

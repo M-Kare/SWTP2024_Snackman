@@ -1,8 +1,19 @@
-package de.hsrm.mi.swt.snackman.entities.mob.Ghost;
+package de.hsrm.mi.swt.snackman.entities.mobileObjects;
 
-import de.hsrm.mi.swt.snackman.entities.mobileObjects.ScriptGhost;
+import de.hsrm.mi.swt.snackman.SnackmanApplication;
+import de.hsrm.mi.swt.snackman.entities.map.GameMap;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import org.springframework.util.FileSystemUtils;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -11,6 +22,28 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * This class validates specific movement scenarios for the ScriptGhost.
  */
 public class ScriptGhostMovementTest {
+
+    @Mock
+    private GameMap gameMap;
+
+    private static final Path workFolder = Paths.get("./extensions").toAbsolutePath();
+
+    @BeforeAll
+    static void fileSetUp() {
+        try {
+            tearDownAfter();
+        } catch (Exception e) {
+            System.out.println("No file to delete");
+        }
+        SnackmanApplication.checkAndCopyResources();
+    }
+
+    @AfterAll
+    static void tearDownAfter() throws IOException {
+        if (Files.exists(workFolder)) {
+            FileSystemUtils.deleteRecursively(workFolder.toFile());
+        }
+    }
 
     /**
      * Tests whether the ghost moves to an empty field (' ’) if one is available.

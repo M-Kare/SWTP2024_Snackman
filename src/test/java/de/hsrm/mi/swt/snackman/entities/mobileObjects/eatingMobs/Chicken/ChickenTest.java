@@ -6,7 +6,14 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Timer;
-
+import de.hsrm.mi.swt.snackman.SnackmanApplication;
+import de.hsrm.mi.swt.snackman.entities.map.GameMap;
+import de.hsrm.mi.swt.snackman.entities.map.Square;
+import de.hsrm.mi.swt.snackman.entities.mapObject.MapObjectType;
+import de.hsrm.mi.swt.snackman.entities.mapObject.snack.Snack;
+import de.hsrm.mi.swt.snackman.entities.mapObject.snack.SnackType;
+import de.hsrm.mi.swt.snackman.services.LobbyManagerService;
+import de.hsrm.mi.swt.snackman.services.MapService;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -17,14 +24,6 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.util.FileSystemUtils;
-
-import de.hsrm.mi.swt.snackman.SnackmanApplication;
-import de.hsrm.mi.swt.snackman.entities.map.GameMap;
-import de.hsrm.mi.swt.snackman.entities.map.Square;
-import de.hsrm.mi.swt.snackman.entities.mapObject.MapObjectType;
-import de.hsrm.mi.swt.snackman.entities.mapObject.snack.Snack;
-import de.hsrm.mi.swt.snackman.entities.mapObject.snack.SnackType;
-import de.hsrm.mi.swt.snackman.services.MapService;
 
 @SpringBootTest
 class ChickenTest {
@@ -61,7 +60,7 @@ class ChickenTest {
         if (!Files.exists(workFolder.resolve("chicken/ChickenMovementSkript.py"))) {
             SnackmanApplication.checkAndCopyResources();
         }
-        char[][] mockMazeData = new char[][]{
+        char[][] mockMazeData = new char[][] {
                 {'#', '#', '#'},
                 {'#', '.', '#'},
                 {'#', '#', '#'}
@@ -116,7 +115,6 @@ class ChickenTest {
         Assertions.assertNotNull(newTimer);
     }
 
-    /*
     @ParameterizedTest
     @CsvSource({
             "true, false",
@@ -162,7 +160,6 @@ class ChickenTest {
         Assertions.assertEquals(expectedScaredState, chicken.isScared(),
                 "Expected scared state: " + expectedScaredState + ", Actual: " + chicken.isScared());
     }
-     */
 
 
     @Test

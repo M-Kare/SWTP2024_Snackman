@@ -145,4 +145,4 @@ def add_walking_direction(liste):
     """
     new_liste = [liste[0]] + liste[1:]
     first_empty_index = next((i for i, x in enumerate(new_liste) if x == " "), None)
-    return first_empty_index
+    return int(first_empty_index)

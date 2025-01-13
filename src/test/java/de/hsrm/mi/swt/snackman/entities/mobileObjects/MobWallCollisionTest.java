@@ -53,7 +53,7 @@ class MobWallCollisionTest {
                                 {new Square(2,0), new Square(MapObjectType.WALL,2,1), new Square(2,2)} };
         this.gameMap = new GameMap(testMap1);
 
-        snackman = new SnackMan(gameMap, 10, 0.3);
+        snackman = new SnackMan(gameMap, 10, 0.3, 1.5 * GameConfig.SQUARE_SIZE,1,1.5 * GameConfig.SQUARE_SIZE);
     }
 
     @Test

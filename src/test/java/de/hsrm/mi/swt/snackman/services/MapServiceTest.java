@@ -18,8 +18,10 @@ import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken.Chicken
 import de.hsrm.mi.swt.snackman.messaging.MessageLoop.MessageLoop;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,16 +41,15 @@ class MapServiceTest {
     @Autowired
     private MapService mapService;
 
-
     private static final Path workFolder = Paths.get("./extensions").toAbsolutePath();
     @Autowired
     private MessageLoop messageLoop;
 
     @BeforeAll
     static void fileSetUp() {
-        try{
+        try {
             tearDownAfter();
-        }catch(Exception e){
+        } catch (Exception e) {
             System.out.println("No file to delete");
         }
         SnackmanApplication.checkAndCopyResources();
@@ -61,7 +62,7 @@ class MapServiceTest {
         }
     }
 
-	@Test
+    @Test
     void testMapServiceInitialization() {
         // Ensure mapService is properly initialized
         assertNotNull(mapService);
@@ -174,12 +175,12 @@ class MapServiceTest {
      * Map:
      * 	Ghost	Ghost		Empty
      * 	Empty	SnackMan	Empty
-     * 	Empty	SnackMan	Empty
+     * 	Empty	Ghost	Empty
      */
     public void spawnLocationTest() {
         Square[][] testMap = {
                 {new Square(0, 0, new Spawnpoint(SpawnpointMobType.GHOST)), new Square(0, 1, new Spawnpoint(SpawnpointMobType.GHOST)),
-                new Square(0, 2, new Spawnpoint(SpawnpointMobType.GHOST))},
+                        new Square(0, 2, new Spawnpoint(SpawnpointMobType.GHOST))},
                 {new Square(1, 0), new Square(1, 1, new Spawnpoint(SpawnpointMobType.SNACKMAN)), new Square(1, 2)},
                 {new Square(2, 0), new Square(2, 1, new Spawnpoint(SpawnpointMobType.GHOST)), new Square(2, 2)}};
         GameMap gameMap = new GameMap(testMap);
@@ -193,7 +194,7 @@ class MapServiceTest {
         testClient02.setRole(ROLE.GHOST);
         testClient03.setRole(ROLE.GHOST);
         testClient04.setRole(ROLE.GHOST);
-        testClient05.setRole(ROLE.SNACKMAN);
+        testClient05.setRole(ROLE.GHOST);
 
         Lobby testLobby = new Lobby("1", "testLobby", testClient01, gameMap, messageLoop);
         testLobby.getMembers().add(testClient02);
@@ -204,20 +205,20 @@ class MapServiceTest {
         mapService.spawnMobs(gameMap, testLobby);
         SortedMap<String, Mob> clientMobs = testLobby.getClientMobMap();
 
-        Assertions.assertTrue(clientMobs.get("01").getPosition().x == testMap[1][1].getIndexX());
-        Assertions.assertTrue(clientMobs.get("01").getPosition().z == testMap[1][1].getIndexZ());
+        Assertions.assertTrue(clientMobs.get("01").calcMapIndexOfCoordinate(clientMobs.get("01").getPosition().x) == testMap[1][1].getIndexX());
+        Assertions.assertTrue(clientMobs.get("01").calcMapIndexOfCoordinate(clientMobs.get("01").getPosition().z) == testMap[1][1].getIndexZ());
 
-        Assertions.assertTrue(clientMobs.get("02").getPosition().x == testMap[1][1].getIndexX());
-        Assertions.assertTrue(clientMobs.get("02").getPosition().z == testMap[1][1].getIndexZ());
+        Assertions.assertTrue(clientMobs.get("02").calcMapIndexOfCoordinate(clientMobs.get("02").getPosition().x) == testMap[0][0].getIndexX());
+        Assertions.assertTrue(clientMobs.get("02").calcMapIndexOfCoordinate(clientMobs.get("02").getPosition().z) == testMap[0][0].getIndexZ());
 
-        Assertions.assertTrue(clientMobs.get("03").getPosition().x == testMap[1][1].getIndexX());
-        Assertions.assertTrue(clientMobs.get("03").getPosition().z == testMap[1][1].getIndexZ());
+        Assertions.assertTrue(clientMobs.get("03").calcMapIndexOfCoordinate(clientMobs.get("03").getPosition().x) == testMap[0][1].getIndexX());
+        Assertions.assertTrue(clientMobs.get("03").calcMapIndexOfCoordinate(clientMobs.get("03").getPosition().z) == testMap[0][1].getIndexZ());
 
-        Assertions.assertTrue(clientMobs.get("04").getPosition().x == testMap[1][1].getIndexX());
-        Assertions.assertTrue(clientMobs.get("04").getPosition().z == testMap[1][1].getIndexZ());
+        Assertions.assertTrue(clientMobs.get("04").calcMapIndexOfCoordinate(clientMobs.get("04").getPosition().x) == testMap[0][2].getIndexX());
+        Assertions.assertTrue(clientMobs.get("04").calcMapIndexOfCoordinate(clientMobs.get("04").getPosition().z) == testMap[0][2].getIndexZ());
 
-        Assertions.assertTrue(clientMobs.get("05").getPosition().x == testMap[1][1].getIndexX());
-        Assertions.assertTrue(clientMobs.get("05").getPosition().z == testMap[1][1].getIndexZ());
+        Assertions.assertTrue(clientMobs.get("05").calcMapIndexOfCoordinate(clientMobs.get("05").getPosition().x) == testMap[2][1].getIndexX());
+        Assertions.assertTrue(clientMobs.get("05").calcMapIndexOfCoordinate(clientMobs.get("05").getPosition().z) == testMap[2][1].getIndexZ());
 
     }
 
