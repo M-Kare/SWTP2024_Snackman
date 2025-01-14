@@ -1,4 +1,5 @@
 <template>
+  <div class="overlay"></div>
   <div id="form-box">
     <h1 id="title">New Leaderboard entry</h1>
 
@@ -95,6 +96,17 @@ const createNewLeaderboardEntry = async () => {
 </script>
 
 <style scoped>
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(5px);
+  z-index: 1;
+}
+
 #title {
   position: absolute;
   top: 1rem;
@@ -108,33 +120,59 @@ const createNewLeaderboardEntry = async () => {
   overflow: hidden;
 }
 
+input::placeholder {
+  color: var(--secondary-text-color);
+  font-weight: bold;
+}
+
+#input-textmessage {
+  padding-bottom: 10px;
+  font-weight: bold;
+}
+
 #form-box {
   z-index: 2;
   position: absolute;
   left: 50%;
   top: 25%;
   transform: translateX(-50%);
-  width: 60%;
+  width: 70%;
   max-width: 600px;
-  height: 20rem;
-  background: #172D54;
-  border-radius: 0.3rem;
+  height: 30rem;
+
+  background-image: url('@/assets/background-design-lobbies.png');
+  background-size: cover;
+  background-position: center;
+
+  border: var(--background-for-text-color) solid 4px;
+  border-radius: 0.5rem;
+  box-shadow: 10px 8px 0 var(--background-for-text-color);
+}
+
+#form-box::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #000000dd;
+  border-radius: 0.5rem;
 }
 
 #form {
-  position: inherit;
   top: 35%;
   width: 100%;
   font-size: 1.5rem;
   font-weight: bold;
-  color: #fff;
+  color: var(--background-for-text-color);
 }
 
 #form > input {
   font-size: 1.2rem;
   width: 70%;
   height: 2rem;
-  margin-top: 0.2rem;
+  margin-top: 0.7rem;
   margin-bottom: 2rem;
   padding: 1.2rem;
 }
@@ -150,8 +188,7 @@ const createNewLeaderboardEntry = async () => {
   bottom: 7%;
   font-size: 0.9rem;
   font-weight: bold;
-  padding: 0.5rem;
-  height: 2rem;
+  padding: 0.7rem;
 }
 
 #cancel-createNewLeaderboardEntry-creation-button {
@@ -161,7 +198,9 @@ const createNewLeaderboardEntry = async () => {
 #create-createNewLeaderboardEntry-button {
   right: 5%;
 }
-#cancel-createNewLeaderboardEntry-creation-button:hover, #create-createNewLeaderboardEntry-button:hover {
+
+#cancel-createNewLeaderboardEntry-creation-button:hover,
+#create-createNewLeaderboardEntry-button:hover {
   box-shadow: 0px 0px 35px 5px rgba(255, 255, 255, 0.5);
 }
 </style>
