@@ -19,7 +19,6 @@ export const useLobbiesStore = defineStore('lobbiesstore', () =>{
         } as IPlayerClientDTD //PlayerClient for each window, for check the sync
     })
 
-    // For Test all Players have the same name 'Player Test'
     /**
      * Creates a new player client.
      * @param name The name of the player.
