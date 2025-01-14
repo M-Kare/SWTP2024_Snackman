@@ -39,7 +39,11 @@
     const playerName = ref('');
     const errorMessage = ref('');
 
-    const emit = defineEmits<(event: 'hidePlayerNameForm') => void>()
+    const emit = defineEmits<{
+        (e: 'hidePlayerNameForm'): void;
+        (e: 'playerNameSaved', value: string): void;
+    }>();
+
 
     /**
      * Saves the name of a player.
@@ -63,6 +67,7 @@
             errorMessage.value = "";
 
             emit('hidePlayerNameForm');
+            emit('playerNameSaved', playerName.value);
         } catch (error) {
             alert("Error saving playername");
             console.error(error);
