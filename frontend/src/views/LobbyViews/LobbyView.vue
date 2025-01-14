@@ -64,6 +64,12 @@
 
     <div v-if="darkenBackground" id="darken-background"></div>
 
+    <PlayerNameForm
+      v-if="showPlayerNameForm && !playerNameSaved"
+      @hidePlayerNameForm="hidePlayerNameForm"
+      >
+    </PlayerNameForm>
+
     <PopUp class="popup-box"
         v-if="errorBox"
         @hidePopUp="hidePopUpAndRedirect"
@@ -88,6 +94,7 @@
 <script setup lang="ts">
     import MenuBackground from '@/components/MenuBackground.vue';
     import SmallNavButton from '@/components/SmallNavButton.vue';
+    import PlayerNameForm from '@/components/PlayerNameForm.vue';
     import PopUp from '@/components/PopUp.vue';
 
     import { useRoute, useRouter } from 'vue-router';
@@ -107,6 +114,8 @@
     const playerCount = computed(() => members.value.length);
     const maxPlayerCount = ref(5);
 
+    const playerNameSaved = lobbiesStore.lobbydata.currentPlayer.playerName;
+
     const darkenBackground = ref(false);
     const showPopUp = ref(false);
     const errorBox = ref(false);
@@ -120,7 +129,7 @@
     const mouseInfoBox = ref(document.getElementById("infoBox"))
 
 
-    const MAX_PLAYER_COUNT = 4;
+    const MAX_PLAYER_COUNT = 5;
 
     const TIP_TOP_DIST = 30;
     const TIP_SIDE_DIST = 20;
