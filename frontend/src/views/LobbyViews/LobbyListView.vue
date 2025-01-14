@@ -123,7 +123,6 @@ const joinLobby = async (lobby: ILobbyDTD) => {
     )
 
     if (joinedLobby) {
-      console.log('Successfully joined lobby', joinedLobby.name)
       router.push({name: 'LobbyView', params: {lobbyId: lobby.lobbyId}})
     }
   } catch (error: any) {
