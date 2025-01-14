@@ -64,7 +64,8 @@
 
             emit('hidePlayerNameForm');
         } catch (error) {
-            console.error("Error saving playername", error);
+            alert("Error saving playername");
+            console.error(error);
         }
     }
 
