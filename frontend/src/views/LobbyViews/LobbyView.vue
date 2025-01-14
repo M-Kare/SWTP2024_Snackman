@@ -326,17 +326,11 @@ watchEffect(() => {
     )
     if (updatedLobby) {
       lobbyLoaded = true
-      console.log('Gamestarted in Lobby-View', updatedLobby.gameStarted)
       if (updatedLobby.gameStarted) {
-        console.log('Game has started! Redirecting to GameView...')
         router.push({
           name: 'GameView',
           query: {role: lobbiesStore.lobbydata.currentPlayer.role},
         })
-        console.log(
-          'Navigating to GameView with role:',
-          lobbiesStore.lobbydata.currentPlayer.role,
-        )
       }
     } else if (lobbyLoaded) {
       deleteUploadedFile(lobbyId);
@@ -385,12 +379,10 @@ const joinLobby = async (lobby: ILobbyDTD) => {
     )
 
     if (joinedLobby) {
-      console.log('Successfully joined lobby', joinedLobby.name)
       router.push({name: 'LobbyView', params: {lobbyId: lobby.lobbyId}})
     }
   } catch (error: any) {
     console.error('Error:', error)
-    alert('Error join Lobby!')
   }
 }
 

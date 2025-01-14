@@ -110,7 +110,6 @@ export const useLobbiesStore = defineStore('lobbiesstore', () =>{
             }
 
             const lobby: ILobbyDTD = await response.json()
-            console.log('Fetched Lobby: ', lobby)
             return lobby
         } catch (error: any){
             console.error('Error:', error)
@@ -136,10 +135,8 @@ export const useLobbiesStore = defineStore('lobbiesstore', () =>{
 
             if (stompclient) {
                 stompclient.subscribe(DEST, async (message) => {
-                    console.log('STOMP Client subscribe')
                     const updatedLobbies = JSON.parse(message.body)
                     lobbydata.lobbies = [...updatedLobbies]
-                    console.log('Received lobby update:', updatedLobbies)
                 })
             } else {
                 console.error('STOMP client is not initialized.')

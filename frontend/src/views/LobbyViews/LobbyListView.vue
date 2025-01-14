@@ -123,7 +123,6 @@ const joinLobby = async (lobby: ILobbyDTD) => {
     )
 
     if (joinedLobby) {
-      console.log('Successfully joined lobby', joinedLobby.name)
       router.push({name: 'LobbyView', params: {lobbyId: lobby.lobbyId}})
     }
   } catch (error: any) {
@@ -143,8 +142,6 @@ onMounted(async () => {
   ) {
     lobbiesStore.createPlayer('Player Test')
   }
-
-  console.log('Current Player:', lobbiesStore.lobbydata.currentPlayer)
 
   lobbiesStore.startLobbyLiveUpdate()
 })
