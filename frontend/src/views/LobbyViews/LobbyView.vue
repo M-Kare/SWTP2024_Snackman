@@ -74,11 +74,11 @@ import MenuBackground from '@/components/MenuBackground.vue'
 import SmallNavButton from '@/components/SmallNavButton.vue'
 import PopUp from '@/components/PopUp.vue'
 
-import {useRouter} from 'vue-router'
-import {computed, onMounted, ref, watchEffect} from 'vue'
-import {useLobbiesStore} from '@/stores/Lobby/lobbiesstore'
-import type {IPlayerClientDTD} from '@/stores/Lobby/IPlayerClientDTD'
-import type {ILobbyDTD} from '@/stores/Lobby/ILobbyDTD'
+import { useRoute, useRouter } from 'vue-router'
+import { computed, onMounted, ref, watchEffect } from 'vue'
+import { useLobbiesStore } from '@/stores/Lobby/lobbiesstore'
+import type { IPlayerClientDTD } from '@/stores/Lobby/IPlayerClientDTD'
+import type { ILobbyDTD } from '@/stores/Lobby/ILobbyDTD'
 
 const router = useRouter()
 const route = useRoute()
@@ -129,7 +129,7 @@ watchEffect(() => {
         console.log('Game has started! Redirecting to GameView...')
         router.push({
           name: 'GameView',
-          query: {role: lobbiesStore.lobbydata.currentPlayer.role},
+          query: { role: lobbiesStore.lobbydata.currentPlayer.role },
         })
         console.log(
           'Navigating to GameView with role:',
@@ -137,7 +137,7 @@ watchEffect(() => {
         )
       }
     } else if (lobbyLoaded) {
-      router.push({name: 'LobbyListView'})
+      router.push({ name: 'LobbyListView' })
     }
   }
 })
@@ -183,7 +183,7 @@ const joinLobby = async (lobby: ILobbyDTD) => {
 
     if (joinedLobby) {
       console.log('Successfully joined lobby', joinedLobby.name)
-      router.push({name: 'LobbyView', params: {lobbyId: lobby.lobbyId}})
+      router.push({ name: 'LobbyView', params: { lobbyId: lobby.lobbyId } })
     }
   } catch (error: any) {
     console.error('Error:', error)
@@ -192,7 +192,7 @@ const joinLobby = async (lobby: ILobbyDTD) => {
 }
 
 function backToLobbyListView() {
-  router.push({name: 'LobbyListView'})
+  router.push({ name: 'LobbyListView' })
 }
 
 /**
@@ -219,7 +219,7 @@ const leaveLobby = async () => {
   }
 
   await lobbiesStore.leaveLobby(lobby.value.lobbyId, playerId)
-  router.push({name: 'LobbyListView'})
+  router.push({ name: 'LobbyListView' })
 }
 
 /**
