@@ -219,11 +219,11 @@ public class LobbyManagerServiceTest {
     @Test
     public void testAssignSnackmanSuccess() throws LobbyAlreadyExistsException {
         PlayerClient adminPlayer = lobbyManagerService.createNewClient("AdminPlayer");
-        Lobby lobby = lobbyManagerService.createLobby("TestLobby", adminPlayer);
-        lobby.setGameStarted(true);
+        Lobby lobby = lobbyManagerService.createLobby("TestLobby", adminPlayer, null);
+        lobby.setGameStarted();
 
         ResponseEntity<Void> response = lobbyController.setPlayerRole(Map.of(
-                "lobbyId", lobby.getUuid(),
+                "lobbyId", lobby.getLobbyId(),
                 "playerId", adminPlayer.getPlayerId(),
                 "role", "SNACKMAN"
         ));
@@ -235,11 +235,11 @@ public class LobbyManagerServiceTest {
     @Test
     public void testAssignGhostSuccess() throws LobbyAlreadyExistsException {
         PlayerClient adminPlayer = lobbyManagerService.createNewClient("AdminPlayer");
-        Lobby lobby = lobbyManagerService.createLobby("TestLobby", adminPlayer);
-        lobby.setGameStarted(true);
+        Lobby lobby = lobbyManagerService.createLobby("TestLobby", adminPlayer, null);
+        lobby.setGameStarted();
 
         ResponseEntity<Void> response = lobbyController.setPlayerRole(Map.of(
-                "lobbyId", lobby.getUuid(),
+                "lobbyId", lobby.getLobbyId(),
                 "playerId", adminPlayer.getPlayerId(),
                 "role", "GHOST"
         ));
@@ -251,10 +251,10 @@ public class LobbyManagerServiceTest {
     @Test
     public void testRoleAssignmentLobbyNotStarted() throws LobbyAlreadyExistsException {
         PlayerClient adminPlayer = lobbyManagerService.createNewClient("AdminPlayer");
-        Lobby lobby = lobbyManagerService.createLobby("TestLobby", adminPlayer);
+        Lobby lobby = lobbyManagerService.createLobby("TestLobby", adminPlayer, null);
 
         ResponseEntity<Void> response = lobbyController.setPlayerRole(Map.of(
-                "lobbyId", lobby.getUuid(),
+                "lobbyId", lobby.getLobbyId(),
                 "playerId", adminPlayer.getPlayerId(),
                 "role", "GHOST"
         ));
@@ -267,12 +267,12 @@ public class LobbyManagerServiceTest {
         PlayerClient adminPlayer = lobbyManagerService.createNewClient("AdminPlayer");
         PlayerClient secondPlayer = lobbyManagerService.createNewClient("SecondPlayer");
         secondPlayer.setRole(ROLE.SNACKMAN);
-        Lobby lobby = lobbyManagerService.createLobby("TestLobby", adminPlayer);
+        Lobby lobby = lobbyManagerService.createLobby("TestLobby", adminPlayer, null);
         lobby.getMembers().add(secondPlayer);
-        lobby.setGameStarted(true);
+        lobby.setGameStarted();
 
         ResponseEntity<Void> response = lobbyController.setPlayerRole(Map.of(
-                "lobbyId", lobby.getUuid(),
+                "lobbyId", lobby.getLobbyId(),
                 "playerId", adminPlayer.getPlayerId(),
                 "role", "SNACKMAN"
         ));
@@ -285,11 +285,11 @@ public class LobbyManagerServiceTest {
     @Test
     public void testAssignInvalidRole() throws LobbyAlreadyExistsException {
         PlayerClient adminPlayer = lobbyManagerService.createNewClient("AdminPlayer");
-        Lobby lobby = lobbyManagerService.createLobby("TestLobby", adminPlayer);
-        lobby.setGameStarted(true);
+        Lobby lobby = lobbyManagerService.createLobby("TestLobby", adminPlayer, null);
+        lobby.setGameStarted();
 
         ResponseEntity<Void> response = lobbyController.setPlayerRole(Map.of(
-                "lobbyId", lobby.getUuid(),
+                "lobbyId", lobby.getLobbyId(),
                 "playerId", adminPlayer.getPlayerId(),
                 "role", "INVALID_ROLE"
         ));

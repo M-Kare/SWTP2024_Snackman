@@ -45,6 +45,14 @@
         >
           Start Game
         </SmallNavButton>
+
+        <SmallNavButton
+          id="start-game-button"
+          class="small-nav-buttons"
+          @click="chooseRole(lobby)"
+        >
+          Choose Role
+        </SmallNavButton>
       </div>
     </div>
   </div>
@@ -62,6 +70,11 @@
   </PopUp>
 
   <PopUp v-if="showPopUp" class="popup-box" @hidePopUp="hidePopUp">
+    <p class="info-heading">Can't start the game</p>
+    <p class="info-text">{{ infoText }}</p>
+  </PopUp>
+
+  <PopUp v-if="showRolePopup" class="popup-box" @hidePopUp="hidePopUp">
     <p class="info-heading">Can't start the game</p>
     <p class="info-text">{{ infoText }}</p>
   </PopUp>
@@ -97,6 +110,7 @@ const maxPlayerCount = ref(5)
 
 const darkenBackground = ref(false)
 const showPopUp = ref(false)
+const showRolePopup = ref(false)
 const errorBox = ref(false)
 const infoText = ref()
 const infoHeading = ref()
@@ -126,11 +140,11 @@ watchEffect(() => {
       lobbyLoaded = true
       console.log('Gamestarted in Lobby-View', updatedLobby.gameStarted)
       if (updatedLobby.gameStarted) {
-        console.log('Game has started! Redirecting to GameView...')
+      //  console.log('Game has started! Redirecting to GameView...')
 
         console.log('Game has started! Redirecting to ChooseRole...');
-        router.push({ name: 'ChooseRole' });
-        /* TODO Routing anpassen
+        router.push({ name: 'ChooseRole' , });
+        /* TODO ROLLE :Routing anpassen
         router.push({
           name: 'GameView',
           query: {role: lobbiesStore.lobbydata.currentPlayer.role},
@@ -150,6 +164,7 @@ watchEffect(() => {
 
 onMounted(async () => {
   await lobbiesStore.fetchLobbyList()
+
 
   if (!lobby.value) {
     infoHeading.value = 'Lobby does not exist'
@@ -257,6 +272,36 @@ const startGame = async () => {
     darkenBackground.value = true
     infoText.value = 'Only SnackMan can start the game!'
   }
+}
+
+const chooseRole = async(lobby: ILobbyDTD | undefined ) =>{
+  const playerId = lobbiesStore.lobbydata.currentPlayer.playerId
+
+  if (!lobby){
+    return
+  }
+
+  if (!playerId || !lobby.members) {
+    console.error('Player or Lobbymembers not found')
+    return
+  }
+
+  if (lobby.members.length < 2) {
+    showPopUp.value = true
+    darkenBackground.value = true
+    infoText.value = 'Not enough players to choose Role!'
+  }
+
+  if (playerId === lobby.adminClient.playerId) {
+    await lobbiesStore.chooseRole(lobby.lobbyId)
+
+    // router.push({name:'ChooseRole',  params: {lobbyId: lobby.lobbyId}})
+  } else {
+    showPopUp.value = true
+    darkenBackground.value = true
+    infoText.value = 'The role selection can only be initiated by the host.!'
+  }
+
 }
 
 function copyToClip() {

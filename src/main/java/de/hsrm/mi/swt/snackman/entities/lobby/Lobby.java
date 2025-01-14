@@ -17,6 +17,7 @@ public class Lobby {
     private String name;
     private PlayerClient adminClient;
     private boolean isGameStarted;
+    private boolean isChooseRole;
     private List<PlayerClient> members;
     private GameMap gameMap;
     private SortedMap<String, Mob> clientMobMap;
@@ -36,6 +37,7 @@ public class Lobby {
         this.name = name;
         this.adminClient = adminClient;
         this.isGameStarted = false;
+        this.isChooseRole = false;
         this.members = new ArrayList<>();
         this.members.add(adminClient);
         this.clientMobMap = new TreeMap<>();
@@ -179,6 +181,13 @@ public class Lobby {
         timeSinceLastSnackSpawn = time;
     }
 
+    public void setChooseRole(){
+        this.isChooseRole = true;
+    }
+    public boolean isChooseRole() {
+        return isChooseRole;
+    }
+
     @Override
     public String toString() {
         return "Lobby{" +
@@ -186,6 +195,7 @@ public class Lobby {
                 ", name='" + name + '\'' +
                 ", adminClient=" + adminClient +
                 ", isGameStarted=" + isGameStarted +
+                ", isChooseRole="+ isChooseRole +
                 ", members=" + members +
                 ", gameMap=" + gameMap +
                 ", clientMobMap=" + clientMobMap +

@@ -98,12 +98,12 @@ public class LobbyManagerService {
             throw new GameAlreadyStartedException("Game already started");
         }
 
-        PlayerClient newJoiningClient = findClientByClientId(playerId);
-        if (!lobby.getAdminClientId().equals(playerId)) {
-            newJoiningClient.setRole(ROLE.GHOST);
+        Optional <PlayerClient> newJoiningClient = findClientByClientId(playerId);
+        if (!lobby.getAdminClientId().equals(playerId) && newJoiningClient.isPresent() ) {
+            newJoiningClient.get().setRole(ROLE.GHOST);
         }
 
-        lobby.getMembers().add(newJoiningClient);
+        lobby.getMembers().add(newJoiningClient.get());
 
         return lobby;
     }
@@ -171,12 +171,12 @@ public class LobbyManagerService {
      * @param clientID UUID of the client
      * @return the client
      */
-    public PlayerClient findClientByClientId(String clientID) {
+    public Optional<PlayerClient> findClientByClientId(String clientID) {
         PlayerClient client = clients.get(clientID);
         if (client == null) {
-            throw new NoSuchElementException();
+            return Optional.of(null);
         } else {
-            return client;
+            return Optional.of(client);
         }
     }
 
@@ -188,16 +188,13 @@ public class LobbyManagerService {
         return messageLoop;
     }
 
-    /**
-     * Retrieves the active client or creates a new client
-     *
-     * @param clientID the uuid of the client
-     * @return the client
-     */
-    public Optional<PlayerClient> getClient(String clientID) {
-        return clients.stream()
-                .filter(l -> l.getPlayerId().equals(clientID))
-                .findFirst();
+
+    public void chooseRoleTrue(String lobbyId) {
+        Lobby lobby = findLobbyByLobbyId(lobbyId);
+
+        log.info("Choosing Roles lobby {}", lobby);
+        lobby.setChooseRole();
     }
+
 
 }

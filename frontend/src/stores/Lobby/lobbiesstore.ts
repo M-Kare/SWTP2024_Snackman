@@ -3,9 +3,11 @@ import { reactive } from 'vue';
 import { Client } from '@stomp/stompjs';
 import type { ILobbyDTD } from './ILobbyDTD';
 import type { IPlayerClientDTD } from './IPlayerClientDTD';
+import router from "@/router";
 
 // const wsurl = `ws://${window.location.host}/stompbroker`
 const DEST = '/topic/lobbies'
+const ROLEDEST = "/topic/lobbies/chooseRole"
 
 export const useLobbiesStore = defineStore('lobbiesstore', () =>{
     let stompclient: Client
@@ -134,16 +136,39 @@ export const useLobbiesStore = defineStore('lobbiesstore', () =>{
         stompclient.onConnect = (frame) => {
             console.log('STOMP connected:', frame)
 
-            if (stompclient) {
-                stompclient.subscribe(DEST, async (message) => {
-                    console.log('STOMP Client subscribe')
-                    const updatedLobbies = JSON.parse(message.body)
-                    lobbydata.lobbies = [...updatedLobbies]
-                    console.log('Received lobby update:', updatedLobbies)
-                })
-            } else {
-                console.error('STOMP client is not initialized.')
-            }
+
+          if (stompclient) {
+            // Subscribe to Lobby updates (existing)
+            stompclient.subscribe(DEST, async (message) => {
+              console.log('STOMP Client subscribe to Lobbies')
+              const updatedLobbies = JSON.parse(message.body)
+              lobbydata.lobbies = [...updatedLobbies]
+              console.log('Received lobby update:', updatedLobbies)
+            })
+
+            // Subscribe to RoleView
+            stompclient.subscribe(ROLEDEST, async (message) => {
+              console.log('STOMP Client subscribe to Role Changes')
+              const updatedLobbyWithRole = JSON.parse(message.body)
+              const lobbyId = updatedLobbyWithRole.lobbyId
+
+              const updatedLobby = lobbydata.lobbies.find(lobby => lobby.lobbyId === lobbyId)
+              if (updatedLobbyWithRole.chooseRole) {
+
+                console.log(`Updated chooseRole state for lobby ${lobbyId}:`, updatedLobby!.chooseRole)
+
+                // Push the update to all clients at /ChooseRole/{lobbyId}
+                if (stompclient && stompclient.connected) {
+                  router.push({name:'ChooseRole',  params: {lobbyId: updatedLobby!.lobbyId}})
+                  console.log(`Pushed update to /ChooseRole/${lobbyId}`)
+                }
+              }
+            })
+
+
+          } else {
+            console.error('STOMP client is not initialized.')
+          }
         }
 
         stompclient.onWebSocketError = (error) => {
@@ -308,6 +333,42 @@ export const useLobbiesStore = defineStore('lobbiesstore', () =>{
         }
     }
 
+    async function chooseRole(lobbyId: string): Promise<void> {
+      try {
+        const url = `/api/lobbies/chooseRole`;
+        const response = await fetch(url, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ lobbyId }),
+        })
+
+        if (!response.ok) {
+          throw new Error(`Failed to choose Roles: ${response.statusText}`)
+        }
+
+        const lobby = lobbydata.lobbies.find(l => l.lobbyId === lobbyId)
+        if (lobby ) {
+
+          if ( lobby.chooseRole){
+            console.log("chooseRole ist True ")
+
+            if (stompclient && stompclient.connected) {
+              stompclient.publish({
+                destination: `/api/lobbies/${lobbyId}/chooseRole`,
+                body: JSON.stringify({ lobbyId }),
+              })
+            }
+          }
+        }
+        console.log(`Choose Role For Lobby : ${lobbyId}`)
+      } catch (error: any) {
+        console.error(`Error choosing Role ${lobbyId}:`, error)
+        throw new Error('Could not choose Roles. Please try again.')
+      }
+    }
+
     return{
         lobbydata,
         createPlayer,
@@ -318,5 +379,6 @@ export const useLobbiesStore = defineStore('lobbiesstore', () =>{
         leaveLobby,
         startGame,
         fetchLobbyById,
+        chooseRole
     }
 })

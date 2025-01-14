@@ -35,4 +35,9 @@ public class FrontendMessageService {
 
         messagingTemplate.convertAndSend("/topic/lobbies", ev.lobbies());
     }
+
+    public void sendChooseEvent ( FrontendChooseRoleEvent ev){
+        log.debug("Send Event: lobby {}", ev.lobby().toString());
+        messagingTemplate.convertAndSend("/topic/lobbies/chooseRole", ev.lobby());
+    }
 }
