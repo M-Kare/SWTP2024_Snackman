@@ -66,8 +66,7 @@
 
     <PopUp class="popup-box"
         v-if="errorBox"
-        @hidePopUp="hidePopUp"
-        @click="backToLobbyListView()"
+        @hidePopUp="hidePopUpAndRedirect"
         >
 
         <p class="info-heading"> - {{ infoHeading }} -  </p>
@@ -131,6 +130,12 @@
         darkenBackground.value = false;
     }
 
+    // needed for errorBox which shows up when lobby does not exist
+    function hidePopUpAndRedirect(){
+        hidePopUp();
+        router.push({ name: "LobbyListView"})
+    }
+
     watchEffect(() => {
         if (lobbiesStore.lobbydata && lobbiesStore.lobbydata.lobbies) {
 
@@ -160,6 +165,7 @@
             infoHeading.value = "Lobby does not exist"
             infoText.value = "Please choose or create another one!"
             errorBox.value = true;
+            darkenBackground.value = true;
         }
         await lobbiesStore.startLobbyLiveUpdate();
         if (!lobbiesStore.lobbydata.currentPlayer || lobbiesStore.lobbydata.currentPlayer.playerId === '' || lobbiesStore.lobbydata.currentPlayer.playerName === '') {
@@ -169,6 +175,7 @@
                 errorBox.value = true
                 darkenBackground.value = true
             } else {
+                // TODO show playerNameForm
                 await lobbiesStore.createPlayer("Mr. Late");
                 await joinLobby(lobby.value!)
             }
@@ -189,10 +196,6 @@
             console.error('Error:', error);
             alert("Error join Lobby!");
         }
-    }
-
-    function backToLobbyListView(){
-        router.push({ name: "LobbyListView"})
     }
 
     /**
