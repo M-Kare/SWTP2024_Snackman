@@ -25,6 +25,7 @@
             <ul>
                 <li
                     v-for="member in members"
+                    :key="member.playerId"
                     class="player-list-items">
 
                     <div class="player-name">
@@ -102,7 +103,7 @@
 
     const lobbyUrl = route.params.lobbyId
     let lobbyLoaded = false
-    let lobby = computed(() => lobbiesStore.lobbydata.lobbies.find(l => l.lobbyId === lobbyUrl));
+    const lobby = computed(() => lobbiesStore.lobbydata.lobbies.find(l => l.lobbyId === lobbyUrl));
     const members = computed(() => lobby.value?.members || [] as Array<IPlayerClientDTD>);
     const playerCount = computed(() => members.value.length);
     const maxPlayerCount = ref(5);
@@ -177,12 +178,6 @@
 
     const joinLobby = async (lobby: ILobbyDTD) => {
 
-        // if(lobby.members.length >= 4){
-        //     showPopUp.value = true;
-        //     darkenBackground.value = true;
-        //     return;
-        // }
-
         try{
             const joinedLobby = await lobbiesStore.joinLobby(lobby.lobbyId, lobbiesStore.lobbydata.currentPlayer.playerId);
 
@@ -190,7 +185,7 @@
                 console.log('Successfully joined lobby', joinedLobby.name);
                 router.push({ name: "LobbyView", params: { lobbyId: lobby.lobbyId } });
             }
-        } catch (error: any){
+        } catch (error){
             console.error('Error:', error);
             alert("Error join Lobby!");
         }
