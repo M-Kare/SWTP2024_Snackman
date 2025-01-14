@@ -65,11 +65,12 @@
 import { useLeaderboardStore } from '@/stores/Leaderboard/leaderboardStore'
 import { computed, onMounted, ref } from 'vue'
 import SmallNavButton from '@/components/SmallNavButton.vue'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import LeaderboardBackground from '@/components/LeaderboardBackground.vue'
 
 const leaderboardStore = useLeaderboardStore()
 const router = useRouter()
+const route = useRoute()
 const gameResult = ref<'SNACKMAN' | 'GHOST' | null>(null)
 
 const backToMainMenu = () => {
@@ -77,7 +78,7 @@ const backToMainMenu = () => {
 }
 
 const mapExport = () => {
-  // TODO add logic for max export
+  // TODO add logic for map export
 }
 
 /**
@@ -87,7 +88,7 @@ onMounted(async () => {
   await leaderboardStore.initLeaderboardStore()
   await leaderboardStore.startLeaderboardUpdate()
 
-  const winningRole = router.params.winningRole
+  const winningRole = route.query.winningRole as string | undefined
 
   switch (winningRole) {
     case 'SNACKMAN':
@@ -222,16 +223,16 @@ tr td:not(:first-child):not(:last-child) {
 .character-image {
   position: absolute;
   bottom: 3%;
-  width: 250px;
+  width: 280px;
   height: auto;
   z-index: 10;
 }
 
 #snackman {
-  left: 3%;
+  left: 6%;
 }
 
 #ghost {
-  right: 3%;
+  right: 6%;
 }
 </style>

@@ -61,10 +61,15 @@ const gameReason = computed(() => {
 })
 
 const showLeaderboard = () => {
-  router.push({
-    name: 'Leaderboard',
-    query: {winningRole: winningRole}
-  })
+  if (winningRole && winningRole !== '-') {
+    router.push({
+      name: 'Leaderboard',
+      query: { winningRole: winningRole },
+    })
+  } else {
+    console.debug('no winning role')
+    router.push({ name: 'Leaderboard' })
+  }
 }
 
 const cancelNewLeaderboardEntryCreation = () => {
