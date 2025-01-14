@@ -5,6 +5,11 @@
 mainMenu.button.singlePlayer;Singleplayer;Einzelspieler
 mainMenu.button.multiPlayer;Multiplayer;Mehrspieler
 
+# PlayerNameForm
+savePlayerName.label;Please enter your name:;Bitte gib deinen Namen ein:
+savePlayerName.button.save;Save;Speichern
+savePlayerName.error.playerNameEmpty;Player-name can’t be empty!;Der Spieler-Name kann nicht leer sein!
+
 
 # LobbyListView
 lobbyList.title;Lobbies;Lobbies
@@ -18,7 +23,7 @@ createLobby.form.label;Enter name:;Namen eingeben:
 createLobby.button.cancelCreation;Cancel;Abbrechen
 createLobby.button.createLobby;Create Lobby;Lobby erstellen
 
-createLobby.error.lobbyNameEmpty;Lobby name can’t be empty!;Der Lobby Name kann nicht leer sein!
+createLobby.error.lobbyNameEmpty;Lobby-name can’t be empty!;Der Lobby-Name kann nicht leer sein!
 createLobby.error.lobbyNameDuplicate;Lobby-name already exists! Please choose another name.;Lobby-Name existiert bereits! Bitte wähle einen anderen.
 
 
