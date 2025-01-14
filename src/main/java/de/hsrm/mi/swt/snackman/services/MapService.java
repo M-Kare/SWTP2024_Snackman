@@ -277,6 +277,8 @@ public class MapService {
 
     /**
      * Save the last map in LastMap.txt in Game-Beginn, for later to download.
+     * 
+     * @param lobbyId  Id of the lobby
      * @param filePath path of last map file
      */
     private void saveLastMapFile(String lobbyId, String filePath) {
