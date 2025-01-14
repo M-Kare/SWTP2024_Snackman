@@ -4,7 +4,7 @@ import { Client } from '@stomp/stompjs';
 import type { ILobbyDTD } from './ILobbyDTD';
 import type { IPlayerClientDTD } from './IPlayerClientDTD';
 
-const wsurl = `ws://${window.location.host}/stompbroker`
+// const wsurl = `ws://${window.location.host}/stompbroker`
 const DEST = '/topic/lobbies'
 
 export const useLobbiesStore = defineStore('lobbiesstore', () =>{
@@ -44,6 +44,12 @@ export const useLobbiesStore = defineStore('lobbiesstore', () =>{
 
             if(response.ok){
                 const newPlayer = await response.json()
+
+                // Only update the role if the backend returns it
+                if (newPlayer.role) {
+                    newPlayerClient.role = newPlayer.role
+                }
+
                 Object.assign(lobbydata.currentPlayer, newPlayer)
             } else {
                 console.error(`Failed to create a new player client: ${response.statusText}`)
@@ -53,9 +59,9 @@ export const useLobbiesStore = defineStore('lobbiesstore', () =>{
 
         } catch (error: any){
             console.error('Error: ', error)
-            
+
         }
-        
+
     }
 
     /**
@@ -80,7 +86,7 @@ export const useLobbiesStore = defineStore('lobbiesstore', () =>{
 
         } catch (error: any){
             console.error('Error: ', error)
-            
+
         }
     }
 
@@ -109,14 +115,15 @@ export const useLobbiesStore = defineStore('lobbiesstore', () =>{
         } catch (error: any){
             console.error('Error:', error)
             return null
-        } 
+        }
     }
 
     /**
      * Starts the STOMP client for real-time lobby updates.
      */
     async function startLobbyLiveUpdate(){
-
+        const protocol = window.location.protocol.replace('http', 'ws')
+        const wsurl = `${protocol}//${window.location.host}/ws`
         stompclient = new Client({ brokerURL: wsurl })
 
         if(stompclient && stompclient.active){
@@ -175,6 +182,14 @@ export const useLobbiesStore = defineStore('lobbiesstore', () =>{
 
             if(response.ok){
                 const lobby: ILobbyDTD = await response.json()
+                lobbydata.currentPlayer.joinedLobbyId = lobby.lobbyId
+
+                // Admin client should have the SNACKMAN role
+                const adminPlayer = lobby.members.find((member) => member.playerId === adminClient.playerId)
+                if (adminPlayer) {
+                    lobbydata.currentPlayer.role = adminPlayer.role
+                }
+
                 lobbydata.lobbies.push(lobby)
                 return lobby
             } else {
@@ -197,9 +212,8 @@ export const useLobbiesStore = defineStore('lobbiesstore', () =>{
     async function joinLobby(lobbyId: string, playerId: string): Promise<ILobbyDTD | null> {
         try{
             const currentLobby = await fetchLobbyById(lobbyId);
-            if (currentLobby && currentLobby.members.length >= 4) {
+            if (currentLobby && currentLobby.members.length >= 5) {
                 console.error('Lobby is full. Cannot join.');
-                alert(`Lobby "${currentLobby.name}" is full!`);
                 return null;
             }
 
@@ -219,7 +233,14 @@ export const useLobbiesStore = defineStore('lobbiesstore', () =>{
 
             if(response.ok){
                 const lobby: ILobbyDTD = await response.json()
-                console.log('lobbiesStore joinLobby successful')
+                lobbydata.currentPlayer.joinedLobbyId = lobby.lobbyId
+
+                // Find the current player in the lobby data and update the role
+                const updatedPlayer = lobby.members.find((member) => member.playerId === playerId)
+                if (updatedPlayer) {
+                    lobbydata.currentPlayer.role = updatedPlayer.role
+                }
+
                 return lobby
             } else {
                 console.error(`Failed to join lobby: ${response.statusText}`)
@@ -247,7 +268,7 @@ export const useLobbiesStore = defineStore('lobbiesstore', () =>{
                 },
                 body: JSON.stringify({ lobbyId, playerId }),
             })
-    
+
             if (!response.ok) {
                 throw new Error(`Failed to leave lobby: ${response.statusText}`)
             }
@@ -276,7 +297,7 @@ export const useLobbiesStore = defineStore('lobbiesstore', () =>{
                 throw new Error(`Failed to start game: ${response.statusText}`)
             }
 
-            const lobby = lobbydata.lobbies.find(l => l.uuid === lobbyId)
+            const lobby = lobbydata.lobbies.find(l => l.lobbyId === lobbyId)
             if (lobby) {
                 lobby.gameStarted = true
             }

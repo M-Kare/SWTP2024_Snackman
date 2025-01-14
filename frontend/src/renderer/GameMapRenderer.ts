@@ -2,6 +2,7 @@ import * as THREE from 'three'
 import { type IGameMap, MapObjectType } from '@/stores/IGameMapDTD'
 import { useGameMapStore } from '@/stores/gameMapStore'
 import { GameObjectRenderer } from '@/renderer/GameObjectRenderer'
+import { SnackType } from '@/stores/Snack/ISnackDTD'
 
 /**
  * for rendering the game map
@@ -65,14 +66,8 @@ export const GameMapRenderer = () => {
         scene.add(wall)
       }
       if (square.type === MapObjectType.FLOOR) {
-        /*const squareToAdd = gameObjectRenderer.createFloorSquare(
-          square.indexX * DEFAULT_SIDE_LENGTH + OFFSET,
-          square.indexZ * DEFAULT_SIDE_LENGTH + OFFSET,
-          DEFAULT_SIDE_LENGTH,
-        )
-        scene.add(squareToAdd)*/
 
-        if (square.snack != null) {
+        if (square.snack != null && square.snack.snackType != SnackType.EMPTY) {
           const snackToAdd = gameObjectRenderer.createSnackOnFloor(
             square.indexX * DEFAULT_SIDE_LENGTH + OFFSET,
             square.indexZ * DEFAULT_SIDE_LENGTH + OFFSET,
@@ -95,6 +90,20 @@ export const GameMapRenderer = () => {
       scene.add(chickenToAdd)
 
       gameMapStore.setChickenMeshId(chickenToAdd.id, currentChicken.id)
+    }
+
+    console.log("GameMap data ", mapData)
+    for (let currentGhost of mapData.scriptGhosts) {
+      console.log("Initialising script ghost with x {} y {}", currentGhost.scriptGhostPosX, currentGhost.scriptGhostPosZ)
+      const scriptGhostToAdd = gameObjectRenderer.createGhostOnFloor(
+        currentGhost.scriptGhostPosX * DEFAULT_SIDE_LENGTH + OFFSET,
+        currentGhost.scriptGhostPosZ * DEFAULT_SIDE_LENGTH + OFFSET,
+        0,
+        DEFAULT_SIDE_LENGTH
+      )
+      scene.add(scriptGhostToAdd)
+
+      gameMapStore.setScriptGhostMeshId(scriptGhostToAdd.id, currentGhost.id)
     }
   }
 

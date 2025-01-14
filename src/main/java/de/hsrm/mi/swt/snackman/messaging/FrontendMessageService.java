@@ -12,22 +12,22 @@ public class FrontendMessageService {
     @Autowired
     private final SimpMessagingTemplate messagingTemplate;
 
-    private final Logger log = LoggerFactory.getLogger(FrontendMessageService.class);
+    Logger log = LoggerFactory.getLogger(FrontendMessageService.class);
 
     public FrontendMessageService(SimpMessagingTemplate messagingTemplate) {
         this.messagingTemplate = messagingTemplate;
     }
 
-    public void sendEvent(FrontendMessageEvent ev) {
-        log.debug("Send Event: eventType {}, changeTyp {}, square {}", ev.eventType(), ev.changeType(), ev.square().toString());
+    public void sendLeaderboardEvent(FrontendLeaderboardMessageEvent ev){
+        log.debug("Send Event: eventType {}, changeTyp {}, leaderboardEntries {}", ev.eventType(), ev.changeType(), ev.leaderboardDTO());
 
-        messagingTemplate.convertAndSend("/topic/square", ev);
+        messagingTemplate.convertAndSend("/topic/leaderboard", ev);
     }
 
-    public void sendChickenEvent(FrontendChickenMessageEvent ev) {
-        log.debug("Send Event: eventType {}, changeTyp {}, chicken {}", ev.eventType(), ev.changeType(), ev.chicken().toString());
+    public void sendLeaderboardEntryEvent(FrontendLeaderboardEntryMessageEvent ev){
+        log.debug("Send Event: eventType {}, changeTyp {}, leaderboardEntry {}", ev.eventType(), ev.changeType(), ev.leaderboardEntry());
 
-        messagingTemplate.convertAndSend("/topic/chicken", ev);
+        messagingTemplate.convertAndSend("/topic/leaderboard", ev);
     }
 
     public void sendLobbyEvent(FrontendLobbyMessageEvent ev) {
