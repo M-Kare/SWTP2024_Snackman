@@ -263,7 +263,7 @@ const sprintBarStyle = computed(() => {
   color: black;
   position: fixed;
   top: 10px;
-  right: 10px;
+  left: 10px;
   padding: 10px;
   border-radius: 5px;
   z-index: 10;
@@ -272,6 +272,7 @@ const sprintBarStyle = computed(() => {
   height: 60px;
   display: flex;
   justify-content: left;
+  box-shadow: 7px 7px 0 rgba(0, 0, 0, 0.8);
 }
 
 .overlayContent {
@@ -288,13 +289,14 @@ const sprintBarStyle = computed(() => {
 .sprint-bar {
   position: absolute;
   bottom: 3vh;
-  right: 3vh;
+  left: 3vh;
   width: 25rem;
   height: 2.5rem;
   background-color: #ccc;
   border: 0.25rem solid #000;
   border-radius: 0.5rem;
   overflow: hidden;
+  box-shadow: 7px 7px 0 rgba(0, 0, 0, 0.8);
 }
 
 .sprint-bar-inner {
