@@ -189,8 +189,7 @@ const fileInput = ref<HTMLInputElement | null>(null);
 
 /**
  * This function processes the file selected by the user in an input field. 
- * It ensures the file is a `.txt` file
- * and validates its content to match a specific pattern for render map 
+ * It ensures the file is a `.txt` file.
  * If the file is valid, it triggers an upload to the server.
  * Otherwise, it displays a popup with error information.
  * 
