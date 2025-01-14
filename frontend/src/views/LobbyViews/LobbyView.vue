@@ -93,6 +93,12 @@
     <p class="info-text">{{ infoText }}</p>
   </PopUp>
 
+  <PopUp v-if="showPopUp" class="popup-box" @hidePopUp="hidePopUp">
+    <p class="info-heading">{{ infoHeading }}</p>
+    <p class="info-text">{{ infoText }}</p>
+  </PopUp>
+
+
   <div v-show="showInfo" id="infoBox">{{ infoText }}</div>
 </template>
 
@@ -200,7 +206,7 @@ const handleFileImport = (event: Event) => {
         } else {
             showPopUp.value = true;
             darkenBackground.value = true;
-            infoHeading.value = "- File Map is not valid -"
+            infoHeading.value = "File Map is not valid"
             infoText.value = "Please upload file .txt"
         }
     }
@@ -245,7 +251,7 @@ const uploadFileToServer = async (file: File, lobbyId: string) => {
             const errorMessage = await response.text();
             showPopUp.value = true;
             darkenBackground.value = true;
-            infoHeading.value = "- File Map is not valid -";
+            infoHeading.value = "File Map is not valid";
             infoText.value = errorMessage;
         }
     } catch (error) {
@@ -413,8 +419,8 @@ const leaveLobby = async () => {
         await lobbiesStore.leaveLobby(lobby.value.lobbyId, member.playerId)
       }
     }
-            // If Admin-Player leave Lobby, delete the uploaded map
-            deleteUploadedFile(lobbyId);
+    // If Admin-Player leave Lobby, delete the uploaded map
+    deleteUploadedFile(lobbyId);
   }
 
   await lobbiesStore.leaveLobby(lobby.value.lobbyId, playerId)
@@ -441,20 +447,28 @@ const startGame = async () => {
     showPopUp.value = true
     darkenBackground.value = true
     infoText.value = 'Not enough players to start the game!'
+    return
   }
 
-        if(playerId === lobby.value.adminClient.playerId){
-            const status = await changeUsedMapStatus(lobbyId, usedCustomMap.value);
-            if (status === "done"){
-                await lobbiesStore.startGame(lobby.value.lobbyId);
-            }
-        } else {
-            showPopUp.value = true;
-            darkenBackground.value = true;
-            infoHeading.value = "- Can't start the game -"
-            infoText.value = "Only SnackMan can start the game!"
-        }
+  if(playerId === lobby.value.adminClient.playerId){
+    const status = await changeUsedMapStatus(lobby.value.lobbyId, usedCustomMap.value);
+    if (status !== "done") {
+      showPopUp.value = true;
+      darkenBackground.value = true;
+      infoHeading.value = "Map Status Error";
+      infoText.value = "Failed to update the map status.";
+      return; 
     }
+
+    await lobbiesStore.startGame(lobby.value.lobbyId);
+  } else {
+    showPopUp.value = true;
+    darkenBackground.value = true;
+    infoHeading.value = "Can't start the game"
+    infoText.value = "Only SnackMan can start the game!"
+    return
+  }
+}
 
 function copyToClip() {
   navigator.clipboard.writeText(document.URL)

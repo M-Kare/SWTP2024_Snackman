@@ -81,8 +81,9 @@ public class GameMapController {
             if (countS != 1) {
                 return ResponseEntity.badRequest().body("The map file must contain exactly one 'S'.");
             }
-            if (countG != 4) {
-                return ResponseEntity.badRequest().body("The map file must contain exactly four 'G's.");
+
+            if (countG < 4) {
+                return ResponseEntity.badRequest().body("The map file must contain at least 4 'G's for 4 ghost player.");
             }
 
             // Save File
@@ -139,7 +140,7 @@ public class GameMapController {
      * @return Returns an HTTP status code:
      *         - 200 OK if the update is successful.
      *         - 404 Not Found if the lobby is not found.
-     *         - 400 Bad Request if an error occurs during processing.
+     *         - 409 (Conflict) status of an error occurs during the upload process.
      */
     @PostMapping("/change-used-map-status")
     public ResponseEntity<Void> updateUsedMapStatus(@RequestBody Map<String, Object> requestBody){
@@ -157,7 +158,8 @@ public class GameMapController {
 
             return ResponseEntity.ok().build();
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+            log.error("Error occurred: ", e);
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
         }
         
     }

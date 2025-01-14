@@ -1,5 +1,6 @@
 package de.hsrm.mi.swt.snackman.services;
 
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -147,7 +148,6 @@ public class LobbyManagerService {
             if (!Files.exists(customMapPath)) {
                 throw new IllegalStateException("Custom map file not found: " + customMapPath);
             }
-            // TODO: check customMap one more time before start game, is there enough G for Ghost
             
             GameMap newGameMap = mapService.createNewGameMap(lobbyId, customMapPath.toString());
 
