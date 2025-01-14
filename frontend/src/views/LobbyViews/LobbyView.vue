@@ -184,7 +184,7 @@
                 errorBox.value = true
                 darkenBackground.value = true
             } else {
-                // TODO show playerNameForm
+                // TODO show playerNameForm and replace Mr. Late with entered name
                 await lobbiesStore.createPlayer("Mr. Late");
                 await joinLobby(lobby.value!)
             }
