@@ -3,7 +3,7 @@
     <h1 class="result-title">{{ gameResult }}</h1>
     <p class="end-reason">{{ gameReason }}</p>
     <p class="end-reason">Ihr habt {{ formatedPlayedTime }} Minuten lang gespielt</p>
-    <p class="end-reason">SnackMan hat {{ kcalCollected }} Kalorien gesammelt!</p>
+    <p class="end-reason" v-if="winningRole != 'GHOST'">SnackMan hat {{ kcalCollected }} Kalorien gesammelt!</p>
     <MainMenuButton class="menu-button" @click="backToMainMenu">Zurück zum Hauptmenü
     </MainMenuButton>
     <MainMenuButton v-if="!alreadyEntered && lobbydata.currentPlayer.role == 'SNACKMAN' && winningRole == 'SNACKMAN'"
