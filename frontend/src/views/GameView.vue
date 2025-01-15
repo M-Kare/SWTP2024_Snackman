@@ -8,7 +8,7 @@
     <div :style="getBackgroundStyle" class="Calories-Overlay" v-if="lobbydata.currentPlayer.role == 'SNACKMAN'">
       <div class="overlayContent">
         <img alt="calories" class="calories-icon" src="@/assets/calories.svg"/>
-        <p v-if="currentCalories < MAX_CALORIES">{{ currentCalories }}kcal</p>
+        <p v-if="currentCalories < MAX_CALORIES">{{ currentCalories }} kcal</p>
         <p v-else>{{ caloriesMessage }}</p>
       </div>
     </div>
@@ -18,16 +18,16 @@
 <script lang="ts" setup>
 import {computed, onMounted, onUnmounted, reactive, ref, watch} from 'vue'
 import * as THREE from 'three'
-import { Player } from '@/components/Player';
-import { fetchSnackManFromBackend } from '@/services/SnackManInitService';
-import { GameMapRenderer } from '@/renderer/GameMapRenderer';
-import { useGameMapStore } from '@/stores/gameMapStore';
-import type { IGameMap } from '@/stores/IGameMapDTD';
-import { useLobbiesStore } from '@/stores/Lobby/lobbiesstore';
+import {Player} from '@/components/Player';
+import {fetchSnackManFromBackend} from '@/services/SnackManInitService';
+import {GameMapRenderer} from '@/renderer/GameMapRenderer';
+import {useGameMapStore} from '@/stores/gameMapStore';
+import type {IGameMap} from '@/stores/IGameMapDTD';
+import {useLobbiesStore} from '@/stores/Lobby/lobbiesstore';
 import type {IPlayerClientDTD} from "@/stores/Lobby/IPlayerClientDTD";
-import { GLTFLoader } from 'three/examples/jsm/Addons.js'
-import { useRouter, useRoute } from 'vue-router';
-import type { IPlayerDTD } from '@/stores/Player/IPlayerDTD';
+import {GLTFLoader} from 'three/examples/jsm/Addons.js'
+import {useRoute} from 'vue-router';
+import type {IPlayerDTD} from '@/stores/Player/IPlayerDTD';
 
 const { lobbydata } = useLobbiesStore();
 const gameMapStore = useGameMapStore()
