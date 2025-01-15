@@ -94,7 +94,6 @@
   <PopUp
     v-if="errorBox"
     class="popup-box"
-    @click="backToLobbyListView()"
     @hidePopUp="hidePopUpAndRedirect"
   >
     <p class="info-heading">{{ infoHeading }}</p>
@@ -173,12 +172,12 @@ const hidePopUp = () => {
 function hidePopUpAndRedirect(){
   hidePopUp();
   router.push({ name: "LobbyListView"})
+}
 
 const mapList = ref<{ mapName: string; fileName: string }[]>([
   {mapName: 'Generated Map', fileName: `Maze.txt`},
 ]);
 
-const feedbackMessage = ref('')
 const usedCustomMap = ref(false);
 const selectedMap = ref<string | null>(null);
 const customMapName = ref('Uploaded Map')
@@ -381,25 +380,21 @@ onMounted(async () => {
     }
   }
 
-    const joinLobby = async (lobby: ILobbyDTD) => {
+  const joinLobby = async (lobby: ILobbyDTD) => {
 
-  try {
-    const joinedLobby = await lobbiesStore.joinLobby(
-      lobby.lobbyId,
-      lobbiesStore.lobbydata.currentPlayer.playerId,
-    )
+    try {
+      const joinedLobby = await lobbiesStore.joinLobby(
+        lobby.lobbyId,
+        lobbiesStore.lobbydata.currentPlayer.playerId,
+      )
 
-    if (joinedLobby) {
-      router.push({ name: 'LobbyView', params: { lobbyId: lobby.lobbyId } })
+      if (joinedLobby) {
+        router.push({ name: 'LobbyView', params: { lobbyId: lobby.lobbyId } })
+      }
+    } catch (error: any) {
+      console.error('Error:', error)
     }
-  } catch (error: any) {
-    console.error('Error:', error)
   }
-}
-
-function backToLobbyListView() {
-  router.push({ name: 'LobbyListView' })
-}
 
 /**
  * Leaves the current lobby. If the player is the admin, it will remove other members from the lobby first.
@@ -469,7 +464,6 @@ const startGame = async () => {
     darkenBackground.value = true;
     infoHeading.value = "Can't start the game"
     infoText.value = "Only SnackMan can start the game!"
-    return
   }
 }
 
