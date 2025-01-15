@@ -19,7 +19,7 @@
       @entryCreated="hideCreateNewLeaderboardEntryForm">
     </CreateNewLeaderboardEntryForm>
 
-    <MapButton class="map-exportieren-button" @click="downloadMap">Map exportieren</MapButton>
+    <MainMenuButton class="menu-button" @click="downloadMap">Map exportieren</MainMenuButton>
     <div v-if="feedbackMessage" :class="['feedback-message', feedbackClass]">
       {{ feedbackMessage }}
     </div>
@@ -28,7 +28,6 @@
 
 <script lang="ts" setup>
 import MainMenuButton from '@/components/MainMenuButton.vue'
-import MapButton from '@/components/MapButton.vue';
 import {computed, ref} from 'vue'
 import {useRoute, useRouter} from 'vue-router'
 import CreateNewLeaderboardEntryForm from "@/components/CreateNewLeaderboardEntryForm.vue"
