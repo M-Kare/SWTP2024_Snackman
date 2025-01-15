@@ -14,7 +14,7 @@
     </div>
 
     <div class="time">
-      <img alt="clock" class="clock-icon" scr="@/assets/clock-icon.svg" />
+      <img alt="clock" class="clock-icon" src="@/assets/clock-icon.svg" />
       <p>{{ formattedTime }}</p>
     </div>
 
