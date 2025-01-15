@@ -1,28 +1,22 @@
 package de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken;
 
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
-import java.util.Random;
-import java.util.Timer;
-import java.util.TimerTask;
-
+import de.hsrm.mi.swt.snackman.configuration.GameConfig;
 import de.hsrm.mi.swt.snackman.entities.map.GameMap;
+import de.hsrm.mi.swt.snackman.entities.map.Square;
+import de.hsrm.mi.swt.snackman.entities.mapObject.MapObjectType;
+import de.hsrm.mi.swt.snackman.entities.mapObject.snack.Snack;
+import de.hsrm.mi.swt.snackman.entities.mapObject.snack.SnackType;
+import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.EatingMob;
 import org.python.core.PyList;
 import org.python.core.PyObject;
 import org.python.util.PythonInterpreter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import de.hsrm.mi.swt.snackman.configuration.GameConfig;
-import de.hsrm.mi.swt.snackman.entities.map.Square;
-import de.hsrm.mi.swt.snackman.entities.mapObject.MapObjectType;
-import de.hsrm.mi.swt.snackman.entities.mapObject.snack.Snack;
-import de.hsrm.mi.swt.snackman.entities.mapObject.snack.SnackType;
-import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.EatingMob;
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
+import java.nio.file.Paths;
+import java.util.*;
 
 /**
  * Represents a chicken entity in the game, capable of moving around the map,
@@ -241,6 +235,7 @@ public class Chicken extends EatingMob implements Runnable {
         }
     }
 
+    // TODO beim Refactoring in gameMap auslagern, gehört nicht ins Chicken rein
     public boolean squareIsBetweenWalls(int x, int z) {
         Square squareAbove = this.gameMap.getSquareAtIndexXZ(x - 1, z);
         Square squareBelow = this.gameMap.getSquareAtIndexXZ(x + 1, z);
@@ -429,13 +424,13 @@ public class Chicken extends EatingMob implements Runnable {
     public void isScaredFromGhost(boolean scared) {
         this.isScared = scared;
         layEgg();
-        startNewTimer();
     }
 
-    public boolean isScared() {
-        return isScared;
-    }
-
+    /**
+     * timer should restart if chicken kcal == 0
+     *
+     * @return if timer is restarted
+     */
     public boolean wasTimerRestarted() {
         return timerRestarted;
     }
