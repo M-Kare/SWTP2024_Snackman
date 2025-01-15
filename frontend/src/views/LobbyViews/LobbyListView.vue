@@ -142,8 +142,6 @@ const joinLobby = async (lobby: ILobbyDTD) => {
     lobbiesStore.createPlayer('Player Test')
   }
 
-  console.log('Current Player:', lobbiesStore.lobbydata.currentPlayer)
-
   lobbiesStore.startLobbyLiveUpdate()
 })
 </script>
