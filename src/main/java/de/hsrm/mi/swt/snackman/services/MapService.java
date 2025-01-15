@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.Ghost;
-import de.hsrm.mi.swt.snackman.entities.mobileObjects.Mob;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.ScriptGhost;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.ScriptGhostDifficulty;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken.Chicken;
@@ -233,6 +232,10 @@ public class MapService {
         }
         int AMOUNT_SCRIPT_GHOSTS = GameConfig.AMOUNT_PLAYERS - lobby.getMembers().size();
         for (int i = 0; i < AMOUNT_SCRIPT_GHOSTS; i++) {
+            if (ghostSpawnIndex >= ghostSpawnSquares.size()) {
+                ghostSpawnIndex = 0;
+            }
+
             log.info("Initialising scriptGhost {}", i);
             Square square = ghostSpawnSquares.get(ghostSpawnIndex);
 
@@ -241,6 +244,7 @@ public class MapService {
             Thread ghostThread = new Thread(newScriptGhost);
             ghostThread.start();
             ghostSpawnIndex++;
+            lobby.addScriptGhost(newScriptGhost);
 
             newScriptGhost.addPropertyChangeListener((PropertyChangeEvent evt) -> {
                 if (evt.getPropertyName().equals("scriptGhost")) {

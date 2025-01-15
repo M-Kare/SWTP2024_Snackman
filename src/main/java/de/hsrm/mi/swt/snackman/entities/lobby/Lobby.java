@@ -4,6 +4,8 @@ import java.util.*;
 import de.hsrm.mi.swt.snackman.configuration.GameConfig;
 import de.hsrm.mi.swt.snackman.entities.map.GameMap;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.Mob;
+import de.hsrm.mi.swt.snackman.entities.mobileObjects.ScriptGhost;
+import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken.Chicken;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.SnackMan;
 import de.hsrm.mi.swt.snackman.messaging.MessageLoop.MessageLoop;
 import org.slf4j.Logger;
@@ -20,6 +22,8 @@ public class Lobby {
     private List<PlayerClient> members;
     private GameMap gameMap;
     private SortedMap<String, Mob> clientMobMap;
+    private List<Chicken> chickens = new ArrayList<>();
+    private List<ScriptGhost> scriptGhosts = new ArrayList<>();
     private long timeSinceLastSnackSpawn;
     private Timer gameTimer;
     private long timePlayed = 0;
@@ -28,16 +32,14 @@ public class Lobby {
     private long gameStartTime;
     private long endTime;
     private final Logger log = LoggerFactory.getLogger(Lobby.class);
-    private MessageLoop messageLoop;    
+    private MessageLoop messageLoop;
     private boolean usedCustomMap;
-
 
     public Lobby(String lobbyId, String name, PlayerClient adminClient, GameMap gameMap, MessageLoop messageLoop) {
         this.lobbyId = lobbyId;
         this.gameMap = gameMap;
         this.name = name;
         this.adminClient = adminClient;
-        this.isGameStarted = false;
         this.isGameStarted = false;
         this.members = new ArrayList<>();
         this.members.add(adminClient);
@@ -100,6 +102,7 @@ public class Lobby {
         SnackMan snackMan = getSnackman();
 
         if(snackMan != null) {
+            this.gameTimer.cancel();
             GameEnd gameEnd = new GameEnd(winningRole, this.timePlayed, snackMan.getKcal(), this.lobbyId);
             setGameFinished(true, gameEnd);
         }
@@ -199,6 +202,22 @@ public class Lobby {
                 ", clientMobMap=" + clientMobMap +
                 ", timeSinceLastSnackSpawn=" + timeSinceLastSnackSpawn +
                 '}';
+    }
+
+    public void addChicken(Chicken chicken){
+        this.chickens.add(chicken);
+    }
+
+    public void addScriptGhost(ScriptGhost scriptGhost){
+        this.scriptGhosts.add(scriptGhost);
+    }
+
+    public List<Chicken> getChickens() {
+        return chickens;
+    }
+
+    public List<ScriptGhost> getScriptGhosts() {
+        return scriptGhosts;
     }
 
     public boolean getUsedCustomMap(){

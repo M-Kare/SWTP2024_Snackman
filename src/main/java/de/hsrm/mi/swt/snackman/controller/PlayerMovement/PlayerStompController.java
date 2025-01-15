@@ -1,8 +1,11 @@
 package de.hsrm.mi.swt.snackman.controller.PlayerMovement;
 
 import de.hsrm.mi.swt.snackman.configuration.GameConfig;
+import de.hsrm.mi.swt.snackman.controller.Lobby.LobbyController;
 import de.hsrm.mi.swt.snackman.entities.lobby.ROLE;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.Mob;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -14,6 +17,7 @@ import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.SnackMan;
 import de.hsrm.mi.swt.snackman.services.LobbyManagerService;
 
 import java.util.Arrays;
+import java.util.NoSuchElementException;
 
 @Controller
 public class PlayerStompController {
@@ -21,9 +25,18 @@ public class PlayerStompController {
     @Autowired
     private LobbyManagerService lobbyService;
 
+    private final Logger log = LoggerFactory.getLogger(PlayerStompController.class);
+
     @MessageMapping("/topic/lobbies/{lobbyId}/player/update")
     public void spreadPlayerUpdate(@DestinationVariable("lobbyId") String lobbyId, PlayerToBackendDTO player) {
-        Lobby currentLobby = lobbyService.findLobbyByLobbyId(lobbyId);
+        log.info("Updating player in lobby {}", lobbyId);
+        Lobby currentLobby = null;
+        try {
+            currentLobby = lobbyService.findLobbyByLobbyId(lobbyId);
+        } catch (NoSuchElementException e) {
+            log.error(e.getMessage());
+            return;
+        }
         var playerMob = switch (currentLobby.getClientMobMap().get(player.playerId())) {
             case SnackMan snackman -> updateSnackman(player, snackman, currentLobby);
             case Ghost ghost -> updateGhost(currentLobby, ghost);
