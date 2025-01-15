@@ -74,11 +74,11 @@ import MenuBackground from '@/components/MenuBackground.vue'
 import SmallNavButton from '@/components/SmallNavButton.vue'
 import PopUp from '@/components/PopUp.vue'
 
-import { useRoute, useRouter } from 'vue-router'
-import { computed, onMounted, ref, watchEffect } from 'vue'
-import { useLobbiesStore } from '@/stores/Lobby/lobbiesstore'
-import type { IPlayerClientDTD } from '@/stores/Lobby/IPlayerClientDTD'
-import type { ILobbyDTD } from '@/stores/Lobby/ILobbyDTD'
+import {useRoute, useRouter} from 'vue-router'
+import {computed, onMounted, ref, watchEffect} from 'vue'
+import {useLobbiesStore} from '@/stores/Lobby/lobbiesstore'
+import type {IPlayerClientDTD} from '@/stores/Lobby/IPlayerClientDTD'
+import type {ILobbyDTD} from '@/stores/Lobby/ILobbyDTD'
 
 const router = useRouter()
 const route = useRoute()
@@ -374,6 +374,6 @@ function moveToMouse(element: HTMLElement) {
 #menu-back-button:hover,
 #copyToClip:hover,
 #start-game-button:hover {
-  box-shadow: 0px 0px 35px 5px rgba(255, 255, 255, 0.5);
+  background: var(--primary-highlight-color);
 }
 </style>

@@ -30,10 +30,10 @@
 
 <script setup lang="ts">
 import SmallNavButton from '@/components/SmallNavButton.vue'
-import { useRouter } from 'vue-router'
-import { ref } from 'vue'
-import { useLobbiesStore } from '@/stores/Lobby/lobbiesstore'
-import type { IPlayerClientDTD } from '@/stores/Lobby/IPlayerClientDTD'
+import {useRouter} from 'vue-router'
+import {ref} from 'vue'
+import {useLobbiesStore} from '@/stores/Lobby/lobbiesstore'
+import type {IPlayerClientDTD} from '@/stores/Lobby/IPlayerClientDTD'
 
 const router = useRouter()
 const lobbiesStore = useLobbiesStore()
@@ -214,6 +214,6 @@ input::placeholder {
 
 #cancel-lobby-creation-button:hover,
 #create-lobby-button:hover {
-  box-shadow: 0px 0px 35px 5px rgba(255, 255, 255, 0.5);
+  background: var(--primary-highlight-color);
 }
 </style>

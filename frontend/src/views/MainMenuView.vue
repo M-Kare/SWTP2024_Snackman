@@ -13,7 +13,6 @@ import {useLobbiesStore} from '@/stores/Lobby/lobbiesstore'
 import MainMenuButton from '@/components/MainMenuButton.vue'
 import MenuBackground from '@/components/MenuBackground.vue'
 import {useRouter} from 'vue-router'
-import {ref} from 'vue'
 
 
 const router = useRouter()

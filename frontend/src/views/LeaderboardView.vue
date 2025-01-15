@@ -62,10 +62,10 @@
 </template>
 
 <script lang="ts" setup>
-import { useLeaderboardStore } from '@/stores/Leaderboard/leaderboardStore'
-import { computed, onMounted, ref } from 'vue'
+import {useLeaderboardStore} from '@/stores/Leaderboard/leaderboardStore'
+import {computed, onMounted, ref} from 'vue'
 import SmallNavButton from '@/components/SmallNavButton.vue'
-import { useRoute, useRouter } from 'vue-router'
+import {useRoute, useRouter} from 'vue-router'
 import LeaderboardBackground from '@/components/LeaderboardBackground.vue'
 
 const leaderboardStore = useLeaderboardStore()
@@ -217,7 +217,7 @@ tr td:not(:first-child):not(:last-child) {
 
 #menu-back-button:hover,
 #export-map-button:hover {
-  box-shadow: 0 0 35px 5px rgba(255, 255, 255, 0.5);
+  background: var(--primary-highlight-color);
 }
 
 .character-image {

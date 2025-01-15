@@ -31,7 +31,7 @@
 
 <script setup lang="ts">
 import SmallNavButton from '@/components/SmallNavButton.vue';
-import { ref } from 'vue';
+import {ref} from 'vue';
 import {useLeaderboardStore} from "@/stores/Leaderboard/leaderboardStore";
 import type {LeaderboardEntry} from "@/stores/Leaderboard/LeaderboardDTD";
 
@@ -201,6 +201,6 @@ input::placeholder {
 
 #cancel-createNewLeaderboardEntry-creation-button:hover,
 #create-createNewLeaderboardEntry-button:hover {
-  box-shadow: 0px 0px 35px 5px rgba(255, 255, 255, 0.5);
+  background: var(--primary-highlight-color);
 }
 </style>
