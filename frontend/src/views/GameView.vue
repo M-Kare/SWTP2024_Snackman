@@ -28,6 +28,7 @@ import type {IPlayerClientDTD} from "@/stores/Lobby/IPlayerClientDTD";
 import { GLTFLoader } from 'three/examples/jsm/Addons.js'
 import { useRouter, useRoute } from 'vue-router';
 import type { IPlayerDTD } from '@/stores/Player/IPlayerDTD';
+import {initSnackEatingSound} from "@/services/SoundManager";
 
 const { lobbydata } = useLobbiesStore();
 const gameMapStore = useGameMapStore()
@@ -49,6 +50,9 @@ const playerRole = ref(route.query.role || ''); // Player role from the URL quer
 
 const SNACKMAN_TEXTURE: string = 'src/assets/kirby.glb'
 let snackManModel: THREE.Group<THREE.Object3DEventMap>
+
+//Sounds
+const globalSounds = new Map<string, THREE.PositionalAudio>();
 
 const canvasRef = ref()
 let renderer: THREE.WebGLRenderer
@@ -176,6 +180,10 @@ async function loadPlayerModel(playerId: string, texture: string) {
     // snackManModel.position.set(0, -1.55, -5);
     // player.getCamera().add(snackManModel)
   })
+
+  const snackSound = initSnackEatingSound(player.getCamera())
+  globalSounds.set("eatSnack", snackSound)
+  snackManModel.add(snackSound)
 }
 
 onUnmounted(() => {
