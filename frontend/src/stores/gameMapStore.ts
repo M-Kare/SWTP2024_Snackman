@@ -138,7 +138,7 @@ export const useGameMapStore = defineStore('gameMap', () => {
                   if (otherPlayers == undefined || otherPlayers.size == 0) {
                     continue;
                   }
-                  otherPlayers.get(ghostUpdate.playerId)?.position.lerp(ghostUpdate.position, 0.3)
+                  otherPlayers.get(ghostUpdate.playerId)?.position.lerp(new THREE.Vector3(ghostUpdate.position.x, ghostUpdate.position.y - 2, ghostUpdate.position.z), 0.3)
                   otherPlayers.get(ghostUpdate.playerId)?.setRotationFromQuaternion(ghostUpdate.rotation)
                 }
                 break;
