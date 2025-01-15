@@ -54,21 +54,21 @@ def choose_next_square(squares_liste):
 
     # make sure you do not walk into a ghost
     if all_squares_have(solution_liste, GHOST):
-        return add_walking_direction(choose_random_square(solution_liste, GHOST, direction))
+        return add_walking_direction(choose_random_square(solution_liste, GHOST, direction))[-1]
     # choose square with snack
     if all_squares_have_snack(solution_liste):
         # choose random snack
-        return add_walking_direction(choose_random_square(solution_liste, SNACK, direction))
+        return add_walking_direction(choose_random_square(solution_liste, SNACK, direction))[-1]
     elif any_square_has(solution_liste, SNACK):
         # choose a square with snack (far away from ghost)
-        return add_walking_direction(choose_snack_away_from_ghost(solution_liste, direction))
+        return add_walking_direction(choose_snack_away_from_ghost(solution_liste, direction))[-1]
     elif any_square_has(solution_liste, GHOST):
         # choose square without snack, away from ghosts
         north, east, south, west = solution_liste
-        return add_walking_direction(choose_square_without_snack_away_from_ghost(north, east, south, west, direction))
+        return add_walking_direction(choose_square_without_snack_away_from_ghost(north, east, south, west, direction))[-1]
     else:
         # choose random square, no snacks there + no ghosts
-        return add_walking_direction(choose_random_square(solution_liste, EMPTY, direction))
+        return add_walking_direction(choose_random_square(solution_liste, EMPTY, direction))[-1]
 
 def getWaitingTime():
     return 500
