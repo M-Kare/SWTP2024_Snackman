@@ -12,6 +12,12 @@
         <p v-else>{{ caloriesMessage }}</p>
       </div>
     </div>
+
+    <div class="time">
+      <img alt="clock" class="clock-icon" scr="@/assets/clock-icon.svg" />
+      <p>{{ formattedTime }}</p>
+    </div>
+
   </div>
 </template>
 
@@ -106,6 +112,9 @@ function animate() {
 }
 
 onMounted(async () => {
+  startCountDown()
+  console.log(formattedTime)
+
   // for rendering the scene, create gameMap in 3d and change window size
   const {initRenderer, createGameMap, getScene} = GameMapRenderer()
   scene = getScene()
@@ -256,14 +265,54 @@ const sprintBarStyle = computed(() => {
     backgroundColor: color,
   }
 })
+
+const countdownTime = ref(300)   // 5 Minute in seconds
+const formattedTime = computed(() => {
+  const minutes = Math.floor(countdownTime.value / 60)
+  const seconds = countdownTime.value % 60
+  return `${minutes < 10 ? '0' : ''}${minutes}:${seconds < 10 ? '0' : ''}${seconds}`
+})
+
+const startCountDown = () => {
+  const interval = setInterval(() => {
+      if (countdownTime.value > 0) {
+        countdownTime.value -= 1;
+      } else {
+        clearInterval(interval); // Stop when countdown reaches 0
+      }
+    }, 1000)
+}
+
 </script>
 
 <style>
+.time {
+  position: absolute;
+  color: white;
+  font-weight: bold;
+  top: 3vh;
+  right: 3vh;
+  font-size: 30px;
+  padding: 10px;
+  z-index: 10;
+  display: flex;
+  width: 400px;
+  height: 60px;
+  gap: 10px;
+  justify-content: right;
+  align-items: center;
+}
+
+.clock-icon {
+  width: 40px;
+  height: 40px;
+}
+
 .Calories-Overlay {
   color: black;
   position: fixed;
-  top: 10px;
-  left: 10px;
+  top: 3vh;
+  left: 3vh;
   padding: 10px;
   border-radius: 5px;
   z-index: 10;
@@ -288,6 +337,7 @@ const sprintBarStyle = computed(() => {
 
 .sprint-bar {
   position: absolute;
+  z-index: 10;
   bottom: 3vh;
   left: 3vh;
   width: 25rem;
