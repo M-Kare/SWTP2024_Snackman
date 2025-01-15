@@ -163,7 +163,7 @@ onMounted(async () => {
   renderer.setAnimationLoop(animate)
   window.addEventListener('resize', resizeCallback)
 
-  SoundManager.initBackgroundSounds(camera)
+  SoundManager.initSoundmanager(camera)
 })
 
 // initially loads the playerModel & attaches playerModel to playerCamera
@@ -176,7 +176,7 @@ async function loadPlayerModel(playerId: string, texture: string) {
     snackManModel.position.lerp(new THREE.Vector3(playerData.posX, playerData.posY - 2, playerData.posZ), 0.5)
     playerHashMap.set(playerId, snackManModel);
 
-    SoundManager.attachEatingSoundToCamera(player.getCamera(), snackManModel)
+    SoundManager.attachEatingSound(snackManModel)
     // optional offset for thirdPersonView
     // snackManModel.position.set(0, -1.55, -5);
     // player.getCamera().add(snackManModel)
