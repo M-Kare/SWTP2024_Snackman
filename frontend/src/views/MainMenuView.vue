@@ -1,37 +1,33 @@
 <template>
-  <MenuBackground></MenuBackground>
+  <MenuBackground>
+    <div class="button-container">
+      <MainMenuButton @click="startSingleplayer">Singleplayer</MainMenuButton>
+      <MainMenuButton @click="showLobbies">Multiplayer</MainMenuButton>
+      <MainMenuButton @click="showLeaderboard">Leaderboard</MainMenuButton>
+    </div>
 
-  <h1 class="title">Snackman</h1>
-  <!--
-  Buttons will be merged later on,
-  right now we need a fast entry into the game to test things (Singpleplayer-Button)
-   -->
-  <MainMenuButton class="menu-button" id="singleplayer-button" @click="startSingleplayer">Singleplayer</MainMenuButton>
-  <MainMenuButton class="menu-button" id="multiplayer-button" @click="showLobbies">Multiplayer</MainMenuButton>
-  <MainMenuButton class="menu-button" id="leaderboard-button" @click="showLeaderboard">Leaderboard</MainMenuButton>
-
-  <Leaderboard
-    v-if="showLeaderboardPopUp"
-    :show="showLeaderboardPopUp"
-    @close="hideLeaderboard"
-  />
-
+    <Leaderboard
+      v-if="showLeaderboardPopUp"
+      :show="showLeaderboardPopUp"
+      @close="hideLeaderboard"
+    />
+  </MenuBackground>
 </template>
 
 <script setup lang="ts">
-import {useLobbiesStore} from '@/stores/Lobby/lobbiesstore'
 import MainMenuButton from '@/components/MainMenuButton.vue'
 import MenuBackground from '@/components/MenuBackground.vue'
-import {useRouter} from 'vue-router'
-import {ref} from "vue"
-import Leaderboard from "@/components/Leaderboard.vue"
+import Leaderboard from '@/components/Leaderboard.vue'
+import { useRouter } from 'vue-router'
+import { useLobbiesStore } from '@/stores/Lobby/lobbiesstore'
+import { ref } from 'vue'
 
 const router = useRouter()
 const lobbiesStore = useLobbiesStore()
 const showLeaderboardPopUp = ref(false)
 
 const showLobbies = () => {
-  router.push({name: 'LobbyListView'})
+  router.push({ name: 'LobbyListView' })
 }
 
 const showLeaderboard = () => {
@@ -44,42 +40,23 @@ const hideLeaderboard = () => {
 
 const startSingleplayer = () => {
   lobbiesStore.lobbydata.currentPlayer.role = 'SNACKMAN'
-
   router.push({
     name: 'GameView',
-    query: {role: 'SNACKMAN'}
+    query: { role: 'SNACKMAN' },
   })
 }
-
 </script>
 
 <style scoped>
-.title {
-  position: absolute;
-  top: 50px;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 10rem;
-  font-weight: bold;
-  color: #fff;
+.button-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.button-container > * {
+  width: 100%;
   text-align: center;
-}
-
-.menu-button {
-  position: absolute;
-  left: 50%;
-  transform: translate(-50%, -50%); /* h & v centered */
-}
-
-#singleplayer-button {
-  top: 45%
-}
-
-#multiplayer-button {
-  top: 65%
-}
-
-#leaderboard-button {
-  top: 85%
 }
 </style>
