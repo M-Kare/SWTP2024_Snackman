@@ -1,6 +1,6 @@
 <template>
-  <div class="end-screen">
   <ViewBackground></ViewBackground>
+  <div id="individual-outer-box-size" class="outer-box">
     <h1 class="result-title">{{ gameResult }}</h1>
     <p class="end-reason">{{ gameReason }}</p>
     <p class="end-reason">Ihr habt {{ formatedPlayedTime }} Minuten lang gespielt</p>
@@ -13,6 +13,18 @@
       Create new leaderboard entry
     </MainMenuButton>
 
+    <div id="button-pair">
+      <SmallNavButton class="menu-button" @click="backToMainMenu">
+        Back to main menu
+      </SmallNavButton>
+
+      <SmallNavButton class="menu-button" @click="downloadMap">Export map</SmallNavButton>
+      <SmallNavButton v-if="!alreadyEntered && lobbydata.currentPlayer.role == 'SNACKMAN' && winningRole == 'SNACKMAN'"
+                      class="menu-button"
+                      @click="showCreateNewLeaderboardEntryForm">
+        Create new leaderboard entry
+      </SmallNavButton>
+    </div>
     <CreateNewLeaderboardEntryForm
       v-if="showCreateNewLeaderboardEntry"
       :playedTime="formatTime(playedTime)"
@@ -28,11 +40,12 @@
 </template>
 
 <script lang="ts" setup>
-import MainMenuButton from '@/components/MainMenuButton.vue'
 import {computed, ref} from 'vue'
 import {useRoute, useRouter} from 'vue-router'
 import CreateNewLeaderboardEntryForm from "@/components/CreateNewLeaderboardEntryForm.vue"
 import {useLobbiesStore} from "@/stores/Lobby/lobbiesstore";
+import SmallNavButton from "@/components/SmallNavButton.vue";
+import PopUp from "@/components/PopUp.vue";
 import ViewBackground from "@/components/ViewBackground.vue";
 
 const route = useRoute()
@@ -50,9 +63,9 @@ const kcalCollected = (route.query.kcalCollected as unknown as number) || 0
 const gameResult = ref()
 
 if (winningRole == "SNACKMAN") {
-  gameResult.value = "Der Snackman hat gewonnen."
+  gameResult.value = "SNACKMAN IS THE WINNER"
 } else {
-  gameResult.value = "Die Geister haben gewonnen."
+  gameResult.value = "GHOSTS ARE THE WINNER"
 }
 
 /**
@@ -62,11 +75,11 @@ if (winningRole == "SNACKMAN") {
 // Compute the game reason dynamically or display '-' if no data is available
 const gameReason = computed(() => {
   if (winningRole === 'SNACKMAN') {
-    return 'SnackMan hat das Kalorienziel erreicht!'
+    return 'SnackMan has reached the calorie target!'
   } else if (winningRole === 'GHOST' && kcalCollected < 0) {
-    return 'Die Geister haben SnackMan auf negative Kalorien gebracht!'
+    return 'The ghosts scared Snackman too many times until he had no calories left!'
   }
-  return 'Die Zeit ist abgelaufen und SnackMan hat nicht genügend Kalorien gesammelt!'
+  return 'The time is up and SnackMan hasn\'t collected enough calories!'
 })
 
 const showLeaderboard = () => {
@@ -154,39 +167,36 @@ const downloadMap = async () => {
 </script>
 
 <style scoped>
-.end-screen {
+#individual-outer-box-size {
+  top: 5%;
+  width: 80%;
   text-align: center;
-  color: #fff;
-  background-color: black;
-  min-height: 100vh;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  padding: 2rem;
-  box-sizing: border-box;
+  padding: 4rem;
 }
 
 .result-title {
-  font-size: clamp(3rem, 8vw, 8rem);
+  color: var(--primary-highlight-color);
   line-height: 1.2;
-  margin-bottom: 1rem;
+  margin-bottom: 4rem;
   font-weight: bold;
 }
 
 .end-reason {
+  color: var(--background-for-text-color);
   font-size: 2rem;
-  margin-bottom: 4rem;
+  margin-bottom: 2rem;
 }
 
-.menu-button {
-  font-size: 1.5rem;
-  margin-top: 4rem;
-}
-
-.map-exportieren-button {
-  font-size: 1.5rem;
-  margin-top: 4rem;
+#button-pair {
+  width: 100%;
+  justify-content: space-around;
+  display: flex;
+  flex-direction: row;
+  padding-top: 2em;
 }
 
 .feedback-message {
