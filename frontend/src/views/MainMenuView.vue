@@ -17,24 +17,25 @@
 </template>
 
 <script setup lang="ts">
-  import MainMenuButton from '@/components/MainMenuButton.vue';
-  import MenuBackground from '@/components/MenuBackground.vue';
-  import PlayerNameForm from '@/components/PlayerNameForm.vue';
-  import { onMounted, ref } from 'vue';
-  import { useRouter } from 'vue-router';
-  import { useLobbiesStore } from '@/stores/Lobby/lobbiesstore';
+import {useLobbiesStore} from '@/stores/Lobby/lobbiesstore'
+import MainMenuButton from '@/components/MainMenuButton.vue'
+import MenuBackground from '@/components/MenuBackground.vue'
+import PlayerNameForm from '@/components/PlayerNameForm.vue';
+import {useRouter} from 'vue-router'
+import { onMounted, ref } from 'vue';
+import type {ILobbyDTD} from "@/stores/Lobby/ILobbyDTD";
 
-  const router = useRouter();
-  const lobbiesStore = useLobbiesStore();
+const router = useRouter()
+const lobbiesStore = useLobbiesStore()
 
-  const playerNameSaved = lobbiesStore.lobbydata.currentPlayer.playerName;
-  const darkenBackground = ref(false);
-  const showPlayerNameForm = ref(false);
+const playerNameSaved = lobbiesStore.lobbydata.currentPlayer.playerName;
+const darkenBackground = ref(false);
+const showPlayerNameForm = ref(false);
 
-  const hidePlayerNameForm = () => {
-        showPlayerNameForm.value = false;
-        darkenBackground.value = false;
-  }
+const hidePlayerNameForm = () => {
+  showPlayerNameForm.value = false;
+  darkenBackground.value = false;
+}
 
 const showLobbies = () => {
   router.push({ name: 'LobbyListView' })
@@ -44,22 +45,30 @@ const showLeaderboard = () => {
   router.push({name: 'Leaderboard'})
 }
 
-  const startSingleplayer = () => {
-      lobbiesStore.lobbydata.currentPlayer.role = 'SNACKMAN';
+const startSingleplayer = async () => {
+  await lobbiesStore.createPlayer("Single Player")
+  const player = lobbiesStore.lobbydata.currentPlayer
+  const lobby = await lobbiesStore.startSingleplayerGame(player) as ILobbyDTD
 
-      router.push({
-          name: 'GameView',
-          query: { role: 'SNACKMAN' }
-      });
+  if (!player.playerId || !lobby) {
+    console.error('Player or Lobby not found')
+    return
   }
-  
-  onMounted(() => {
-    if (!playerNameSaved) {
-      darkenBackground.value = true;
-      showPlayerNameForm.value = true;
-    }
-  })
 
+  if (player.playerId === lobby.adminClient.playerId) {
+    await router.push({
+      name: 'GameView',
+      query: {role: lobbiesStore.lobbydata.currentPlayer.role},
+    })
+  }
+}
+
+onMounted(() => {
+  if (!playerNameSaved) {
+    darkenBackground.value = true;
+    showPlayerNameForm.value = true;
+  }
+})
 </script>
 
 <style scoped>
