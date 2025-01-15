@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.Ghost;
-import de.hsrm.mi.swt.snackman.entities.mobileObjects.Mob;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.ScriptGhost;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.ScriptGhostDifficulty;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken.Chicken;
@@ -26,6 +25,12 @@ import de.hsrm.mi.swt.snackman.entities.mapObject.MapObjectType;
 import de.hsrm.mi.swt.snackman.entities.mapObject.snack.Snack;
 import de.hsrm.mi.swt.snackman.entities.mapObject.snack.SnackType;
 import de.hsrm.mi.swt.snackman.messaging.MessageLoop.MessageLoop;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 
 /**
  * Service class for managing the game map
@@ -51,6 +56,7 @@ public class MapService {
     public GameMap createNewGameMap(String lobbyId, String filePath) {
         readMazeService.generateNewMaze();
         char[][] mazeData = readMazeService.readMazeFromFile(filePath);
+        saveLastMapFile(lobbyId, filePath);
         return convertMazeDataGameMap(lobbyId, mazeData);
     }
 
@@ -224,9 +230,12 @@ public class MapService {
                     break;
             }
         }
-
         int AMOUNT_SCRIPT_GHOSTS = GameConfig.AMOUNT_PLAYERS - lobby.getMembers().size();
         for (int i = 0; i < AMOUNT_SCRIPT_GHOSTS; i++) {
+            if (ghostSpawnIndex >= ghostSpawnSquares.size()) {
+                ghostSpawnIndex = 0;
+            }
+
             log.info("Initialising scriptGhost {}", i);
             Square square = ghostSpawnSquares.get(ghostSpawnIndex);
 
@@ -235,6 +244,7 @@ public class MapService {
             Thread ghostThread = new Thread(newScriptGhost);
             ghostThread.start();
             ghostSpawnIndex++;
+            lobby.addScriptGhost(newScriptGhost);
 
             newScriptGhost.addPropertyChangeListener((PropertyChangeEvent evt) -> {
                 if (evt.getPropertyName().equals("scriptGhost")) {
@@ -243,8 +253,9 @@ public class MapService {
             });
             log.info("New scriptGhost is: {}", newScriptGhost);
         }
-
     }
+
+   
 
     public double calcCenterPositionFromMapIndex(int index) {
         return (index * GameConfig.SQUARE_SIZE) + (GameConfig.SQUARE_SIZE / 2);
@@ -268,8 +279,30 @@ public class MapService {
         }
     }
 
+    /**
+     * Save the last map in LastMap.txt in Game-Beginn, for later to download.
+     * 
+     * @param lobbyId  Id of the lobby
+     * @param filePath path of last map file
+     */
+    private void saveLastMapFile(String lobbyId, String filePath) {
+        Path source = Paths.get(filePath).toAbsolutePath();
+        String fileName = String.format("LastMap_%s.txt", lobbyId);
+        Path lastMapPath = Paths.get("./extensions/map/" + fileName).toAbsolutePath();
+
+        try {
+            if (!Files.exists(lastMapPath)) {
+                Files.copy(source, lastMapPath, StandardCopyOption.REPLACE_EXISTING);
+            }
+        } catch (IOException e) {
+            log.error("Failed to back up the original maze file", e);
+        }
+    }
+
+
     public SnackMan getSnackMan() {
         return null; //snackman;
     }
+
 
 }

@@ -1,28 +1,22 @@
 package de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken;
 
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
-import java.util.Random;
-import java.util.Timer;
-import java.util.TimerTask;
-
+import de.hsrm.mi.swt.snackman.configuration.GameConfig;
 import de.hsrm.mi.swt.snackman.entities.map.GameMap;
+import de.hsrm.mi.swt.snackman.entities.map.Square;
+import de.hsrm.mi.swt.snackman.entities.mapObject.MapObjectType;
+import de.hsrm.mi.swt.snackman.entities.mapObject.snack.Snack;
+import de.hsrm.mi.swt.snackman.entities.mapObject.snack.SnackType;
+import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.EatingMob;
 import org.python.core.PyList;
 import org.python.core.PyObject;
 import org.python.util.PythonInterpreter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import de.hsrm.mi.swt.snackman.configuration.GameConfig;
-import de.hsrm.mi.swt.snackman.entities.map.Square;
-import de.hsrm.mi.swt.snackman.entities.mapObject.MapObjectType;
-import de.hsrm.mi.swt.snackman.entities.mapObject.snack.Snack;
-import de.hsrm.mi.swt.snackman.entities.mapObject.snack.SnackType;
-import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.EatingMob;
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
+import java.nio.file.Paths;
+import java.util.*;
 
 /**
  * Represents a chicken entity in the game, capable of moving around the map,
@@ -73,7 +67,7 @@ public class Chicken extends EatingMob implements Runnable {
         this.fileName = "ChickenMovementSkript";
         this.isWalking = true;
         this.lookingDirection = Direction.getRandomDirection();
-        // log.info("Chicken looking direction is {}", lookingDirection);
+        log.debug("Chicken looking direction is {}", lookingDirection);
         initJython();
         initTimer();
     }
@@ -338,6 +332,7 @@ public class Chicken extends EatingMob implements Runnable {
         try {
             Thread.sleep(WAITING_TIME);
             move();
+            log.debug("Stopping chicken with id {}", id);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new RuntimeException(e);
@@ -429,7 +424,6 @@ public class Chicken extends EatingMob implements Runnable {
     public void isScaredFromGhost(boolean scared) {
         this.isScared = scared;
         layEgg();
-        startNewTimer();
     }
 
     public boolean wasTimerRestarted() {
@@ -490,4 +484,7 @@ public class Chicken extends EatingMob implements Runnable {
         return squares;
     }
 
+    public void setWalking(boolean walking) {
+        isWalking = walking;
+    }
 }

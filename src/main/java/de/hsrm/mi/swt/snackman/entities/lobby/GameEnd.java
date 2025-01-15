@@ -8,11 +8,13 @@ public class GameEnd {
     private ROLE role;
     private long timePlayed;
     private int kcalCollected;
+    private String lobbyId;
 
-    public GameEnd(ROLE role, long timePlayed, int kcalCollected) {
+    public GameEnd(ROLE role, long timePlayed, int kcalCollected, String lobbyId) {
         this.role = role;
         this.timePlayed = timePlayed;
         this.kcalCollected = kcalCollected;
+        this.lobbyId = lobbyId;
     }
 
     public ROLE getRole() {
@@ -25,5 +27,9 @@ public class GameEnd {
 
     public int getKcalCollected() {
         return kcalCollected;
+    }
+
+    public String getLobbyId(){
+        return lobbyId;
     }
 }
