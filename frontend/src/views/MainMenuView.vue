@@ -13,7 +13,7 @@ import {useLobbiesStore} from '@/stores/Lobby/lobbiesstore'
 import MainMenuButton from '@/components/MainMenuButton.vue'
 import MenuBackground from '@/components/MenuBackground.vue'
 import {useRouter} from 'vue-router'
-
+import type {ILobbyDTD} from "@/stores/Lobby/ILobbyDTD";
 
 const router = useRouter()
 const lobbiesStore = useLobbiesStore()
@@ -26,12 +26,22 @@ const showLeaderboard = () => {
   router.push({name: 'Leaderboard'})
 }
 
-const startSingleplayer = () => {
-  lobbiesStore.lobbydata.currentPlayer.role = 'SNACKMAN'
-  router.push({
-    name: 'GameView',
-    query: { role: 'SNACKMAN' },
-  })
+const startSingleplayer = async () => {
+  await lobbiesStore.createPlayer("Single Player")
+  const player = lobbiesStore.lobbydata.currentPlayer
+  const lobby = await lobbiesStore.startSingleplayerGame(player) as ILobbyDTD
+
+  if (!player.playerId || !lobby) {
+    console.error('Player or Lobby not found')
+    return
+  }
+
+  if (player.playerId === lobby.adminClient.playerId) {
+    await router.push({
+      name: 'GameView',
+      query: {role: lobbiesStore.lobbydata.currentPlayer.role},
+    })
+  }
 }
 </script>
 
