@@ -71,3 +71,14 @@ def choose_next_square(squares_liste):
 
     return newIndex
 
+def getWaitingTime():
+    return 2000
+
+liste = ("W", "W", "W", "L", "W",
+                                                    "L", "L", "W", "L", "L",
+                                                    "L", "W", "H", "L", "L",
+                                                    "L", "W", "W", "W", "L",
+                                                    "L", "W", "L", "W", "L")
+
+print(choose_next_square(liste))
+

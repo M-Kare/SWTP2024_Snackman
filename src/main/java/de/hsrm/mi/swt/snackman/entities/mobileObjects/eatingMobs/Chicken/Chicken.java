@@ -289,14 +289,15 @@ public class Chicken extends EatingMob implements Runnable {
      */
     public int executeMovementSkript(List<String> squares) {
         try {
-            log.debug("Running python chicken {} script with: {} and {}", this.id, squares.toString(), this.fileName);
+            log.debug("Running python chicken script with: {}", squares.toString());
+            //pythonInterpreter.exec(interpreterCommand);
             PyObject func = pythonInterpreter.get("choose_next_square");
             PyObject result = func.__call__(new PyList(squares));
-            log.debug("Result {} of chicken {}:", Integer.parseInt(result.toString()), this.id);
 
-            return Integer.parseInt(result.toString());
+            return result.asInt();
+
         } catch (Exception ex) {
-            log.error("Error while executing chicken {} with id {} python script: ", this.fileName, this.id, ex);
+            log.error("Error while executing chicken python script: ", ex);
             ex.printStackTrace();
             return 0;
         }
