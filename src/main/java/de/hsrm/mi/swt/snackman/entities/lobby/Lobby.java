@@ -33,6 +33,7 @@ public class Lobby {
     private long endTime;
     private final Logger log = LoggerFactory.getLogger(Lobby.class);
     private MessageLoop messageLoop;
+    private boolean usedCustomMap;
 
     public Lobby(String lobbyId, String name, PlayerClient adminClient, GameMap gameMap, MessageLoop messageLoop) {
         this.lobbyId = lobbyId;
@@ -45,6 +46,7 @@ public class Lobby {
         this.clientMobMap = new TreeMap<>();
         this.messageLoop = messageLoop;
         initTimer();
+        this.usedCustomMap = false;
     }
 
     /**
@@ -101,7 +103,7 @@ public class Lobby {
 
         if(snackMan != null) {
             this.gameTimer.cancel();
-            GameEnd gameEnd = new GameEnd(winningRole, this.timePlayed, snackMan.getKcal());
+            GameEnd gameEnd = new GameEnd(winningRole, this.timePlayed, snackMan.getKcal(), this.lobbyId);
             setGameFinished(true, gameEnd);
         }
     }
@@ -172,6 +174,10 @@ public class Lobby {
         return gameMap;
     }
 
+    public void setGameMap(GameMap newGameMap){
+        this.gameMap = newGameMap;
+    }
+
     public String getLobbyId() {
         return lobbyId;
     }
@@ -212,5 +218,13 @@ public class Lobby {
 
     public List<ScriptGhost> getScriptGhosts() {
         return scriptGhosts;
+    }
+
+    public boolean getUsedCustomMap(){
+        return usedCustomMap;
+    }
+
+    public void setUsedCustomMap(boolean value){
+        this.usedCustomMap = value;
     }
 }

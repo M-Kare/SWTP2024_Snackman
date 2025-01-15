@@ -61,7 +61,6 @@ export const useLobbiesStore = defineStore('lobbiesstore', () => {
       console.error('Error: ', error)
 
     }
-
   }
 
   /**
@@ -83,10 +82,8 @@ export const useLobbiesStore = defineStore('lobbiesstore', () => {
       } else {
         console.error(`Failed to create a new player client: ${response.statusText}`)
       }
-
     } catch (error: any) {
       console.error('Error: ', error)
-
     }
   }
 
@@ -110,7 +107,6 @@ export const useLobbiesStore = defineStore('lobbiesstore', () => {
       }
 
       const lobby: ILobbyDTD = await response.json()
-      console.log('Fetched Lobby: ', lobby)
       return lobby
     } catch (error: any) {
       console.error('Error:', error)
@@ -131,20 +127,16 @@ export const useLobbiesStore = defineStore('lobbiesstore', () => {
       return
     }
 
-    stompclient.onConnect = (frame) => {
-      console.log('STOMP connected:', frame)
-
-      if (stompclient) {
-        stompclient.subscribe(DEST, async (message) => {
-          console.log('STOMP Client subscribe')
-          const updatedLobbies = JSON.parse(message.body)
-          lobbydata.lobbies = [...updatedLobbies]
-          console.log('Received lobby update:', updatedLobbies)
-        })
-      } else {
-        console.error('STOMP client is not initialized.')
-      }
-    }
+        stompclient.onConnect = (frame) => {
+            if (stompclient) {
+                stompclient.subscribe(DEST, async (message) => {
+                    const updatedLobbies = JSON.parse(message.body)
+                    lobbydata.lobbies = [...updatedLobbies]
+                })
+            } else {
+                console.error('STOMP client is not initialized.')
+            }
+        }
 
     stompclient.onWebSocketError = (error) => {
       console.error('WebSocket Error:', error)
@@ -301,7 +293,6 @@ export const useLobbiesStore = defineStore('lobbiesstore', () => {
       if (lobby) {
         lobby.gameStarted = true
       }
-      console.log(`Game started successfully in lobby: ${lobbyId}`)
     } catch (error: any) {
       console.error(`Error starting game in lobby ${lobbyId}:`, error)
       throw new Error('Could not start the game. Please try again.')
