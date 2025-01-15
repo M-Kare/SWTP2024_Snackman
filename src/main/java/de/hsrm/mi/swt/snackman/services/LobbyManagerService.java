@@ -68,7 +68,7 @@ public class LobbyManagerService {
         GameMap gameMap = this.mapService.createNewGameMap(uuid);
 
         Lobby lobby = new Lobby(uuid, name, admin, gameMap, messageLoop);
-        admin.setRole(ROLE.SNACKMAN);
+        admin.setRole(ROLE.UNDEFINED);
 
         lobbies.put(lobby.getLobbyId(), lobby);
         return lobby;
@@ -100,7 +100,7 @@ public class LobbyManagerService {
 
         Optional <PlayerClient> newJoiningClient = findClientByClientId(playerId);
         if (!lobby.getAdminClientId().equals(playerId) && newJoiningClient.isPresent() ) {
-            newJoiningClient.get().setRole(ROLE.GHOST);
+            newJoiningClient.get().setRole(ROLE.UNDEFINED);
         }
 
         lobby.getMembers().add(newJoiningClient.get());
@@ -194,6 +194,12 @@ public class LobbyManagerService {
 
         log.info("Choosing Roles lobby {}", lobby);
         lobby.setChooseRole();
+    }
+    public void chooseRoleFinish(String lobbyId) {
+        Lobby lobby = findLobbyByLobbyId(lobbyId);
+
+        log.info("Choosing Roles Finish lobby {}", lobby);
+        lobby.setChooseRoleFinsih();
     }
 
 

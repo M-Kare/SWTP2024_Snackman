@@ -184,6 +184,9 @@ public class Lobby {
     public void setChooseRole(){
         this.isChooseRole = true;
     }
+    public void setChooseRoleFinsih(){
+        this.isChooseRole = false;
+    }
     public boolean isChooseRole() {
         return isChooseRole;
     }

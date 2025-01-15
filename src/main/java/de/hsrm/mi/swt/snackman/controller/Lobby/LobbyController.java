@@ -201,7 +201,7 @@ public class LobbyController {
         Lobby currentLobby = lobbyManagerService.findLobbyByLobbyId(lobbyId);
         Optional <PlayerClient> player = lobbyManagerService.findClientByClientId(playerId);
 
-        if(!currentLobby.isGameStarted()){
+        if(currentLobby.isGameStarted()){
             return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
         }
 
@@ -209,16 +209,17 @@ public class LobbyController {
             case "SNACKMAN":
                 if (!lobbyManagerService.snackmanAlreadySelected(currentLobby) ) {
                     player.get().setRole(ROLE.SNACKMAN);
-                    frontendMessageService.sendLobbyEvent(new FrontendLobbyMessageEvent(lobbyManagerService.getAllLobbies()));
+                    frontendMessageService.sendRoleChhooseUpdate(new FrontedLobbyRoleUpdateEvent(currentLobby));
                     // TODO ROLLE: sendet an alle lobbys -> verarbeitung im store anscheuen
                     return ResponseEntity.ok().build();
                 } else {
+                    logger.info("Snackman wurde berreits ausgewählt");
                     return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
                 }
             case "GHOST":
                 if(player.isPresent()) {
                     player.get().setRole(ROLE.GHOST);
-                    frontendMessageService.sendLobbyEvent(new FrontendLobbyMessageEvent(lobbyManagerService.getAllLobbies()));
+                    frontendMessageService.sendRoleChhooseUpdate(new FrontedLobbyRoleUpdateEvent(currentLobby));
                     // TODO ROLLE: siehe oben
                     return ResponseEntity.ok().build();
                 } else {
@@ -244,18 +245,20 @@ public class LobbyController {
           return ResponseEntity.ok().build();
 
     }
+    @PostMapping("/chooseRoleFinish")
+    public ResponseEntity<Void> setChooseRoleFinsih(@RequestBody Map<String, String> requestBody){
+        String lobbyId = requestBody.get("lobbyId");
 
+        if(lobbyId == null || lobbyId.isEmpty()){
+            System.out.println("Lobby data  not found ");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+        lobbyManagerService.chooseRoleFinish(lobbyId);
+        logger.info("Sending chooseRoleFinish update for lobby: {}", lobbyManagerService.findLobbyByLobbyId(lobbyId));
+        frontendMessageService.sendChooseFinishEvent(new FrontendChooseRoleEvent(lobbyManagerService.findLobbyByLobbyId(lobbyId)));
+        return ResponseEntity.ok().build();
 
-    /*
-    @MessageMapping("/lobbies/{lobbyId}/chooseRole")
-    public void chooseRole(@DestinationVariable String lobbyId, @Payload String payload) {
-        // Logik, um allen Clients in der Lobby eine Nachricht zu senden
-        // Sende Nachricht an alle Mitglieder der Lobby
-        messagingTemplate.convertAndSend("/topic/lobbies/" + lobbyId + "/roles", payload);
     }
-
-
-     */
 
 
 }
