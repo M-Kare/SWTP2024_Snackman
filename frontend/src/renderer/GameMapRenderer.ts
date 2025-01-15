@@ -104,8 +104,6 @@ export const GameMapRenderer = () => {
       ).then((scriptGhostToAdd) => {
         scene.add(scriptGhostToAdd)
         gameMapStore.setScriptGhostMeshId(scriptGhostToAdd.id, currentGhost.id)
-      }).catch((error) => {
-        console.error("Error beim Geist laden: ", error)
       })
     }
   }

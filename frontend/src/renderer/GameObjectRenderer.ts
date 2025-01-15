@@ -130,10 +130,6 @@ export const GameObjectRenderer = () => {
           resolve(ghostModel.clone())
         },
         undefined,
-        (error) => {
-          console.error('Fehler beim Laden von ghost.glb:', error)
-          reject(error)
-        }
       )
     })
   }
