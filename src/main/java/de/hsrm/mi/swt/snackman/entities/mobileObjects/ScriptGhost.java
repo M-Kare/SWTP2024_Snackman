@@ -291,7 +291,7 @@ public class ScriptGhost extends Mob implements Runnable {
         try {
             Thread.sleep(WAITING_TIME);
             move();
-            log.info("Stopping chicken with id {}", id);
+            log.debug("Stopping script ghost with id {}", id);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }

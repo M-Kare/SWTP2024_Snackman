@@ -338,7 +338,7 @@ public class Chicken extends EatingMob implements Runnable {
         try {
             Thread.sleep(WAITING_TIME);
             move();
-            log.info("Stopping chicken with id {}", id);
+            log.debug("Stopping chicken with id {}", id);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new RuntimeException(e);
