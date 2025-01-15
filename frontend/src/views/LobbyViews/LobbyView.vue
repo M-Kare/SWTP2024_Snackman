@@ -1,22 +1,6 @@
 <template>
   <MenuBackground></MenuBackground>
 
-  <div class="map-list" v-for="map in mapList" :key="map.mapName">
-      <div class="map-list-item">
-          <input class="map-choose" 
-              type="radio" 
-              :value="map.mapName" 
-              :checked="selectedMap === map.mapName" 
-              @change="selectMap(map.mapName)"
-          />
-          <span>{{ map.mapName }}</span>
-      </div>
-  </div>
-
-  <div v-if="feedbackMessage" :class="['feedback-message', feedbackClass]">
-      {{ feedbackMessage }}
-  </div>
-
   <div id="individual-outer-box-size" class="outer-box">
     <div class="item-row">
       <h1 class="title">{{ lobby?.name || 'Lobby Name' }}</h1>
@@ -39,19 +23,21 @@
         </li>
       </ul>
     </div>
+
     <div class="item-row">
-      <div class="map-list" v-for="map in mapList" :key="map.mapName">
-      <div class="map-list-item">
-          <input class="map-choose" 
+      <ul class="map-list" v-if="playerId == adminClientId">
+        <li class="map-list-item" v-for="map in mapList" :key="map.mapName">
+            <input class="map-choose" 
               type="radio" 
               :value="map.mapName" 
               :checked="selectedMap === map.mapName" 
               @change="selectMap(map.mapName)"
           />
           <span>{{ map.mapName }}</span>
-      </div>
-  </div>
+        </li>
+      </ul>
     </div>
+
     <div class="item-row">
       <div id="button-pair">
         <SmallNavButton
@@ -64,6 +50,7 @@
         <SmallNavButton 
           id="menu-map-importieren"
           class="small-nav-button"
+          v-if="playerId == adminClientId"
           @click="triggerFileInput"
         >
           Map Importieren
@@ -173,25 +160,20 @@ const mapList = ref<{ mapName: string; fileName: string }[]>([
 
 const usedCustomMap = ref(false);
 const selectedMap = ref<string | null>(null);
-
+const customMapName = ref('Snack Man Map')
 const selectMap = (mapName: string) => {
     selectedMap.value = mapName;
 
     if (selectedMap.value === 'Original Map'){
         usedCustomMap.value = false;
     }
-    else if (selectedMap.value === 'Snack Man Map') {
+    else if (selectedMap.value === customMapName.value) {
         usedCustomMap.value = true;
     } 
 };
 
 const feedbackMessage = ref('');
 const feedbackClass = ref('');
-const toggleState = ref(false);
-
-const updateToggleState = (state: boolean) => {
-    toggleState.value = state;
-}
 
 const triggerFileInput = () => {
     fileInput.value?.click();
@@ -213,6 +195,7 @@ const handleFileImport = (event: Event) => {
     if (input.files && input.files.length > 0) {
         const file = input.files[0];
         if (file.name.endsWith('.txt')) {
+            customMapName.value = file.name.slice(0, -4)
             uploadFileToServer(file, lobbyId);
         } else {
             showPopUp.value = true;
@@ -244,7 +227,7 @@ const uploadFileToServer = async (file: File, lobbyId: string) => {
             feedbackMessage.value = 'Map saved';
             feedbackClass.value = 'success';
 
-            const mapName = 'Snack Man Map';
+            const mapName = customMapName.value;
             const fileName = `SnackManMap_${lobbyId}.txt`;
 
             if (mapList.value.length > 1) {
@@ -551,7 +534,7 @@ function moveToMouse(element: HTMLElement) {
   margin: 0;
   padding: 0;
   width: 100%;
-  min-height: 350px;
+  min-height: 300px;
 }
 
 .player-list-items {
@@ -581,7 +564,7 @@ function moveToMouse(element: HTMLElement) {
 }
 
 .item-row {
-  padding: 2rem 3rem;
+  padding: 1.4rem 3rem;
   display: flex;
   justify-content: space-between;
 }
@@ -596,39 +579,26 @@ function moveToMouse(element: HTMLElement) {
 #start-game-button:hover {
   box-shadow: 0px 0px 35px 5px rgba(255, 255, 255, 0.5);
 }
-.custom-map{
-  position: absolute;
-  right: 20px;
-  top: 30px;
-  display: flex;
-  gap: 25px;
-  justify-content: center;
-  align-items: center;
-  font-size: 2rem;
-  color: #fff;
-  z-index: 3;
-}
-
-.map-importiren{
-  position: absolute;
-  right: 20px;
-  top: 100px;
-  z-index: 3;
-}
 
 .map-list{
-    font-size: 1.5rem;
-    margin-top: 30px;
-    gap: 25px;
-    justify-content: center;
-    align-items: center;
+  display: flex;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.map-list-item{
+  margin-right: 40px; 
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  font-size: 1.5rem;
 }
 
 .map-choose{
-    width: 20px;
-    height: 20px;
-    transform: scale(1.5);
-    margin-right: 15px; 
+  width: 20px;
+  height: 20px;
+  transform: scale(1.5);
 }
 
 .input-feld{
@@ -636,32 +606,32 @@ function moveToMouse(element: HTMLElement) {
 }
 
 .feedback-message {
-    margin-top: 30px;
-    font-size: 1.5rem;
-    font-weight: bold;
-    padding: 10px 20px;
-    border-radius: 5px;
-    text-align: center;
-    animation: fadeIn 0.5s;
+  margin-top: 30px;
+  font-size: 1.5rem;
+  font-weight: bold;
+  padding: 10px 20px;
+  border-radius: 5px;
+  text-align: center;
+  animation: fadeIn 0.5s;
 }
 
 .feedback-message.success {
-    color: #fff;
-    background-color: #50C878;
+  color: #fff;
+  background-color: #50C878;
 }
 
 .feedback-message.error {
-    color: #fff;
-    background-color: #C70039;
+  color: #fff;
+  background-color: #C70039;
 }
 
 /* Fade-in animation */
 @keyframes fadeIn {
-    from {
-      opacity: 0;
-    }
-    to {
-      opacity: 1;
-    }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 </style>
