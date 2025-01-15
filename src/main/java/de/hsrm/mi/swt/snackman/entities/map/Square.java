@@ -61,6 +61,7 @@ public class Square {
     public Square(Snack snack, int indexX, int indexZ) {
         this(indexX, indexZ);
         this.snack = snack;
+        type = MapObjectType.FLOOR;
     }
 
     /**
