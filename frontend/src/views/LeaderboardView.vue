@@ -1,5 +1,5 @@
 <template>
-  <LeaderboardBackground></LeaderboardBackground>
+  <ViewBackground></ViewBackground>
   <div id="individual-outer-box-size" class="outer-box">
     <h1 class="info-heading">Leaderboard</h1>
     <div class="table-container">
@@ -208,8 +208,7 @@ tr td:not(:first-child):not(:last-child) {
   padding-top: 2em;
 }
 
-#menu-back-button:hover,
-#export-map-button:hover {
+#menu-back-button:hover {
   background: var(--primary-highlight-color);
 }
 
