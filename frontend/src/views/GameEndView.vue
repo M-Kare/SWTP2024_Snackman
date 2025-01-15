@@ -6,15 +6,11 @@
     <p class="end-reason">SnackMan hat {{ kcalCollected }} Kalorien gesammelt!</p>
     <MainMenuButton class="menu-button" @click="backToMainMenu">Zurück zum Hauptmenü
     </MainMenuButton>
-    <MainMenuButton class="menu-button" @click="showCreateNewLeaderboardEntryForm"
-                    v-if="!alreadyEntered && lobbydata.currentPlayer.role == 'SNACKMAN' && winningRole == 'SNACKMAN'">Create new leaderboard entry
+    <MainMenuButton v-if="!alreadyEntered && lobbydata.currentPlayer.role == 'SNACKMAN' && winningRole == 'SNACKMAN'"
+                    class="menu-button"
+                    @click="showCreateNewLeaderboardEntryForm">
+      Create new leaderboard entry
     </MainMenuButton>
-
-    <Leaderboard
-      v-if="showLeaderboardPopUp"
-      :show="showLeaderboardPopUp"
-      @close="hideLeaderboard"
-    />
 
     <CreateNewLeaderboardEntryForm
       v-if="showCreateNewLeaderboardEntry"
@@ -30,19 +26,17 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script lang="ts" setup>
 import MainMenuButton from '@/components/MainMenuButton.vue'
 import MapButton from '@/components/MapButton.vue';
 import {computed, ref} from 'vue'
 import {useRoute, useRouter} from 'vue-router'
 import CreateNewLeaderboardEntryForm from "@/components/CreateNewLeaderboardEntryForm.vue"
-import Leaderboard from "@/components/Leaderboard.vue";
 import {useLobbiesStore} from "@/stores/Lobby/lobbiesstore";
 
 const route = useRoute()
 const router = useRouter()
 const showCreateNewLeaderboardEntry = ref(false)
-const showLeaderboardPopUp = ref(false)
 const alreadyEntered = ref(false)
 const {lobbydata} = useLobbiesStore()
 
@@ -75,11 +69,15 @@ const gameReason = computed(() => {
 })
 
 const showLeaderboard = () => {
-  showLeaderboardPopUp.value = true
-}
-
-const hideLeaderboard = () => {
-  showLeaderboardPopUp.value = false
+  if (winningRole && winningRole !== '-') {
+    router.push({
+      name: 'Leaderboard',
+      query: { winningRole: winningRole },
+    })
+  } else {
+    console.debug('no winning role')
+    router.push({ name: 'Leaderboard' })
+  }
 }
 
 const cancelNewLeaderboardEntryCreation = () => {
