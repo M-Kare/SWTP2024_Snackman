@@ -301,7 +301,6 @@ export const useGameMapStore = defineStore('gameMap', () => {
   }
 
   function updateLookingDirectionScriptGhost(currentScriptGhost: IScriptGhost, scriptGhostUpdate: IScriptGhostDTD) {
-    console.log("ScriptGhost looking direction updated")
     const scriptGhostMesh = scene.getObjectById(currentScriptGhost.meshId)
 
     currentScriptGhost.lookingDirection = scriptGhostUpdate.lookingDirection
