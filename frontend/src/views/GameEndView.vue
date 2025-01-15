@@ -1,5 +1,6 @@
 <template>
   <div class="end-screen">
+  <ViewBackground></ViewBackground>
     <h1 class="result-title">{{ gameResult }}</h1>
     <p class="end-reason">{{ gameReason }}</p>
     <p class="end-reason">Ihr habt {{ formatedPlayedTime }} Minuten lang gespielt</p>
@@ -32,6 +33,7 @@ import {computed, ref} from 'vue'
 import {useRoute, useRouter} from 'vue-router'
 import CreateNewLeaderboardEntryForm from "@/components/CreateNewLeaderboardEntryForm.vue"
 import {useLobbiesStore} from "@/stores/Lobby/lobbiesstore";
+import ViewBackground from "@/components/ViewBackground.vue";
 
 const route = useRoute()
 const router = useRouter()
