@@ -191,7 +191,8 @@ export const useGameMapStore = defineStore('gameMap', () => {
       query: {
         winningRole: gameEndUpdate.role,
         timePlayed: gameEndUpdate.timePlayed,
-        kcalCollected: gameEndUpdate.kcalCollected
+        kcalCollected: gameEndUpdate.kcalCollected,
+        lobbyId : gameEndUpdate.lobbyId
       }
     }).then(r => {
         stompclient.deactivate()

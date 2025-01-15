@@ -101,7 +101,7 @@ public class Lobby {
 
         if(snackMan != null) {
             this.gameTimer.cancel();
-            GameEnd gameEnd = new GameEnd(winningRole, this.timePlayed, snackMan.getKcal());
+            GameEnd gameEnd = new GameEnd(winningRole, this.timePlayed, snackMan.getKcal(), this.lobbyId);
             setGameFinished(true, gameEnd);
         }
     }

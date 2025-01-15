@@ -437,6 +437,16 @@ public class Chicken extends EatingMob implements Runnable {
         return timerRestarted;
     }
 
+    // For Testing
+    public boolean isScared(){
+        return this.isScared;
+    }
+
+    // For Testing
+    public void setScared(boolean b){
+        this.isScared = b;
+    }
+
     @Override
     public String toString() {
         return "Chicken{" +
