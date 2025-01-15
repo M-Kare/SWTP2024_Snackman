@@ -67,6 +67,7 @@
     <PlayerNameForm
       v-if="showPlayerNameForm && !playerNameSaved"
       @hidePlayerNameForm="hidePlayerNameForm"
+      @playerNameSaved="savePlayerName"
       >
     </PlayerNameForm>
 
@@ -115,6 +116,7 @@
     const maxPlayerCount = ref(5);
 
     const playerNameSaved = lobbiesStore.lobbydata.currentPlayer.playerName;
+    const showPlayerNameForm = ref(false);
 
     const darkenBackground = ref(false);
     const showPopUp = ref(false);
@@ -133,6 +135,11 @@
 
     const TIP_TOP_DIST = 30;
     const TIP_SIDE_DIST = 20;
+
+    const hidePlayerNameForm = () => {
+        showPlayerNameForm.value = false;
+        darkenBackground.value = false;
+    }
 
     const hidePopUp = () => {
         showPopUp.value = false;
@@ -177,20 +184,35 @@
             darkenBackground.value = true;
         }
         await lobbiesStore.startLobbyLiveUpdate();
+
+        // player joined via link
         if (!lobbiesStore.lobbydata.currentPlayer || lobbiesStore.lobbydata.currentPlayer.playerId === '' || lobbiesStore.lobbydata.currentPlayer.playerName === '') {
             if(lobby.value!.members.length >= MAX_PLAYER_COUNT){
                 infoHeading.value = "Lobby full"
                 infoText.value = "Please choose or create another one!"
                 errorBox.value = true
                 darkenBackground.value = true
-            } else {
-                // TODO show playerNameForm and replace Mr. Late with entered name
-                await lobbiesStore.createPlayer("Mr. Late");
-                await joinLobby(lobby.value!)
+            }
+            
+            // player who joined via link needs to set a playerName aswell
+            else {
+                showPlayerNameForm.value = true;
+                darkenBackground.value = true;
             }
         }
 
     })
+
+    const savePlayerName = async (newName: string) => {
+        try {
+            await lobbiesStore.createPlayer(newName);
+            await joinLobby(lobby.value!)
+
+        } catch(error) {
+            console.error("Error saving playerName:", error);
+            alert("Error saving playerName!");
+        }
+    }
 
     const joinLobby = async (lobby: ILobbyDTD) => {
 
