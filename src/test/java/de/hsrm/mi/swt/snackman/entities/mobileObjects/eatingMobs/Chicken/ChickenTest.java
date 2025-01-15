@@ -68,7 +68,7 @@ class ChickenTest {
     @Test
     void testIsScaredFromGhost() {
         Square square = new Square(MapObjectType.FLOOR, 0, 0);
-        Chicken chicken = spy(new Chicken(square, gameMap));
+        Chicken chicken = spy(new Chicken(square, gameMap, "ChickenMovementSkript"));
         chicken.setKcal(3000);
 
         chicken.isScaredFromGhost(true);
