@@ -9,20 +9,18 @@ import java.util.Properties;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
-
 import de.hsrm.mi.swt.snackman.entities.map.GameMap;
-import org.python.core.PyList;
-import org.python.core.PyObject;
-import org.python.util.PythonInterpreter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import de.hsrm.mi.swt.snackman.configuration.GameConfig;
 import de.hsrm.mi.swt.snackman.entities.map.Square;
 import de.hsrm.mi.swt.snackman.entities.mapObject.MapObjectType;
 import de.hsrm.mi.swt.snackman.entities.mapObject.snack.Snack;
 import de.hsrm.mi.swt.snackman.entities.mapObject.snack.SnackType;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.EatingMob;
+import org.python.core.PyList;
+import org.python.core.PyObject;
+import org.python.util.PythonInterpreter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import de.hsrm.mi.swt.snackman.configuration.GameConfig;
 
 /**
  * Represents a chicken entity in the game, capable of moving around the map,
@@ -64,34 +62,20 @@ public class Chicken extends EatingMob implements Runnable {
         initJython();
     }
 
-    public Chicken(Square initialPosition, GameMap gameMap) {
+    public Chicken(Square initialPosition, GameMap gameMap, String fileName) {
         super();
         id = generateId();
         this.gameMap = gameMap;
         this.chickenPosX = initialPosition.getIndexX();
         this.chickenPosZ = initialPosition.getIndexZ();
         initialPosition.addMob(this);
-        this.fileName = "ChickenMovementSkript";
+        this.fileName = fileName;
         this.isWalking = true;
         this.lookingDirection = Direction.getRandomDirection();
-        // log.info("Chicken looking direction is {}", lookingDirection);
-        //setWaitingTime();
+        log.debug("Chicken looking direction is {}", lookingDirection);
         initJython();
         initTimer();
     }
-
-    public List<String> act(List<String> squares) {
-        List<String> result = executeMovementSkript(squares);
-        return result;
-    }
-
-    // public void setScared(boolean h){
-    //     this.isScared = h;
-    // }
-
-    // public boolean isScared(){
-    //     return this.isScared();
-    // }
 
     /**
      * Converts a Python list to a Java list.
@@ -141,9 +125,9 @@ public class Chicken extends EatingMob implements Runnable {
      *
      * @param newMove a list representing the next move for the chicken.
      */
-    private void setNewPosition(List<String> newMove) {
+    private void setNewPosition(int newMove) {
         //get positions
-        Direction walkingDirection = Direction.getDirection(newMove.getLast());
+        Direction walkingDirection = Direction.getDirection(newMove);
         log.debug("Walking direction is: {}", walkingDirection);
 
         this.lookingDirection = walkingDirection;
@@ -185,7 +169,7 @@ public class Chicken extends EatingMob implements Runnable {
             if (!blockingPath) {
                 log.debug("Current position is x {} z {}", this.chickenPosX, this.chickenPosZ);
 
-                List<String> newMove = act(squares);
+                int newMove = executeMovementSkript(squares);
 
                 // set new square you move to
                 setNewPosition(newMove);
@@ -276,7 +260,7 @@ public class Chicken extends EatingMob implements Runnable {
         this.pythonInterpreter = new PythonInterpreter();
 
         try {
-            String scriptPath = Paths.get("extensions/chicken/ChickenMovementSkript.py").normalize().toAbsolutePath().toString();
+            String scriptPath = Paths.get("extensions/chicken/" + fileName + ".py").normalize().toAbsolutePath().toString();
             log.debug("Resolved script path: {}", scriptPath);
 
             // Get the directory of the script (without the .)
@@ -291,15 +275,15 @@ public class Chicken extends EatingMob implements Runnable {
             this.pythonInterpreter.execfile(scriptPath);
 
         } catch (Exception ex) {
-            log.error("Error initializing ChickenMovementSkript.py: ", ex);
+            log.error("Error initializing {}: ", this.fileName, ex);
             ex.printStackTrace();
         }
         setWaitingTime();
-        this.pythonInterpreter.exec("from ChickenMovementSkript import choose_next_square");
+        this.pythonInterpreter.exec("from " + fileName + " import choose_next_square");
     }
 
     private void setWaitingTime(){
-        this.pythonInterpreter.exec("from ChickenMovementSkript import getWaitingTime");
+        this.pythonInterpreter.exec("from " + fileName + " import getWaitingTime");
 
         PyObject func = pythonInterpreter.get("getWaitingTime");
         PyObject result = func.__call__();
@@ -313,26 +297,21 @@ public class Chicken extends EatingMob implements Runnable {
      * next move.
      *
      * @param squares a list of squares visible from the chicken's current position.
-     * @return a list of moves resulting from the Python script's execution.
+     * @return the movement direction as int resulting from the Python script's execution.
      */
-    public List<String> executeMovementSkript(List<String> squares) {
+    public int executeMovementSkript(List<String> squares) {
         try {
-            log.debug("Running python chicken script with: {}", squares.toString());
+            log.info("Running python chicken {} script with: {} and {}", this.id, squares.toString(), this.fileName);
             PyObject func = pythonInterpreter.get("choose_next_square");
             PyObject result = func.__call__(new PyList(squares));
+            log.info("Result {} of chicken {}:", Integer.parseInt(result.toString()), this.id);
 
-            if (result instanceof PyList) {
-                PyList pyList = (PyList) result;
-                log.debug("Python chicken script return: {}", pyList);
-                return convertPythonList(pyList);
-            }
-
-            throw new Exception("Python chicken script did not load.");
+            return Integer.parseInt(result.toString());
         } catch (Exception ex) {
-            log.error("Error while executing chicken python script: ", ex);
+            log.error("Error while executing chicken {} with id {} python script: ", this.fileName, this.id, ex);
             ex.printStackTrace();
+            return 0;
         }
-        return squares;
     }
 
     public boolean getBlockingPath() {
@@ -491,11 +470,15 @@ public class Chicken extends EatingMob implements Runnable {
         squares.add(Direction.ONE_NORTH.get_one_North_Square(gameMap, currentPosition).getPrimaryType());
         squares.add(Direction.ONE_NORTH_ONE_EAST.get_one_North_one_East_Square(gameMap, currentPosition).getPrimaryType());
         squares.add(Direction.ONE_NORTH_TWO_EAST.get_one_North_two_East_Square(gameMap, currentPosition).getPrimaryType());
+
         squares.add(Direction.TWO_WEST.get_two_West_Square(gameMap, currentPosition).getPrimaryType());
         squares.add(Direction.ONE_WEST.get_one_West_Square(gameMap, currentPosition).getPrimaryType());
+
         squares.add(Direction.CHICKEN.get_Chicken_Square(gameMap, currentPosition).getPrimaryType());
+
         squares.add(Direction.ONE_EAST.get_one_East_Square(gameMap, currentPosition).getPrimaryType());
         squares.add(Direction.TWO_EAST.get_two_East_Square(gameMap, currentPosition).getPrimaryType());
+
         squares.add(Direction.ONE_SOUTH_TWO_WEST.get_one_South_two_West_Square(gameMap, currentPosition).getPrimaryType());
         squares.add(Direction.ONE_SOUTH_ONE_WEST.get_one_South_one_West_Square(gameMap, currentPosition).getPrimaryType());
         squares.add(Direction.ONE_SOUTH.get_one_South_Square(gameMap, currentPosition).getPrimaryType());
@@ -511,4 +494,11 @@ public class Chicken extends EatingMob implements Runnable {
         return squares;
     }
 
+    public void setScared(boolean scared) {
+        isScared = scared;
+    }
+
+    public boolean isScared() {
+        return isScared;
+    }
 }

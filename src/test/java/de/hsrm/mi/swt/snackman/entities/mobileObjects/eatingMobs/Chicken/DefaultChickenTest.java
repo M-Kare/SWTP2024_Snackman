@@ -1,19 +1,15 @@
 package de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
-
 import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.util.FileSystemUtils;
-
 import de.hsrm.mi.swt.snackman.SnackmanApplication;
 
 class DefaultChickenTest {
@@ -31,7 +27,7 @@ class DefaultChickenTest {
     }
 
     @AfterAll
-    static void tearDownAfter() throws IOException {
+    static void tearDownAfter() {
         if (Files.exists(workFolder)) {
             FileSystemUtils.deleteRecursively(workFolder.toFile());
         }
@@ -39,9 +35,7 @@ class DefaultChickenTest {
 
     @Test
     public void chickenMovementTest_big(){
-
-        System.out.println();
-        Chicken chicken = new Chicken();
+        Chicken chicken = new Chicken("ChickenMovementSkript");
 
         List<String> visibleEnvironment = List.of("W", "W", "W", "L", "W",
                                                     "W", "L", "L", "L", "L",
@@ -49,18 +43,15 @@ class DefaultChickenTest {
                                                     "L", "W", "L", "W", "L",
                                                     "L", "W", "L", "W", "L", "0");
 
-        List<String> result = chicken.act(visibleEnvironment);
+        int result = chicken.executeMovementSkript(visibleEnvironment);
 
-        //int chosenDirectionIndex = Integer.parseInt(result.get(12));
-        int chosenDirectionIndex = Integer.parseInt(result.get(result.size() - 1));
-
-        assertEquals(" ", result.get(chosenDirectionIndex),
+        assertEquals(0, result,
                 "The Chicken should move to the empty space (' ') matching its new direction.");
     }
 
     @Test
     public void ChickenAvoidsGhost_big(){
-        Chicken chicken = new Chicken();
+        Chicken chicken = new Chicken("ChickenMovementSkript");
 
         List<String> visibleEnvironment = List.of("W", "W", "W", "L", "W",
                                                     "SM", "L", "G", "L", "L",
@@ -68,20 +59,14 @@ class DefaultChickenTest {
                                                     "L", "L", "L", "L", "L",
                                                     "L", "W", "L", "W", "L", "0");
 
-        List<String> result = chicken.act(visibleEnvironment);
+        int result = chicken.executeMovementSkript(visibleEnvironment);
 
-        //int chosenDirectionIndex = Integer.parseInt(result.get(12));
-        int chosenDirectionIndex = Integer.parseInt(result.get(result.size() - 1));
-
-        assertTrue(Integer.parseInt(result.get(result.size() - 1)) != 0, "New ChickenIndex must not be the Index with the Ghost");
-
-        assertEquals(" ", result.get(chosenDirectionIndex),
-                "The Chicken should move to the empty space (' ') matching its new direction.");
+        Assertions.assertTrue(List.of(1,2,3).contains(result));
     }
 
     @Test
     public void testChickenDoesntSeeSnackMan_big(){
-        Chicken chicken = new Chicken();
+        Chicken chicken = new Chicken("ChickenMovementSkript");
 
         List<String> visibleEnvironment = List.of("W", "W", "W", "L", "W",
                                                     "SM", "L", "G", "SM", "L",
@@ -89,17 +74,14 @@ class DefaultChickenTest {
                                                     "L", "L", "L", "L", "L",
                                                     "L", "W", "L", "W", "L", "0");
 
-        List<String> result = chicken.act(visibleEnvironment);
+        int result = chicken.executeMovementSkript(visibleEnvironment);
 
-        int chosenDirectionIndex = Integer.parseInt(result.get(result.size() - 1));
-
-        assertEquals(" ", result.get(chosenDirectionIndex),
-                "The Chicken should move to the empty space (' ') matching its new direction.");
+        Assertions.assertTrue(List.of(1,2,3).contains(result));
     }
 
     @Test
     public void testChickenMovesToSnack_big(){
-        Chicken chicken = new Chicken();
+        Chicken chicken = new Chicken("ChickenMovementSkript");
 
         List<String> visibleEnvironment = List.of("W", "W", "W", "L", "W",
                                                     "SM", "L", "S", "L", "L",
@@ -107,17 +89,15 @@ class DefaultChickenTest {
                                                     "L", "L", "L", "L", "L",
                                                     "L", "W", "L", "W", "L", "0");
 
-        List<String> result = chicken.act(visibleEnvironment);
+        int result = chicken.executeMovementSkript(visibleEnvironment);
 
-        int chosenDirectionIndex = Integer.parseInt(result.getLast());
-
-        assertEquals(" ", result.get(chosenDirectionIndex),
+        assertEquals(0, result,
                 "The Chicken should move to the empty space (' ') matching its new direction.");
     }
 
     @Test
     public void testChickenChoosesBetweenMultipleSnacks_big(){
-        Chicken chicken = new Chicken();
+        Chicken chicken = new Chicken("ChickenMovementSkript");
 
         List<String> visibleEnvironment = List.of("W", "W", "W", "L", "W",
                                                     "SM", "S", "L", "L", "L",
@@ -125,17 +105,15 @@ class DefaultChickenTest {
                                                     "L", "L", "L", "L", "L",
                                                     "L", "W", "L", "W", "L", "0");
 
-        List<String> result = chicken.act(visibleEnvironment);
+        int result = chicken.executeMovementSkript(visibleEnvironment);
 
-        int chosenDirectionIndex = Integer.parseInt(result.get(result.size() - 1));
-
-        assertEquals(" ", result.get(chosenDirectionIndex),
+        assertEquals(1, result,
                 "The Chicken should move to the empty space (' ') matching its new direction.");
     }
 
     @Test
     public void testChickenInComplexEnvironment_big(){
-        Chicken chicken = new Chicken();
+        Chicken chicken = new Chicken("ChickenMovementSkript");
 
         List<String> visibleEnvironment = List.of("W", "W", "W", "L", "W",
                                                     "SM", "G", "L", "S", "L",
@@ -143,17 +121,14 @@ class DefaultChickenTest {
                                                     "L", "G", "S", "W", "L",
                                                     "L", "W", "L", "W", "L", "0");
 
-        List<String> result = chicken.act(visibleEnvironment);
+        int result = chicken.executeMovementSkript(visibleEnvironment);
 
-        int chosenDirectionIndex = Integer.parseInt(result.get(result.size() - 1));
-
-        assertEquals(" ", result.get(chosenDirectionIndex),
-                "The Chicken should move to the empty space (' ') matching its new direction.");
+        Assertions.assertTrue(List.of(1,2).contains(result));
     }
     
     @Test
     public void testChickenWithRandomSelection_big(){
-        Chicken chicken = new Chicken();
+        Chicken chicken = new Chicken("ChickenMovementSkript");
 
         List<String> visibleEnvironment = List.of("W", "W", "W", "L", "W",
                                                     "SM", "L", "L", "L", "L",
@@ -161,11 +136,9 @@ class DefaultChickenTest {
                                                     "L", "L", "L", "L", "L",
                                                     "L", "W", "L", "W", "L", "0");
 
-        List<String> result = chicken.act(visibleEnvironment);
+        int result = chicken.executeMovementSkript(visibleEnvironment);
 
-        int chosenDirectionIndex = Integer.parseInt(result.get(result.size() - 1));
-
-        assertEquals(" ", result.get(chosenDirectionIndex),
+        assertEquals(0, result,
                 "The Chicken should move to the empty space (' ') matching its new direction.");
     }
 }

@@ -97,7 +97,7 @@ class MapServiceTest {
         };
         GameMap gameMap = mapService.convertMazeDataGameMap("1", mockMazeData);
         Square currentSquare = gameMap.getGameMapSquares()[1][1]; // Assuming it's a floor square
-        Chicken chicken = new Chicken(currentSquare, gameMap);
+        Chicken chicken = new Chicken(currentSquare, gameMap, "ChickenMovementSkript");
 
         List<String> visibleSquares = chicken.getSquaresVisibleForChicken(gameMap, currentSquare, Direction.ONE_NORTH);
 
@@ -125,7 +125,7 @@ class MapServiceTest {
         };
         GameMap gameMap = mapService.convertMazeDataGameMap("1", mockMazeData);
         Square currentSquare = gameMap.getGameMapSquares()[1][1]; // Assuming it's a floor square
-        Chicken chicken = new Chicken(currentSquare, gameMap);
+        Chicken chicken = new Chicken(currentSquare, gameMap, "ChickenMovementSkript");
 
         Square square = new Square(MapObjectType.FLOOR, 0, 0);
         Snack egg = new Snack(SnackType.EGG);
@@ -148,7 +148,7 @@ class MapServiceTest {
         };
         GameMap gameMap = mapService.convertMazeDataGameMap("1", mockMazeData);
         Square currentSquare = gameMap.getGameMapSquares()[1][1]; // Assuming it's a floor square
-        Chicken chicken = new Chicken(currentSquare, gameMap);
+        Chicken chicken = new Chicken(currentSquare, gameMap, "ChickenMovementSkript");
 
         Square square = new Square(MapObjectType.FLOOR, 0, 0);
         Snack egg = null;
@@ -219,6 +219,15 @@ class MapServiceTest {
 
         Assertions.assertTrue(clientMobs.get("05").calcMapIndexOfCoordinate(clientMobs.get("05").getPosition().x) == testMap[2][1].getIndexX());
         Assertions.assertTrue(clientMobs.get("05").calcMapIndexOfCoordinate(clientMobs.get("05").getPosition().z) == testMap[2][1].getIndexZ());
+
+    }
+
+    @Test
+    void randomeChickenSkriptLoad(){
+
+        String skriptName = mapService.loadChickenScripts();
+
+        Assertions.assertTrue(skriptName.equals("ChickenMovementSkript")  || skriptName.equals("TalaChickenMovementSkript"), skriptName);
 
     }
 

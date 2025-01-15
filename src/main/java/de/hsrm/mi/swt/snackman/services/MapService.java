@@ -1,8 +1,11 @@
 package de.hsrm.mi.swt.snackman.services;
 
 import java.beans.PropertyChangeEvent;
+import java.io.File;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.Ghost;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.Mob;
@@ -147,6 +150,26 @@ public class MapService {
         }
     }
 
+    protected String loadChickenScripts() {
+        String name = Paths.get("extensions/chicken/").normalize().toAbsolutePath().toString();
+        File folder = new File(name);
+        List<String> filenames = new ArrayList<String>();
+
+        for (File currFile : folder.listFiles()) {
+            if (currFile.getName().endsWith(".py")) {
+                if (!currFile.getName().equals("Maze.py")) {
+                    filenames.add(currFile.getName().replaceAll("\\.py$", ""));
+                }
+            }
+        }
+
+        Random rn = new Random();
+        int randomeFileNumber = rn.nextInt(0, filenames.size());
+
+        return filenames.get(randomeFileNumber);
+    }
+
+
     /**
      * Goes trough the map and checks if it's a spawnpoint and sets a Mob
      *
@@ -165,7 +188,7 @@ public class MapService {
                     SpawnpointMobType spawnpointMobType = spawnpoint.spawnpointMobType();
                     switch (spawnpointMobType) {
                         case SpawnpointMobType.CHICKEN:
-                            Chicken newChicken = new Chicken(currentSquare, gameMap);
+                            Chicken newChicken = new Chicken(currentSquare, gameMap, loadChickenScripts());
 
                             Thread chickenThread = new Thread(newChicken);
                             chickenThread.start();
