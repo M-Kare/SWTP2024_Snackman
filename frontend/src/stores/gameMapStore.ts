@@ -19,6 +19,8 @@ import type {IScriptGhost, IScriptGhostDTD} from "@/stores/Ghost/IScriptGhostDTD
 import type {IGhostUpdateDTD} from "@/stores/messaging/IGhostUpdateDTD";
 import {useRouter} from "vue-router";
 import type {IGameEndDTD} from "@/stores/GameEnd/IGameEndDTD";
+import {SoundManager} from "@/services/SoundManager";
+import {SoundType} from "@/services/SoundTypes";
 
 /**
  * Defines the pinia store used for saving the map from
@@ -125,7 +127,7 @@ export const useGameMapStore = defineStore('gameMap', () => {
                   }
                   otherPlayers.get(mobUpdate.playerId)?.setRotationFromQuaternion(mobUpdate.rotation)
                   //TODO adjust player height
-                  otherPlayers.get(mobUpdate.playerId)?.position.lerp(new THREE.Vector3( mobUpdate.position.x, mobUpdate.position.y - 2, mobUpdate.position.z), 0.3)
+                  otherPlayers.get(mobUpdate.playerId)?.position.lerp(new THREE.Vector3(mobUpdate.position.x, mobUpdate.position.y - 2, mobUpdate.position.z), 0.3)
                 }
                 break;
 
@@ -192,7 +194,7 @@ export const useGameMapStore = defineStore('gameMap', () => {
         winningRole: gameEndUpdate.role,
         timePlayed: gameEndUpdate.timePlayed,
         kcalCollected: gameEndUpdate.kcalCollected,
-        lobbyId : gameEndUpdate.lobbyId
+        lobbyId: gameEndUpdate.lobbyId
       }
     }).then(r => {
         stompclient.deactivate()
@@ -205,8 +207,11 @@ export const useGameMapStore = defineStore('gameMap', () => {
           scene.remove(scene.children[i])
         }
         lobbydata.currentPlayer.joinedLobbyId = ""
+
+        SoundManager.playSound(SoundType.GAME_END)
       }
     )
+
   }
 
   function updateChicken(change: IChickenDTD) {

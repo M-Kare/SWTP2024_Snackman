@@ -162,6 +162,8 @@ onMounted(async () => {
   renderer.render(scene, camera)
   renderer.setAnimationLoop(animate)
   window.addEventListener('resize', resizeCallback)
+
+  SoundManager.initBackgroundSounds(camera)
 })
 
 // initially loads the playerModel & attaches playerModel to playerCamera
