@@ -11,7 +11,7 @@
           v-if="errorMessage">
         {{ errorMessage }}
       </p>
-      <p>Played time: {{ playedTime }} minutes</p>
+      <p>Played time: {{ playedTime }}</p>
     </form>
 
     <SmallNavButton

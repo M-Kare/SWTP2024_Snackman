@@ -59,6 +59,7 @@ import {useLeaderboardStore} from '@/stores/Leaderboard/leaderboardStore'
 import {computed, onMounted, ref} from 'vue'
 import SmallNavButton from '@/components/SmallNavButton.vue'
 import {useRoute, useRouter} from 'vue-router'
+import ViewBackground from "@/components/ViewBackground.vue";
 
 const leaderboardStore = useLeaderboardStore()
 const router = useRouter()
