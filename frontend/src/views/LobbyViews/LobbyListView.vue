@@ -164,22 +164,20 @@ onMounted(async () => {
 }
 
 #individual-outer-box-size {
-  width: 70%;
-  max-width: 1000px;
-  height: 65%;
+  width: 60%;
+  max-width: 80%;
+  height: 60%;
+  padding: 2%;
 }
 
 .inner-box {
   position: relative;
-  margin-top: 1vh;
-  margin-bottom: 1vh;
   left: 50%;
   transform: translateX(-50%);
-  width: 90%;
-  max-height: 80%;
+  height: 65%;
   border-radius: 0.3rem;
   color: var(--primary-text-color);
-  overflow-y: scroll;
+  overflow-y: auto;
 }
 
 .inner-box > ul {

@@ -288,10 +288,11 @@ function moveToMouse(element: HTMLElement) {
 }
 
 #individual-outer-box-size {
-  width: 70vw;
-  max-width: 1000px;
-  height: 40rem;
-  max-height: 50rem;
+  width: 50%;
+  max-width: 60%;
+  height: 50%;
+  max-height: 70%;
+  padding: 2%;
 }
 
 #infoBox {
@@ -299,8 +300,6 @@ function moveToMouse(element: HTMLElement) {
   border-radius: 0.5rem;
   background: rgba(255, 255, 255, 60%);
   color: #000000;
-  padding-left: 0.5rem;
-  padding-right: 0.5rem;
 }
 
 #player-count {
@@ -316,7 +315,6 @@ function moveToMouse(element: HTMLElement) {
   margin-bottom: 1vh;
   left: 50%;
   transform: translateX(-50%);
-  width: 90%;
   height: auto;
   border-radius: 0.3rem;
   color: var(--primary-text-color);
@@ -331,7 +329,7 @@ function moveToMouse(element: HTMLElement) {
   margin: 0;
   padding: 0;
   width: 100%;
-  min-height: 350px;
+  min-height: 30vh;
 }
 
 .player-list-items {
@@ -357,11 +355,9 @@ function moveToMouse(element: HTMLElement) {
 
 .info-text {
   font-size: 1.8rem;
-  padding: 1.2rem 0;
 }
 
 .item-row {
-  padding: 2rem 3rem;
   display: flex;
   justify-content: space-between;
 }
@@ -375,5 +371,9 @@ function moveToMouse(element: HTMLElement) {
 #copyToClip:hover,
 #start-game-button:hover {
   background: var(--primary-highlight-color);
+}
+
+@media (max-height: 1200px) {
+
 }
 </style>
