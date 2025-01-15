@@ -2,23 +2,9 @@
     <MenuBackground></MenuBackground>
     <h1 class="title"> {{ lobby?.name || 'Lobby Name' }} </h1>
     <div class="outer-box">
-        <SmallNavButton
-            id="menu-back-button"
-            class="small-nav-buttons"
-            @click="leaveLobby">
-
-            Leave Lobby
-        </SmallNavButton>
-        <SmallNavButton
-            id="start-game-button"
-            class="small-nav-buttons"
-            @click="startGame">
-
-            Start Game
-        </SmallNavButton>
 
         <div id="player-count">
-                {{ playerCount }} / {{ maxPlayerCount }} Players
+                {{ playerCount }} / {{ MAX_PLAYER_COUNT }} Players
         </div>
 
         <div class="inner-box">
@@ -113,7 +99,6 @@
     const lobby = computed(() => lobbiesStore.lobbydata.lobbies.find(l => l.lobbyId === lobbyUrl));
     const members = computed(() => lobby.value?.members || [] as Array<IPlayerClientDTD>);
     const playerCount = computed(() => members.value.length);
-    const maxPlayerCount = ref(5);
 
     const playerNameSaved = lobbiesStore.lobbydata.currentPlayer.playerName;
     const showPlayerNameForm = ref(false);
