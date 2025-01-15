@@ -212,7 +212,7 @@ tr td:not(:first-child):not(:last-child) {
   display: flex;
   justify-content: center;
   gap: 20px;
-  padding-top: 6%;
+  padding-top: 2em;
 }
 
 #menu-back-button:hover,
