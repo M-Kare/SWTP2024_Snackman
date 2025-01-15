@@ -1,54 +1,54 @@
 <template>
-  <MenuBackground></MenuBackground>
-  <div id="individual-outer-box-size" class="outer-box">
-    <h1 class="title">Lobbies</h1>
-    <SmallNavButton
-      id="menu-back-button"
-      class="small-nav-buttons"
-      @click="backToMainMenu"
-    >
-      Back
-    </SmallNavButton>
-    <SmallNavButton
-      id="show-lobby-creation-button"
-      class="small-nav-buttons"
-      @click="showCreateLobbyForm"
-    >
-      Create new Lobby
-    </SmallNavButton>
+  <MenuBackground :isLobbyView="true">
+    <div id="individual-outer-box-size" class="outer-box">
+      <h1 class="title">Lobbies</h1>
+      <SmallNavButton
+        id="menu-back-button"
+        class="small-nav-buttons"
+        @click="backToMainMenu"
+      >
+        Back
+      </SmallNavButton>
+      <SmallNavButton
+        id="show-lobby-creation-button"
+        class="small-nav-buttons"
+        @click="showCreateLobbyForm"
+      >
+        Create new Lobby
+      </SmallNavButton>
 
-    <div class="inner-box">
-      <ul>
-        <li
-          v-for="lobby in filteredLobbies"
-          :key="lobby.lobbyId"
-          class="lobby-list-items"
-          @click="joinLobby(lobby)"
-        >
-          <div class="lobby-name">
-            {{ lobby.name }}
-          </div>
+      <div class="inner-box">
+        <ul>
+          <li
+            v-for="lobby in filteredLobbies"
+            :key="lobby.lobbyId"
+            class="lobby-list-items"
+            @click="joinLobby(lobby)"
+          >
+            <div class="lobby-name">
+              {{ lobby.name }}
+            </div>
 
-          <div class="playercount">
-            {{ lobby.members.length }} / {{ MAX_PLAYER_COUNT }} Spieler
-          </div>
-        </li>
-      </ul>
+            <div class="playercount">
+              {{ lobby.members.length }} / {{ MAX_PLAYER_COUNT }} Spieler
+            </div>
+          </li>
+        </ul>
+      </div>
     </div>
-  </div>
 
-  <div v-if="darkenBackground" id="darken-background"></div>
+    <div v-if="darkenBackground" id="darken-background"></div>
 
   <PopUp v-if="showPopUp" class="popup-box" @hidePopUp="hidePopUp">
     <p class="info-heading">Lobby full</p>
     <p class="info-text">Please choose or create another one!</p>
   </PopUp>
 
-  <CreateLobbyForm
-    v-if="showLobbyForm"
-    @cancelLobbyCreation="cancelLobbyCreation"
-  >
-  </CreateLobbyForm>
+    <CreateLobbyForm
+      v-if="showLobbyForm"
+      @cancelLobbyCreation="cancelLobbyCreation"
+    />
+  </MenuBackground>
 </template>
 
 <script lang="ts" setup>
