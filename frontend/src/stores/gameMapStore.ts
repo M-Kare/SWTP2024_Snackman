@@ -57,6 +57,10 @@ export const useGameMapStore = defineStore('gameMap', () => {
       OFFSET = mapData.DEFAULT_SQUARE_SIDE_LENGTH / 2
       DEFAULT_SIDE_LENGTH = mapData.DEFAULT_SQUARE_SIDE_LENGTH
 
+      mapData.chickens = []
+      mapData.scriptGhosts = []
+      mapData.gameMap = new Map<number, ISquare>()
+
       for (const square of response.gameMap) {
         mapData.gameMap.set(square.id, square as ISquare)
       }
@@ -187,9 +191,22 @@ export const useGameMapStore = defineStore('gameMap', () => {
       query: {
         winningRole: gameEndUpdate.role,
         timePlayed: gameEndUpdate.timePlayed,
-        kcalCollected: gameEndUpdate.kcalCollected
+        kcalCollected: gameEndUpdate.kcalCollected,
+        lobbyId : gameEndUpdate.lobbyId
       }
-    })
+    }).then(r => {
+        stompclient.deactivate()
+        mapData.DEFAULT_SQUARE_SIDE_LENGTH = 0
+        mapData.DEFAULT_WALL_HEIGHT = 0
+        mapData.scriptGhosts = []
+        mapData.chickens = []
+        mapData.gameMap = new Map<number, ISquare>()
+        for (let i = scene.children.length - 1; i >= 0; i--) {
+          scene.remove(scene.children[i])
+        }
+        lobbydata.currentPlayer.joinedLobbyId = ""
+      }
+    )
   }
 
   function updateChicken(change: IChickenDTD) {

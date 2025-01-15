@@ -123,7 +123,6 @@ const joinLobby = async (lobby: ILobbyDTD) => {
     )
 
     if (joinedLobby) {
-      console.log('Successfully joined lobby', joinedLobby.name)
       router.push({name: 'LobbyView', params: {lobbyId: lobby.lobbyId}})
     }
   } catch (error: any) {
@@ -132,9 +131,8 @@ const joinLobby = async (lobby: ILobbyDTD) => {
   }
 }
 
-onMounted(async () => {
-  await lobbiesStore.fetchLobbyList()
-  console.log(lobbies)
+    onMounted(async () => {
+        await lobbiesStore.fetchLobbyList();
 
   if (
     !lobbiesStore.lobbydata.currentPlayer ||
@@ -143,8 +141,6 @@ onMounted(async () => {
   ) {
     lobbiesStore.createPlayer('Player Test')
   }
-
-  console.log('Current Player:', lobbiesStore.lobbydata.currentPlayer)
 
   lobbiesStore.startLobbyLiveUpdate()
 })
