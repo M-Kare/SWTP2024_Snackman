@@ -26,7 +26,7 @@
 
     <div class="item-row">
       <ul class="map-list" v-if="playerId == adminClientId">
-        <li class="map-list-item" v-for="map in mapList" :key="map.mapName">
+        <li class="map-list-item" v-for="map in mapList" :key="map.mapName" v-if="mapList.length > 1">
             <input class="map-choose" 
               type="radio" 
               :value="map.mapName" 
@@ -158,6 +158,7 @@ const mapList = ref<{ mapName: string; fileName: string }[]>([
     { mapName: 'Original Map', fileName: `Maze.txt` },
 ]);
 
+const feedbackMessage = ref('')
 const usedCustomMap = ref(false);
 const selectedMap = ref<string | null>(null);
 const customMapName = ref('Snack Man Map')
@@ -171,9 +172,6 @@ const selectMap = (mapName: string) => {
         usedCustomMap.value = true;
     } 
 };
-
-const feedbackMessage = ref('');
-const feedbackClass = ref('');
 
 const triggerFileInput = () => {
     fileInput.value?.click();
@@ -223,10 +221,6 @@ const uploadFileToServer = async (file: File, lobbyId: string) => {
         });
 
         if (response.ok) {
-            // Success feedback
-            feedbackMessage.value = 'Map saved';
-            feedbackClass.value = 'success';
-
             const mapName = customMapName.value;
             const fileName = `SnackManMap_${lobbyId}.txt`;
 
@@ -238,10 +232,6 @@ const uploadFileToServer = async (file: File, lobbyId: string) => {
 
             selectMap(mapName);
         } else {
-            // Failure feedback
-            feedbackMessage.value = 'Map not saved';
-            feedbackClass.value = 'error';
-
             const errorMessage = await response.text();
             showPopUp.value = true;
             darkenBackground.value = true;
@@ -250,16 +240,11 @@ const uploadFileToServer = async (file: File, lobbyId: string) => {
         }
     } catch (error) {
         console.error('Error uploading file:', error);
-        // Failure feedback
-        feedbackMessage.value = 'Map not saved';
-        feedbackClass.value = 'error';
+        showPopUp.value = true;
+        darkenBackground.value = true;
+        infoHeading.value = "Error uploading file";
+        infoText.value = error;
     }
-
-    // Clear feedback after 3 seconds
-    setTimeout(() => {
-        feedbackMessage.value = '';
-        feedbackClass.value = '';
-    }, 3000);
 }
 
 /**
@@ -603,35 +588,5 @@ function moveToMouse(element: HTMLElement) {
 
 .input-feld{
   display: none;
-}
-
-.feedback-message {
-  margin-top: 30px;
-  font-size: 1.5rem;
-  font-weight: bold;
-  padding: 10px 20px;
-  border-radius: 5px;
-  text-align: center;
-  animation: fadeIn 0.5s;
-}
-
-.feedback-message.success {
-  color: #fff;
-  background-color: #50C878;
-}
-
-.feedback-message.error {
-  color: #fff;
-  background-color: #C70039;
-}
-
-/* Fade-in animation */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
 }
 </style>
