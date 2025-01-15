@@ -235,6 +235,7 @@ public class Chicken extends EatingMob implements Runnable {
         }
     }
 
+    // TODO beim Refactoring in gameMap auslagern, gehört nicht ins Chicken rein
     public boolean squareIsBetweenWalls(int x, int z) {
         Square squareAbove = this.gameMap.getSquareAtIndexXZ(x - 1, z);
         Square squareBelow = this.gameMap.getSquareAtIndexXZ(x + 1, z);
@@ -426,6 +427,11 @@ public class Chicken extends EatingMob implements Runnable {
         layEgg();
     }
 
+    /**
+     * timer should restart if chicken kcal == 0
+     *
+     * @return if timer is restarted
+     */
     public boolean wasTimerRestarted() {
         return timerRestarted;
     }

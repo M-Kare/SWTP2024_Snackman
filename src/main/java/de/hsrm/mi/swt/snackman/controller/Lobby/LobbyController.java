@@ -72,6 +72,27 @@ public class LobbyController {
             }
       }
 
+      @PostMapping("start/singleplayer")
+      public ResponseEntity<Lobby> startSingleplayer(@RequestBody Map<String, String> requestBody) {
+            String creatorUuid = requestBody.get("creatorUuid");
+
+            if (creatorUuid == null || creatorUuid.isEmpty()) {
+                  return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+            }
+
+            PlayerClient client = lobbyManagerService.findClientByClientId(creatorUuid);
+            try {
+                  Lobby newLobby = lobbyManagerService.createLobby(client.getPlayerId(), client, lobbyManagerService.getMessageLoop());
+                  lobbyManagerService.startSingleplayer(newLobby.getLobbyId());
+
+                  messagingTemplate.convertAndSend("/topic/lobbies/singleplayer", newLobby);
+                  return ResponseEntity.ok(newLobby);
+            } catch (LobbyAlreadyExistsException e) {
+                  logger.error("Error occurred: ", e);
+                  return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+            }
+      }
+
       /**
        * Create a new player client with a name
        * 

@@ -558,7 +558,8 @@ function moveToMouse(element: HTMLElement) {
 
 #menu-back-button:hover,
 #copyToClip:hover,
-#start-game-button:hover {
+#start-game-button:hover,
+#menu-map-importieren:hover {
   background: var(--primary-highlight-color);
 }
 

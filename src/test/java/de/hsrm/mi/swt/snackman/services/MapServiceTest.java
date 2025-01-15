@@ -38,10 +38,9 @@ import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken.Directi
 @SpringBootTest
 class MapServiceTest {
 
+    private static final Path workFolder = Paths.get("./extensions").toAbsolutePath();
     @Autowired
     private MapService mapService;
-
-    private static final Path workFolder = Paths.get("./extensions").toAbsolutePath();
     @Autowired
     private MessageLoop messageLoop;
 
@@ -138,7 +137,7 @@ class MapServiceTest {
 
 
     @Test
-    void testAddEggToSquare_EggAddedToSquare_CaseEggIsNull() {
+    void testAddEggToSquare_EggAddedToSquare_CaseEggIsEmpty() {
         char[][] mockMazeData = new char[][]{
                 {'W', 'W', 'W', 'L', 'W'},
                 {'W', 'L', 'L', 'L', 'L'},
@@ -151,13 +150,11 @@ class MapServiceTest {
         Chicken chicken = new Chicken(currentSquare, gameMap);
 
         Square square = new Square(MapObjectType.FLOOR, 0, 0);
-        Snack egg = null;
+        Snack emptyEgg = new Snack(SnackType.EMPTY);
 
-        Assertions.assertThrows(NullPointerException.class, () -> {
-            chicken.addEggToSquare(square, egg);
-        });
+        chicken.addEggToSquare(square, emptyEgg);
 
-        Assertions.assertNull(square.getSnack());
+        Assertions.assertEquals(square.getSnack().getSnackType(), SnackType.EMPTY);
     }
 
     @Test

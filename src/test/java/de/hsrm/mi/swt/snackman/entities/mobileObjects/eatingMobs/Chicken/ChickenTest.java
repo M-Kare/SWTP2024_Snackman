@@ -18,6 +18,10 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Timer;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.*;
+
 @SpringBootTest
 class ChickenTest {
 
@@ -62,6 +66,17 @@ class ChickenTest {
     }
 
     @Test
+    void testIsScaredFromGhost() {
+        Square square = new Square(MapObjectType.FLOOR, 0, 0);
+        Chicken chicken = spy(new Chicken(square, gameMap));
+        chicken.setKcal(3000);
+
+        chicken.isScaredFromGhost(true);
+        assertEquals(0, chicken.getKcal());
+        verify(chicken, times(1)).layEgg(); // Prüfen, ob layEgg aufgerufen wurde
+    }
+
+    @Test
     void testLayEgg_ChickenThicknessAndKcalReset() {
         Square square = new Square(MapObjectType.FLOOR, 0, 0);
 
@@ -85,7 +100,7 @@ class ChickenTest {
 
         Assertions.assertEquals(Thickness.THIN, chicken.getThickness());
         Assertions.assertEquals(0, chicken.getKcal());
-        Assertions.assertTrue(chicken.wasTimerRestarted());
+        assertTrue(chicken.wasTimerRestarted());
     }
 
     @Test
