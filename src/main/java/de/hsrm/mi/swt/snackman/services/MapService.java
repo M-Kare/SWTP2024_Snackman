@@ -165,7 +165,7 @@ public class MapService {
 
         Random rn = new Random();
         int randomeFileNumber = rn.nextInt(0, filenames.size());
-
+        System.out.println("--------------------------Chicken:" + filenames.get(randomeFileNumber));
         return filenames.get(randomeFileNumber);
     }
 

@@ -201,18 +201,19 @@ public class Chicken extends EatingMob implements Runnable {
                 if (super.getKcal() >= this.MAX_CALORIES) {
                     this.thickness = Thickness.VERY_HEAVY;
 
-                    if (squareIsBetweenWalls(this.chickenPosX, this.chickenPosZ)) {
-                        new Thread(() -> {
-                            try {
-                                blockingPath = true;
-                                Thread.sleep(10000);
-                                blockingPath = false;
-                                layEgg();
-                            } catch (InterruptedException e) {
-                                e.printStackTrace();
-                            }
-                        }).start();
-                    }
+                    new Thread(() -> {
+                        try {
+                            blockingPath = true;
+                            Thread.sleep(10000);
+                            blockingPath = false;
+                            layEgg();
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }).start();
+
+
+
                 } else {
                     if ((super.getKcal()) <= 2 * CALORIES_PER_SIXTH) {
                         this.thickness = Thickness.THIN;
@@ -235,22 +236,6 @@ public class Chicken extends EatingMob implements Runnable {
         }
     }
 
-    public boolean squareIsBetweenWalls(int x, int z) {
-        Square squareAbove = this.gameMap.getSquareAtIndexXZ(x - 1, z);
-        Square squareBelow = this.gameMap.getSquareAtIndexXZ(x + 1, z);
-        Square squareRight = this.gameMap.getSquareAtIndexXZ(x, z + 1);
-        Square squareLeft = this.gameMap.getSquareAtIndexXZ(x, z - 1);
-
-        if ((squareAbove.getType() == MapObjectType.WALL) && (squareBelow.getType() == MapObjectType.WALL)) {
-            return true;
-        }
-
-        if ((squareRight.getType() == MapObjectType.WALL) && (squareLeft.getType() == MapObjectType.WALL)) {
-            return true;
-        }
-
-        return false;
-    }
 
     /**
      * Initializes Jython for executing the chicken's movement script.
