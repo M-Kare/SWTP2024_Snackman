@@ -291,6 +291,7 @@ public class ScriptGhost extends Mob implements Runnable {
         try {
             Thread.sleep(WAITING_TIME);
             move();
+            log.info("Stopping chicken with id {}", id);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
@@ -324,5 +325,9 @@ public class ScriptGhost extends Mob implements Runnable {
                 ", id=" + id +
                 ", lookingDirection=" + lookingDirection +
                 '}';
+    }
+
+    public void setWalking(boolean walking) {
+        isWalking = walking;
     }
 }
