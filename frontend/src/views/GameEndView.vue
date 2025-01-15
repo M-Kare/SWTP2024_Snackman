@@ -3,15 +3,6 @@
   <div id="individual-outer-box-size" class="outer-box">
     <h1 class="result-title">{{ gameResult }}</h1>
     <p class="end-reason">{{ gameReason }}</p>
-    <p class="end-reason" v-if="winningRole != 'GHOST'">SnackMan hat {{ kcalCollected }} Kalorien gesammelt!</p>
-    <MainMenuButton class="menu-button" @click="backToMainMenu">Zurück zum Hauptmenü
-    </MainMenuButton>
-    <MainMenuButton v-if="!alreadyEntered && lobbydata.currentPlayer.role == 'SNACKMAN' && winningRole == 'SNACKMAN'"
-                    class="menu-button"
-                    @click="showCreateNewLeaderboardEntryForm">
-      Create new leaderboard entry
-    </MainMenuButton>
-
     <p class="end-reason">The playing time was {{ formatedPlayedTime }} </p>
     <div id="button-pair">
       <SmallNavButton class="menu-button" @click="backToMainMenu">
@@ -31,8 +22,6 @@
       @cancelNewLeaderboardEntryCreation="cancelNewLeaderboardEntryCreation"
       @entryCreated="hideCreateNewLeaderboardEntryForm">
     </CreateNewLeaderboardEntryForm>
-
-    <MainMenuButton class="menu-button" @click="downloadMap">Export map</MainMenuButton>
     <div v-if="feedbackMessage" :class="['feedback-message', feedbackClass]">
       {{ feedbackMessage }}
     </div>
