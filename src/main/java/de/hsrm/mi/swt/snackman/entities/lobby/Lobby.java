@@ -36,6 +36,7 @@ public class Lobby {
         this.name = name;
         this.adminClient = adminClient;
         this.isGameStarted = false;
+        this.isGameStarted = false;
         this.members = new ArrayList<>();
         this.members.add(adminClient);
         this.clientMobMap = new TreeMap<>();
@@ -96,7 +97,7 @@ public class Lobby {
         SnackMan snackMan = getSnackman();
 
         if(snackMan != null) {
-            GameEnd gameEnd = new GameEnd(winningRole, this.timePlayed, snackMan.getKcal());
+            GameEnd gameEnd = new GameEnd(winningRole, this.timePlayed, snackMan.getKcal(), this.lobbyId);
             setGameFinished(true, gameEnd);
         }
     }

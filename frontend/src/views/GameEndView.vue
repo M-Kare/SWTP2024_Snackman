@@ -19,6 +19,10 @@
       @entryCreated="hideCreateNewLeaderboardEntryForm">
     </CreateNewLeaderboardEntryForm>
 
+    <MainMenuButton class="menu-button" @click="downloadMap">Map exportieren</MainMenuButton>
+    <div v-if="feedbackMessage" :class="['feedback-message', feedbackClass]">
+      {{ feedbackMessage }}
+    </div>
   </div>
 </template>
 
@@ -36,6 +40,7 @@ const alreadyEntered = ref(false)
 const {lobbydata} = useLobbiesStore()
 
 // Read player role and game result from query parameters
+const lobbyId = (route.query.lobbyId as string) || '-';
 const winningRole = (route.query.winningRole as string) || '-'
 const playedTime = (route.query.timePlayed as unknown as number) || 0
 const formatedPlayedTime = formatTime(playedTime)
@@ -51,6 +56,8 @@ if (winningRole == "SNACKMAN") {
 /**
  * Computes the reason for the game's result based on the winning role and game conditions.
  */
+
+// Compute the game reason dynamically or display '-' if no data is available
 const gameReason = computed(() => {
   if (winningRole === 'SNACKMAN') {
     return 'SnackMan hat das Kalorienziel erreicht!'
@@ -101,6 +108,47 @@ function formatTime(seconds: number): string {
   return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
 }
 
+
+const feedbackMessage = ref('');
+const feedbackClass = ref('');
+    
+const downloadMap = async () => {
+  try{
+      const response = await fetch(`/api/download?lobbyId=${lobbyId}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+      });
+
+      if(!response.ok) throw new Error('Failed to download map.');
+
+      const blob = await response.blob();
+      const link = document.createElement('a');   // Create an anchor element to trigger the download
+      const url = URL.createObjectURL(blob);
+      link.href = url;
+      link.download = 'SnackManMap.txt';
+      document.body.appendChild(link);            // Append the link to the DOM
+      link.click();                               // Simulate a click to start the download        
+      document.body.removeChild(link);            // Remove the link after the download
+
+      // Revoke the object URL to free up memory
+      URL.revokeObjectURL(url);
+      
+      // Success feedback
+      feedbackMessage.value = 'Map saved';
+      feedbackClass.value = 'success';    
+  } catch(error: any){
+      // Failure feedback
+      feedbackMessage.value = 'Map not saved';
+      feedbackClass.value = 'error';
+  }
+  // Clear feedback after 3 seconds
+  setTimeout(() => {
+    feedbackMessage.value = '';
+    feedbackClass.value = '';
+  }, 3000);
+}
 </script>
 
 <style scoped>
@@ -132,5 +180,40 @@ function formatTime(seconds: number): string {
 .menu-button {
   font-size: 1.5rem;
   margin-top: 4rem;
+}
+
+.map-exportieren-button {
+  font-size: 1.5rem;
+  margin-top: 4rem;
+}
+
+.feedback-message {
+  font-size: 2rem;
+  margin-top: 4rem;
+  font-weight: bold;
+  padding: 10px 20px;
+  border-radius: 5px;
+  text-align: center;
+  animation: fadeIn 0.5s;
+}
+
+.feedback-message.success {
+  color: #fff;
+  background-color: #50C878;
+}
+
+.feedback-message.error {
+  color: #fff;
+  background-color: #C70039;
+}
+
+/* Fade-in animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 </style>

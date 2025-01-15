@@ -4,11 +4,10 @@
     <div class="item-row">
       <h1 class="title">{{ lobby?.name || 'Lobby Name' }}</h1>
 
-      <div id="player-count">
-        {{ playerCount }} / {{ maxPlayerCount }} Player
-      </div>
+        <div id="player-count">
+                {{ playerCount }} / {{ MAX_PLAYER_COUNT }} Players
+        </div>
     </div>
-
     <div class="inner-box">
       <ul>
         <li v-for="member in members" class="player-list-items">
@@ -107,7 +106,7 @@ const mouseY = ref(0)
 
 const mouseInfoBox = ref(document.getElementById('infoBox'))
 
-const MAX_PLAYER_COUNT = 4
+const MAX_PLAYER_COUNT = 5
 
 const TIP_TOP_DIST = 30
 const TIP_SIDE_DIST = 20
@@ -124,17 +123,14 @@ watchEffect(() => {
     )
     if (updatedLobby) {
       lobbyLoaded = true
-      console.log('Gamestarted in Lobby-View', updatedLobby.gameStarted)
       if (updatedLobby.gameStarted) {
-        console.log('Game has started! Redirecting to GameView...')
         router.push({
           name: 'GameView',
-          query: { role: lobbiesStore.lobbydata.currentPlayer.role },
+          query: { 
+            role: lobbiesStore.lobbydata.currentPlayer.role ,
+            lobbyId: lobbiesStore.lobbydata.currentPlayer.joinedLobbyId,
+          },
         })
-        console.log(
-          'Navigating to GameView with role:',
-          lobbiesStore.lobbydata.currentPlayer.role,
-        )
       }
     } else if (lobbyLoaded) {
       router.push({ name: 'LobbyListView' })
@@ -182,12 +178,10 @@ const joinLobby = async (lobby: ILobbyDTD) => {
     )
 
     if (joinedLobby) {
-      console.log('Successfully joined lobby', joinedLobby.name)
       router.push({ name: 'LobbyView', params: { lobbyId: lobby.lobbyId } })
     }
   } catch (error: any) {
     console.error('Error:', error)
-    alert('Error join Lobby!')
   }
 }
 
