@@ -30,13 +30,6 @@
       >
         Back to main menu
       </SmallNavButton>
-      <SmallNavButton
-        id="export-map-button"
-        class="small-nav-buttons"
-        @click="mapExport"
-      >
-        Export map
-      </SmallNavButton>
     </div>
   </div>
   <img

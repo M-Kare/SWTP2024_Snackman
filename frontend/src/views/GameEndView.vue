@@ -19,7 +19,7 @@
       @entryCreated="hideCreateNewLeaderboardEntryForm">
     </CreateNewLeaderboardEntryForm>
 
-    <MainMenuButton class="menu-button" @click="downloadMap">Map exportieren</MainMenuButton>
+    <MainMenuButton class="menu-button" @click="downloadMap">Export map</MainMenuButton>
     <div v-if="feedbackMessage" :class="['feedback-message', feedbackClass]">
       {{ feedbackMessage }}
     </div>
@@ -111,7 +111,7 @@ function formatTime(seconds: number): string {
 
 const feedbackMessage = ref('');
 const feedbackClass = ref('');
-    
+
 const downloadMap = async () => {
   try{
       const response = await fetch(`/api/download?lobbyId=${lobbyId}`, {
@@ -129,15 +129,15 @@ const downloadMap = async () => {
       link.href = url;
       link.download = 'SnackManMap.txt';
       document.body.appendChild(link);            // Append the link to the DOM
-      link.click();                               // Simulate a click to start the download        
+    link.click();                               // Simulate a click to start the download
       document.body.removeChild(link);            // Remove the link after the download
 
       // Revoke the object URL to free up memory
       URL.revokeObjectURL(url);
-      
-      // Success feedback
+
+    // Success feedback
       feedbackMessage.value = 'Map saved';
-      feedbackClass.value = 'success';    
+    feedbackClass.value = 'success';
   } catch(error: any){
       // Failure feedback
       feedbackMessage.value = 'Map not saved';
