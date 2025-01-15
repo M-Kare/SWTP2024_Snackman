@@ -1,18 +1,19 @@
 <template>
-    <MenuBackground></MenuBackground>
+    <MenuBackground>
+        <div v-if="darkenBackground" id="darken-background"></div>
 
-    <div v-if="darkenBackground" id="darken-background"></div>
+        <PlayerNameForm
+          v-if="showPlayerNameForm && !playerNameSaved"
+          @hidePlayerNameForm="hidePlayerNameForm"
+          >
+        </PlayerNameForm>
 
-    <PlayerNameForm
-      v-if="showPlayerNameForm && !playerNameSaved"
-      @hidePlayerNameForm="hidePlayerNameForm"
-      >
-    </PlayerNameForm>
-
-    <h1 class="title">Snackman</h1>
-    
-    <MainMenuButton class="menu-button" id="singleplayer-button" @click="startSingleplayer">Singleplayer</MainMenuButton>
-    <MainMenuButton class="menu-button" id="multiplayer-button" @click="showLobbies">Multiplayer</MainMenuButton>
+        <div class="button-container">
+          <MainMenuButton @click="startSingleplayer">Singleplayer</MainMenuButton>
+          <MainMenuButton @click="showLobbies">Multiplayer</MainMenuButton>
+          <MainMenuButton @click="showLeaderboard">Leaderboard</MainMenuButton>
+        </div>
+    </MenuBackground>
 </template>
 
 <script setup lang="ts">
@@ -35,9 +36,13 @@
         darkenBackground.value = false;
   }
 
-  const showLobbies = () => {
-      router.push({name: 'LobbyListView'});
-  }
+const showLobbies = () => {
+  router.push({ name: 'LobbyListView' })
+}
+
+const showLeaderboard = () => {
+  router.push({name: 'Leaderboard'})
+}
 
   const startSingleplayer = () => {
       lobbiesStore.lobbydata.currentPlayer.role = 'SNACKMAN';
@@ -58,29 +63,16 @@
 </script>
 
 <style scoped>
-.title {
-  position: absolute;
-  top: 50px;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 10rem;
-  font-weight: bold;
-  color: #fff;
+.button-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.button-container > * {
+  width: 100%;
   text-align: center;
-}
-
-.menu-button {
-  position: absolute;
-  left: 50%;
-  transform: translate(-50%, -50%); /* h & v centered */
-}
-
-#singleplayer-button {
-  top: 50%;
-}
-
-#multiplayer-button {
-  top: 70%;
 }
 
 #darken-background {

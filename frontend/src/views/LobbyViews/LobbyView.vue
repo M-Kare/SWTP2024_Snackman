@@ -1,19 +1,16 @@
 <template>
     <MenuBackground></MenuBackground>
-    <h1 class="title"> {{ lobby?.name || 'Lobby Name' }} </h1>
-    <div class="outer-box">
+    <div id="individual-outer-box-size" class="outer-box">
+        <div class="item-row">
+            <h1 class="title">{{ lobby?.name || 'Lobby Name' }}</h1>
 
-        <div id="player-count">
+            <div id="player-count">
                 {{ playerCount }} / {{ MAX_PLAYER_COUNT }} Players
+            </div>
         </div>
-
         <div class="inner-box">
             <ul>
-                <li
-                    v-for="member in members"
-                    :key="member.playerId"
-                    class="player-list-items">
-
+                <li v-for="member in members" class="player-list-items">
                     <div class="player-name">
                         {{ member.playerName.replace(/"/g, '') }} <!-- replace all " in String using RegEx modifier /g (find all) -->
                     </div>
@@ -21,31 +18,34 @@
                     <div class="player-character">
                         {{ member.role }}
                     </div>
-
                 </li>
             </ul>
-
         </div>
-        <SmallNavButton
-            id="menu-back-button"
-            class="small-nav-buttons"
-            @click="leaveLobby">
-
-            Leave Lobby
-        </SmallNavButton>
-        <SmallNavButton
-            id="start-game-button"
-            class="small-nav-buttons"
-            @click="startGame">
-
-            Start Game
-        </SmallNavButton>
-        <SmallNavButton
-        id="copyToClip"
-        class="small-nav-buttons"
-        @click="copyToClip()">
-            Copy Link
-        </SmallNavButton>
+        <div class="item-row">
+            <SmallNavButton
+                id="menu-back-button"
+                class="small-nav-buttons"
+                @click="leaveLobby"
+            >
+                Leave Lobby
+            </SmallNavButton>
+            <div id="button-pair">
+                <SmallNavButton
+                id="copyToClip"
+                class="small-nav-buttons"
+                @click="copyToClip()"
+                >
+                Copy Link
+                </SmallNavButton>
+                <SmallNavButton
+                id="start-game-button"
+                class="small-nav-buttons"
+                @click="startGame"
+                >
+                Start Game
+                </SmallNavButton>
+            </div>
+        </div>
     </div>
 
     <div v-if="darkenBackground" id="darken-background"></div>
@@ -302,121 +302,96 @@
 
 <style scoped>
 .title {
-    position: absolute;
-    top: 3rem;
-    left: 50%;
-    transform: translateX(-50%);
-    font-size: 3rem;
-    font-weight: bold;
-    color: #fff;
-    text-align: center;
+  font-size: 3rem;
+  font-weight: bold;
+  color: var(--background-for-text-color);
+  text-align: left;
 }
 
-.outer-box {
-    position: absolute;
-    top: 30%;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 70vw;
-    max-width: 1000px;
-    height: 35rem;
-    max-height: 45rem;
-    background: rgba(255, 255, 255, 60%);
-    border-radius: 0.5rem;
+#individual-outer-box-size {
+  width: 50%;
+  max-width: 60%;
+  height: 50%;
+  max-height: 70%;
+  padding: 2%;
 }
 
 #infoBox {
-    position: absolute;
-    border-radius: 0.5rem;
-    background: rgba(255, 255, 255, 60%);
-    color: #000000;
-    padding-left: 0.5rem;
-    padding-right: 0.5rem;
+  position: absolute;
+  border-radius: 0.5rem;
+  background: rgba(255, 255, 255, 60%);
+  color: #000000;
 }
 
 #player-count {
-    top: 1%;
-    left: 50%;
-    transform: translateX(-50%);
-    text-align: center;
-    font-size: 1.8rem;
-    font-weight: bold;
-    color: #000000;
-    padding: 1rem;
-}
-
-.hidden {
-    display: none;
+  font-size: 3rem;
+  font-weight: bold;
+  color: var(--background-for-text-color);
+  text-align: right;
 }
 
 .inner-box {
-    position: relative;
-    margin-top: 1vh;
-    margin-bottom: 1vh;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 90%;
-    height: auto;
-    background: rgba(255, 255, 255, 70%);
-    border-radius: 0.3rem;
-    color: #000000;
+  position: relative;
+  margin-top: 1vh;
+  margin-bottom: 1vh;
+  left: 50%;
+  transform: translateX(-50%);
+  height: auto;
+  border-radius: 0.3rem;
+  color: var(--primary-text-color);
 }
 
 .inner-box > ul {
-    list-style: none;
-    display: flex;
-    flex-direction: column;
-    left: 50%;
-    transform: translateX(-50%);
-    margin: 0;
-    padding: 0;
-    width: 100%;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  left: 50%;
+  transform: translateX(-50%);
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  min-height: 30vh;
 }
 
 .player-list-items {
-    display: flex;
-    justify-content: space-between;
-    border: 0.5px solid black;
-    border-radius: 0.2rem;
-    font-size: 1.2rem;
-    padding: 0.5rem;
-    margin: 0.6rem;
+  display: flex;
+  justify-content: space-between;
+  background: var(--background-for-text-color);
+  border: 4px solid var(--primary-text-color);
+  border-radius: 0.1rem;
+  box-shadow: 4px 3px 0 var(--primary-text-color);
+  font-size: 1.2rem;
+  padding: 0.5rem 0.8rem;
+  margin: 0.4rem 0;
 }
 
-.small-nav-buttons {
-    bottom: 3%;
-    font-weight: bold;
-}
-
-#copyToClip{
-    top: 3%;
-    right: 1.5%;
-    width: 8%;
-    height: 3rem;
-    font-size: 0.8rem;
-    padding: 0;
+.player-list-items:hover {
+  cursor: pointer;
 }
 
 .info-heading {
-    font-size: 3rem;
-    font-weight: bold;
+  font-size: 3rem;
+  font-weight: bold;
 }
 
 .info-text {
-    font-size: 1.8rem;
-    padding: 1.2rem;
+  font-size: 1.8rem;
 }
 
-#menu-back-button {
-    left: 5%;
+.item-row {
+  display: flex;
+  justify-content: space-between;
 }
 
-#start-game-button {
-    right: 5%;
+#button-pair {
+  display: flex;
+  gap: 20px;
 }
 
-#menu-back-button:hover, #start-game-button:hover {
-  box-shadow: 0px 0px 35px 5px rgba(255, 255, 255, 0.5);
+#menu-back-button:hover,
+#copyToClip:hover,
+#start-game-button:hover {
+  background: var(--primary-highlight-color);
 }
 
 #darken-background {
@@ -430,4 +405,7 @@
     transition: background 0.3s ease;
 }
 
+@media (max-height: 1200px) {
+
+}
 </style>

@@ -22,11 +22,6 @@ import de.hsrm.mi.swt.snackman.SnackmanApplication;
  */
 public class ChickenIntegrationTest {
 
-    /**
-     * Verifies that the Chicken can interact with the Python script directly,
-     * using a Jython interpreter and chooses the correct empty square (" ").
-     */
-
     private static final Path workFolder = Paths.get("./extensions").toAbsolutePath();
 
     @BeforeAll
@@ -45,6 +40,11 @@ public class ChickenIntegrationTest {
             FileSystemUtils.deleteRecursively(workFolder.toFile());
         }
     }
+
+    /**
+     * Verifies that the Chicken can interact with the Python script directly,
+     * using a Jython interpreter and chooses the correct empty square (" ").
+     */
     @Test
     void testChickenMovement() {
         try (PythonInterpreter pyInterp = new PythonInterpreter()) {

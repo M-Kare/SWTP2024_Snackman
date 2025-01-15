@@ -30,6 +30,12 @@ public class PlayerClient {
             this.role = role;
       }
 
-      
-      
+      @Override
+      public String toString() {
+            return "PlayerClient{" +
+                    "playerId='" + playerId + '\'' +
+                    ", playerName='" + playerName + '\'' +
+                    ", role=" + role +
+                    '}';
+      }
 }

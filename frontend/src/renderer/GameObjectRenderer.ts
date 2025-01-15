@@ -81,6 +81,28 @@ export const GameObjectRenderer = () => {
     return chicken
   }
 
+  const createGhostOnFloor = (
+    xPosition: number,
+    zPosition: number,
+    yPosition: number,
+    sideLength: number
+  ) => {
+    let color = 'green';
+    const GHOST_WIDTH_AND_DEPTH = sideLength / 2
+    const GHOST_HEIGHT = 15
+
+    //@TODO add correct ghost-material-design
+    const ghostMaterial = new THREE.MeshStandardMaterial({color: color})
+    const ghostGeometry = new THREE.BoxGeometry(GHOST_WIDTH_AND_DEPTH, GHOST_HEIGHT, GHOST_WIDTH_AND_DEPTH)
+    const ghost = new THREE.Mesh(ghostGeometry, ghostMaterial)
+    ghost.castShadow = true
+    ghost.receiveShadow = true
+
+    ghost.position.set(xPosition, yPosition, zPosition)
+
+    return ghost
+  }
+
   const createFloorSquare = (
     xPosition: number,
     zPosition: number,
@@ -142,5 +164,6 @@ export const GameObjectRenderer = () => {
     createFloorSquare,
     createGround,
     createWall,
+    createGhostOnFloor
   }
 }
