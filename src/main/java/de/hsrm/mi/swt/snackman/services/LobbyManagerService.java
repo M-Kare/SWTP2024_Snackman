@@ -1,6 +1,5 @@
 package de.hsrm.mi.swt.snackman.services;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -128,9 +127,26 @@ public class LobbyManagerService {
         }
     }
 
-    public void removeLobby(String lobbyId) {
+    /**
+     * Stops all threads of chickens and script ghosts.
+     * Removes all players from the lobby and deletes the
+     * lobby afterward.
+     * @param lobbyId the id of the lobby to be closed
+     */
+    public void closeAndDeleteLobby(String lobbyId) {
         Lobby lobby = findLobbyByLobbyId(lobbyId);
 
+        stopAllScriptThreads(lobby);
+        removeAllPlayersFromLobby(lobby);
+
+        messagingTemplate.convertAndSend("/topic/lobbies", getAllLobbies());
+    }
+
+    /**
+     * Stops all threads of chickens and script ghosts.
+     * @param lobby the lobby where to stop the scripts
+     */
+    private void stopAllScriptThreads(Lobby lobby) {
         for (Chicken chicken : lobby.getChickens()) {
             chicken.setWalking(false);
         }
@@ -138,6 +154,14 @@ public class LobbyManagerService {
             scriptGhost.setWalking(false);
         }
 
+    }
+
+    /**
+     * Removes all players from the lobby and deletes the
+     * lobby afterward.
+     * @param lobby the lobby where to stop the scripts
+     */
+    private void removeAllPlayersFromLobby(Lobby lobby) {
         PlayerClient admin = null;
         for (PlayerClient player : lobby.getMembers()) {
             if (!lobby.getAdminClient().equals(player)) {
@@ -149,8 +173,6 @@ public class LobbyManagerService {
 
         assert admin != null;
         leaveLobby(lobby.getLobbyId(), admin.getPlayerId());
-
-        messagingTemplate.convertAndSend("/topic/lobbies", getAllLobbies());
     }
 
     /**
