@@ -126,7 +126,7 @@ class ChickenTest {
         chicken.setKcal(2800);
 
         System.out.println("Initial scared state: " + initialScaredState);
-        chicken.setScared(initialScaredState);
+        chicken.isScaredFromGhost(initialScaredState);
 
         long startTime = System.currentTimeMillis();
         System.out.println("Start time: " + startTime);

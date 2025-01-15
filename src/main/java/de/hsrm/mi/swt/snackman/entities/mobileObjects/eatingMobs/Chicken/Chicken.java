@@ -432,6 +432,10 @@ public class Chicken extends EatingMob implements Runnable {
         startNewTimer();
     }
 
+    public boolean isScared() {
+        return isScared;
+    }
+
     public boolean wasTimerRestarted() {
         return timerRestarted;
     }
