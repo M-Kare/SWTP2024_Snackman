@@ -288,7 +288,7 @@ const startCountDown = () => {
 <style>
 .time {
   position: absolute;
-  color: white;
+  color: black;
   font-weight: bold;
   top: 3vh;
   right: 3vh;
