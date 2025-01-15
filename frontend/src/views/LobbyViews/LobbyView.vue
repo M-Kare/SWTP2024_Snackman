@@ -1,35 +1,20 @@
 <template>
   <MenuBackground></MenuBackground>
 
-  <div v-if="playerId === adminClientId" class="custom-map">
-      <span>Custom Map</span>
-      <CustomMapButton :toggleState="toggleState" @updateToggleState="updateToggleState"></CustomMapButton>
+  <div class="map-list" v-for="map in mapList" :key="map.mapName">
+      <div class="map-list-item">
+          <input class="map-choose" 
+              type="radio" 
+              :value="map.mapName" 
+              :checked="selectedMap === map.mapName" 
+              @change="selectMap(map.mapName)"
+          />
+          <span>{{ map.mapName }}</span>
+      </div>
   </div>
-  
-  <div v-if="toggleState" class="map-importiren">
-      <MapButton @click="triggerFileInput">Map Importieren</MapButton>
-      <input class="input-feld"
-          ref="fileInput" 
-          type="file" 
-          accept=".txt" 
-          @change="handleFileImport"
-      />
 
-      <div class="map-list" v-for="map in mapList" :key="map.mapName">
-          <div class="map-list-item">
-              <input class="map-choose" 
-                  type="radio" 
-                  :value="map.mapName" 
-                  :checked="selectedMap === map.mapName" 
-                  @change="selectMap(map.mapName)"
-              />
-              <span>{{ map.mapName }}</span>
-          </div>
-      </div>
-
-      <div v-if="feedbackMessage" :class="['feedback-message', feedbackClass]">
-          {{ feedbackMessage }}
-      </div>
+  <div v-if="feedbackMessage" :class="['feedback-message', feedbackClass]">
+      {{ feedbackMessage }}
   </div>
 
   <div id="individual-outer-box-size" class="outer-box">
@@ -55,13 +40,42 @@
       </ul>
     </div>
     <div class="item-row">
-      <SmallNavButton
-        id="menu-back-button"
-        class="small-nav-buttons"
-        @click="leaveLobby"
-      >
-        Leave Lobby
-      </SmallNavButton>
+      <div class="map-list" v-for="map in mapList" :key="map.mapName">
+      <div class="map-list-item">
+          <input class="map-choose" 
+              type="radio" 
+              :value="map.mapName" 
+              :checked="selectedMap === map.mapName" 
+              @change="selectMap(map.mapName)"
+          />
+          <span>{{ map.mapName }}</span>
+      </div>
+  </div>
+    </div>
+    <div class="item-row">
+      <div id="button-pair">
+        <SmallNavButton
+          id="menu-back-button"
+          class="small-nav-buttons"
+          @click="leaveLobby"
+        >
+          Leave Lobby
+        </SmallNavButton>
+        <SmallNavButton 
+          id="menu-map-importieren"
+          class="small-nav-button"
+          @click="triggerFileInput"
+        >
+          Map Importieren
+        </SmallNavButton>
+        <input class="input-feld"
+            ref="fileInput" 
+            type="file" 
+            accept=".txt" 
+            @change="handleFileImport"
+        />
+      </div>
+      
       <div id="button-pair">
         <SmallNavButton
           id="copyToClip"
@@ -106,8 +120,6 @@
 import MenuBackground from '@/components/MenuBackground.vue'
 import SmallNavButton from '@/components/SmallNavButton.vue'
 import PopUp from '@/components/PopUp.vue'
-import CustomMapButton from '@/components/CustomMapButton.vue'
-import MapButton from '@/components/MapButton.vue'
 
 import {useRoute, useRouter} from 'vue-router'
 import {computed, onMounted, ref, watchEffect} from 'vue'
