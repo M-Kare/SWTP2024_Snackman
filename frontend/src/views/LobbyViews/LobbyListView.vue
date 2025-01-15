@@ -39,10 +39,10 @@
 
     <div v-if="darkenBackground" id="darken-background"></div>
 
-    <PopUp v-if="showPopUp" class="popup-box" @hidePopUp="hidePopUp">
-      <p class="info-heading">- Lobby full -</p>
-      <p class="info-text">Please choose or create another one!</p>
-    </PopUp>
+  <PopUp v-if="showPopUp" class="popup-box" @hidePopUp="hidePopUp">
+    <p class="info-heading">Lobby full</p>
+    <p class="info-text">Please choose or create another one!</p>
+  </PopUp>
 
     <CreateLobbyForm
       v-if="showLobbyForm"
@@ -222,7 +222,7 @@ onMounted(async () => {
 
 #menu-back-button:hover,
 #show-lobby-creation-button:hover {
-  box-shadow: 0px 0px 35px 5px rgba(255, 255, 255, 0.5);
+  background: var(--primary-highlight-color);
 }
 
 .info-heading {
