@@ -1,4 +1,5 @@
 <template>
+  <div class="overlay"></div>
   <div id="form-box">
     <h1 id="title">New Lobby</h1>
 
@@ -28,11 +29,11 @@
 </template>
 
 <script setup lang="ts">
-    import SmallNavButton from '@/components/SmallNavButton.vue';
-    import { useRouter } from 'vue-router';
-    import { ref } from 'vue';
-    import { useLobbiesStore } from '@/stores/Lobby/lobbiesstore';
-    import type { IPlayerClientDTD } from '@/stores/Lobby/IPlayerClientDTD';
+import SmallNavButton from '@/components/SmallNavButton.vue'
+import {useRouter} from 'vue-router'
+import {ref} from 'vue'
+import {useLobbiesStore} from '@/stores/Lobby/lobbiesstore'
+import type {IPlayerClientDTD} from '@/stores/Lobby/IPlayerClientDTD'
 
 const router = useRouter()
 const lobbiesStore = useLobbiesStore()
@@ -115,6 +116,17 @@ const createLobby = async () => {
 </script>
 
 <style scoped>
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(5px);
+  z-index: 1;
+}
+
 #title {
   position: absolute;
   top: 1rem;
@@ -168,7 +180,7 @@ input::placeholder {
   width: 100%;
   font-size: 1.5rem;
   font-weight: bold;
-  color: #fff;
+  color: var(--background-for-text-color);
 }
 
 #form > input {
@@ -202,6 +214,6 @@ input::placeholder {
 
 #cancel-lobby-creation-button:hover,
 #create-lobby-button:hover {
-  box-shadow: 0px 0px 35px 5px rgba(255, 255, 255, 0.5);
+  background: var(--primary-highlight-color);
 }
 </style>
