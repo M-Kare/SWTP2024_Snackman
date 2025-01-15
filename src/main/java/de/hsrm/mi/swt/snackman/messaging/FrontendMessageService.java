@@ -44,9 +44,9 @@ public class FrontendMessageService {
         log.debug("Send Event: lobby {}", ev.lobby().toString());
         messagingTemplate.convertAndSend("/topic/lobbies/chooseRoleFinish", ev.lobby());
     }
-    public void sendRoleChhooseUpdate( FrontedLobbyRoleUpdateEvent ev){
-        log.debug("Sendet Role Update " , ev.lobby());
-        messagingTemplate.convertAndSend("/topic/lobby/Role-Update", ev.lobby());
+    public void sendRoleChooseUpdate( FrontedLobbyRoleUpdateEvent ev){
+        log.debug("Sendet Role Update " , ev.lobby(), "CharacterId: " , ev.characterId());
+        messagingTemplate.convertAndSend("/topic/lobby/Role-Update", ev);
     }
 
 

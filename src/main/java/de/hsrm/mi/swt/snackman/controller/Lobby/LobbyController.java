@@ -1,5 +1,6 @@
 package de.hsrm.mi.swt.snackman.controller.Lobby;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -197,6 +198,9 @@ public class LobbyController {
         String lobbyId = requestBody.get("lobbyId");
         String playerId = requestBody.get("playerId");
         String role = requestBody.get("role");
+        String characterId = requestBody.get("characterId");
+
+        System.out.println("Character id :" + characterId);
 
         Lobby currentLobby = lobbyManagerService.findLobbyByLobbyId(lobbyId);
         Optional <PlayerClient> player = lobbyManagerService.findClientByClientId(playerId);
@@ -209,7 +213,8 @@ public class LobbyController {
             case "SNACKMAN":
                 if (!lobbyManagerService.snackmanAlreadySelected(currentLobby) ) {
                     player.get().setRole(ROLE.SNACKMAN);
-                    frontendMessageService.sendRoleChhooseUpdate(new FrontedLobbyRoleUpdateEvent(currentLobby));
+                    logger.info("Snackan wurde selected " + "characterId =" + characterId);
+                    frontendMessageService.sendRoleChooseUpdate(new FrontedLobbyRoleUpdateEvent(currentLobby ,characterId));
                     // TODO ROLLE: sendet an alle lobbys -> verarbeitung im store anscheuen
                     return ResponseEntity.ok().build();
                 } else {
@@ -219,8 +224,9 @@ public class LobbyController {
             case "GHOST":
                 if(player.isPresent()) {
                     player.get().setRole(ROLE.GHOST);
-                    frontendMessageService.sendRoleChhooseUpdate(new FrontedLobbyRoleUpdateEvent(currentLobby));
-                    // TODO ROLLE: siehe oben
+                    logger.info("Ghost wurde selected " + "characterId =" + characterId);
+                    frontendMessageService.sendRoleChooseUpdate(new FrontedLobbyRoleUpdateEvent(currentLobby, characterId));
+
                     return ResponseEntity.ok().build();
                 } else {
                     return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
@@ -259,6 +265,22 @@ public class LobbyController {
         return ResponseEntity.ok().build();
 
     }
+
+    /*
+    public ResponseEntity<String> getRolleStatus(@RequestBody Map<String, String> responseBody){
+          lobbyId = responseBody.get("lobbyId");
+
+          Lobby lobby = lobbyManagerService.findLobbyByLobbyId(lobbyId);
+          List<String> rolleStatus = new ArrayList<>();
+
+          for (PlayerClient player : lobby.getMembers()){
+              rolleStatus.add(player.getRole().toString());
+          }
+
+
+    }
+
+     */
 
 
 }

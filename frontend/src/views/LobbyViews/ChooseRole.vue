@@ -46,7 +46,7 @@
 </template>
 
 <script setup lang="ts">
-import {onMounted, reactive, ref} from 'vue';
+import {onMounted, reactive, ref, watchEffect} from 'vue';
 import MenuBackground from '@/components/MenuBackground.vue';
 import SmallNavButton from '@/components/SmallNavButton.vue';
 import {useRoute, useRouter} from "vue-router";
@@ -79,7 +79,8 @@ const hidePopUp = () => {
 interface Character {
   id: number,
   name: string,
-  image: string
+  image: string,
+  selectedBy?: string
 }
 
 const characters = ref<Character[]>([      // TODO add as many as there are players
@@ -89,6 +90,7 @@ const characters = ref<Character[]>([      // TODO add as many as there are play
   {id: 4, name: 'Ghost', image: '/ghost.jpg'},
   {id: 5, name: 'Ghost', image: '/ghost.jpg'}
 ]);
+
 
 
 /**
@@ -105,14 +107,20 @@ const selectedCharacter = ref<Character | null>(null);    // TODO make responsiv
 const selectCharacter = async (character: Character) => {    // TODO API Call to backend to see if you can pick this character
   console.log("Trying to select this character", character)
 
-
+  // already choosen Role
+  if (character.selectedBy) {
+    infoText.value = "Dieser Charakter wurde bereits gewählt!";
+    showPopUp.value = true;
+    darkenBackground.value = true;
+    return;
+  }
   const payload = {
     lobbyId: lobbyId,
     playerId: lobbiesStore.lobbydata.currentPlayer.playerId,
-    role: character.name.toUpperCase() // "SNACKMAN" oder "GHOST"
+    role: character.name.toUpperCase(), // "SNACKMAN" oder "GHOST"
+    characterId: character.id
   };
-  console.log("Lobbie Bei Charakter : ", lobbiesStore.lobbydata.lobbies.find(lobby => lobby.lobbyId === lobbyId))
-
+  console.log("Lobbie  : ", lobbiesStore.lobbydata.lobbies.find(lobby => lobby.lobbyId === lobbyId))
   try {
     const response = await fetch('/api/lobbies/lobby/choose/role', {
       method: 'POST',
@@ -121,15 +129,20 @@ const selectCharacter = async (character: Character) => {    // TODO API Call to
       },
       body: JSON.stringify(payload)
     });
-
     //  Backend Rollen werden beim Createn und Joinen auf Undefined gesetzt
-
     if (response.ok) {
+      // playerId aus allen anderen entfernen
+      characters.value.forEach((char) => {
+        if (char.selectedBy === lobbiesStore.lobbydata.currentPlayer.playerId) {
+          char.selectedBy = undefined
+        }
+      })
+      character.selectedBy = lobbiesStore.lobbydata.currentPlayer.playerId
       selectedCharacter.value = character;
-      selectedCharacter.value = character;
+
       console.log("Character selected successfully");
     } else if (response.status === 409) {
-      console.log("Value " , selectedCharacter.value ,"Response " , response )
+      console.log("Value ", selectedCharacter.value, "Response ", response)
       infoText.value = "Dieser Charakter wurde bereits gewählt!";
       showPopUp.value = true;
       darkenBackground.value = true;
@@ -144,16 +157,13 @@ const selectCharacter = async (character: Character) => {    // TODO API Call to
     showPopUp.value = true;
     darkenBackground.value = true;
   }
-
+}
 
   onMounted(async () => {
     await lobbiesStore.fetchLobbyById(lobbyId)
 
     await lobbiesStore.startLobbyLiveUpdate()
   })
-
-
-};
 
 
 /**

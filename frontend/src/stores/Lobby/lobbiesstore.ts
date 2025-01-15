@@ -167,17 +167,21 @@ export const useLobbiesStore = defineStore('lobbiesstore', () => {
             }
           }
         })
-
-        // Subscribe To ROLEUPDATE
+        // Subscribe to ROLEUPDATE
         stompclient.subscribe(ROLEUPDATE, async (message) => {
-          console.log('STOMP Client subscribe to ROLE-UPDATE ')
-          const updatedLobbyWithRole = JSON.parse(message.body)
-          const lobbyId = updatedLobbyWithRole.lobbyId
-
+          console.log('STOMP Client subscribe to ROLE-UPDATE ', message)
+          const data = JSON.parse(message.body)
+          const lobbyId = data.lobby.lobbyId
+          console.log("ROLEUPDATE " , lobbyId )
+          console.log("ROLEUPDATE " , data.characterId )
+          const characterId = data.characterId
           const updatedLobby = lobbydata.lobbies.find(lobby => lobby.lobbyId === lobbyId)
 
-
           console.log(`Updated Role for lobby ${lobbyId}:`, updatedLobby!.members.toString())
+          if (updatedLobby){
+
+
+          }
 
           // Push the update to all clients at /ChooseRole/{lobbyId}
           if (stompclient && stompclient.connected) {
@@ -249,6 +253,7 @@ export const useLobbiesStore = defineStore('lobbiesstore', () => {
       return null
     }
   }
+
 
   /**
    * Joins an existing lobby.
