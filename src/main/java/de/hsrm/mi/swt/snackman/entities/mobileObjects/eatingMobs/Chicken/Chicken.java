@@ -174,6 +174,9 @@ public class Chicken extends EatingMob implements Runnable {
                 // set new square you move to
                 setNewPosition(newMove);
                 log.debug("New position is x {} z {}", this.chickenPosX, this.chickenPosZ);
+            }else{
+                Square chickensAktSquare = this.gameMap.getSquareAtIndexXZ(chickenPosX, chickenPosZ);
+                chickensAktSquare.setType(MapObjectType.WALL);                
             }
 
             // consume snack if present
