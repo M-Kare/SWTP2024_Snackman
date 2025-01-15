@@ -1,5 +1,9 @@
 package de.hsrm.mi.swt.snackman.services;
 
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -8,11 +12,14 @@ import java.util.NoSuchElementException;
 import java.util.UUID;
 
 import de.hsrm.mi.swt.snackman.entities.map.GameMap;
+import de.hsrm.mi.swt.snackman.entities.mobileObjects.ScriptGhost;
+import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken.Chicken;
 import de.hsrm.mi.swt.snackman.messaging.MessageLoop.MessageLoop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import de.hsrm.mi.swt.snackman.entities.lobby.Lobby;
 import de.hsrm.mi.swt.snackman.entities.lobby.PlayerClient;
@@ -29,6 +36,9 @@ public class LobbyManagerService {
     private final Map<String, PlayerClient> clients = new HashMap<>();
     private final Logger log = LoggerFactory.getLogger(LobbyManagerService.class);
     private final MessageLoop messageLoop;
+
+    @Autowired
+    private SimpMessagingTemplate messagingTemplate;
 
     @Autowired
     public LobbyManagerService(MapService mapService, @Lazy MessageLoop messageLoop) {
@@ -67,6 +77,7 @@ public class LobbyManagerService {
         GameMap gameMap = this.mapService.createNewGameMap(uuid);
 
         Lobby lobby = new Lobby(uuid, name, admin, gameMap, messageLoop);
+        log.debug("Creating new lobby with id {}", lobby.getLobbyId());
         admin.setRole(ROLE.SNACKMAN);
 
         lobbies.put(lobby.getLobbyId(), lobby);
@@ -117,10 +128,57 @@ public class LobbyManagerService {
         Lobby lobby = findLobbyByLobbyId(lobbyId);
         lobby.getMembers().removeIf(client -> client.getPlayerId().equals(playerId));
 
-
         if (lobby.getAdminClientId().equals(playerId) || lobby.getMembers().isEmpty()) {
             lobbies.remove(lobby.getLobbyId());
         }
+    }
+
+    /**
+     * Stops all threads of chickens and script ghosts.
+     * Removes all players from the lobby and deletes the
+     * lobby afterward.
+     * @param lobbyId the id of the lobby to be closed
+     */
+    public void closeAndDeleteLobby(String lobbyId) {
+        Lobby lobby = findLobbyByLobbyId(lobbyId);
+
+        stopAllScriptThreads(lobby);
+        removeAllPlayersFromLobby(lobby);
+
+        messagingTemplate.convertAndSend("/topic/lobbies", getAllLobbies());
+    }
+
+    /**
+     * Stops all threads of chickens and script ghosts.
+     * @param lobby the lobby where to stop the scripts
+     */
+    private void stopAllScriptThreads(Lobby lobby) {
+        for (Chicken chicken : lobby.getChickens()) {
+            chicken.setWalking(false);
+        }
+        for (ScriptGhost scriptGhost : lobby.getScriptGhosts()) {
+            scriptGhost.setWalking(false);
+        }
+
+    }
+
+    /**
+     * Removes all players from the lobby and deletes the
+     * lobby afterward.
+     * @param lobby the lobby where to stop the scripts
+     */
+    private void removeAllPlayersFromLobby(Lobby lobby) {
+        PlayerClient admin = null;
+        for (PlayerClient player : lobby.getMembers()) {
+            if (!lobby.getAdminClient().equals(player)) {
+                leaveLobby(lobby.getLobbyId(), player.getPlayerId());
+            } else {
+                admin = player;
+            }
+        }
+
+        assert admin != null;
+        leaveLobby(lobby.getLobbyId(), admin.getPlayerId());
     }
 
     /**
@@ -133,6 +191,25 @@ public class LobbyManagerService {
 
         if (lobby.getMembers().size() < 2) {
             throw new IllegalStateException("Not enough players to start the game");
+        }
+
+        // If Admin want to play with custom map
+        if(lobby.getUsedCustomMap()){
+            String customMapName = String.format("SnackManMap_%s.txt", lobbyId);
+
+            Path customMapPath = Paths.get("./extensions/map/" + customMapName).toAbsolutePath();
+
+            if (!Files.exists(customMapPath)) {
+                throw new IllegalStateException("Custom map file not found: " + customMapPath);
+            }
+
+            GameMap newGameMap = mapService.createNewGameMap(lobbyId, customMapPath.toString());
+
+            lobby.setGameMap(newGameMap);
+        }
+
+        if (lobby.getGameMap() == null) {
+            throw new IllegalStateException("Game map is not set. Unable to start the game.");
         }
 
         log.info("Starting lobby {}", lobby);
@@ -149,7 +226,7 @@ public class LobbyManagerService {
     public Lobby findLobbyByLobbyId(String lobbyID) {
         Lobby lobby = lobbies.get(lobbyID);
         if (lobby == null) {
-            throw new NoSuchElementException();
+                throw new NoSuchElementException("There is not lobby with the id " + lobbyID);
         } else {
             return lobby;
         }

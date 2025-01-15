@@ -8,7 +8,6 @@ import java.util.Map;
 import de.hsrm.mi.swt.snackman.controller.Square.SquareDTO;
 import de.hsrm.mi.swt.snackman.entities.lobby.GameEnd;
 import de.hsrm.mi.swt.snackman.entities.lobby.GameEndDTO;
-import de.hsrm.mi.swt.snackman.entities.map.GameMap;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.Ghost;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.ScriptGhost;
 import de.hsrm.mi.swt.snackman.services.MapService;
@@ -62,6 +61,19 @@ public class MessageLoop {
             }
             List<Message> messages = new ArrayList<>();
 
+            List<GameEnd> gameEndQueue = changedGameEnd.get(lobby.getLobbyId());
+            changedGameEnd.remove(lobby.getLobbyId());
+
+            if(gameEndQueue != null){
+                for(GameEnd gameEnd : gameEndQueue){
+                    log.info("The game {} has been ended.", lobby.getLobbyId());
+                    messages.add(new Message<>(EventEnum.GameEnd, GameEndDTO.fromGameEnd(gameEnd)));
+                    lobbyService.closeAndDeleteLobby(lobby.getLobbyId());
+                    messagingTemplate.convertAndSend("/topic/lobbies/" + lobby.getLobbyId() + "/update", messages);
+                    return;
+                }
+            }
+
             List<Square> squareQueue = changedSquares.get(lobby.getLobbyId());
             changedSquares.remove(lobby.getLobbyId());
 
@@ -71,14 +83,6 @@ public class MessageLoop {
             List<ScriptGhost> scriptGhostQueue = changedScriptGhosts.get(lobby.getLobbyId());
             changedScriptGhosts.remove(lobby.getLobbyId());
 
-            List<GameEnd> gameEndQueue = changedGameEnd.get(lobby.getLobbyId());
-            changedGameEnd.remove(lobby.getLobbyId());
-
-            if(gameEndQueue != null){
-                for(GameEnd gameEnd : gameEndQueue){
-                    messages.add(new Message<>(EventEnum.GameEnd, GameEndDTO.fromGameEnd(gameEnd)));
-                }
-            }
             for(String client : lobby.getClientMobMap().keySet()){
                 Mob mob = lobby.getClientMobMap().get(client);
 
