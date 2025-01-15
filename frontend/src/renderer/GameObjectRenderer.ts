@@ -2,12 +2,18 @@ import * as THREE from 'three'
 import {SnackType} from '@/stores/Snack/ISnackDTD'
 import {ChickenThickness} from '@/stores/Chicken/IChickenDTD'
 
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
+import ghostGLB from '@/assets/ghost.glb'
+
 /**
  * for creating the objects in the map
  * objects are rendered by the GameMapRenderer.ts
  */
 export const GameObjectRenderer = () => {
   const GROUNDSIZE = 1000
+  const loader = new GLTFLoader()
+
+  let ghostModel: THREE.Group | null = null 
 
   const createSnackOnFloor = (
     xPosition: number,
@@ -81,26 +87,55 @@ export const GameObjectRenderer = () => {
     return chicken
   }
 
-  const createGhostOnFloor = (
+  async function createGhostOnFloor(
     xPosition: number,
     zPosition: number,
     yPosition: number,
     sideLength: number
-  ) => {
-    let color = 'green';
-    const GHOST_WIDTH_AND_DEPTH = sideLength / 2
-    const GHOST_HEIGHT = 15
-
-    //@TODO add correct ghost-material-design
-    const ghostMaterial = new THREE.MeshStandardMaterial({color: color})
-    const ghostGeometry = new THREE.BoxGeometry(GHOST_WIDTH_AND_DEPTH, GHOST_HEIGHT, GHOST_WIDTH_AND_DEPTH)
-    const ghost = new THREE.Mesh(ghostGeometry, ghostMaterial)
-    ghost.castShadow = true
-    ghost.receiveShadow = true
-
-    ghost.position.set(xPosition, yPosition, zPosition)
-
-    return ghost
+  ): Promise<THREE.Object3D> {
+    const placeholder = new THREE.Mesh(
+      new THREE.SphereGeometry(0.5, 16, 16),
+      new THREE.MeshStandardMaterial({ color: 'gray', opacity: 0.5, transparent: true })
+    )
+    placeholder.position.set(xPosition, yPosition, zPosition)
+  
+    // If the model is already loaded, clone it
+    if (ghostModel) {
+      const clonedGhost = ghostModel.clone()
+      clonedGhost.position.set(xPosition, yPosition, zPosition)
+      clonedGhost.scale.set(0.5, 0.5, 0.5)
+      clonedGhost.traverse((child: any) => {
+        if (child.isMesh) {
+          child.castShadow = true
+          child.receiveShadow = true
+        }
+      })
+      return clonedGhost
+    }
+  
+    // Load model asynchronously and replace placeholder
+    return new Promise((resolve, reject) => {
+      loader.load(
+        ghostGLB,
+        (gltf) => {
+          ghostModel = gltf.scene
+          ghostModel.position.set(xPosition, yPosition, zPosition)
+          ghostModel.scale.set(0.5, 0.5, 0.5)
+          ghostModel.traverse((child: any) => {
+            if (child.isMesh) {
+              child.castShadow = true
+              child.receiveShadow = true
+            }
+          })
+          resolve(ghostModel.clone())
+        },
+        undefined,
+        (error) => {
+          console.error('Fehler beim Laden von ghost.glb:', error)
+          reject(error)
+        }
+      )
+    })
   }
 
   const createFloorSquare = (

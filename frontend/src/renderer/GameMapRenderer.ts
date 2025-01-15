@@ -44,7 +44,7 @@ export const GameMapRenderer = () => {
     return renderer
   }
 
-  const createGameMap = (mapData: IGameMap) => {
+  const createGameMap = async (mapData: IGameMap) => {
     const OFFSET = mapData.DEFAULT_SQUARE_SIDE_LENGTH / 2
     const DEFAULT_SIDE_LENGTH = mapData.DEFAULT_SQUARE_SIDE_LENGTH
     const WALL_HEIGHT = mapData.DEFAULT_WALL_HEIGHT
@@ -95,15 +95,18 @@ export const GameMapRenderer = () => {
     console.log("GameMap data ", mapData)
     for (let currentGhost of mapData.scriptGhosts) {
       console.log("Initialising script ghost with x {} y {}", currentGhost.scriptGhostPosX, currentGhost.scriptGhostPosZ)
-      const scriptGhostToAdd = gameObjectRenderer.createGhostOnFloor(
+      
+      gameObjectRenderer.createGhostOnFloor(
         currentGhost.scriptGhostPosX * DEFAULT_SIDE_LENGTH + OFFSET,
         currentGhost.scriptGhostPosZ * DEFAULT_SIDE_LENGTH + OFFSET,
         0,
         DEFAULT_SIDE_LENGTH
-      )
-      scene.add(scriptGhostToAdd)
-
-      gameMapStore.setScriptGhostMeshId(scriptGhostToAdd.id, currentGhost.id)
+      ).then((scriptGhostToAdd) => {
+        scene.add(scriptGhostToAdd)
+        gameMapStore.setScriptGhostMeshId(scriptGhostToAdd.id, currentGhost.id)
+      }).catch((error) => {
+        console.error("Error beim Geist laden: ", error)
+      })
     }
   }
 
