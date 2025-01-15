@@ -3,7 +3,6 @@
   <div id="individual-outer-box-size" class="outer-box">
     <h1 class="result-title">{{ gameResult }}</h1>
     <p class="end-reason">{{ gameReason }}</p>
-    <p class="end-reason">Ihr habt {{ formatedPlayedTime }} Minuten lang gespielt</p>
     <p class="end-reason" v-if="winningRole != 'GHOST'">SnackMan hat {{ kcalCollected }} Kalorien gesammelt!</p>
     <MainMenuButton class="menu-button" @click="backToMainMenu">Zurück zum Hauptmenü
     </MainMenuButton>
@@ -13,6 +12,7 @@
       Create new leaderboard entry
     </MainMenuButton>
 
+    <p class="end-reason">The playing time was {{ formatedPlayedTime }} </p>
     <div id="button-pair">
       <SmallNavButton class="menu-button" @click="backToMainMenu">
         Back to main menu
@@ -61,6 +61,11 @@ const playedTime = (route.query.timePlayed as unknown as number) || 0
 const formatedPlayedTime = formatTime(playedTime)
 const kcalCollected = (route.query.kcalCollected as unknown as number) || 0
 const gameResult = ref()
+const showPopUp = ref(false)
+
+const hidePopUp = () => {
+  showPopUp.value = false
+}
 
 if (winningRole == "SNACKMAN") {
   gameResult.value = "SNACKMAN IS THE WINNER"
@@ -120,9 +125,15 @@ const backToMainMenu = () => {
 function formatTime(seconds: number): string {
   const minutes = Math.floor(seconds / 60);
   const remainingSeconds = seconds % 60;
-  return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
-}
 
+  if (minutes < 1) {
+    return `${remainingSeconds} second${remainingSeconds !== 1 ? 's' : ''}`;
+  } else {
+    const formattedMinutes = minutes.toString().padStart(2, '0');
+    const formattedSeconds = remainingSeconds.toString().padStart(2, '0');
+    return `${formattedMinutes}:${formattedSeconds} minute${minutes !== 1 ? 's' : ''}`;
+  }
+}
 
 const feedbackMessage = ref('');
 const feedbackClass = ref('');
