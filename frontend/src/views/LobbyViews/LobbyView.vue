@@ -53,7 +53,7 @@
           v-if="playerId == adminClientId"
           @click="triggerFileInput"
         >
-          Map Importieren
+          Import map
         </SmallNavButton>
         <input class="input-feld"
             ref="fileInput"
@@ -154,17 +154,17 @@ const hidePopUp = () => {
 }
 
 const mapList = ref<{ mapName: string; fileName: string }[]>([
-    { mapName: 'Original Map', fileName: `Maze.txt` },
+  {mapName: 'Generated Map', fileName: `Maze.txt`},
 ]);
 
 const feedbackMessage = ref('')
 const usedCustomMap = ref(false);
 const selectedMap = ref<string | null>(null);
-const customMapName = ref('Snack Man Map')
+const customMapName = ref('Uploaded Map')
 const selectMap = (mapName: string) => {
     selectedMap.value = mapName;
 
-    if (selectedMap.value === 'Original Map'){
+  if (selectedMap.value === 'Uploaded Map') {
         usedCustomMap.value = false;
     }
     else if (selectedMap.value === customMapName.value) {
@@ -192,7 +192,7 @@ const handleFileImport = (event: Event) => {
     if (input.files && input.files.length > 0) {
         const file = input.files[0];
         if (file.name.endsWith('.txt')) {
-            customMapName.value = file.name.slice(0, -4)
+          customMapName.value = "Uploaded Map"
             uploadFileToServer(file, lobbyId);
         } else {
             showPopUp.value = true;
@@ -478,9 +478,8 @@ function moveToMouse(element: HTMLElement) {
 }
 
 #individual-outer-box-size {
-  width: 50%;
-  max-width: 60%;
-  height: 50%;
+  width: 60%;
+  height: 60%;
   max-height: 70%;
   padding: 2%;
 }
