@@ -62,6 +62,19 @@ public class MessageLoop {
             }
             List<Message> messages = new ArrayList<>();
 
+            List<GameEnd> gameEndQueue = changedGameEnd.get(lobby.getLobbyId());
+            changedGameEnd.remove(lobby.getLobbyId());
+
+            if(gameEndQueue != null){
+                for(GameEnd gameEnd : gameEndQueue){
+                    log.info("The game {} has been ended.", lobby.getLobbyId());
+                    messages.add(new Message<>(EventEnum.GameEnd, GameEndDTO.fromGameEnd(gameEnd)));
+                    lobbyService.removeLobby(lobby.getLobbyId());
+                    messagingTemplate.convertAndSend("/topic/lobbies/" + lobby.getLobbyId() + "/update", messages);
+                    return;
+                }
+            }
+
             List<Square> squareQueue = changedSquares.get(lobby.getLobbyId());
             changedSquares.remove(lobby.getLobbyId());
 
@@ -71,14 +84,6 @@ public class MessageLoop {
             List<ScriptGhost> scriptGhostQueue = changedScriptGhosts.get(lobby.getLobbyId());
             changedScriptGhosts.remove(lobby.getLobbyId());
 
-            List<GameEnd> gameEndQueue = changedGameEnd.get(lobby.getLobbyId());
-            changedGameEnd.remove(lobby.getLobbyId());
-
-            if(gameEndQueue != null){
-                for(GameEnd gameEnd : gameEndQueue){
-                    messages.add(new Message<>(EventEnum.GameEnd, GameEndDTO.fromGameEnd(gameEnd)));
-                }
-            }
             for(String client : lobby.getClientMobMap().keySet()){
                 Mob mob = lobby.getClientMobMap().get(client);
 

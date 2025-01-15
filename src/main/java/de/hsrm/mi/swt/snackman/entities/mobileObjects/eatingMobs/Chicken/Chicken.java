@@ -73,7 +73,7 @@ public class Chicken extends EatingMob implements Runnable {
         this.fileName = "ChickenMovementSkript";
         this.isWalking = true;
         this.lookingDirection = Direction.getRandomDirection();
-        // log.info("Chicken looking direction is {}", lookingDirection);
+        log.debug("Chicken looking direction is {}", lookingDirection);
         initJython();
         initTimer();
     }
@@ -338,6 +338,7 @@ public class Chicken extends EatingMob implements Runnable {
         try {
             Thread.sleep(WAITING_TIME);
             move();
+            log.info("Stopping chicken with id {}", id);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new RuntimeException(e);
@@ -490,4 +491,7 @@ public class Chicken extends EatingMob implements Runnable {
         return squares;
     }
 
+    public void setWalking(boolean walking) {
+        isWalking = walking;
+    }
 }
