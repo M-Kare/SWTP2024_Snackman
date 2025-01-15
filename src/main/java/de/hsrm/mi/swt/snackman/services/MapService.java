@@ -32,7 +32,6 @@ import de.hsrm.mi.swt.snackman.messaging.MessageLoop.MessageLoop;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 
 /**
@@ -198,6 +197,7 @@ public class MapService {
 
                             Thread chickenThread = new Thread(newChicken);
                             chickenThread.start();
+                            log.debug("Starting chicken with id {}", newChicken.getId());
 
                             newChicken.addPropertyChangeListener((PropertyChangeEvent evt) -> {
                                 if (evt.getPropertyName().equals("chicken")) {
@@ -266,6 +266,7 @@ public class MapService {
 
             Thread ghostThread = new Thread(newScriptGhost);
             ghostThread.start();
+            log.debug("Starting script ghost with id {}", newScriptGhost.getId());
             ghostSpawnIndex++;
             lobby.addScriptGhost(newScriptGhost);
 
