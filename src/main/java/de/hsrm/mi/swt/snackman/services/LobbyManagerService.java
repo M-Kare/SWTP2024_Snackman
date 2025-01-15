@@ -141,6 +141,18 @@ public class LobbyManagerService {
     }
 
     /**
+     * Starts a singleplayer game in the specified lobby.
+     *
+     * @param lobbyId ID of the lobby
+     */
+    public void startSingleplayer(String lobbyId) {
+        Lobby lobby = findLobbyByLobbyId(lobbyId);
+        lobby.startGame();
+
+        mapService.spawnMobs(lobby.getGameMap(), lobby);
+    }
+
+    /**
      * Searches the lobby for its UUID
      *
      * @param lobbyID UUID of the lobby
