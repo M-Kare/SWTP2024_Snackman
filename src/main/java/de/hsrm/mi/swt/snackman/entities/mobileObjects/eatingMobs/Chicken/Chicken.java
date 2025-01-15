@@ -9,18 +9,20 @@ import java.util.Properties;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
+
 import de.hsrm.mi.swt.snackman.entities.map.GameMap;
-import de.hsrm.mi.swt.snackman.entities.map.Square;
-import de.hsrm.mi.swt.snackman.entities.mapObject.MapObjectType;
-import de.hsrm.mi.swt.snackman.entities.mapObject.snack.Snack;
-import de.hsrm.mi.swt.snackman.entities.mapObject.snack.SnackType;
-import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.EatingMob;
 import org.python.core.PyList;
 import org.python.core.PyObject;
 import org.python.util.PythonInterpreter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import de.hsrm.mi.swt.snackman.configuration.GameConfig;
+import de.hsrm.mi.swt.snackman.entities.map.Square;
+import de.hsrm.mi.swt.snackman.entities.mapObject.MapObjectType;
+import de.hsrm.mi.swt.snackman.entities.mapObject.snack.Snack;
+import de.hsrm.mi.swt.snackman.entities.mapObject.snack.SnackType;
+import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.EatingMob;
 
 /**
  * Represents a chicken entity in the game, capable of moving around the map,
@@ -31,7 +33,6 @@ public class Chicken extends EatingMob implements Runnable {
     private static long idCounter = 0;
     private final PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
     private final Logger log = LoggerFactory.getLogger(Chicken.class);
-    //private final int WAITING_TIME = GameConfig.WAITING_TIME;  // in ms
     private int waitingTime;
     private final int MAX_CALORIES = GameConfig.MAX_KALORIEN;
     private final int CALORIES_PER_SIXTH = (MAX_CALORIES / 6);
@@ -176,7 +177,7 @@ public class Chicken extends EatingMob implements Runnable {
                 log.debug("New position is x {} z {}", this.chickenPosX, this.chickenPosZ);
             }else{
                 Square chickensAktSquare = this.gameMap.getSquareAtIndexXZ(chickenPosX, chickenPosZ);
-                chickensAktSquare.setType(MapObjectType.WALL);                
+                chickensAktSquare.setType(MapObjectType.WALL);
             }
 
             // consume snack if present
@@ -215,8 +216,6 @@ public class Chicken extends EatingMob implements Runnable {
                         }
                     }).start();
 
-
-
                 } else {
                     if ((super.getKcal()) <= 2 * CALORIES_PER_SIXTH) {
                         this.thickness = Thickness.THIN;
@@ -238,7 +237,6 @@ public class Chicken extends EatingMob implements Runnable {
             currentSquare.setSnack(new Snack(SnackType.EMPTY));
         }
     }
-
 
     /**
      * Initializes Jython for executing the chicken's movement script.
@@ -270,6 +268,9 @@ public class Chicken extends EatingMob implements Runnable {
         this.pythonInterpreter.exec("from " + fileName + " import choose_next_square");
     }
 
+    /**
+     * TODO
+     */
     private void setWaitingTime(){
         this.pythonInterpreter.exec("from " + fileName + " import getWaitingTime");
 
@@ -277,7 +278,6 @@ public class Chicken extends EatingMob implements Runnable {
         PyObject result = func.__call__();
 
         this.waitingTime = result.asInt();
-
     }
 
     /**
@@ -290,7 +290,6 @@ public class Chicken extends EatingMob implements Runnable {
     public int executeMovementSkript(List<String> squares) {
         try {
             log.debug("Running python chicken script with: {}", squares.toString());
-            //pythonInterpreter.exec(interpreterCommand);
             PyObject func = pythonInterpreter.get("choose_next_square");
             PyObject result = func.__call__(new PyList(squares));
 
@@ -419,21 +418,15 @@ public class Chicken extends EatingMob implements Runnable {
     public void isScaredFromGhost(boolean scared) {
         this.isScared = scared;
         layEgg();
-        startNewTimer();
     }
 
+    /**
+     * timer should restart if chicken kcal == 0
+     *
+     * @return if timer is restarted
+     */
     public boolean wasTimerRestarted() {
         return timerRestarted;
-    }
-
-    // For Testing
-    public boolean isScared(){
-        return this.isScared;
-    }
-
-    // For Testing
-    public void setScared(boolean b){
-        this.isScared = b;
     }
 
     @Override

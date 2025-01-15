@@ -1,13 +1,15 @@
 <template>
   <MenuBackground></MenuBackground>
+
   <div id="individual-outer-box-size" class="outer-box">
     <div class="item-row">
       <h1 class="title">{{ lobby?.name || 'Lobby Name' }}</h1>
 
-        <div id="player-count">
-                {{ playerCount }} / {{ MAX_PLAYER_COUNT }} Players
-        </div>
+      <div id="player-count">
+        {{ playerCount }} / {{ MAX_PLAYER_COUNT }} Player
+      </div>
     </div>
+
     <div class="inner-box">
       <ul>
         <li v-for="member in members" class="player-list-items">
@@ -21,14 +23,46 @@
         </li>
       </ul>
     </div>
+
     <div class="item-row">
-      <SmallNavButton
-        id="menu-back-button"
-        class="small-nav-buttons"
-        @click="leaveLobby"
-      >
-        Leave Lobby
-      </SmallNavButton>
+      <ul class="map-list" v-if="playerId == adminClientId">
+        <li class="map-list-item" v-for="map in mapList" :key="map.mapName" v-if="mapList.length > 1">
+            <input class="map-choose"
+              type="radio"
+              :value="map.mapName"
+              :checked="selectedMap === map.mapName"
+              @change="selectMap(map.mapName)"
+          />
+          <span>{{ map.mapName }}</span>
+        </li>
+      </ul>
+    </div>
+
+    <div class="item-row">
+      <div id="button-pair">
+        <SmallNavButton
+          id="menu-back-button"
+          class="small-nav-buttons"
+          @click="leaveLobby"
+        >
+          Leave Lobby
+        </SmallNavButton>
+        <SmallNavButton
+          id="menu-map-importieren"
+          class="small-nav-button"
+          v-if="playerId == adminClientId"
+          @click="triggerFileInput"
+        >
+          Import map
+        </SmallNavButton>
+        <input class="input-feld"
+            ref="fileInput"
+            type="file"
+            accept=".txt"
+            @change="handleFileImport"
+        />
+      </div>
+
       <div id="button-pair">
         <SmallNavButton
           id="copyToClip"
@@ -61,7 +95,7 @@
   </PopUp>
 
   <PopUp v-if="showPopUp" class="popup-box" @hidePopUp="hidePopUp">
-    <p class="info-heading">Can't start the game</p>
+    <p class="info-heading">{{ infoHeading }}</p>
     <p class="info-text">{{ infoText }}</p>
   </PopUp>
 
@@ -83,16 +117,19 @@ const router = useRouter()
 const route = useRoute()
 const lobbiesStore = useLobbiesStore()
 
+const playerId = lobbiesStore.lobbydata.currentPlayer.playerId;
+const lobbyId = route.params.lobbyId as string;
+
 const lobbyUrl = route.params.lobbyId
 let lobbyLoaded = false
 const lobby = computed(() =>
   lobbiesStore.lobbydata.lobbies.find(l => l.lobbyId === lobbyUrl),
 )
+const adminClientId = lobby.value?.adminClient.playerId;
 const members = computed(
   () => lobby.value?.members || ([] as Array<IPlayerClientDTD>),
 )
 const playerCount = computed(() => members.value.length)
-const maxPlayerCount = ref(5)
 
 const darkenBackground = ref(false)
 const showPopUp = ref(false)
@@ -116,6 +153,150 @@ const hidePopUp = () => {
   darkenBackground.value = false
 }
 
+const mapList = ref<{ mapName: string; fileName: string }[]>([
+  {mapName: 'Generated Map', fileName: `Maze.txt`},
+]);
+
+const feedbackMessage = ref('')
+const usedCustomMap = ref(false);
+const selectedMap = ref<string | null>(null);
+const customMapName = ref('Uploaded Map')
+const selectMap = (mapName: string) => {
+    selectedMap.value = mapName;
+
+  if (selectedMap.value === 'Uploaded Map') {
+        usedCustomMap.value = false;
+    }
+    else if (selectedMap.value === customMapName.value) {
+        usedCustomMap.value = true;
+    }
+};
+
+const triggerFileInput = () => {
+    fileInput.value?.click();
+}
+
+const fileInput = ref<HTMLInputElement | null>(null);
+
+/**
+ * This function processes the file selected by the user in an input field.
+ * It ensures the file is a `.txt` file.
+ * If the file is valid, it triggers an upload to the server.
+ * Otherwise, it displays a popup with error information.
+ *
+ * @param event - The event triggered by the file input change.
+ */
+const handleFileImport = (event: Event) => {
+    const input = event.target as HTMLInputElement;
+
+    if (input.files && input.files.length > 0) {
+        const file = input.files[0];
+        if (file.name.endsWith('.txt')) {
+          customMapName.value = "Uploaded Map"
+            uploadFileToServer(file, lobbyId);
+        } else {
+            showPopUp.value = true;
+            darkenBackground.value = true;
+            infoHeading.value = "File Map is not valid"
+            infoText.value = "Please upload file .txt"
+        }
+    }
+}
+
+/**
+ * Upload file to server
+ * @param file - new custom map in file .txt
+ * @param lobbyId - The unique identifier of the lobby.
+ */
+const uploadFileToServer = async (file: File, lobbyId: string) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('lobbyId', lobbyId);
+
+    try {
+        const response = await fetch('/api/upload', {
+            method: 'POST',
+            body: formData
+        });
+
+        if (response.ok) {
+            const mapName = customMapName.value;
+            const fileName = `SnackManMap_${lobbyId}.txt`;
+
+            if (mapList.value.length > 1) {
+                mapList.value[1] = { mapName, fileName };
+            } else {
+                mapList.value.push({ mapName, fileName });
+            }
+
+            selectMap(mapName);
+        } else {
+            const errorMessage = await response.text();
+            showPopUp.value = true;
+            darkenBackground.value = true;
+            infoHeading.value = "File Map is not valid";
+            infoText.value = errorMessage;
+        }
+    } catch (error) {
+        console.error('Error uploading file:', error);
+        showPopUp.value = true;
+        darkenBackground.value = true;
+        infoHeading.value = "Error uploading file";
+        infoText.value = error;
+    }
+}
+
+/**
+ * Delete uploaded File, when the lobby doesn't exist anymore.
+ * @param lobbyId - The unique identifier of the lobby.
+ */
+const deleteUploadedFile = async (lobbyId: string) => {
+    const formData = new FormData();
+    formData.append('lobbyId', lobbyId);
+
+    fetch('/api/deleteMap', {
+        method: 'DELETE',
+        body: formData
+    })
+    .then(response => {
+        if (!response.ok) {
+            console.error('Error deleting file:', response.text());
+        }
+    })
+    .catch(error => {
+        console.error('Error deleting file:', error);
+    });
+}
+
+/**
+ * Sends a request to update the used map status for a specific lobby.
+ *
+ * @param {string} lobbyId - The unique identifier of the lobby.
+ * @param {boolean} usedCustomMap - Indicates whether a custom map is used (true) or not (false).
+*/
+const changeUsedMapStatus = async (lobbyId: string, usedCustomMap: boolean): Promise<string> => {
+    try {
+        const response = await fetch('/api/change-used-map-status', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ lobbyId, usedCustomMap })
+        });
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error('Error changing the used map status:', errorText);
+            throw new Error(`Failed to change map status: ${errorText}`);
+        }
+
+        return "done";
+    } catch (error) {
+        console.error('Error changing the used map status:', error);
+        throw error;
+    }
+}
+
 watchEffect(() => {
   if (lobbiesStore.lobbydata && lobbiesStore.lobbydata.lobbies) {
     const updatedLobby = lobbiesStore.lobbydata.lobbies.find(
@@ -126,13 +307,14 @@ watchEffect(() => {
       if (updatedLobby.gameStarted) {
         router.push({
           name: 'GameView',
-          query: { 
+          query: {
             role: lobbiesStore.lobbydata.currentPlayer.role ,
             lobbyId: lobbiesStore.lobbydata.currentPlayer.joinedLobbyId,
           },
         })
       }
     } else if (lobbyLoaded) {
+      deleteUploadedFile(lobbyId);
       router.push({ name: 'LobbyListView' })
     }
   }
@@ -210,6 +392,8 @@ const leaveLobby = async () => {
         await lobbiesStore.leaveLobby(lobby.value.lobbyId, member.playerId)
       }
     }
+    // If Admin-Player leave Lobby, delete the uploaded map
+    deleteUploadedFile(lobbyId);
   }
 
   await lobbiesStore.leaveLobby(lobby.value.lobbyId, playerId)
@@ -236,14 +420,26 @@ const startGame = async () => {
     showPopUp.value = true
     darkenBackground.value = true
     infoText.value = 'Not enough players to start the game!'
+    return
   }
 
-  if (playerId === lobby.value.adminClient.playerId) {
-    await lobbiesStore.startGame(lobby.value.lobbyId)
+  if(playerId === lobby.value.adminClient.playerId){
+    const status = await changeUsedMapStatus(lobby.value.lobbyId, usedCustomMap.value);
+    if (status !== "done") {
+      showPopUp.value = true;
+      darkenBackground.value = true;
+      infoHeading.value = "Map Status Error";
+      infoText.value = "Failed to update the map status.";
+      return;
+    }
+
+    await lobbiesStore.startGame(lobby.value.lobbyId);
   } else {
-    showPopUp.value = true
-    darkenBackground.value = true
-    infoText.value = 'Only SnackMan can start the game!'
+    showPopUp.value = true;
+    darkenBackground.value = true;
+    infoHeading.value = "Can't start the game"
+    infoText.value = "Only SnackMan can start the game!"
+    return
   }
 }
 
@@ -282,9 +478,8 @@ function moveToMouse(element: HTMLElement) {
 }
 
 #individual-outer-box-size {
-  width: 50%;
-  max-width: 60%;
-  height: 50%;
+  width: 60%;
+  height: 60%;
   max-height: 70%;
   padding: 2%;
 }
@@ -363,11 +558,35 @@ function moveToMouse(element: HTMLElement) {
 
 #menu-back-button:hover,
 #copyToClip:hover,
-#start-game-button:hover {
+#start-game-button:hover,
+#menu-map-importieren:hover {
   background: var(--primary-highlight-color);
 }
 
-@media (max-height: 1200px) {
+.map-list{
+  margin-top: 1vh;
+  margin-bottom: 1vh;
+  display: flex;
+  list-style: none;
+  padding: 0;
+}
 
+.map-list-item{
+  margin-right: 40px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  font-size: 1.5rem;
+  color: white;
+}
+
+.map-choose{
+  width: 20px;
+  height: 20px;
+  transform: scale(1.5);
+}
+
+.input-feld{
+  display: none;
 }
 </style>

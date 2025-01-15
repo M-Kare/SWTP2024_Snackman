@@ -1,5 +1,10 @@
 package de.hsrm.mi.swt.snackman.services;
 
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,6 +36,7 @@ public class LobbyManagerService {
     private final Map<String, PlayerClient> clients = new HashMap<>();
     private final Logger log = LoggerFactory.getLogger(LobbyManagerService.class);
     private final MessageLoop messageLoop;
+
     @Autowired
     private SimpMessagingTemplate messagingTemplate;
 
@@ -71,7 +77,7 @@ public class LobbyManagerService {
         GameMap gameMap = this.mapService.createNewGameMap(uuid);
 
         Lobby lobby = new Lobby(uuid, name, admin, gameMap, messageLoop);
-        log.info("Creating new lobby with id {}", lobby.getLobbyId());
+        log.debug("Creating new lobby with id {}", lobby.getLobbyId());
         admin.setRole(ROLE.SNACKMAN);
 
         lobbies.put(lobby.getLobbyId(), lobby);
@@ -187,8 +193,39 @@ public class LobbyManagerService {
             throw new IllegalStateException("Not enough players to start the game");
         }
 
+        // If Admin want to play with custom map
+        if(lobby.getUsedCustomMap()){
+            String customMapName = String.format("SnackManMap_%s.txt", lobbyId);
+
+            Path customMapPath = Paths.get("./extensions/map/" + customMapName).toAbsolutePath();
+
+            if (!Files.exists(customMapPath)) {
+                throw new IllegalStateException("Custom map file not found: " + customMapPath);
+            }
+
+            GameMap newGameMap = mapService.createNewGameMap(lobbyId, customMapPath.toString());
+
+            lobby.setGameMap(newGameMap);
+        }
+
+        if (lobby.getGameMap() == null) {
+            throw new IllegalStateException("Game map is not set. Unable to start the game.");
+        }
+
         log.info("Starting lobby {}", lobby);
         lobby.startGame();
+        mapService.spawnMobs(lobby.getGameMap(), lobby);
+    }
+
+    /**
+     * Starts a singleplayer game in the specified lobby.
+     *
+     * @param lobbyId ID of the lobby
+     */
+    public void startSingleplayer(String lobbyId) {
+        Lobby lobby = findLobbyByLobbyId(lobbyId);
+        lobby.startGame();
+
         mapService.spawnMobs(lobby.getGameMap(), lobby);
     }
 
