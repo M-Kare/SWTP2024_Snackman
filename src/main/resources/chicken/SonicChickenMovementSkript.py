@@ -71,7 +71,7 @@ def choose_next_square(squares_liste):
         return add_walking_direction(choose_random_square(solution_liste, EMPTY, direction))
 
 def getWaitingTime():
-    return 2000
+    return 500
 
 def eliminate_walls_as_options(squares):
     """

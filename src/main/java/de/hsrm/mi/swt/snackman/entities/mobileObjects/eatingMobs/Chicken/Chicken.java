@@ -33,7 +33,8 @@ public class Chicken extends EatingMob implements Runnable {
     private static long idCounter = 0;
     private final PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
     private final Logger log = LoggerFactory.getLogger(Chicken.class);
-    private final int WAITING_TIME = GameConfig.WAITING_TIME;  // in ms
+    //private final int WAITING_TIME = GameConfig.WAITING_TIME;  // in ms
+    private int waitingTime;
     private final int MAX_CALORIES = GameConfig.MAX_KALORIEN;
     private final int CALORIES_PER_SIXTH = (MAX_CALORIES / 6);
     private long id;
@@ -74,6 +75,7 @@ public class Chicken extends EatingMob implements Runnable {
         this.isWalking = true;
         this.lookingDirection = Direction.getRandomDirection();
         // log.info("Chicken looking direction is {}", lookingDirection);
+        //setWaitingTime();
         initJython();
         initTimer();
     }
@@ -82,6 +84,14 @@ public class Chicken extends EatingMob implements Runnable {
         List<String> result = executeMovementSkript(squares);
         return result;
     }
+
+    // public void setScared(boolean h){
+    //     this.isScared = h;
+    // }
+
+    // public boolean isScared(){
+    //     return this.isScared();
+    // }
 
     /**
      * Converts a Python list to a Java list.
@@ -143,8 +153,8 @@ public class Chicken extends EatingMob implements Runnable {
         propertyChangeSupport.firePropertyChange("chicken", null, this);
 
         try {
-            log.debug("Waiting " + WAITING_TIME + " sec before walking on next square.");
-            Thread.sleep(WAITING_TIME);
+            log.debug("Waiting " + waitingTime + " sec before walking on next square.");
+            Thread.sleep(waitingTime);
         } catch (InterruptedException e) {
             log.error(e.getMessage());
             Thread.currentThread().interrupt();
@@ -284,7 +294,18 @@ public class Chicken extends EatingMob implements Runnable {
             log.error("Error initializing ChickenMovementSkript.py: ", ex);
             ex.printStackTrace();
         }
+        setWaitingTime();
         this.pythonInterpreter.exec("from ChickenMovementSkript import choose_next_square");
+    }
+
+    private void setWaitingTime(){
+        this.pythonInterpreter.exec("from ChickenMovementSkript import getWaitingTime");
+
+        PyObject func = pythonInterpreter.get("getWaitingTime");
+        PyObject result = func.__call__();
+
+        this.waitingTime = result.asInt();
+
     }
 
     /**
@@ -336,7 +357,7 @@ public class Chicken extends EatingMob implements Runnable {
     @Override
     public void run() {
         try {
-            Thread.sleep(WAITING_TIME);
+            Thread.sleep(waitingTime);
             move();
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
