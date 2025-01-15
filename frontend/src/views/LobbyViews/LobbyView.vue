@@ -128,7 +128,7 @@ watchEffect(() => {
           name: 'GameView',
           query: {
             role: lobbiesStore.lobbydata.currentPlayer.role,
-            lobby: lobbiesStore.lobbydata.currentPlayer.joinedLobbyId,
+            lobbyId: lobbiesStore.lobbydata.currentPlayer.joinedLobbyId,
           },
         })
       }
