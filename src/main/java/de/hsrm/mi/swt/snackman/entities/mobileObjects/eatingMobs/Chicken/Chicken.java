@@ -301,10 +301,10 @@ public class Chicken extends EatingMob implements Runnable {
      */
     public int executeMovementSkript(List<String> squares) {
         try {
-            log.info("Running python chicken {} script with: {} and {}", this.id, squares.toString(), this.fileName);
+            log.debug("Running python chicken {} script with: {} and {}", this.id, squares.toString(), this.fileName);
             PyObject func = pythonInterpreter.get("choose_next_square");
             PyObject result = func.__call__(new PyList(squares));
-            log.info("Result {} of chicken {}:", Integer.parseInt(result.toString()), this.id);
+            log.debug("Result {} of chicken {}:", Integer.parseInt(result.toString()), this.id);
 
             return Integer.parseInt(result.toString());
         } catch (Exception ex) {
