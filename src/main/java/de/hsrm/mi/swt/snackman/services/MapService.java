@@ -27,6 +27,12 @@ import de.hsrm.mi.swt.snackman.entities.mapObject.snack.Snack;
 import de.hsrm.mi.swt.snackman.entities.mapObject.snack.SnackType;
 import de.hsrm.mi.swt.snackman.messaging.MessageLoop.MessageLoop;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+
 /**
  * Service class for managing the game map
  * This class is responsible for loading and providing access to the game map data
@@ -51,6 +57,7 @@ public class MapService {
     public GameMap createNewGameMap(String lobbyId, String filePath) {
         readMazeService.generateNewMaze();
         char[][] mazeData = readMazeService.readMazeFromFile(filePath);
+        saveLastMapFile(lobbyId, filePath);
         return convertMazeDataGameMap(lobbyId, mazeData);
     }
 
@@ -224,7 +231,6 @@ public class MapService {
                     break;
             }
         }
-
         int AMOUNT_SCRIPT_GHOSTS = GameConfig.AMOUNT_PLAYERS - lobby.getMembers().size();
         for (int i = 0; i < AMOUNT_SCRIPT_GHOSTS; i++) {
             log.info("Initialising scriptGhost {}", i);
@@ -243,8 +249,9 @@ public class MapService {
             });
             log.info("New scriptGhost is: {}", newScriptGhost);
         }
-
     }
+
+   
 
     public double calcCenterPositionFromMapIndex(int index) {
         return (index * GameConfig.SQUARE_SIZE) + (GameConfig.SQUARE_SIZE / 2);
@@ -267,6 +274,27 @@ public class MapService {
             }
         }
     }
+
+    /**
+     * Save the last map in LastMap.txt in Game-Beginn, for later to download.
+     * 
+     * @param lobbyId  Id of the lobby
+     * @param filePath path of last map file
+     */
+    private void saveLastMapFile(String lobbyId, String filePath) {
+        Path source = Paths.get(filePath).toAbsolutePath();
+        String fileName = String.format("LastMap_%s.txt", lobbyId);
+        Path lastMapPath = Paths.get("./extensions/map/" + fileName).toAbsolutePath();
+
+        try {
+            if (!Files.exists(lastMapPath)) {
+                Files.copy(source, lastMapPath, StandardCopyOption.REPLACE_EXISTING);
+            }
+        } catch (IOException e) {
+            log.error("Failed to back up the original maze file", e);
+        }
+    }
+
 
     public SnackMan getSnackMan() {
         return null; //snackman;

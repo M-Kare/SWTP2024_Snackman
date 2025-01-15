@@ -131,9 +131,8 @@ const joinLobby = async (lobby: ILobbyDTD) => {
   }
 }
 
-onMounted(async () => {
-  await lobbiesStore.fetchLobbyList()
-  console.log(lobbies)
+    onMounted(async () => {
+        await lobbiesStore.fetchLobbyList();
 
   if (
     !lobbiesStore.lobbydata.currentPlayer ||

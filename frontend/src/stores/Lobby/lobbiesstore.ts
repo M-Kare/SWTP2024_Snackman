@@ -131,8 +131,6 @@ export const useLobbiesStore = defineStore('lobbiesstore', () =>{
         }
 
         stompclient.onConnect = (frame) => {
-            console.log('STOMP connected:', frame)
-
             if (stompclient) {
                 stompclient.subscribe(DEST, async (message) => {
                     const updatedLobbies = JSON.parse(message.body)
@@ -298,6 +296,7 @@ export const useLobbiesStore = defineStore('lobbiesstore', () =>{
             if (lobby) {
                 lobby.gameStarted = true
             }
+            console.debug(`Game started successfully in lobby: ${lobbyId}`)
         } catch (error: any) {
             console.error(`Error starting game in lobby ${lobbyId}:`, error)
             throw new Error('Could not start the game. Please try again.')

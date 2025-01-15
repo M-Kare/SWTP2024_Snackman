@@ -1,6 +1,5 @@
 package de.hsrm.mi.swt.snackman.controller.GameMap;
 
-
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -12,6 +11,9 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -48,12 +50,36 @@ public class GameMapController {
         return ResponseEntity.ok(GameMapDTO.fromGameMap(lobbyManagerService.getGameMapByLobbyId(lobbyId)));
     }
 
+    /**
+     * Downloads the last map file as "SnackManMap.txt".
+     *
+     * @return ResponseEntity containing the map file as a resource, or:
+     *         - HTTP 404 (Not Found) if the file does not exist.
+     *         - HTTP 409 (Conflict) if an error occurs during the process.
+     */
+    @GetMapping("/download")
+    public ResponseEntity<Resource> downloadMap(@RequestParam("lobbyId") String lobbyId){
+        try{
+            String fileName = String.format("LastMap_%s.txt", lobbyId);
+            Path filePath = Paths.get("./extensions/map/" + fileName).toAbsolutePath();
+            Resource resource = new UrlResource(filePath.toUri());
+
+            if(!resource.exists()){
+                return ResponseEntity.notFound().build();
+            }
+
+            return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"SnackManMap.txt\"").body(resource);
+        } catch (Exception e){
+            log.error("Error occurred: ", e);
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+        }
+    }
 
     /**
      * Upload custom map and save in folder "./extensions/map"
      * @param file uploaded File
      * @param lobbyId lobbyId, where upload custom map
-     * @return ResponseEntity: file is uploaded sucessfully or 
+     * @return ResponseEntity: file is uploaded sucessfully or
      *          400 (Bad Request) file is not valid
      *          409 (Conflict) status of an error occurs during the upload process
      */
@@ -67,7 +93,7 @@ public class GameMapController {
             // Check File-Content
             String fileContent = new String(file.getBytes(), StandardCharsets.UTF_8);
             String validPattern = "^[SGCo#\\s]*$";
-            
+
             if (!fileContent.matches(validPattern)) {
                 return ResponseEntity.badRequest().body(
                     "The map file is only allowed to contain the following characters: S, G, C, o, #, and spaces."
@@ -103,7 +129,7 @@ public class GameMapController {
      * Deletes the map file associated with a given lobby ID.
      * This method is invoked when a lobby no longer exists, and the map file
      * for that lobby needs to be deleted from the server.
-     * @param requestBody A map containing the lobbyId
+     * @param lobbyId
      * @return Returns an HTTP status code:
      *     - HTTP 200 (OK) if the file was successfully deleted.
      *     - HTTP 404 (Not Found) if the file does not exist.
@@ -147,12 +173,12 @@ public class GameMapController {
         try{
             String lobbyId = (String) requestBody.get("lobbyId");
             Boolean usedCustomMap = (Boolean) requestBody.get("usedCustomMap");
-            
+
             Lobby lobby = lobbyManagerService.findLobbyByLobbyId(lobbyId);
             if (lobby == null) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
             }
-        
+
             lobby.setUsedCustomMap(usedCustomMap);
             log.info(lobbyId + " have the staus of used custom map: " + usedCustomMap.toString());
 
@@ -161,7 +187,5 @@ public class GameMapController {
             log.error("Error occurred: ", e);
             return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
         }
-        
     }
 }
-

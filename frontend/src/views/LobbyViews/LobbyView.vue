@@ -27,10 +27,10 @@
     <div class="item-row">
       <ul class="map-list" v-if="playerId == adminClientId">
         <li class="map-list-item" v-for="map in mapList" :key="map.mapName" v-if="mapList.length > 1">
-            <input class="map-choose" 
-              type="radio" 
-              :value="map.mapName" 
-              :checked="selectedMap === map.mapName" 
+            <input class="map-choose"
+              type="radio"
+              :value="map.mapName"
+              :checked="selectedMap === map.mapName"
               @change="selectMap(map.mapName)"
           />
           <span>{{ map.mapName }}</span>
@@ -47,7 +47,7 @@
         >
           Leave Lobby
         </SmallNavButton>
-        <SmallNavButton 
+        <SmallNavButton
           id="menu-map-importieren"
           class="small-nav-button"
           v-if="playerId == adminClientId"
@@ -56,13 +56,13 @@
           Map Importieren
         </SmallNavButton>
         <input class="input-feld"
-            ref="fileInput" 
-            type="file" 
-            accept=".txt" 
+            ref="fileInput"
+            type="file"
+            accept=".txt"
             @change="handleFileImport"
         />
       </div>
-      
+
       <div id="button-pair">
         <SmallNavButton
           id="copyToClip"
@@ -98,7 +98,6 @@
     <p class="info-heading">{{ infoHeading }}</p>
     <p class="info-text">{{ infoText }}</p>
   </PopUp>
-
 
   <div v-show="showInfo" id="infoBox">{{ infoText }}</div>
 </template>
@@ -170,7 +169,7 @@ const selectMap = (mapName: string) => {
     }
     else if (selectedMap.value === customMapName.value) {
         usedCustomMap.value = true;
-    } 
+    }
 };
 
 const triggerFileInput = () => {
@@ -180,11 +179,11 @@ const triggerFileInput = () => {
 const fileInput = ref<HTMLInputElement | null>(null);
 
 /**
- * This function processes the file selected by the user in an input field. 
+ * This function processes the file selected by the user in an input field.
  * It ensures the file is a `.txt` file.
  * If the file is valid, it triggers an upload to the server.
  * Otherwise, it displays a popup with error information.
- * 
+ *
  * @param event - The event triggered by the file input change.
  */
 const handleFileImport = (event: Event) => {
@@ -273,7 +272,7 @@ const deleteUploadedFile = async (lobbyId: string) => {
  * Sends a request to update the used map status for a specific lobby.
  *
  * @param {string} lobbyId - The unique identifier of the lobby.
- * @param {boolean} usedCustomMap - Indicates whether a custom map is used (true) or not (false). 
+ * @param {boolean} usedCustomMap - Indicates whether a custom map is used (true) or not (false).
 */
 const changeUsedMapStatus = async (lobbyId: string, usedCustomMap: boolean): Promise<string> => {
     try {
@@ -308,7 +307,10 @@ watchEffect(() => {
       if (updatedLobby.gameStarted) {
         router.push({
           name: 'GameView',
-          query: { role: lobbiesStore.lobbydata.currentPlayer.role },
+          query: {
+            role: lobbiesStore.lobbydata.currentPlayer.role ,
+            lobbyId: lobbiesStore.lobbydata.currentPlayer.joinedLobbyId,
+          },
         })
       }
     } else if (lobbyLoaded) {
@@ -428,7 +430,7 @@ const startGame = async () => {
       darkenBackground.value = true;
       infoHeading.value = "Map Status Error";
       infoText.value = "Failed to update the map status.";
-      return; 
+      return;
     }
 
     await lobbiesStore.startGame(lobby.value.lobbyId);
@@ -559,11 +561,6 @@ function moveToMouse(element: HTMLElement) {
 #copyToClip:hover,
 #start-game-button:hover {
   background: var(--primary-highlight-color);
-
-}
-
-@media (max-height: 1200px) {
-
 }
 
 .map-list{
@@ -575,7 +572,7 @@ function moveToMouse(element: HTMLElement) {
 }
 
 .map-list-item{
-  margin-right: 40px; 
+  margin-right: 40px;
   display: flex;
   align-items: center;
   gap: 20px;
