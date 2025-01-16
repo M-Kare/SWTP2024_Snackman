@@ -21,8 +21,7 @@ public class ReadMazeService {
         interpreter = new PythonInterpreter();
         interpreter.exec("import sys");
         URL path = SnackmanApplication.class.getProtectionDomain().getCodeSource().getLocation();
-        interpreter.exec("sys.path.append('" + path.getPath().replace("nested:", "").replace("!", "").replace("classes", "lib") + "lib/jython-standalone-2.7.4.jar/Lib')");
-        interpreter.exec("import random");
+        interpreter.exec("sys.path.append('" + path.getPath().replace("nested:", "").replace("!", "") + "/Lib')");
     }
 
     /**
