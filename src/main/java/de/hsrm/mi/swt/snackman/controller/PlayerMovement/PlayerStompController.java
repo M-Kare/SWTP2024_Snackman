@@ -29,7 +29,6 @@ public class PlayerStompController {
 
     @MessageMapping("/topic/lobbies/{lobbyId}/player/update")
     public void spreadPlayerUpdate(@DestinationVariable("lobbyId") String lobbyId, PlayerToBackendDTO player) {
-        log.info("Updating player in lobby {}", lobbyId);
         Lobby currentLobby = null;
         try {
             currentLobby = lobbyService.findLobbyByLobbyId(lobbyId);
