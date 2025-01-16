@@ -208,9 +208,9 @@ public class LobbyManagerService {
             lobby.setGameMap(newGameMap);
         }
 
-        // if (lobby.getGameMap() == null) {
-        //     throw new IllegalStateException("Game map is not set. Unable to start the game.");
-        // }
+        if (lobby.getGameMap() == null) {
+            throw new IllegalStateException("Game map is not set. Unable to start the game.");
+        }
 
         log.info("Starting lobby {}", lobby);
         lobby.startGame();
