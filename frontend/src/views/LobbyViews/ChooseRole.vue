@@ -23,12 +23,11 @@
     </div>
 
     <SmallNavButton
-      id="confirm-button"
+      id="start-game-button"
       class="small-nav-buttons"
       @click="startGame"
-      :disabled="!selectedCharacter"
     >
-     Start Game
+      Start Game
     </SmallNavButton>
 
     <PopUp v-if="showPopUp" class="popup-box" @hidePopUp="hidePopUp">
@@ -47,14 +46,13 @@
 </template>
 
 <script setup lang="ts">
-import {onMounted, reactive, ref, watchEffect} from 'vue';
+import {computed, onMounted, reactive, ref, watchEffect} from 'vue';
 import MenuBackground from '@/components/MenuBackground.vue';
 import SmallNavButton from '@/components/SmallNavButton.vue';
 import {useRoute, useRouter} from "vue-router";
 import PopUp from "@/components/PopUp.vue";
 import {useLobbiesStore} from "@/stores/Lobby/lobbiesstore";
-import{Button} from "@/stores/Lobby/lobbiesstore"
-
+import {Button} from "@/stores/Lobby/lobbiesstore"
 
 
 // TODO Finish ersetzten durch Start
@@ -72,11 +70,11 @@ const infoText = ref()
 const hidePopUp = () => {
   showPopUp.value = false
 }
+const lobbyUrl = route.params.lobbyId
 
-//TO DELETE
-
-// alle die nicht selected sind sind hell alle anderen dunkel
-
+const lobby = computed(() =>
+  lobbiesStore.lobbydata.lobbies.find(l => l.lobbyId === lobbyUrl),
+)
 
 
 /**
@@ -124,7 +122,7 @@ const selectCharacter = async (button: Button) => {    // TODO API Call to backe
       //  lobbiesStore.updateButtonSelection(button.id  , lobbiesStore.lobbydata.currentPlayer.playerId )
 
       selectedCharacter.value = button;
-      darkenBackground.value=true;
+      darkenBackground.value = true;
       console.log("Character selected successfully");
     } else if (response.status === 409) {
       console.log("Value ", selectedCharacter.value, "Response ", response)
@@ -146,37 +144,80 @@ const selectCharacter = async (button: Button) => {    // TODO API Call to backe
 }
 
 
-  onMounted(async () => {
-    await lobbiesStore.fetchLobbyById(lobbyId)
+onMounted(async () => {
+  await lobbiesStore.fetchLobbyById(lobbyId)
 
-    await lobbiesStore.startLobbyLiveUpdate()
-  })
+  await lobbiesStore.startLobbyLiveUpdate()
+})
+/*
+watchEffect(() => {
+  const lobby = lobbiesStore.lobbydata.lobbies.find(l => l.lobbyId === lobbyUrl);
+  if (lobby) {
+    console.log("Aktuelle Lobby-Daten:", lobby);
+  }
+});
+
+
+ */
 
 
 /**
- * Route to gameview when characters have been selected
+ * Starts the game if the player is the admin and there are enough members in the lobby.
+ * If the player is not the admin or there are not enough members, a popup will be shown.
+ *
+ * @async
+ * @function startGame
+ * @throws {Error} If the player or lobby is not found.
  */
-const startGame = async () => {      // TODO enable this when the snackman character has been chosen + currently not routing to gameview correctly
-  /*const lobby = lobbiesStore.lobbydata.lobbies.find(l => l.lobbyId === lobbiesStore.lobbydata.currentPlayer.lobbyId);
+const startGame = async () => {
   const playerId = lobbiesStore.lobbydata.currentPlayer.playerId
+  let snackmanCounter:number = 0
+  let memberCounter :number = 0
+  const lobby = lobbiesStore.lobbydata.lobbies.find(l => l.lobbyId === lobbyId)
 
-  if (!lobby) {
+  console.log("Lobby bevore Start ", lobby)
+
+  if (!playerId || !lobby) {
+    console.error('Player or Lobby not found')
     return
   }
-
   if (playerId === lobby.adminClient.playerId) {
-    await lobbiesStore.chooseRoleFinish(lobby.lobbyId)
+    lobby.members.forEach(member => {
+      console.log("Überprüfe Mitglied : ", member.role)
+      if (member.role === 'UNDEFINED') {
+        showPopUp.value= true
+        darkenBackground.value = true
+        infoText.value = 'Every Player has to choose a Role!'
+        return
+      }
+      else if(member.role === 'SNACKMAN'){
+        snackmanCounter ++
+        memberCounter++
+        // TODO counter hochzählen und dann starten noch mit der bedingung verbinden
+      }
+      else if(member.role ==='GHOST'){
+        memberCounter ++
+      }
+    })
 
-    // router.push({name:'ChooseRole',  params: {lobbyId: lobby.lobbyId}})
+    console.log("Es sind " , memberCounter, " Spieler und" , snackmanCounter, " Snackman")
+    if ( snackmanCounter === 1 && memberCounter === lobby.members.length){
+      await lobbiesStore.startGame(lobby.lobbyId)
+    }
+    else {
+      showPopUp.value = true
+      darkenBackground.value = true
+      infoText.value = 'There must be exactly one SnackMan and all players must have a role!'
+    }
   } else {
     showPopUp.value = true
     darkenBackground.value = true
-    infoText.value = 'The role selection can only be initiated by the host.!'
-
-
-  } */
-
+    infoText.value = 'Only Admin can start the game!'
+  }
 }
+
+
+// TODO die neue Lobby aus watch effect nutzen
 
 
 </script>

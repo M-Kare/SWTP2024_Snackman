@@ -38,20 +38,14 @@
         >
           Copy Link
         </SmallNavButton>
-        <SmallNavButton
-          id="start-game-button"
-          class="small-nav-buttons"
-          @click="startGame"
-        >
-          Start Game
-        </SmallNavButton>
+
 
         <SmallNavButton
           id="start-game-button"
           class="small-nav-buttons"
           @click="chooseRole(lobby)"
         >
-          Choose Role
+          Start Game
         </SmallNavButton>
       </div>
     </div>
@@ -83,6 +77,17 @@
 </template>
 
 <script lang="ts" setup>
+
+
+/*
+ <SmallNavButton
+          id="start-game-button"
+          class="small-nav-buttons"
+          @click="startGame"
+        >
+          Start Game
+        </SmallNavButton>
+ */
 import MenuBackground from '@/components/MenuBackground.vue'
 import SmallNavButton from '@/components/SmallNavButton.vue'
 import PopUp from '@/components/PopUp.vue'
@@ -250,7 +255,7 @@ const leaveLobby = async () => {
  * @async
  * @function startGame
  * @throws {Error} If the player or lobby is not found.
- */
+
 const startGame = async () => {
   const playerId = lobbiesStore.lobbydata.currentPlayer.playerId
 
@@ -273,6 +278,7 @@ const startGame = async () => {
     infoText.value = 'Only SnackMan can start the game!'
   }
 }
+*/
 
 const chooseRole = async(lobby: ILobbyDTD | undefined ) =>{
   const playerId = lobbiesStore.lobbydata.currentPlayer.playerId

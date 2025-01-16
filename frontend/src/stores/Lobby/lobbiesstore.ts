@@ -40,7 +40,6 @@ export const useLobbiesStore = defineStore('lobbiesstore', () => {
       }
     })
     const buttonIdNumber = Number(buttonId);
-
     // Gewählten Button aktualisieren
     const button = buttons.value.find(btn => btn.id === buttonIdNumber)
     if (button) {
@@ -48,7 +47,6 @@ export const useLobbiesStore = defineStore('lobbiesstore', () => {
       button.selectedBy = playerId
     }
   }
-
 
   const lobbydata = reactive({
     lobbies: [] as Array<ILobbyDTD>,
@@ -174,7 +172,6 @@ export const useLobbiesStore = defineStore('lobbiesstore', () => {
     stompclient.onConnect = (frame) => {
       console.log('STOMP connected:', frame)
 
-
       if (stompclient) {
         // Subscribe to Lobby updates (existing)
         stompclient.subscribe(DEST, async (message) => {
@@ -209,13 +206,22 @@ export const useLobbiesStore = defineStore('lobbiesstore', () => {
 
           // Daten aus backend empfangen
           const buttonId = data.buttonId
-          console.log("BUTTON ID" , buttonId)
-          const lobby = data.lobby
-          const lobbyId = lobby.lobbyId
+          const updatedLobby = data.lobby
+          const lobbyId = updatedLobby.lobbyId
           const selectedBy = data.selectedBy
+          console.log("Lobby aus backend ",updatedLobby)
+
+
+          // Lobby in lobbydata aktualisieren
+          const lobbyIndex = lobbydata.lobbies.findIndex(lobby => lobby.lobbyId === updatedLobby.lobbyId);
+          if (lobbyIndex !== -1) {
+            lobbydata.lobbies[lobbyIndex] = updatedLobby;
+          } else {
+            lobbydata.lobbies.push(updatedLobby);
+          }
 
           updateButtonSelection(buttonId, selectedBy)
-          console.log("BUTTONS", buttons.value)
+          //console.log("BUTTONS", buttons.value)
 
           // Push the update to all clients at /ChooseRole/{lobbyId}
           if (stompclient && stompclient.connected) {
@@ -363,6 +369,7 @@ export const useLobbiesStore = defineStore('lobbiesstore', () => {
    * Starts the game in the specified lobby.
    * @param lobbyId The ID of the lobby where the game is to be started.
    */
+
   async function startGame(lobbyId: string): Promise<void> {
     try {
       const url = `/api/lobbies/start`;
