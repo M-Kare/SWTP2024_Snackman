@@ -4,6 +4,11 @@ import {ChickenThickness} from '@/stores/Chicken/IChickenDTD'
 
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import ghostGLB from '@/assets/ghost.glb'
+import strawberryGLB from '@/assets/strawberry.glb'
+import orangeGLB from '@/assets/orange.glb'
+import cherryGLB from '@/assets/cherry.glb'
+import appleGLB from '@/assets/apple.glb'
+import eggGLB from '@/assets/yoshiegg.glb'
 
 /**
  * for creating the objects in the map
@@ -15,48 +20,69 @@ export const GameObjectRenderer = () => {
 
   let ghostModel: THREE.Group | null = null 
 
-  const createSnackOnFloor = (
+  const snackModels = {
+    [SnackType.STRAWBERRY]: strawberryGLB,
+    [SnackType.ORANGE]: orangeGLB,
+    [SnackType.CHERRY]: cherryGLB,
+    [SnackType.APPLE]: appleGLB,
+    [SnackType.EGG]: eggGLB,
+    [SnackType.EMPTY]: null,
+  };
+
+  const snackModelCache: { [key in SnackType]?: THREE.Group } = {};
+
+  async function createSnackOnFloor(
     xPosition: number,
     zPosition: number,
     sideLength: number,
-    type: SnackType,
-  ) => {
-    let color = 'blue'
-
-    switch (type) {
-      case SnackType.STRAWBERRY:
-        color = 'purple'
-        break
-      case SnackType.ORANGE:
-        color = 'orange'
-        break
-      case SnackType.CHERRY:
-        color = 'red'
-        break
-      case SnackType.APPLE:
-        color = 'green'
-        break
-      case SnackType.EGG:
-        color = 'white'
-        break
-      default:
-        console.error("SnackType {} doesn't exist", type)
+    type: SnackType
+  ): Promise<THREE.Object3D> {
+    const modelPath = snackModels[type];
+    if (!modelPath) {
+      console.error(`No model found for SnackType: ${type}`);
+      return new THREE.Mesh(
+        new THREE.BoxGeometry(sideLength / 3, 1, sideLength / 3),
+        new THREE.MeshStandardMaterial({ color: 'gray', opacity: 0.5, transparent: true })
+      );
     }
-
-    // TODO add correct snack-material-design
-    const SNACK_WIDTH_AND_DEPTH = sideLength / 3
-    const SNACK_HEIGHT = 1
-    const snackMaterial = new THREE.MeshStandardMaterial({ color: color })
-    const snackGeometry = new THREE.BoxGeometry(
-      SNACK_WIDTH_AND_DEPTH,
-      SNACK_HEIGHT,
-      SNACK_WIDTH_AND_DEPTH,
-    )
-    const snack = new THREE.Mesh(snackGeometry, snackMaterial)
-
-    snack.position.set(xPosition, 0, zPosition)
-
-    return snack
+  
+    if (!snackModelCache[type]) {
+      try {
+        const gltf = await loader.loadAsync(modelPath);
+        const snackModel = gltf.scene;
+  
+        // Calculate scaling
+        const box = new THREE.Box3().setFromObject(snackModel);
+        const size = new THREE.Vector3();
+        box.getSize(size);
+  
+        const maxDimension = Math.max(size.x, size.y, size.z);
+        const scale = (sideLength / 3) / maxDimension; // Standardised scaling based on `sideLength`.
+        snackModel.scale.set(scale, scale, scale);
+  
+        const yOffset = box.min.y * scale; // Bottom edge of the model after scaling
+        snackModel.position.y -= yOffset;
+  
+        snackModel.traverse((child: any) => {
+          if (child.isMesh) {
+            child.castShadow = true;
+            child.receiveShadow = true;
+          }
+        });
+  
+        snackModelCache[type] = snackModel;
+      } catch (error) {
+        console.error(`Error loading snack model for ${type}:`, error);
+        return new THREE.Mesh(
+          new THREE.BoxGeometry(sideLength / 3, 1, sideLength / 3),
+          new THREE.MeshStandardMaterial({ color: 'gray', opacity: 0.5, transparent: true })
+        );
+      }
+    }
+  
+    const clonedSnack = snackModelCache[type]!.clone();
+    clonedSnack.position.set(xPosition, 0, zPosition);
+    return clonedSnack;
   }
 
   const createChickenOnFloor = (

@@ -68,16 +68,15 @@ export const GameMapRenderer = () => {
       if (square.type === MapObjectType.FLOOR) {
 
         if (square.snack != null && square.snack.snackType != SnackType.EMPTY) {
-          const snackToAdd = gameObjectRenderer.createSnackOnFloor(
+          const snackToAdd = await gameObjectRenderer.createSnackOnFloor(
             square.indexX * DEFAULT_SIDE_LENGTH + OFFSET,
             square.indexZ * DEFAULT_SIDE_LENGTH + OFFSET,
             DEFAULT_SIDE_LENGTH,
             square.snack?.snackType,
-          )
-          scene.add(snackToAdd)
-          gameMapStore.setSnackMeshId(id, snackToAdd.id)
-        }
-      }
+        )
+        scene.add(snackToAdd)
+        gameMapStore.setSnackMeshId(id, snackToAdd.id)
+      }}
     }
     // add chickens
     for (let currentChicken of mapData.chickens) {
