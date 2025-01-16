@@ -25,9 +25,29 @@
     >
     </CreateNewLeaderboardEntryForm>
   </div>
+  <img
+    id="snackman"
+    :src="
+      winningRole === 'SNACKMAN'
+        ? '/src/assets/characters/kirby.png'
+        : '/src/assets/characters/kirby-monochrome.png'
+    "
+    alt="representation of snackman"
+    class="character-image"
+  />
   <div v-if="feedbackMessage" :class="['feedback-message', feedbackClass]">
     {{ feedbackMessage }}
   </div>
+  <img
+    id="ghost"
+    :src="
+      winningRole === 'GHOST'
+        ? '/src/assets/characters/ghost.png'
+        : '/src/assets/characters/ghost-monochrome.png'
+    "
+    alt="representation of ghost"
+    class="character-image"
+  />
 </template>
 
 <script lang="ts" setup>
@@ -50,7 +70,7 @@ const winningRole = (route.query.winningRole as string) || '-'
 const playedTime = (route.query.timePlayed as unknown as number) || 0
 const formatedPlayedTime = formatTime(playedTime)
 const kcalCollected = (route.query.kcalCollected as unknown as number) || 0
-const gameResult = ref()
+const gameResult = ref<'SNACKMAN' | 'GHOST'>(null)
 
 if (winningRole == 'SNACKMAN') {
   gameResult.value = 'SNACKMAN IS THE WINNER'
@@ -194,6 +214,22 @@ const downloadMap = async () => {
   background: var(--primary-highlight-color);
 }
 
+.character-image {
+  position: absolute;
+  bottom: 6%;
+  width: 20%;
+  height: auto;
+  z-index: 10;
+}
+
+#snackman {
+  left: 6%;
+}
+
+#ghost {
+  right: 6%;
+}
+
 .feedback-message {
   position: absolute;
   bottom: 0;
@@ -226,6 +262,12 @@ const downloadMap = async () => {
   }
   to {
     opacity: 1;
+  }
+}
+
+@media (max-width: 1000px) {
+  .result-title {
+    font-size: 60px;
   }
 }
 </style>
