@@ -55,14 +55,14 @@ public enum Direction {
      * @param indexOfList index of the list where the chicken want to move to
      * @return the direction the chicken wants to move towards
      */
-    public static Direction getDirection(String indexOfList) {
+    public static Direction getDirection(int indexOfList) {
         log.debug("Index of List: {}", indexOfList);
         return switch (indexOfList) {
-            case "0" -> Direction.ONE_NORTH;
-            case "1" -> Direction.ONE_EAST;
-            case "2" -> Direction.ONE_SOUTH;
-            case "3" -> Direction.ONE_WEST;
-            case null, default -> throw new IndexOutOfBoundsException("Chicken is walking into a not defined direction.");
+            case 0 -> Direction.ONE_NORTH;
+            case 1 -> Direction.ONE_EAST;
+            case 2 -> Direction.ONE_SOUTH;
+            case 3 -> Direction.ONE_WEST;
+            default -> throw new IndexOutOfBoundsException("Chicken is walking into a not defined direction.");
         };
     }
 

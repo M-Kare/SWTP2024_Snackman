@@ -14,7 +14,7 @@
       <ul>
         <li v-for="member in members" class="player-list-items">
           <div class="player-name">
-            {{ member.playerName }}
+            {{ member.playerName.replace(/"/g, '') }} <!-- replace all " in String using RegEx modifier /g (find all) -->
           </div>
 
           <div class="player-character">
@@ -82,13 +82,19 @@
     </div>
   </div>
 
-  <div v-if="darkenBackground" id="darken-background"></div>
+    <div v-if="darkenBackground" id="darken-background"></div>
+
+  <PlayerNameForm
+    v-if="showPlayerNameForm && !playerNameSaved"
+    @hidePlayerNameForm="hidePlayerNameForm"
+    @playerNameSaved="savePlayerName"
+  >
+  </PlayerNameForm>
 
   <PopUp
     v-if="errorBox"
     class="popup-box"
-    @click="backToLobbyListView()"
-    @hidePopUp="hidePopUp"
+    @hidePopUp="hidePopUpAndRedirect"
   >
     <p class="info-heading">{{ infoHeading }}</p>
     <p class="info-text">{{ infoText }}</p>
@@ -105,6 +111,7 @@
 <script lang="ts" setup>
 import MenuBackground from '@/components/MenuBackground.vue'
 import SmallNavButton from '@/components/SmallNavButton.vue'
+import PlayerNameForm from '@/components/PlayerNameForm.vue'
 import PopUp from '@/components/PopUp.vue'
 
 import {useRoute, useRouter} from 'vue-router'
@@ -131,6 +138,9 @@ const members = computed(
 )
 const playerCount = computed(() => members.value.length)
 
+const playerNameSaved = lobbiesStore.lobbydata.currentPlayer.playerName;
+const showPlayerNameForm = ref(false);
+
 const darkenBackground = ref(false)
 const showPopUp = ref(false)
 const errorBox = ref(false)
@@ -148,26 +158,36 @@ const MAX_PLAYER_COUNT = 5
 const TIP_TOP_DIST = 30
 const TIP_SIDE_DIST = 20
 
+const hidePlayerNameForm = () => {
+  showPlayerNameForm.value = false;
+  darkenBackground.value = false;
+}
+
 const hidePopUp = () => {
   showPopUp.value = false
   darkenBackground.value = false
+}
+
+// needed for errorBox which shows up when lobby does not exist
+function hidePopUpAndRedirect(){
+  hidePopUp();
+  router.push({ name: "LobbyListView"})
 }
 
 const mapList = ref<{ mapName: string; fileName: string }[]>([
   {mapName: 'Generated Map', fileName: `Maze.txt`},
 ]);
 
-const feedbackMessage = ref('')
 const usedCustomMap = ref(false);
 const selectedMap = ref<string | null>(null);
-const customMapName = ref('Uploaded Map')
+
 const selectMap = (mapName: string) => {
     selectedMap.value = mapName;
 
-  if (selectedMap.value === 'Uploaded Map') {
+  if (selectedMap.value === 'Generated Map') {
         usedCustomMap.value = false;
     }
-    else if (selectedMap.value === customMapName.value) {
+    else if (selectedMap.value === 'Uploaded Map') {
         usedCustomMap.value = true;
     }
 };
@@ -192,7 +212,6 @@ const handleFileImport = (event: Event) => {
     if (input.files && input.files.length > 0) {
         const file = input.files[0];
         if (file.name.endsWith('.txt')) {
-          customMapName.value = "Uploaded Map"
             uploadFileToServer(file, lobbyId);
         } else {
             showPopUp.value = true;
@@ -220,7 +239,7 @@ const uploadFileToServer = async (file: File, lobbyId: string) => {
         });
 
         if (response.ok) {
-            const mapName = customMapName.value;
+            const mapName = 'Uploaded Map';
             const fileName = `SnackManMap_${lobbyId}.txt`;
 
             if (mapList.value.length > 1) {
@@ -327,8 +346,11 @@ onMounted(async () => {
     infoHeading.value = 'Lobby does not exist'
     infoText.value = 'Please choose or create another one!'
     errorBox.value = true
+    darkenBackground.value = true;
   }
   await lobbiesStore.startLobbyLiveUpdate()
+
+  // player joined via link
   if (
     !lobbiesStore.lobbydata.currentPlayer ||
     lobbiesStore.lobbydata.currentPlayer.playerId === '' ||
@@ -340,36 +362,38 @@ onMounted(async () => {
       errorBox.value = true
       darkenBackground.value = true
     } else {
-      await lobbiesStore.createPlayer('Mr. Late')
-      await joinLobby(lobby.value!)
+      showPlayerNameForm.value = true;
+      darkenBackground.value = true;
     }
   }
 })
 
-const joinLobby = async (lobby: ILobbyDTD) => {
-  // if(lobby.members.length >= 4){
-  //     showPopUp.value = true;
-  //     darkenBackground.value = true;
-  //     return;
-  // }
+  const savePlayerName = async (newName: string) => {
+    try {
+      await lobbiesStore.createPlayer(newName);
+      await joinLobby(lobby.value!)
 
-  try {
-    const joinedLobby = await lobbiesStore.joinLobby(
-      lobby.lobbyId,
-      lobbiesStore.lobbydata.currentPlayer.playerId,
-    )
-
-    if (joinedLobby) {
-      router.push({ name: 'LobbyView', params: { lobbyId: lobby.lobbyId } })
+    } catch(error) {
+      console.error("Error saving playerName:", error);
+      alert("Error saving playerName!");
     }
-  } catch (error: any) {
-    console.error('Error:', error)
   }
-}
 
-function backToLobbyListView() {
-  router.push({ name: 'LobbyListView' })
-}
+  const joinLobby = async (lobby: ILobbyDTD) => {
+
+    try {
+      const joinedLobby = await lobbiesStore.joinLobby(
+        lobby.lobbyId,
+        lobbiesStore.lobbydata.currentPlayer.playerId,
+      )
+
+      if (joinedLobby) {
+        router.push({ name: 'LobbyView', params: { lobbyId: lobby.lobbyId } })
+      }
+    } catch (error: any) {
+      console.error('Error:', error)
+    }
+  }
 
 /**
  * Leaves the current lobby. If the player is the admin, it will remove other members from the lobby first.
@@ -439,7 +463,6 @@ const startGame = async () => {
     darkenBackground.value = true;
     infoHeading.value = "Can't start the game"
     infoText.value = "Only SnackMan can start the game!"
-    return
   }
 }
 
@@ -578,6 +601,17 @@ function moveToMouse(element: HTMLElement) {
   gap: 20px;
   font-size: 1.5rem;
   color: white;
+}
+
+#darken-background {
+    z-index: 1;
+    position: fixed;
+    top: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 50%);
+
+    transition: background 0.3s ease;
 }
 
 .map-choose{
