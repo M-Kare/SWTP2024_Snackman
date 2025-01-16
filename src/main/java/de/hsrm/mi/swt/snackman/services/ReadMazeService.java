@@ -3,11 +3,14 @@ package de.hsrm.mi.swt.snackman.services;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.python.util.PythonInterpreter;
 import org.springframework.stereotype.Service;
+
+import de.hsrm.mi.swt.snackman.SnackmanApplication;
 
 @Service
 public class ReadMazeService {
@@ -17,7 +20,9 @@ public class ReadMazeService {
     public ReadMazeService(){
         interpreter = new PythonInterpreter();
         interpreter.exec("import sys");
-        interpreter.exec("sys.path.append('./extensions/maze')");
+        URL path = SnackmanApplication.class.getProtectionDomain().getCodeSource().getLocation();
+        interpreter.exec("sys.path.append('" + path.getPath().replace("nested:", "").replace("!", "").replace("classes", "lib") + "lib/jython-standalone-2.7.4.jar/Lib')");
+        interpreter.exec("import random");
     }
 
     /**
