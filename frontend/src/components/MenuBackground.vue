@@ -1,39 +1,50 @@
 <template>
-    <div class="start-page">
-      <div class="background"></div>
-      <div class="overlay"></div>
-    </div>
-  </template>
-  
-  <script setup lang="ts"></script>
-  
-  <style scoped>
-  .start-page {
-    width: 100vw;
-    height: 100vh;
-    position: relative;
-    overflow: hidden;
-  }
+  <div class="menu-background">
+    <div v-if="isLobbyView" class="color-overlay"></div>
+    <slot></slot>
+  </div>
+</template>
 
-  .background {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-image: url('@/assets/main_menu-bg.jpg');
+<script setup lang="ts">
+import { defineProps } from 'vue';
+
+// Prop to control the color&blur overlay
+defineProps({
+  isLobbyView: {
+    type: Boolean,
+    default: false,
+  },
+});
+</script>
+
+<style>
+.menu-background {
+  background: url('@/assets/background-design.png') no-repeat center center;
+  background-size: cover;
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  position: relative;
+}
+
+.color-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(5px) brightness(0.8);
+  pointer-events: none;
+}
+
+@media (max-width: 1280px) {
+  .menu-background {
+    background: url('@/assets/background-design-S.png') no-repeat center center;
     background-size: cover;
-    background-position: center;
-    z-index: -10;
   }
-
-  .overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    z-index: -9;
-  }
-  </style>
+}
+</style>

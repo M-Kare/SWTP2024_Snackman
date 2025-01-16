@@ -11,11 +11,13 @@ import java.util.logging.Logger;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+
 @SpringBootApplication
 public class SnackmanApplication {
     static Logger log = Logger.getLogger(SnackmanApplication.class.getName());
-
+    
     public static void main(String[] args) {
+        System.setProperty("python.import.site", "false");
         checkAndCopyResources();
         SpringApplication.run(SnackmanApplication.class, args);
     }

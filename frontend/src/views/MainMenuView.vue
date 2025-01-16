@@ -1,62 +1,97 @@
 <template>
-    <MenuBackground></MenuBackground>
+    <MenuBackground>
+        <div v-if="darkenBackground" id="darken-background"></div>
 
-    <h1 class="title">Snackman</h1>
-    <!--
-    Buttons will be merged later on,
-    right now we need a fast entry into the game to test things (Singpleplayer-Button)
-     -->
-    <MainMenuButton class="menu-button" id="singleplayer-button" @click="startSingleplayer">Singleplayer</MainMenuButton>
-    <MainMenuButton class="menu-button" id="multiplayer-button" @click="showLobbies">Multiplayer</MainMenuButton>
+        <PlayerNameForm
+          v-if="showPlayerNameForm && !playerNameSaved"
+          @hidePlayerNameForm="hidePlayerNameForm"
+          >
+        </PlayerNameForm>
+
+        <div class="button-container">
+          <MainMenuButton @click="startSingleplayer">Singleplayer</MainMenuButton>
+          <MainMenuButton @click="showLobbies">Multiplayer</MainMenuButton>
+          <MainMenuButton @click="showLeaderboard">Leaderboard</MainMenuButton>
+        </div>
+    </MenuBackground>
 </template>
 
 <script setup lang="ts">
-  import MainMenuButton from '@/components/MainMenuButton.vue';
-  import MenuBackground from '@/components/MenuBackground.vue';
-  import { useRouter } from 'vue-router';
-  import { useLobbiesStore } from '@/stores/Lobby/lobbiesstore';
+import {useLobbiesStore} from '@/stores/Lobby/lobbiesstore'
+import MainMenuButton from '@/components/MainMenuButton.vue'
+import MenuBackground from '@/components/MenuBackground.vue'
+import PlayerNameForm from '@/components/PlayerNameForm.vue';
+import {useRouter} from 'vue-router'
+import { onMounted, ref } from 'vue';
+import type {ILobbyDTD} from "@/stores/Lobby/ILobbyDTD";
 
-  const router = useRouter();
-  const lobbiesStore = useLobbiesStore();
+const router = useRouter()
+const lobbiesStore = useLobbiesStore()
 
-  const showLobbies = () => {
-      router.push({name: 'LobbyListView'});
+const playerNameSaved = lobbiesStore.lobbydata.currentPlayer.playerName;
+const darkenBackground = ref(false);
+const showPlayerNameForm = ref(false);
+
+const hidePlayerNameForm = () => {
+  showPlayerNameForm.value = false;
+  darkenBackground.value = false;
+}
+
+const showLobbies = () => {
+  router.push({ name: 'LobbyListView' })
+}
+
+const showLeaderboard = () => {
+  router.push({name: 'Leaderboard'})
+}
+
+const startSingleplayer = async () => {
+  await lobbiesStore.createPlayer("Single Player")
+  const player = lobbiesStore.lobbydata.currentPlayer
+  const lobby = await lobbiesStore.startSingleplayerGame(player) as ILobbyDTD
+
+  if (!player.playerId || !lobby) {
+    console.error('Player or Lobby not found')
+    return
   }
 
-  const startSingleplayer = () => {
-      lobbiesStore.lobbydata.currentPlayer.role = 'SNACKMAN';
-
-      router.push({
-          name: 'GameView',
-          query: { role: 'SNACKMAN' }
-      });
+  if (player.playerId === lobby.adminClient.playerId) {
+    await router.push({
+      name: 'GameView',
+      query: {role: lobbiesStore.lobbydata.currentPlayer.role},
+    })
   }
-  
+}
+
+onMounted(() => {
+  if (!playerNameSaved) {
+    darkenBackground.value = true;
+    showPlayerNameForm.value = true;
+  }
+})
 </script>
 
 <style scoped>
-.title {
-  position: absolute;
-  top: 50px;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 10rem;
-  font-weight: bold;
-  color: #fff;
+.button-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.button-container > * {
+  width: 100%;
   text-align: center;
 }
 
-.menu-button {
-  position: absolute;
-  left: 50%;
-  transform: translate(-50%, -50%); /* h & v centered */
-}
+#darken-background {
+    z-index: 1;
+    position: fixed;
+    top: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 50%);
 
-#singleplayer-button {
-  top: 50%;
-}
-
-#multiplayer-button {
-  top: 70%;
+    transition: background 0.3s ease;
 }
 </style>

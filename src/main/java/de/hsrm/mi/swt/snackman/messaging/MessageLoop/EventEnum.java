@@ -1,5 +1,5 @@
 package de.hsrm.mi.swt.snackman.messaging.MessageLoop;
 
 public enum EventEnum{
-    MobUpdate, SquareUpdate, ChickenUpdate
+    SnackManUpdate, SquareUpdate, ChickenUpdate, GhostUpdate, ScriptGhostUpdate, GameEnd
 }

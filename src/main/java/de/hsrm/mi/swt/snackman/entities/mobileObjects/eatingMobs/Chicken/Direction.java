@@ -31,8 +31,6 @@ import java.util.Random;
  * --------------------------------------------------------------
  */
 public enum Direction {
-    //NORTH_WEST("", -1, -1), NORTH("0", -1, 0), NORTH_EAST("", -1, 1), EAST("1", 0, 1), SOUTH_EAST("", 1, 1), SOUTH("2", 1, 0), SOUTH_WEST("", 1, -1), WEST("3", 0, -1),
-
     TWO_NORTH_TWO_WEST("", -2, -2), TWO_NORTH_ONE_WEST("", -2, -1), TWO_NORTH("ß", -2, 0), TWO_NORTH_ONE_EAST("", -2, 1), TWO_NORTH_TWO_EAST("", -2, 2),
     ONE_NORTH_TWO_WEST("", -1, -2), ONE_NORTH_ONE_WEST("", -1, -1), ONE_NORTH("0", -1, 0), ONE_NORTH_ONE_EAST("", -1, 1), ONE_NORTH_TWO_EAST("", -1, 2),
     TWO_WEST("", 0, -2), ONE_WEST("3", 0, -1), CHICKEN("", 0, 0), ONE_EAST("1", 0, 1), TWO_EAST("", 0, 2),
@@ -57,14 +55,14 @@ public enum Direction {
      * @param indexOfList index of the list where the chicken want to move to
      * @return the direction the chicken wants to move towards
      */
-    public static Direction getDirection(String indexOfList) {
+    public static Direction getDirection(int indexOfList) {
         log.debug("Index of List: {}", indexOfList);
         return switch (indexOfList) {
-            case "0" -> Direction.ONE_NORTH;
-            case "1" -> Direction.ONE_EAST;
-            case "2" -> Direction.ONE_SOUTH;
-            case "3" -> Direction.ONE_WEST;
-            case null, default -> throw new IndexOutOfBoundsException("Chicken is walking into a not defined direction.");
+            case 0 -> Direction.ONE_NORTH;
+            case 1 -> Direction.ONE_EAST;
+            case 2 -> Direction.ONE_SOUTH;
+            case 3 -> Direction.ONE_WEST;
+            default -> throw new IndexOutOfBoundsException("Chicken is walking into a not defined direction.");
         };
     }
 

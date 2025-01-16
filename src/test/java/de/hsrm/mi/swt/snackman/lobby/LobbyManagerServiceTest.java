@@ -1,13 +1,5 @@
 package de.hsrm.mi.swt.snackman.lobby;
 
-import java.util.NoSuchElementException;
-
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -15,10 +7,16 @@ import java.nio.file.Paths;
 import java.util.NoSuchElementException;
 
 import org.junit.jupiter.api.AfterAll;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.util.FileSystemUtils;
 
@@ -26,6 +24,8 @@ import de.hsrm.mi.swt.snackman.SnackmanApplication;
 import de.hsrm.mi.swt.snackman.entities.lobby.Lobby;
 import de.hsrm.mi.swt.snackman.entities.lobby.PlayerClient;
 import de.hsrm.mi.swt.snackman.entities.lobby.ROLE;
+import de.hsrm.mi.swt.snackman.entities.map.GameMap;
+import de.hsrm.mi.swt.snackman.entities.map.Square;
 import de.hsrm.mi.swt.snackman.services.GameAlreadyStartedException;
 import de.hsrm.mi.swt.snackman.services.LobbyAlreadyExistsException;
 import de.hsrm.mi.swt.snackman.services.LobbyManagerService;
@@ -39,7 +39,7 @@ public class LobbyManagerServiceTest {
 
       private LobbyManagerService lobbyManagerService;
       private static final Path workFolder = Paths.get("./extensions").toAbsolutePath();
-
+      
       @BeforeAll
       static void fileSetUp() {
             try{
@@ -49,17 +49,22 @@ public class LobbyManagerServiceTest {
             }
             SnackmanApplication.checkAndCopyResources();
       }
-
+      
       @AfterAll
       static void tearDownAfter() throws IOException {
             if (Files.exists(workFolder)) {
                   FileSystemUtils.deleteRecursively(workFolder.toFile());
             }
       }
-
+      
       @BeforeEach
       public void setup() {
-            lobbyManagerService = new LobbyManagerService(mapService);
+            Square[][] emptyMap = { {new Square(0,0), new Square(0,1), new Square(0,2)},
+                                {new Square(1,0), new Square(1,1), new Square(1,2)}, 
+                                {new Square(2,0), new Square(2,1), new Square(2,2)} };
+            GameMap gameMap = new GameMap(emptyMap);
+            Mockito.when(mapService.createNewGameMap(Mockito.any())).thenReturn(gameMap);
+            lobbyManagerService = new LobbyManagerService(mapService, null);
       }
 
       @Test
@@ -74,7 +79,7 @@ public class LobbyManagerServiceTest {
       @Test
       public void testCreateLobbySuccess() throws LobbyAlreadyExistsException {
             PlayerClient adminPlayer = lobbyManagerService.createNewClient("AdminPlayer");
-            Lobby lobby = lobbyManagerService.createLobby("TestLobby", adminPlayer);
+            Lobby lobby = lobbyManagerService.createLobby("TestLobby", adminPlayer, null);
 
             assertNotNull(lobby);
             assertEquals("TestLobby", lobby.getName());
@@ -87,15 +92,15 @@ public class LobbyManagerServiceTest {
             PlayerClient adminPlayer = lobbyManagerService.createNewClient("AdminPlayer");
 
             assertThrows(LobbyAlreadyExistsException.class, () -> {
-                  lobbyManagerService.createLobby("DuplicateLobby", adminPlayer);
-                  lobbyManagerService.createLobby("DuplicateLobby", adminPlayer);
+                  lobbyManagerService.createLobby("DuplicateLobby", adminPlayer, null);
+                  lobbyManagerService.createLobby("DuplicateLobby", adminPlayer, null);
             });
       }
 
       @Test
       public void testJoinLobbySuccess() throws LobbyAlreadyExistsException, GameAlreadyStartedException {
             PlayerClient adminPlayer = lobbyManagerService.createNewClient("AdminPlayer");
-            Lobby lobby = lobbyManagerService.createLobby("TestLobby", adminPlayer);
+            Lobby lobby = lobbyManagerService.createLobby("TestLobby", adminPlayer, null);
             PlayerClient secondPlayer = lobbyManagerService.createNewClient("2.Player");
             lobby = lobbyManagerService.joinLobby(lobby.getLobbyId(), secondPlayer.getPlayerId());
 
@@ -108,7 +113,7 @@ public class LobbyManagerServiceTest {
       public void testJoinLobbyGameAlreadyStarted() throws LobbyAlreadyExistsException {
             PlayerClient adminPlayer = lobbyManagerService.createNewClient("AdminPlayer");
             PlayerClient secondPlayer = lobbyManagerService.createNewClient("2.Player");
-            Lobby lobby = lobbyManagerService.createLobby("TestLobby", adminPlayer);
+            Lobby lobby = lobbyManagerService.createLobby("TestLobby", adminPlayer, null);
 
             assertDoesNotThrow(() -> {
                   lobbyManagerService.joinLobby(lobby.getLobbyId(), secondPlayer.getPlayerId());
@@ -124,7 +129,7 @@ public class LobbyManagerServiceTest {
       @Test
       public void testLeaveLobbySuccess() throws LobbyAlreadyExistsException {
             PlayerClient adminPlayer = lobbyManagerService.createNewClient("AdminPlayer");
-            Lobby lobby = lobbyManagerService.createLobby("TestLobby", adminPlayer);
+            Lobby lobby = lobbyManagerService.createLobby("TestLobby", adminPlayer, null);
 
             PlayerClient secondPlayer = lobbyManagerService.createNewClient("2.Player");
 
@@ -140,7 +145,7 @@ public class LobbyManagerServiceTest {
       @Test
       public void testLeaveLobbyAdminLeavesDeletesLobby() throws LobbyAlreadyExistsException {
             PlayerClient adminPlayer = lobbyManagerService.createNewClient("AdminPlayer");
-            Lobby lobby = lobbyManagerService.createLobby("TestLobby", adminPlayer);
+            Lobby lobby = lobbyManagerService.createLobby("TestLobby", adminPlayer, null);
             lobbyManagerService.leaveLobby(lobby.getLobbyId(), adminPlayer.getPlayerId());
 
             assertThrows(NoSuchElementException.class, () -> {
@@ -151,7 +156,7 @@ public class LobbyManagerServiceTest {
       @Test
       public void testStartGameSuccess() throws LobbyAlreadyExistsException {
             PlayerClient adminPlayer = lobbyManagerService.createNewClient("AdminPlayer");
-            Lobby lobby = lobbyManagerService.createLobby("TestLobby", adminPlayer);
+            Lobby lobby = lobbyManagerService.createLobby("TestLobby", adminPlayer, null);
 
             PlayerClient secondPlayer = lobbyManagerService.createNewClient("2.Player");
             PlayerClient thirdPlayer = lobbyManagerService.createNewClient("3.Player");
@@ -168,7 +173,7 @@ public class LobbyManagerServiceTest {
       @Test
       public void testStartGameNotEnoughPlayers() throws LobbyAlreadyExistsException {
             PlayerClient adminPlayer = lobbyManagerService.createNewClient("AdminPlayer");
-            Lobby lobby = lobbyManagerService.createLobby("TestLobby", adminPlayer);
+            Lobby lobby = lobbyManagerService.createLobby("TestLobby", adminPlayer, null);
 
             assertThrows(IllegalStateException.class, () -> {
                   lobbyManagerService.startGame(lobby.getLobbyId());
@@ -178,7 +183,7 @@ public class LobbyManagerServiceTest {
       @Test
       public void testFindLobbyByUUIDSuccess() throws LobbyAlreadyExistsException {
             PlayerClient adminPlayer = lobbyManagerService.createNewClient("AdminPlayer");
-            Lobby lobby = lobbyManagerService.createLobby("TestLobby", adminPlayer);
+            Lobby lobby = lobbyManagerService.createLobby("TestLobby", adminPlayer, null);
 
             Lobby foundLobby = lobbyManagerService.findLobbyByLobbyId(lobby.getLobbyId());
 

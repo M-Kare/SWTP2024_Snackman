@@ -1,15 +1,22 @@
 package de.hsrm.mi.swt.snackman.services;
 
 import java.beans.PropertyChangeEvent;
+import java.io.File;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
+import de.hsrm.mi.swt.snackman.entities.mobileObjects.Ghost;
+import de.hsrm.mi.swt.snackman.entities.mobileObjects.ScriptGhost;
+import de.hsrm.mi.swt.snackman.entities.mobileObjects.ScriptGhostDifficulty;
+import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken.Chicken;
+import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.SnackMan;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
-
 import de.hsrm.mi.swt.snackman.configuration.GameConfig;
 import de.hsrm.mi.swt.snackman.entities.lobby.Lobby;
 import de.hsrm.mi.swt.snackman.entities.lobby.PlayerClient;
@@ -20,9 +27,12 @@ import de.hsrm.mi.swt.snackman.entities.map.Square;
 import de.hsrm.mi.swt.snackman.entities.mapObject.MapObjectType;
 import de.hsrm.mi.swt.snackman.entities.mapObject.snack.Snack;
 import de.hsrm.mi.swt.snackman.entities.mapObject.snack.SnackType;
-import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken.Chicken;
-import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.SnackMan;
 import de.hsrm.mi.swt.snackman.messaging.MessageLoop.MessageLoop;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 
 /**
  * Service class for managing the game map
@@ -33,7 +43,6 @@ public class MapService {
 
     private final ReadMazeService readMazeService;
     private final MessageLoop messageLoop;
-
     Logger log = LoggerFactory.getLogger(MapService.class);
 
     /**
@@ -49,6 +58,7 @@ public class MapService {
     public GameMap createNewGameMap(String lobbyId, String filePath) {
         readMazeService.generateNewMaze();
         char[][] mazeData = readMazeService.readMazeFromFile(filePath);
+        saveLastMapFile(lobbyId, filePath);
         return convertMazeDataGameMap(lobbyId, mazeData);
     }
 
@@ -61,8 +71,7 @@ public class MapService {
      *
      * @param mazeData the char array representing the maze
      */
-    public GameMap convertMazeDataGameMap(String lobbyId,
-                                           char[][] mazeData) {
+    public GameMap convertMazeDataGameMap(String lobbyId, char[][] mazeData) {
         Square[][] squaresBuildingMap = new Square[mazeData.length][mazeData[0].length];
 
         for (int x = 0; x < mazeData.length; x++) {
@@ -89,7 +98,7 @@ public class MapService {
      * @return a created Square
      */
     private Square createSquare(String lobbyId, char symbol, int x, int z) {
-        Square square;
+        Square square = null;
 
         switch (symbol) {
             case '#':
@@ -103,12 +112,6 @@ public class MapService {
                 } else {
                     square.setSnack(new Snack(SnackType.EMPTY));
                 }
-
-                square.addPropertyChangeListener((PropertyChangeEvent evt) -> {
-                    if (evt.getPropertyName().equals("square")) {
-                        messageLoop.addSquareToQueue((Square) evt.getNewValue(), lobbyId);
-                    }
-                });
                 break;
             case 'C':
 
@@ -129,6 +132,14 @@ public class MapService {
             default:
                 square = new Square(MapObjectType.FLOOR, x, z);
         }
+
+        square.addPropertyChangeListener((PropertyChangeEvent evt) -> {
+            if (evt.getPropertyName().equals("square")) {
+                log.debug("Square changed {}", evt);
+                messageLoop.addSquareToQueue((Square) evt.getNewValue(), lobbyId);
+            }
+        });
+
         return square;
     }
 
@@ -144,15 +155,34 @@ public class MapService {
         }
     }
 
+    protected String loadChickenScripts() {
+        String name = Paths.get("extensions/chicken/").normalize().toAbsolutePath().toString();
+        File folder = new File(name);
+        List<String> filenames = new ArrayList<String>();
+
+        for (File currFile : folder.listFiles()) {
+            if (currFile.getName().endsWith(".py")) {
+                if (!currFile.getName().equals("Maze.py")) {
+                    filenames.add(currFile.getName().replaceAll("\\.py$", ""));
+                }
+            }
+        }
+
+        Random rn = new Random();
+        int randomeFileNumber = rn.nextInt(0, filenames.size());
+        return filenames.get(randomeFileNumber);
+    }
+
+
     /**
      * Goes trough the map and checks if it's a spawnpoint and sets a Mob
      *
      * @param gameMap where the mobs should spawn
-     * @param lobby of the mobs
+     * @param lobby   of the mobs
      */
     public void spawnMobs(GameMap gameMap, Lobby lobby) {
         List<Square> ghostSpawnSquares = new ArrayList<>();
-        List<Square> snackmanSpawnSquares = new ArrayList<>();
+        Square snackmanSpawnSquare = null;
 
         for (int i = 0; i < gameMap.getGameMapSquares().length; i++) {
             for (int j = 0; j < gameMap.getGameMapSquares()[i].length; j++) {
@@ -162,71 +192,94 @@ public class MapService {
                     SpawnpointMobType spawnpointMobType = spawnpoint.spawnpointMobType();
                     switch (spawnpointMobType) {
                         case SpawnpointMobType.CHICKEN:
-/*
-                            Chicken newChicken = new Chicken(currentSquare, gameMap);
+                            Chicken newChicken = new Chicken(currentSquare, gameMap, loadChickenScripts());
+                            lobby.addChicken(newChicken);
 
                             Thread chickenThread = new Thread(newChicken);
                             chickenThread.start();
+                            log.debug("Starting chicken with id {}", newChicken.getId());
 
                             newChicken.addPropertyChangeListener((PropertyChangeEvent evt) -> {
                                 if (evt.getPropertyName().equals("chicken")) {
                                     messageLoop.addChickenToQueue((Chicken) evt.getNewValue(), lobby.getLobbyId());
                                 }
-                            });*/
+                            });
                             break;
                         case SpawnpointMobType.GHOST:
                             ghostSpawnSquares.add(currentSquare);
                             break;
                         case SpawnpointMobType.SNACKMAN:
-                            snackmanSpawnSquares.add(currentSquare);
+                            snackmanSpawnSquare = currentSquare;
                             break;
                     }
-
                 }
-
             }
         }
 
-        placeMobsOnMap(lobby, ghostSpawnSquares, snackmanSpawnSquares);
+        placeMobsOnMap(lobby, ghostSpawnSquares, snackmanSpawnSquare);
     }
 
     /**
-     *
-     * @param lobby where the Mobs should spawn
-     * @param ghostSpawnSquares list of spawnpoints of ghosts
-     * @param snackmanSpawnSquares list of spawnpoints of snackmans
+     * @param lobby               where the Mobs should spawn
+     * @param ghostSpawnSquares   list of spawnpoints of ghosts
+     * @param snackmanSpawnSquare spawnpoint of the snackman
      */
-    private void placeMobsOnMap(Lobby lobby, List<Square> ghostSpawnSquares, List<Square> snackmanSpawnSquares) {
+    private void placeMobsOnMap(Lobby lobby, List<Square> ghostSpawnSquares, Square snackmanSpawnSquare) {
         int ghostSpawnIndex = 0;
-        int snackmanSpawnIndex = 0;
         Square temp;
 
         for (PlayerClient client : lobby.getMembers()) {
             switch (client.getRole()) {
-                // TODO change to spawn ghost instead of snackman
                 case GHOST:
+                    log.info("Initialising playerGhost with spawnpoint {}", ghostSpawnSquares.get(ghostSpawnIndex));
+                    double x = ghostSpawnSquares.get(ghostSpawnIndex).getIndexX() * GameConfig.SQUARE_SIZE + 0.5 * GameConfig.SQUARE_SIZE;
+                    double z = ghostSpawnSquares.get(ghostSpawnIndex).getIndexZ() * GameConfig.SQUARE_SIZE + 0.5 * GameConfig.SQUARE_SIZE;
+                    Ghost ghost = new Ghost(ghostSpawnSquares.get(ghostSpawnIndex), x, z, lobby.getGameMap());
+                    log.info("New player ghost is: {}", ghost);
+
                     if (ghostSpawnIndex >= ghostSpawnSquares.size()) {
                         ghostSpawnIndex = 0;
                     }
-                    temp = ghostSpawnSquares.get(ghostSpawnIndex);
-                    lobby.getClientMobMap().put(client.getPlayerId(),
-                            new SnackMan(lobby.getGameMap(), calcCenterPositionFromMapIndex(temp.getIndexX()),
-                                    GameConfig.SNACKMAN_GROUND_LEVEL,
-                                    calcCenterPositionFromMapIndex(temp.getIndexZ())));
+
+                    lobby.getClientMobMap().put(client.getPlayerId(), ghost);
                     ghostSpawnIndex++;
                     break;
                 case SNACKMAN:
-                    if (snackmanSpawnIndex >= snackmanSpawnSquares.size()) {
-                        snackmanSpawnIndex = 0;
-                    }
-                    temp = snackmanSpawnSquares.get(snackmanSpawnIndex);
-                    SnackMan snackMan = new SnackMan(lobby.getGameMap(), calcCenterPositionFromMapIndex(temp.getIndexX()), GameConfig.SNACKMAN_GROUND_LEVEL, calcCenterPositionFromMapIndex(temp.getIndexZ()));
+                    log.info("Initialising snackman with spawnpoint {}", snackmanSpawnSquare);
+                    SnackMan snackMan = new SnackMan(lobby.getGameMap(), snackmanSpawnSquare, calcCenterPositionFromMapIndex(snackmanSpawnSquare.getIndexX()), GameConfig.SNACKMAN_GROUND_LEVEL, calcCenterPositionFromMapIndex(snackmanSpawnSquare.getIndexZ()));
+
+                    log.info("New player snackman is {}", snackMan);
                     lobby.getClientMobMap().put(client.getPlayerId(), snackMan);
-                    snackmanSpawnIndex++;
                     break;
             }
         }
+        int AMOUNT_SCRIPT_GHOSTS = GameConfig.AMOUNT_PLAYERS - lobby.getMembers().size();
+        for (int i = 0; i < AMOUNT_SCRIPT_GHOSTS; i++) {
+            if (ghostSpawnIndex >= ghostSpawnSquares.size()) {
+                ghostSpawnIndex = 0;
+            }
+
+            log.info("Initialising scriptGhost {}", i);
+            Square square = ghostSpawnSquares.get(ghostSpawnIndex);
+
+            ScriptGhost newScriptGhost = new ScriptGhost(lobby.getGameMap(), square, ScriptGhostDifficulty.EASY);
+
+            Thread ghostThread = new Thread(newScriptGhost);
+            ghostThread.start();
+            log.debug("Starting script ghost with id {}", newScriptGhost.getId());
+            ghostSpawnIndex++;
+            lobby.addScriptGhost(newScriptGhost);
+
+            newScriptGhost.addPropertyChangeListener((PropertyChangeEvent evt) -> {
+                if (evt.getPropertyName().equals("scriptGhost")) {
+                    messageLoop.addScriptGhostToQueue((ScriptGhost) evt.getNewValue(), lobby.getLobbyId());
+                }
+            });
+            log.info("New scriptGhost is: {}", newScriptGhost);
+        }
     }
+
+   
 
     public double calcCenterPositionFromMapIndex(int index) {
         return (index * GameConfig.SQUARE_SIZE) + (GameConfig.SQUARE_SIZE / 2);
@@ -249,4 +302,31 @@ public class MapService {
             }
         }
     }
+
+    /**
+     * Save the last map in LastMap.txt in Game-Beginn, for later to download.
+     * 
+     * @param lobbyId  Id of the lobby
+     * @param filePath path of last map file
+     */
+    private void saveLastMapFile(String lobbyId, String filePath) {
+        Path source = Paths.get(filePath).toAbsolutePath();
+        String fileName = String.format("LastMap_%s.txt", lobbyId);
+        Path lastMapPath = Paths.get("./extensions/map/" + fileName).toAbsolutePath();
+
+        try {
+            if (!Files.exists(lastMapPath)) {
+                Files.copy(source, lastMapPath, StandardCopyOption.REPLACE_EXISTING);
+            }
+        } catch (IOException e) {
+            log.error("Failed to back up the original maze file", e);
+        }
+    }
+
+
+    public SnackMan getSnackMan() {
+        return null; //snackman;
+    }
+
+
 }
