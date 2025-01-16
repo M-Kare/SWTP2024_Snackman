@@ -180,14 +180,14 @@ const mapList = ref<{ mapName: string; fileName: string }[]>([
 
 const usedCustomMap = ref(false);
 const selectedMap = ref<string | null>(null);
-const customMapName = ref('Uploaded Map')
+
 const selectMap = (mapName: string) => {
     selectedMap.value = mapName;
 
-  if (selectedMap.value === 'Uploaded Map') {
+  if (selectedMap.value === 'Generated Map') {
         usedCustomMap.value = false;
     }
-    else if (selectedMap.value === customMapName.value) {
+    else if (selectedMap.value === 'Uploaded Map') {
         usedCustomMap.value = true;
     }
 };
@@ -212,7 +212,6 @@ const handleFileImport = (event: Event) => {
     if (input.files && input.files.length > 0) {
         const file = input.files[0];
         if (file.name.endsWith('.txt')) {
-          customMapName.value = "Uploaded Map"
             uploadFileToServer(file, lobbyId);
         } else {
             showPopUp.value = true;
@@ -240,7 +239,7 @@ const uploadFileToServer = async (file: File, lobbyId: string) => {
         });
 
         if (response.ok) {
-            const mapName = customMapName.value;
+            const mapName = 'Uploaded Map';
             const fileName = `SnackManMap_${lobbyId}.txt`;
 
             if (mapList.value.length > 1) {
