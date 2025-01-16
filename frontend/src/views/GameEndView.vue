@@ -151,7 +151,7 @@ const downloadMap = async () => {
   setTimeout(() => {
     feedbackMessage.value = ''
     feedbackClass.value = ''
-  }, 30000)
+  }, 3000)
 }
 </script>
 
