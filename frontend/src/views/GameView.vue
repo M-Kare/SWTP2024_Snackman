@@ -328,8 +328,7 @@ const startCountDown = async () => {
   font-weight: bold;
   top: 3vh;
   right: 3vh;
-  font-size: 30px;
-  padding: 10px;
+  font-size: 40px;
   z-index: 10;
   display: flex;
   width: 400px;
@@ -339,9 +338,15 @@ const startCountDown = async () => {
   align-items: center;
 }
 
+.time p {
+  margin: 0;
+  line-height: 1;
+}
+
 .clock-icon {
   width: 40px;
   height: 40px;
+  filter: grayscale(100%);
 }
 
 .Calories-Overlay {
@@ -357,6 +362,7 @@ const startCountDown = async () => {
   height: 60px;
   display: flex;
   justify-content: left;
+  align-items: center; 
   box-shadow: 7px 7px 0 rgba(0, 0, 0, 0.8);
 }
 
@@ -364,6 +370,11 @@ const startCountDown = async () => {
   display: flex;
   align-items: center;
   gap: 16px;
+}
+
+.overlayContent p {
+  margin: 0;
+  line-height: 1;
 }
 
 .calories-icon {
