@@ -7,5 +7,4 @@ export interface ILobbyDTD{
     gameStarted: boolean
     chooseRole: boolean
     members: Array<IPlayerClientDTD>
-
 }

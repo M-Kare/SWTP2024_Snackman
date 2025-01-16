@@ -6,19 +6,21 @@
     <div class="inner-box">
       <div class="character-grid">
         <div
-          v-for="character in characters"
-          :key="character.id"
-          @click="selectCharacter(character)"
+          v-for="button in buttons"
+          :key="button.id"
+          @click="selectCharacter(button)"
           class="character-item"
-          :class="{ 'selected': selectedCharacter === character }">
-          <div class="image-container">
-            <img :src="character.image" :alt="character.name" class="character-image">
+          :class="{ 'selected': button.selected }"
+          :style="button.selected ? { opacity: 0.3, cursor: 'not-allowed' } : {}"
+        >
+          <div class="image-container"
+               :style="button.selected ? { pointerEvents: 'none' } : {}">
+            <img :src="button.image" :alt="button.name" class="character-image">
           </div>
-          <p class="character-name">{{ character.name }}</p>
+          <p class="character-name">{{ button.name }}</p>
         </div>
       </div>
     </div>
-
 
     <SmallNavButton
       id="confirm-button"
@@ -26,9 +28,8 @@
       @click="startGame"
       :disabled="!selectedCharacter"
     >
-      Finish Character Selection
+     Start Game
     </SmallNavButton>
-
 
     <PopUp v-if="showPopUp" class="popup-box" @hidePopUp="hidePopUp">
       <p class="info-heading">Can't start the game</p>
@@ -51,45 +52,30 @@ import MenuBackground from '@/components/MenuBackground.vue';
 import SmallNavButton from '@/components/SmallNavButton.vue';
 import {useRoute, useRouter} from "vue-router";
 import PopUp from "@/components/PopUp.vue";
-import type {ILobbyDTD} from "@/stores/Lobby/ILobbyDTD";
-import type {IPlayerClientDTD} from "@/stores/Lobby/IPlayerClientDTD";
 import {useLobbiesStore} from "@/stores/Lobby/lobbiesstore";
+import{Button} from "@/stores/Lobby/lobbiesstore"
+
+
 
 // TODO Finish ersetzten durch Start
 
 const route = useRoute();
 const lobbyId = route.params.lobbyId as string;
 
-
-
 const lobbiesStore = useLobbiesStore()
+const buttons = lobbiesStore.buttons
 const router = useRouter();
-
 const darkenBackground = ref(false)
-
 const showPopUp = ref(false)
 const showRolePopup = ref(false)
 const infoText = ref()
-
 const hidePopUp = () => {
   showPopUp.value = false
-
 }
 
-interface Character {
-  id: number,
-  name: string,
-  image: string,
-  selectedBy?: string
-}
+//TO DELETE
 
-const characters = ref<Character[]>([      // TODO add as many as there are players
-  {id: 1, name: 'Snackman', image: '/packman.png'},
-  {id: 2, name: 'Ghost', image: '/ghost.jpg'},
-  {id: 3, name: 'Ghost', image: '/ghost.jpg'},
-  {id: 4, name: 'Ghost', image: '/ghost.jpg'},
-  {id: 5, name: 'Ghost', image: '/ghost.jpg'}
-]);
+// alle die nicht selected sind sind hell alle anderen dunkel
 
 
 
@@ -102,26 +88,29 @@ const characters = ref<Character[]>([      // TODO add as many as there are play
  * @throws {Error} If the player or lobby is not found.
  */
 
-const selectedCharacter = ref<Character | null>(null);    // TODO make responsive
+const selectedCharacter = ref<Button | null>(null); // TODO make responsive
 
-const selectCharacter = async (character: Character) => {    // TODO API Call to backend to see if you can pick this character
-  console.log("Trying to select this character", character)
+
+const selectCharacter = async (button: Button) => {    // TODO API Call to backend to see if you can pick this character
+  console.log("Trying to select this character", button)
 
   // already choosen Role
-  if (character.selectedBy) {
+  if (button.selected) {
     infoText.value = "Dieser Charakter wurde bereits gewählt!";
     showPopUp.value = true;
     darkenBackground.value = true;
     return;
   }
+  // sende LobbyId, PlayerId,Rolle, ButtonId, Selected, ButtonId
   const payload = {
     lobbyId: lobbyId,
     playerId: lobbiesStore.lobbydata.currentPlayer.playerId,
-    role: character.name.toUpperCase(), // "SNACKMAN" oder "GHOST"
-    characterId: character.id
+    role: button.name.toUpperCase(), // "SNACKMAN" oder "GHOST"
+    buttonId: button.id,
+    selected: button.selected,
   };
-  console.log("Lobbie  : ", lobbiesStore.lobbydata.lobbies.find(lobby => lobby.lobbyId === lobbyId))
   try {
+    // bekommt statuscode Zurück 200 Ok , 409 Conflict , 400 Badrequest
     const response = await fetch('/api/lobbies/lobby/choose/role', {
       method: 'POST',
       headers: {
@@ -129,17 +118,13 @@ const selectCharacter = async (character: Character) => {    // TODO API Call to
       },
       body: JSON.stringify(payload)
     });
-    //  Backend Rollen werden beim Createn und Joinen auf Undefined gesetzt
-    if (response.ok) {
-      // playerId aus allen anderen entfernen
-      characters.value.forEach((char) => {
-        if (char.selectedBy === lobbiesStore.lobbydata.currentPlayer.playerId) {
-          char.selectedBy = undefined
-        }
-      })
-      character.selectedBy = lobbiesStore.lobbydata.currentPlayer.playerId
-      selectedCharacter.value = character;
 
+    if (response.ok) {
+      // schauen welche Buttons bereits selected sind und löschen
+      //  lobbiesStore.updateButtonSelection(button.id  , lobbiesStore.lobbydata.currentPlayer.playerId )
+
+      selectedCharacter.value = button;
+      darkenBackground.value=true;
       console.log("Character selected successfully");
     } else if (response.status === 409) {
       console.log("Value ", selectedCharacter.value, "Response ", response)
@@ -147,10 +132,11 @@ const selectCharacter = async (character: Character) => {    // TODO API Call to
       showPopUp.value = true;
       darkenBackground.value = true;
     } else {
-      infoText.value = "Fehler bei der Charakterauswahl!";
+      infoText.value = "Fehler beim Charakterauswählen!";
       showPopUp.value = true;
       darkenBackground.value = true;
     }
+
   } catch (error) {
     console.error("Error selecting character:", error);
     infoText.value = "Verbindung zum Server fehlgeschlagen!";
@@ -158,6 +144,7 @@ const selectCharacter = async (character: Character) => {    // TODO API Call to
     darkenBackground.value = true;
   }
 }
+
 
   onMounted(async () => {
     await lobbiesStore.fetchLobbyById(lobbyId)
@@ -272,6 +259,7 @@ const startGame = async () => {      // TODO enable this when the snackman chara
   align-items: center;
   justify-content: center;
   overflow: hidden;
+  position: relative;
 }
 
 .character-image {
@@ -283,6 +271,21 @@ const startGame = async () => {      // TODO enable this when the snackman chara
 .character-name {
   font-weight: bold;
   color: #000000;
+}
+
+.overlay {
+  position: absolute; /* Overlay über dem Bild platzieren */
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5); /* Dunkler halbtransparenter Hintergrund */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 1.5rem;
+  font-weight: bold;
 }
 
 

@@ -2,24 +2,31 @@ package de.hsrm.mi.swt.snackman.messaging;
 
 import de.hsrm.mi.swt.snackman.entities.lobby.Lobby;
 
-
-public record FrontedLobbyRoleUpdateEvent(Lobby lobby, String characterId) {
+// Idee lobby, SELECTED?, ButtonId,
+public record FrontedLobbyRoleUpdateEvent(Lobby lobby, String selectedBy, boolean selected, String buttonId) {
 
     @Override
     public Lobby lobby() {
         return lobby;
     }
 
-    @Override
+
     public String characterId() {
-        return characterId;
+        return buttonId;
     }
+
+    public String selectedBy(){return selectedBy;}
+
+    public boolean selected(){return selected;}
+
 
     @Override
     public String toString() {
-        return "FrontendLobbyRoleUpdateEvent{" +
+        return "FrontedLobbyRoleUpdateEvent{" +
                 "lobby=" + lobby +
-                ", characterId='" + characterId + '\'' +
+                ", selectedBy='" + selectedBy + '\'' +
+                ", selected=" + selected +
+                ", buttonId='" + buttonId + '\'' +
                 '}';
     }
 }

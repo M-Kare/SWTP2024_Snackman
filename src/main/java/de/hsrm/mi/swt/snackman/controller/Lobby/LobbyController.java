@@ -198,9 +198,14 @@ public class LobbyController {
         String lobbyId = requestBody.get("lobbyId");
         String playerId = requestBody.get("playerId");
         String role = requestBody.get("role");
-        String characterId = requestBody.get("characterId");
+        String buttonId = requestBody.get("buttonId");
+        boolean selected = Boolean.parseBoolean(requestBody.get("selected"));
 
-        System.out.println("Character id :" + characterId);
+
+
+        //TODO Liste von Buttons noch mit schcken
+
+        System.out.println("Character id :" + selected);
 
         Lobby currentLobby = lobbyManagerService.findLobbyByLobbyId(lobbyId);
         Optional <PlayerClient> player = lobbyManagerService.findClientByClientId(playerId);
@@ -213,8 +218,10 @@ public class LobbyController {
             case "SNACKMAN":
                 if (!lobbyManagerService.snackmanAlreadySelected(currentLobby) ) {
                     player.get().setRole(ROLE.SNACKMAN);
-                    logger.info("Snackan wurde selected " + "characterId =" + characterId);
-                    frontendMessageService.sendRoleChooseUpdate(new FrontedLobbyRoleUpdateEvent(currentLobby ,characterId));
+                    selected = true ;
+                    logger.info("Snackan wurde von " +player + " selected, buttonId =" + buttonId + " zustand " + selected);
+                    // Senden LOBBY, PLAYERID, SELECTED?, BUTTONID
+                    frontendMessageService.sendRoleChooseUpdate(new FrontedLobbyRoleUpdateEvent(currentLobby ,player.get().getPlayerId(), selected ,buttonId));
                     // TODO ROLLE: sendet an alle lobbys -> verarbeitung im store anscheuen
                     return ResponseEntity.ok().build();
                 } else {
@@ -224,8 +231,10 @@ public class LobbyController {
             case "GHOST":
                 if(player.isPresent()) {
                     player.get().setRole(ROLE.GHOST);
-                    logger.info("Ghost wurde selected " + "characterId =" + characterId);
-                    frontendMessageService.sendRoleChooseUpdate(new FrontedLobbyRoleUpdateEvent(currentLobby, characterId));
+                    selected = true ;
+                    logger.info("Ghost wurde von " +player + " selected, buttonId =" + buttonId + " zustand " + selected);
+                    // Senden LOBBY, PLAYERID, SELECTED?, BUTTONID
+                    frontendMessageService.sendRoleChooseUpdate(new FrontedLobbyRoleUpdateEvent(currentLobby, player.get().getPlayerId(), selected,buttonId));
 
                     return ResponseEntity.ok().build();
                 } else {

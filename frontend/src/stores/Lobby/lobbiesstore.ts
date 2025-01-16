@@ -1,5 +1,5 @@
 import {defineStore} from 'pinia';
-import {reactive} from 'vue';
+import {reactive, ref} from 'vue';
 import {Client} from '@stomp/stompjs';
 import type {ILobbyDTD} from './ILobbyDTD';
 import type {IPlayerClientDTD} from './IPlayerClientDTD';
@@ -11,9 +11,44 @@ const ROLEDEST = "/topic/lobbies/chooseRole"
 const CELECTEDROLE = "/topic/selected"
 const ROLEUPDATE = "/topic/lobby/Role-Update"
 
+interface Button {
+  id: number,
+  name: string,
+  image: string,
+  selected:boolean,
+  selectedBy?:string
+}
+
 
 export const useLobbiesStore = defineStore('lobbiesstore', () => {
   let stompclient: Client
+
+  const buttons = ref<Button[]>([
+    {id: 1, name: 'Snackman', image: '/kirby.png', selected: false},
+    {id: 2, name: 'Ghost', image: '/ghost.png', selected: false},
+    {id: 3, name: 'Ghost', image: '/ghost.png', selected: false},
+    {id: 4, name: 'Ghost', image: '/ghost.png', selected: false},
+    {id: 5, name: 'Ghost', image: '/ghost.png', selected: false}
+  ])
+
+  const updateButtonSelection = (buttonId: string, playerId: string) => {
+    // Zuvor gewählte Buttons des Spielers zurücksetzen
+    buttons.value.forEach(button => {
+      if (button.selectedBy === playerId) {
+        button.selected = false
+        button.selectedBy = undefined
+      }
+    })
+    const buttonIdNumber = Number(buttonId);
+
+    // Gewählten Button aktualisieren
+    const button = buttons.value.find(btn => btn.id === buttonIdNumber)
+    if (button) {
+      button.selected = true
+      button.selectedBy = playerId
+    }
+  }
+
 
   const lobbydata = reactive({
     lobbies: [] as Array<ILobbyDTD>,
@@ -169,38 +204,32 @@ export const useLobbiesStore = defineStore('lobbiesstore', () => {
         })
         // Subscribe to ROLEUPDATE
         stompclient.subscribe(ROLEUPDATE, async (message) => {
-          console.log('STOMP Client subscribe to ROLE-UPDATE ', message)
+          console.log('STOMP Client subscribe to ROLE-UPDATE ')
           const data = JSON.parse(message.body)
-          const lobbyId = data.lobby.lobbyId
-          console.log("ROLEUPDATE " , lobbyId )
-          console.log("ROLEUPDATE " , data.characterId )
-          const characterId = data.characterId
-          const updatedLobby = lobbydata.lobbies.find(lobby => lobby.lobbyId === lobbyId)
 
-          console.log(`Updated Role for lobby ${lobbyId}:`, updatedLobby!.members.toString())
-          if (updatedLobby){
+          // Daten aus backend empfangen
+          const buttonId = data.buttonId
+          console.log("BUTTON ID" , buttonId)
+          const lobby = data.lobby
+          const lobbyId = lobby.lobbyId
+          const selectedBy = data.selectedBy
 
-
-          }
+          updateButtonSelection(buttonId, selectedBy)
+          console.log("BUTTONS", buttons.value)
 
           // Push the update to all clients at /ChooseRole/{lobbyId}
           if (stompclient && stompclient.connected) {
-
-            console.log(`Pushed update to /LobbyView/${lobbyId}`)
-
+            console.log(`Pushed update to /ChooseRole/${lobbyId}`);
+            router.push({ path: `/ChooseRole/${lobbyId}` }).catch(() => {})
           }
         })
-
-
       } else {
         console.error('STOMP client is not initialized.')
       }
     }
-
     stompclient.onWebSocketError = (error) => {
       console.error('WebSocket Error:', error)
     }
-
     stompclient.onStompError = (frame) => {
       console.error('Full STOMP Error Frame: ', frame)
     }
@@ -442,6 +471,8 @@ export const useLobbiesStore = defineStore('lobbiesstore', () => {
     startGame,
     fetchLobbyById,
     chooseRole,
-    chooseRoleFinish
+    chooseRoleFinish,
+    buttons,
+    updateButtonSelection
   }
 })
