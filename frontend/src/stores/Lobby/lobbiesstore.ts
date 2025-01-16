@@ -19,18 +19,17 @@ export const useLobbiesStore = defineStore('lobbiesstore', () => {
     } as IPlayerClientDTD //PlayerClient for each window, for check the sync
   })
 
-  // For Test all Players have the same name 'Player Test'
-  /**
-   * Creates a new player client.
-   * @param name The name of the player.
-   * @returns The newly created player client object.
-   */
-  async function createPlayer(name: string) {
-    const newPlayerClient: IPlayerClientDTD = {
-      playerId: '',
-      playerName: name,
-      role: '',
-    }
+    /**
+     * Creates a new player client.
+     * @param name The name of the player.
+     * @returns The newly created player client object.
+     */
+    async function createPlayer(name: string){
+        const newPlayerClient: IPlayerClientDTD = {
+            playerId: '',
+            playerName: name,
+            role: '',
+        }
 
     try {
       const url = `/api/lobbies/create/player`
