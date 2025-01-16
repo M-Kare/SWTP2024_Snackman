@@ -266,21 +266,57 @@ const sprintBarStyle = computed(() => {
   }
 })
 
-const countdownTime = ref(300)   // 5 Minute in seconds
+const countdownTime = ref(300) // 5 Minute in seconds
+const lobbyId = ref(route.query.lobbyId || '');
+
+/**
+ * Get Current Playing Time From Backend
+ */
+const getCurrentPlayingTime = async () => {
+  try {
+    const url = `/api/lobby/${lobbyId.value}/current-playing-time`
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+    })
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`)
+    }
+
+    const currentPlayingTime = await response.json();
+    console.log('Current Playing Time:', currentPlayingTime);
+    return currentPlayingTime;
+
+    } catch (error: any) {
+      console.error('Error:', error)
+      return null
+    }
+}
+   
 const formattedTime = computed(() => {
   const minutes = Math.floor(countdownTime.value / 60)
   const seconds = countdownTime.value % 60
   return `${minutes < 10 ? '0' : ''}${minutes}:${seconds < 10 ? '0' : ''}${seconds}`
 })
 
-const startCountDown = () => {
+const startCountDown = async () => {
+  const currentTime = await getCurrentPlayingTime();
+  if (currentTime !== null) {
+    countdownTime.value = Math.floor(currentTime / 1000); // Chuyển từ ms sang giây
+  } else {
+    console.error('Failed to fetch current playing time. Using default value.');
+  }
+
   const interval = setInterval(() => {
-      if (countdownTime.value > 0) {
-        countdownTime.value -= 1;
-      } else {
-        clearInterval(interval); // Stop when countdown reaches 0
-      }
-    }, 1000)
+    if (countdownTime.value > 0) {
+      countdownTime.value -= 1;
+    } else {
+      clearInterval(interval); // Stop when countdown reaches 0
+    }
+  }, 1000)
 }
 
 </script>

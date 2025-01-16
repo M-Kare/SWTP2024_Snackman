@@ -227,4 +227,8 @@ public class Lobby {
     public void setUsedCustomMap(boolean value){
         this.usedCustomMap = value;
     }
+
+    public long getGameStartTime(){
+        return this.gameStartTime;
+    }
 }
