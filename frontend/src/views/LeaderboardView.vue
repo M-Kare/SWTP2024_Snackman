@@ -70,10 +70,6 @@ const backToMainMenu = () => {
   router.push({ name: 'MainMenu' })
 }
 
-const mapExport = () => {
-  // TODO add logic for map export
-}
-
 /**
  * Load the leaderboard data, initialize stomp message updates and look for winner
  */

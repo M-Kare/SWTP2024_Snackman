@@ -3,15 +3,16 @@
   <div id="individual-outer-box-size" class="outer-box">
     <h1 class="result-title">{{ gameResult }}</h1>
     <p class="end-reason">{{ gameReason }}</p>
-    <p class="end-reason">The playing time was {{ formatedPlayedTime }} </p>
+    <p class="end-reason">The playing time was {{ formatedPlayedTime }} minutes</p>
     <div id="button-pair">
-      <SmallNavButton class="menu-button" @click="backToMainMenu">
-        Back to main menu
+      <SmallNavButton id="menu-back-button" @click="backToMainMenu">
+        Main menu
       </SmallNavButton>
-
-      <SmallNavButton class="menu-button" @click="downloadMap">Export map</SmallNavButton>
+      <SmallNavButton id="export-map-button" @click="downloadMap">
+        Export map
+      </SmallNavButton>
       <SmallNavButton v-if="!alreadyEntered && lobbydata.currentPlayer.role == 'SNACKMAN' && winningRole == 'SNACKMAN'"
-                      class="menu-button"
+                      id="create-leaderboard-entry-button"
                       @click="showCreateNewLeaderboardEntryForm">
         Create new leaderboard entry
       </SmallNavButton>
@@ -20,22 +21,22 @@
       v-if="showCreateNewLeaderboardEntry"
       :playedTime="formatTime(playedTime)"
       @cancelNewLeaderboardEntryCreation="cancelNewLeaderboardEntryCreation"
-      @entryCreated="hideCreateNewLeaderboardEntryForm">
+      @entryCreated="hideCreateNewLeaderboardEntryForm"
+    >
     </CreateNewLeaderboardEntryForm>
-    <div v-if="feedbackMessage" :class="['feedback-message', feedbackClass]">
-      {{ feedbackMessage }}
-    </div>
+  </div>
+  <div v-if="feedbackMessage" :class="['feedback-message', feedbackClass]">
+    {{ feedbackMessage }}
   </div>
 </template>
 
 <script lang="ts" setup>
 import {computed, ref} from 'vue'
 import {useRoute, useRouter} from 'vue-router'
-import CreateNewLeaderboardEntryForm from "@/components/CreateNewLeaderboardEntryForm.vue"
-import {useLobbiesStore} from "@/stores/Lobby/lobbiesstore";
+import CreateNewLeaderboardEntryForm from '@/components/CreateNewLeaderboardEntryForm.vue'
+import {useLobbiesStore} from '@/stores/Lobby/lobbiesstore'
+import ViewBackground from '@/components/ViewBackground.vue'
 import SmallNavButton from "@/components/SmallNavButton.vue";
-import PopUp from "@/components/PopUp.vue";
-import ViewBackground from "@/components/ViewBackground.vue";
 
 const route = useRoute()
 const router = useRouter()
@@ -44,22 +45,17 @@ const alreadyEntered = ref(false)
 const {lobbydata} = useLobbiesStore()
 
 // Read player role and game result from query parameters
-const lobbyId = (route.query.lobbyId as string) || '-';
+const lobbyId = (route.query.lobbyId as string) || '-'
 const winningRole = (route.query.winningRole as string) || '-'
 const playedTime = (route.query.timePlayed as unknown as number) || 0
 const formatedPlayedTime = formatTime(playedTime)
 const kcalCollected = (route.query.kcalCollected as unknown as number) || 0
 const gameResult = ref()
-const showPopUp = ref(false)
 
-const hidePopUp = () => {
-  showPopUp.value = false
-}
-
-if (winningRole == "SNACKMAN") {
-  gameResult.value = "SNACKMAN IS THE WINNER"
+if (winningRole == 'SNACKMAN') {
+  gameResult.value = 'SNACKMAN IS THE WINNER'
 } else {
-  gameResult.value = "GHOSTS ARE THE WINNER"
+  gameResult.value = 'GHOSTS ARE THE WINNER'
 }
 
 /**
@@ -73,7 +69,7 @@ const gameReason = computed(() => {
   } else if (winningRole === 'GHOST' && kcalCollected < 0) {
     return 'The ghosts scared Snackman too many times until he had no calories left!'
   }
-  return 'The time is up and SnackMan hasn\'t collected enough calories!'
+  return "The time is up and SnackMan hasn't collected enough calories!"
 })
 
 const showLeaderboard = () => {
@@ -114,55 +110,48 @@ const backToMainMenu = () => {
 function formatTime(seconds: number): string {
   const minutes = Math.floor(seconds / 60);
   const remainingSeconds = seconds % 60;
-
-  if (minutes < 1) {
-    return `${remainingSeconds} second${remainingSeconds !== 1 ? 's' : ''}`;
-  } else {
-    const formattedMinutes = minutes.toString().padStart(2, '0');
-    const formattedSeconds = remainingSeconds.toString().padStart(2, '0');
-    return `${formattedMinutes}:${formattedSeconds} minute${minutes !== 1 ? 's' : ''}`;
-  }
+  return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
 }
 
-const feedbackMessage = ref('');
-const feedbackClass = ref('');
+const feedbackMessage = ref('')
+const feedbackClass = ref('')
 
 const downloadMap = async () => {
-  try{
-      const response = await fetch(`/api/download?lobbyId=${lobbyId}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-      });
+  try {
+    const response = await fetch(`/api/download?lobbyId=${lobbyId}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
 
-      if(!response.ok) throw new Error('Failed to download map.');
+    if (!response.ok) throw new Error('Failed to download map.')
 
-      const blob = await response.blob();
-      const link = document.createElement('a');   // Create an anchor element to trigger the download
-      const url = URL.createObjectURL(blob);
-      link.href = url;
-      link.download = 'SnackManMap.txt';
-      document.body.appendChild(link);            // Append the link to the DOM
-    link.click();                               // Simulate a click to start the download
-      document.body.removeChild(link);            // Remove the link after the download
+    const blob = await response.blob()
+    const link = document.createElement('a') // Create an anchor element to trigger the download
+    const url = URL.createObjectURL(blob)
+    link.href = url
+    link.download = 'SnackManMap.txt'
+    document.body.appendChild(link) // Append the link to the DOM
+    link.click() // Simulate a click to start the download
+    document.body.removeChild(link) // Remove the link after the download
 
-      // Revoke the object URL to free up memory
-      URL.revokeObjectURL(url);
+    // Revoke the object URL to free up memory
+    URL.revokeObjectURL(url)
 
     // Success feedback
-      feedbackMessage.value = 'Map saved';
-    feedbackClass.value = 'success';
-  } catch(error: any){
-      // Failure feedback
-      feedbackMessage.value = 'Map not saved';
-      feedbackClass.value = 'error';
+    feedbackMessage.value = 'Map saved'
+    feedbackClass.value = 'success'
+  } catch (error: any) {
+    // Failure feedback
+    feedbackMessage.value = 'Map not saved'
+    feedbackClass.value = 'error'
   }
   // Clear feedback after 3 seconds
   setTimeout(() => {
-    feedbackMessage.value = '';
-    feedbackClass.value = '';
-  }, 3000);
+    feedbackMessage.value = ''
+    feedbackClass.value = ''
+  }, 30000)
 }
 </script>
 
@@ -180,8 +169,8 @@ const downloadMap = async () => {
 
 .result-title {
   color: var(--primary-highlight-color);
-  line-height: 1.2;
-  margin-bottom: 4rem;
+  line-height: 1.1;
+  margin-bottom: 3rem;
   font-weight: bold;
 }
 
@@ -199,24 +188,35 @@ const downloadMap = async () => {
   padding-top: 2em;
 }
 
+#menu-back-button:hover,
+#export-map-button:hover,
+#create-leaderboard-entry-button:hover {
+  background: var(--primary-highlight-color);
+}
+
 .feedback-message {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: 20%;
   font-size: 2rem;
   margin-top: 4rem;
   font-weight: bold;
   padding: 10px 20px;
   border-radius: 5px;
   text-align: center;
+  align-content: center;
   animation: fadeIn 0.5s;
 }
 
 .feedback-message.success {
   color: #fff;
-  background-color: #50C878;
+  background-color: #50c878;
 }
 
 .feedback-message.error {
   color: #fff;
-  background-color: #C70039;
+  background-color: #c70039;
 }
 
 /* Fade-in animation */
