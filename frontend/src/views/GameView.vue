@@ -47,7 +47,7 @@ let currentCalories = ref()
 let caloriesMessage = ref('')
 const playerRole = ref(route.query.role || ''); // Player role from the URL query
 
-const SNACKMAN_TEXTURE: string = 'src/assets/kirby.glb'
+const SNACKMAN_TEXTURE: string = '/kirby.glb'
 let snackManModel: THREE.Group<THREE.Object3DEventMap>
 
 const canvasRef = ref()
