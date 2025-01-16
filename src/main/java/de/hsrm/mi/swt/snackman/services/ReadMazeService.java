@@ -5,7 +5,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
 
 import org.python.util.PythonInterpreter;
 import org.springframework.stereotype.Service;
@@ -13,8 +12,13 @@ import org.springframework.stereotype.Service;
 @Service
 public class ReadMazeService {
 
-    private PythonInterpreter pythonInterpreter = null;
-    private Properties pythonProps = new Properties();
+    private PythonInterpreter interpreter;
+
+    public ReadMazeService(){
+        interpreter = new PythonInterpreter();
+        interpreter.exec("import sys");
+        interpreter.exec("sys.path.append('./extensions/maze')");
+    }
 
     /**
      * Reads maze data from a file and converts it into a char array with [x][z]-coordinates
@@ -51,12 +55,7 @@ public class ReadMazeService {
 
     public void generateNewMaze() {
         String mazeScriptPath = "./extensions/maze/Maze.py";
-        try (PythonInterpreter localPythonInterpreter = new PythonInterpreter()) {
-            localPythonInterpreter.execfile(mazeScriptPath);
-            localPythonInterpreter.exec("main()");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        interpreter.execfile(mazeScriptPath);
     }
 
     // /**

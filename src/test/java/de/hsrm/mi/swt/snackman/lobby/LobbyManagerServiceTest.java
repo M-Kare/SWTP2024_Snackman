@@ -1,25 +1,22 @@
 package de.hsrm.mi.swt.snackman.lobby;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.NoSuchElementException;
 
+import org.junit.jupiter.api.AfterAll;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-
-import de.hsrm.mi.swt.snackman.entities.map.GameMap;
-import de.hsrm.mi.swt.snackman.services.MapService;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.util.FileSystemUtils;
 
@@ -27,9 +24,12 @@ import de.hsrm.mi.swt.snackman.SnackmanApplication;
 import de.hsrm.mi.swt.snackman.entities.lobby.Lobby;
 import de.hsrm.mi.swt.snackman.entities.lobby.PlayerClient;
 import de.hsrm.mi.swt.snackman.entities.lobby.ROLE;
+import de.hsrm.mi.swt.snackman.entities.map.GameMap;
+import de.hsrm.mi.swt.snackman.entities.map.Square;
 import de.hsrm.mi.swt.snackman.services.GameAlreadyStartedException;
 import de.hsrm.mi.swt.snackman.services.LobbyAlreadyExistsException;
 import de.hsrm.mi.swt.snackman.services.LobbyManagerService;
+import de.hsrm.mi.swt.snackman.services.MapService;
 
 @SpringBootTest
 public class LobbyManagerServiceTest {
@@ -39,7 +39,7 @@ public class LobbyManagerServiceTest {
 
       private LobbyManagerService lobbyManagerService;
       private static final Path workFolder = Paths.get("./extensions").toAbsolutePath();
-
+      
       @BeforeAll
       static void fileSetUp() {
             try{
@@ -49,16 +49,21 @@ public class LobbyManagerServiceTest {
             }
             SnackmanApplication.checkAndCopyResources();
       }
-
+      
       @AfterAll
       static void tearDownAfter() throws IOException {
             if (Files.exists(workFolder)) {
                   FileSystemUtils.deleteRecursively(workFolder.toFile());
             }
       }
-
+      
       @BeforeEach
       public void setup() {
+            Square[][] emptyMap = { {new Square(0,0), new Square(0,1), new Square(0,2)},
+                                {new Square(1,0), new Square(1,1), new Square(1,2)}, 
+                                {new Square(2,0), new Square(2,1), new Square(2,2)} };
+            GameMap gameMap = new GameMap(emptyMap);
+            Mockito.when(mapService.createNewGameMap(Mockito.any())).thenReturn(gameMap);
             lobbyManagerService = new LobbyManagerService(mapService, null);
       }
 
