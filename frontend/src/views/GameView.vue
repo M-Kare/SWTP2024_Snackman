@@ -305,7 +305,7 @@ const formattedTime = computed(() => {
 const startCountDown = async () => {
   const currentTime = await getCurrentPlayingTime();
   if (currentTime !== null) {
-    countdownTime.value = Math.floor(currentTime / 1000); // Chuyển từ ms sang giây
+    countdownTime.value = Math.floor(currentTime / 1000); // Change from milis second to second
   } else {
     console.error('Failed to fetch current playing time. Using default value.');
   }
@@ -346,7 +346,6 @@ const startCountDown = async () => {
 .clock-icon {
   width: 40px;
   height: 40px;
-  filter: grayscale(100%);
 }
 
 .Calories-Overlay {
