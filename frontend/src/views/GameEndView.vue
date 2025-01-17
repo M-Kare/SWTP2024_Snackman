@@ -51,7 +51,7 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, ref} from 'vue'
+import {computed, onMounted, ref} from 'vue'
 import {useRoute, useRouter} from 'vue-router'
 import CreateNewLeaderboardEntryForm from '@/components/CreateNewLeaderboardEntryForm.vue'
 import {useLobbiesStore} from '@/stores/Lobby/lobbiesstore'
