@@ -29,6 +29,7 @@ import {GLTFLoader} from 'three/examples/jsm/Addons.js'
 import {useRoute} from 'vue-router';
 import type {IPlayerDTD} from '@/stores/Player/IPlayerDTD';
 import {SoundManager} from "@/services/SoundManager";
+import {SoundType} from "@/services/SoundTypes";
 
 const { lobbydata } = useLobbiesStore();
 const gameMapStore = useGameMapStore()
@@ -163,7 +164,19 @@ onMounted(async () => {
   renderer.setAnimationLoop(animate)
   window.addEventListener('resize', resizeCallback)
 
-  SoundManager.initSoundmanager(camera)
+  await SoundManager.initSoundmanager(camera)
+  console.log("All sounds loaded, attaching to meshes...");
+
+  gameMapStore.mapContent.chickens.forEach((chicken) => {
+    const chickenMesh = scene.getObjectById(chicken.meshId);
+    if (!chickenMesh) {
+      console.warn(`Chicken mesh with ID ${chicken.meshId} not found in the scene.`);
+      return;
+    }
+    SoundManager.attachSoundToModelOrMesh(chickenMesh, SoundType.CHICKEN);
+  });
+
+  SoundManager.playSound(SoundType.CHICKEN)
 })
 
 // initially loads the playerModel & attaches playerModel to playerCamera
@@ -176,7 +189,6 @@ async function loadPlayerModel(playerId: string, texture: string) {
     snackManModel.position.lerp(new THREE.Vector3(playerData.posX, playerData.posY - 2, playerData.posZ), 0.5)
     playerHashMap.set(playerId, snackManModel);
 
-    SoundManager.attachEatingSound(snackManModel)
     // optional offset for thirdPersonView
     // snackManModel.position.set(0, -1.55, -5);
     // player.getCamera().add(snackManModel)
