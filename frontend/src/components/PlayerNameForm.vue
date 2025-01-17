@@ -2,7 +2,7 @@
     <div id="form-box">
         <form id="form" @submit.prevent="savePlayerName">
             <label>
-                
+
                 Please enter your name:
                 <input
                     v-model.trim="playerName"
@@ -22,8 +22,8 @@
         <SmallNavButton
             id="save-name-button"
             class="small-nav-button"
-            @click="savePlayerName"> 
-            
+            @click="savePlayerName">
+
             Save
         </SmallNavButton>
     </div>
@@ -31,11 +31,13 @@
 
 <script setup lang="ts">
     import SmallNavButton from '@/components/SmallNavButton.vue';
-    import { ref } from 'vue';
+    import {onMounted, ref} from 'vue';
     import { useLobbiesStore } from '@/stores/Lobby/lobbiesstore';
+    import {SoundManager} from "@/services/SoundManager";
+    import {SoundType} from "@/services/SoundTypes";
 
     const lobbiesStore = useLobbiesStore();
-    
+
     const playerName = ref('');
     const errorMessage = ref('');
 
@@ -50,7 +52,7 @@
      * Validates the admin client and playerName before attempting to save the playerName.
      * Alerts the user if there are any validation errors or if the save fails.
      * On success, hides the popup and shows the main menu.
-     * 
+     *
      * @async
      * @function savePlayerName
      * @throws {Error} Shows a popup if there is an error while saving the playerName.
@@ -68,6 +70,12 @@
 
             emit('hidePlayerNameForm');
             emit('playerNameSaved', playerName.value);
+
+
+            await SoundManager.initBackgroundMusicManager()
+            SoundManager.stopAllInGameSounds()
+            SoundManager.playSound(SoundType.LOBBY_MUSIC)
+
         } catch (error) {
             alert("Error saving playername");
             console.error(error);

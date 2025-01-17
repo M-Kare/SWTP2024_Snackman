@@ -176,7 +176,9 @@ onMounted(async () => {
     SoundManager.attachSoundToModelOrMesh(chickenMesh, SoundType.CHICKEN);
   });
 
+  SoundManager.stopLobbySound()
   SoundManager.playSound(SoundType.CHICKEN)
+  SoundManager.playSound(SoundType.INGAME_BACKGROUND)
 })
 
 // initially loads the playerModel & attaches playerModel to playerCamera
