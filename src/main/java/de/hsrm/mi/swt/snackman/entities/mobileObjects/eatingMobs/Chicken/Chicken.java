@@ -175,9 +175,6 @@ public class Chicken extends EatingMob implements Runnable {
                 // set new square you move to
                 setNewPosition(newMove);
                 log.debug("New position is x {} z {}", this.chickenPosX, this.chickenPosZ);
-            }else{
-                Square chickensAktSquare = this.gameMap.getSquareAtIndexXZ(chickenPosX, chickenPosZ);
-                chickensAktSquare.setType(MapObjectType.WALL);
             }
 
             // consume snack if present
@@ -208,7 +205,10 @@ public class Chicken extends EatingMob implements Runnable {
                     new Thread(() -> {
                         try {
                             blockingPath = true;
+                            Square chickensAktSquare = this.gameMap.getSquareAtIndexXZ(this.chickenPosX, this.chickenPosZ);
+                            chickensAktSquare.setType(MapObjectType.WALL);
                             Thread.sleep(10000);
+                            chickensAktSquare.setType(MapObjectType.FLOOR);
                             blockingPath = false;
                             layEgg();
                         } catch (InterruptedException e) {
