@@ -124,7 +124,7 @@ public class Square {
     /**
      * @return the dominant type of MapObject
      */
-    public String getPrimaryType() {
+    public synchronized String getPrimaryType() {
         if (type == MapObjectType.WALL) {
             return "W";
         } else if (type == MapObjectType.FLOOR) {
