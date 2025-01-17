@@ -28,10 +28,11 @@
 
 <script lang="ts" setup>
 import MainMenuButton from '@/components/MainMenuButton.vue'
-import {computed, ref} from 'vue'
+import {computed, onMounted, ref} from 'vue'
 import {useRoute, useRouter} from 'vue-router'
 import CreateNewLeaderboardEntryForm from "@/components/CreateNewLeaderboardEntryForm.vue"
 import {useLobbiesStore} from "@/stores/Lobby/lobbiesstore";
+import {SoundManager} from "@/services/SoundManager";
 
 const route = useRoute()
 const router = useRouter()
@@ -149,6 +150,10 @@ const downloadMap = async () => {
     feedbackClass.value = '';
   }, 3000);
 }
+
+onMounted(() => {
+  SoundManager.stopAllInGameSounds()
+})
 </script>
 
 <style scoped>
