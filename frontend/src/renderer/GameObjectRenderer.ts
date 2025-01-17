@@ -126,8 +126,12 @@ export const GameObjectRenderer = () => {
 
   const createGround = () => {
     // ground setup
+    const groundTexture = new THREE.TextureLoader().load('./textures/mossy_wall_by_lon_kamikaze_d3ziic.png')
+    groundTexture.wrapS = THREE.RepeatWrapping;
+    groundTexture.wrapT = THREE.RepeatWrapping;
+    groundTexture.repeat.set(1000, 1000);
     const groundGeometry = new THREE.PlaneGeometry(GROUNDSIZE, GROUNDSIZE)
-    const groundMaterial = new THREE.MeshMatcapMaterial({ color: 'lightgrey' })
+    const groundMaterial = new THREE.MeshStandardMaterial({ map: groundTexture })
     const ground = new THREE.Mesh(groundGeometry, groundMaterial)
     ground.castShadow = true
     ground.receiveShadow = true
