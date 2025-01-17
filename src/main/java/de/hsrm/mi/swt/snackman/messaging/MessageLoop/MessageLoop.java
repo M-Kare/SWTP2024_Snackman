@@ -6,8 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import de.hsrm.mi.swt.snackman.controller.Square.SquareDTO;
-import de.hsrm.mi.swt.snackman.entities.lobby.GameEnd;
-import de.hsrm.mi.swt.snackman.entities.lobby.GameEndDTO;
+import de.hsrm.mi.swt.snackman.entities.lobby.*;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.Ghost;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.ScriptGhost;
 import de.hsrm.mi.swt.snackman.services.MapService;
@@ -19,7 +18,6 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import de.hsrm.mi.swt.snackman.configuration.GameConfig;
-import de.hsrm.mi.swt.snackman.entities.lobby.Lobby;
 import de.hsrm.mi.swt.snackman.entities.map.Square;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.Mob;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken.Chicken;
@@ -160,6 +158,11 @@ public class MessageLoop {
     public void addGameEndToQueue(GameEnd gameEnd, String lobbyId) {
         if(changedGameEnd.containsKey(lobbyId)){
             changedGameEnd.get(lobbyId).add(gameEnd);
+            // Lobby Role entfernen
+            Lobby l = lobbyService.findLobbyByLobbyId(lobbyId);
+            for (PlayerClient p : l.getMembers()){
+                p.setRole(ROLE.UNDEFINED);
+            }
         } else {
             List<GameEnd> temp = new ArrayList<>();
             temp.add(gameEnd);

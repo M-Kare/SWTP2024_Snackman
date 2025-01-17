@@ -228,8 +228,16 @@ export const useLobbiesStore = defineStore('lobbiesstore', () => {
           const lobbyIndex = lobbydata.lobbies.findIndex(lobby => lobby.lobbyId === updatedLobby.lobbyId); // wenn kein Element gefunden mit Index, wird -1 returnt
           if (lobbyIndex !== -1) {
             lobbydata.lobbies[lobbyIndex] = updatedLobby;
+            for (let member of updatedLobby.members){
+              if (member.playerId == lobbydata.currentPlayer.playerId){
+                console.log("Character" ,member.role )
+                lobbydata.currentPlayer.role = member.role
+                console.log("2Character" ,member.role )
+              }
+            }
           } else {
             lobbydata.lobbies.push(updatedLobby);
+
           }
 
           updateButtonSelection(buttonId, selectedBy)

@@ -331,25 +331,11 @@ watchEffect(() => {
     )
     if (updatedLobby) {
       lobbyLoaded = true
-      if (updatedLobby.gameStarted) {
-      //  console.log('Game has started! Redirecting to GameView...')
+      if (updatedLobby.chooseRole) {
+      // .gameStarted
 
         console.log('Game has started! Redirecting to ChooseRole...');
         router.push({ name: 'ChooseRole' , });
-        /* TODO ROLLE :Routing anpassen
-        router.push({
-          name: 'GameView',
-          query: {
-            role: lobbiesStore.lobbydata.currentPlayer.role ,
-            lobbyId: lobbiesStore.lobbydata.currentPlayer.joinedLobbyId,
-          },
-        })
-
-         */
-        console.log(
-          'Navigating to GameView with role:',
-          lobbiesStore.lobbydata.currentPlayer.role,
-        )
       }
     } else if (lobbyLoaded) {
       deleteUploadedFile(lobbyId);
@@ -443,49 +429,6 @@ const leaveLobby = async () => {
   router.push({ name: 'LobbyListView' })
 }
 
-/**
- * Starts the game if the player is the admin and there are enough members in the lobby.
- * If the player is not the admin or there are not enough members, a popup will be shown.
- *
- * @async
- * @function startGame
- * @throws {Error} If the player or lobby is not found.
-
-const startGame = async () => {
-  const playerId = lobbiesStore.lobbydata.currentPlayer.playerId
-
-  if (!playerId || !lobby.value) {
-    console.error('Player or Lobby not found')
-    return
-  }
-
-  if (lobby.value.members.length < 2) {
-    showPopUp.value = true
-    darkenBackground.value = true
-    infoText.value = 'Not enough players to start the game!'
-    return
-  }
-
-  if(playerId === lobby.value.adminClient.playerId){
-    const status = await changeUsedMapStatus(lobby.value.lobbyId, usedCustomMap.value);
-    if (status !== "done") {
-      showPopUp.value = true;
-      darkenBackground.value = true;
-      infoHeading.value = "Map Status Error";
-      infoText.value = "Failed to update the map status.";
-      return;
-    }
-
-    await lobbiesStore.startGame(lobby.value.lobbyId);
-  } else {
-    showPopUp.value = true;
-    darkenBackground.value = true;
-    infoHeading.value = "Can't start the game"
-    infoText.value = "Only SnackMan can start the game!"
-  }
-}
-*/
-
 const chooseRole = async(lobby: ILobbyDTD | undefined ) =>{
   const playerId = lobbiesStore.lobbydata.currentPlayer.playerId
 
@@ -502,6 +445,7 @@ const chooseRole = async(lobby: ILobbyDTD | undefined ) =>{
     showPopUp.value = true
     darkenBackground.value = true
     infoText.value = 'Not enough players to choose Role!'
+    return
   }
 
   if (playerId === lobby.adminClient.playerId) {

@@ -94,9 +94,9 @@ public class LobbyController {
                   return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
             }
 
-            PlayerClient client = lobbyManagerService.findClientByClientId(creatorUuid);
+            Optional<PlayerClient> client = lobbyManagerService.findClientByClientId(creatorUuid);
             try {
-                  Lobby newLobby = lobbyManagerService.createLobby(client.getPlayerId(), client, lobbyManagerService.getMessageLoop());
+                  Lobby newLobby = lobbyManagerService.createLobby(client.get().getPlayerId(), client.get(), lobbyManagerService.getMessageLoop());
                   lobbyManagerService.startSingleplayer(newLobby.getLobbyId());
 
                   messagingTemplate.convertAndSend("/topic/lobbies/singleplayer", newLobby);
@@ -295,22 +295,5 @@ public class LobbyController {
         return ResponseEntity.ok().build();
 
     }
-
-    /*
-    public ResponseEntity<String> getRolleStatus(@RequestBody Map<String, String> responseBody){
-          lobbyId = responseBody.get("lobbyId");
-
-          Lobby lobby = lobbyManagerService.findLobbyByLobbyId(lobbyId);
-          List<String> rolleStatus = new ArrayList<>();
-
-          for (PlayerClient player : lobby.getMembers()){
-              rolleStatus.add(player.getRole().toString());
-          }
-
-
-    }
-
-     */
-
 
 }
