@@ -155,17 +155,16 @@ export class SoundManager {
   }
 
   private static async initScaredChickenSound() {
-    const chickenScaredSoundPath = "src/assets/sounds/chicken/chicken-single-alarm-call.ogg"
+    const chickenScaredSoundPath = "src/assets/sounds/chicken/chicken-single-alarm-call.mp3"
 
     const promiseChickenScaredSound = await this.loadAudioAsync(chickenScaredSoundPath)
     const scaredChickenSound = new THREE.PositionalAudio(this.listener)
-    scaredChickenSound.setBuffer(promiseChickenScaredSound)
-    scaredChickenSound.setRefDistance(3) // maximum volume at x units of distance
-    scaredChickenSound.setMaxDistance(12)
-    scaredChickenSound.setRolloffFactor(1) // how quickly the volume decreases with increasing distance
-    scaredChickenSound.setDistanceModel('linear') // decrease in volume (linear is a good choice for games)
+    scaredChickenSound.setBuffer(promiseChickenScaredSound);
+    scaredChickenSound.setRefDistance(15);
+    scaredChickenSound.setDistanceModel('linear')
     scaredChickenSound.setVolume(0.8);
 
+    console.log("Scare chicken sound initialized.");
     this.characterSounds.set(SoundType.GHOST_SCARES_CHICKEN, scaredChickenSound)
   }
 }

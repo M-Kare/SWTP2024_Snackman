@@ -169,7 +169,6 @@ export const useGameMapStore = defineStore('gameMap', () => {
 
                 updateChicken(chickenUpdate)
                 if (chickenUpdate.isScared) {
-                  console.log("Chicken is Scared")
                   SoundManager.playSound(SoundType.GHOST_SCARES_CHICKEN)
                 }
                 break;
