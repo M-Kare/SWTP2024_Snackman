@@ -81,7 +81,7 @@ const savePlayerName = async () => {
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: #0000007F;
   backdrop-filter: blur(5px);
   z-index: 1;
 }
@@ -95,7 +95,6 @@ const savePlayerName = async () => {
   width: 60%;
   max-width: 600px;
   height: 12rem;
-  background: #172D54;
   border-radius: 0.3rem;
 }
 
@@ -172,7 +171,7 @@ input::placeholder {
   font-size: 1.1rem;
   font-style: italic;
   margin-top: -1.6rem;
-  color: red;
+  color: var(--accent-color);
 }
 
 #save-name-button {
