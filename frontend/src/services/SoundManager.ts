@@ -90,8 +90,6 @@ export class SoundManager {
   }
 
   public static playSound(soundType: SoundType) {
-    console.log("SoundType: " + soundType)
-
     if (soundType === SoundType.CHICKEN) {
       this.chickenSounds.forEach((chickenSound) => {
         console.log("Chickens are playing")
@@ -144,7 +142,7 @@ export class SoundManager {
     const lobbyMusic = new THREE.Audio(this.lobbyListener);
     const buffer = await this.loadAudioAsync('src/assets/sounds/backgroundMusic/lobbyMusic.mp3');
     lobbyMusic.setBuffer(buffer);
-    lobbyMusic.setVolume(0.2);
+    lobbyMusic.setVolume(0.3);
     lobbyMusic.setLoop(true);
 
     this.backgroundSounds.set(SoundType.LOBBY_MUSIC, lobbyMusic);
