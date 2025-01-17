@@ -3,19 +3,18 @@
   <div id="form-box">
     <h1 id="title">New Lobby</h1>
 
-        <form id="form" @submit.prevent="createLobby">
-            <label>
+    <form id="form" @submit.prevent="createLobby">
+      <label>
+        Enter Name:
+      </label>
+      <input ref="lobbyInput" v-model.trim="lobbyName" placeholder="Lobbyname" type="text">
+      <p
+        v-if="errorMessage"
+        id="error-message">
 
-                Enter Name:
-                <input v-model.trim="lobbyName" placeholder="Lobbyname" ref="lobbyInput" type="text">
-            </label>
-            <p
-            v-if="errorMessage"
-            id="error-message">
-
-                {{ errorMessage }}
-            </p>
-        </form>
+        {{ errorMessage }}
+      </p>
+    </form>
 
     <SmallNavButton
       id="cancel-lobby-creation-button"
@@ -35,47 +34,47 @@
 </template>
 
 <script setup lang="ts">
-    import SmallNavButton from '@/components/SmallNavButton.vue';
-    import { useRouter } from 'vue-router';
-    import { onMounted, ref } from 'vue';
-    import { useLobbiesStore } from '@/stores/Lobby/lobbiesstore';
-    import type { IPlayerClientDTD } from '@/stores/Lobby/IPlayerClientDTD';
+import SmallNavButton from '@/components/SmallNavButton.vue';
+import {useRouter} from 'vue-router';
+import {onMounted, ref} from 'vue';
+import {useLobbiesStore} from '@/stores/Lobby/lobbiesstore';
+import type {IPlayerClientDTD} from '@/stores/Lobby/IPlayerClientDTD';
 
-    const router = useRouter();
-    const lobbiesStore = useLobbiesStore();
-    const currentPlayer = lobbiesStore.lobbydata.currentPlayer as IPlayerClientDTD;
+const router = useRouter();
+const lobbiesStore = useLobbiesStore();
+const currentPlayer = lobbiesStore.lobbydata.currentPlayer as IPlayerClientDTD;
 
-    const lobbyName = ref('');
-    const lobbyInput = ref(); // needed for autofocus
-    const errorMessage = ref('');
+const lobbyName = ref('');
+const lobbyInput = ref(); // needed for autofocus
+const errorMessage = ref('');
 
-    // defines event wich can be triggered by this component
-    const emit = defineEmits< (event: 'cancelLobbyCreation') => void >()
-    
-    /**
-     * Emits an event to cancel the lobby creation process.
-     *
-     * @function cancelLobbyCreation
-     * @returns {void}
-     */
-    const cancelLobbyCreation = () => {
-        emit('cancelLobbyCreation');
-    }
+// defines event wich can be triggered by this component
+const emit = defineEmits<(event: 'cancelLobbyCreation') => void>()
 
-    /**
-     * Creates a new lobby with the specified name and admin client.
-     * Validates the admin client and lobby name before attempting to create the lobby.
-     * Alerts the user if there are any validation errors or if the lobby creation fails.
-     * On success, redirects to the newly created lobby view.
-     *
-     * @async
-     * @function createLobby
-     * @throws {Error} Throws an alert if the admin client is invalid or the lobby name is empty or already taken.
-     * @throws {Error} Shows a popup if there is an error creating the lobby.
-     * @returns {void}
-     */
-    const createLobby = async () => {
-        const adminClient = currentPlayer;
+/**
+ * Emits an event to cancel the lobby creation process.
+ *
+ * @function cancelLobbyCreation
+ * @returns {void}
+ */
+const cancelLobbyCreation = () => {
+  emit('cancelLobbyCreation');
+}
+
+/**
+ * Creates a new lobby with the specified name and admin client.
+ * Validates the admin client and lobby name before attempting to create the lobby.
+ * Alerts the user if there are any validation errors or if the lobby creation fails.
+ * On success, redirects to the newly created lobby view.
+ *
+ * @async
+ * @function createLobby
+ * @throws {Error} Throws an alert if the admin client is invalid or the lobby name is empty or already taken.
+ * @throws {Error} Shows a popup if there is an error creating the lobby.
+ * @returns {void}
+ */
+const createLobby = async () => {
+  const adminClient = currentPlayer;
 
   if (
     !adminClient ||
@@ -86,10 +85,10 @@
     return
   }
 
-        if (!lobbyName.value.trim()) {
-            errorMessage.value = "Lobbyname can't be empty";
-            return;
-        }
+  if (!lobbyName.value.trim()) {
+    errorMessage.value = "Lobbyname can't be empty";
+    return;
+  }
 
   const isDuplicateName = lobbiesStore.lobbydata.lobbies.some(
     lobby => lobby.name === lobbyName.value.trim(),
@@ -108,7 +107,7 @@
     )
     if (newLobby && newLobby.lobbyId) {
       cancelLobbyCreation()
-      router.push({ name: 'LobbyView', params: { lobbyId: newLobby.lobbyId } })
+      router.push({name: 'LobbyView', params: {lobbyId: newLobby.lobbyId}})
     } else {
       throw new Error('Lobby creation returned invalid response.')
     }
@@ -119,7 +118,7 @@
 }
 
 onMounted(() => {
-    lobbyInput.value.focus();
+  lobbyInput.value.focus();
 })
 
 </script>
@@ -194,10 +193,9 @@ input::placeholder {
 
 #form > input {
   font-size: 1.2rem;
-  width: 90%;
+  width: auto;
   height: 2rem;
-  margin-top: 0.2rem;
-  margin-bottom: 2rem;
+  margin: 0.7rem 0 2rem 0.6rem;
   padding: 1.2rem;
 }
 
