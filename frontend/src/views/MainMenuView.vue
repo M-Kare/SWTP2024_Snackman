@@ -70,6 +70,8 @@ onMounted(() => {
     darkenBackground.value = true;
     showPlayerNameForm.value = true;
   }
+
+  SoundManager.playSound(SoundType.LOBBY_MUSIC)
 })
 </script>
 
