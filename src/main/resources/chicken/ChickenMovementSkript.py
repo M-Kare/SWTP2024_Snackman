@@ -223,6 +223,9 @@ def choose_snack_away_from_ghost(original_liste, direction):
 def getWaitingTime():
     return 2000
 
+def getWaitingTime():
+    return 2000
+
 def choose_square_without_snack_away_from_ghost(north_square, east_square, south_square, west_square, direction):
     """
     Chooses an empty square away from ghosts.
