@@ -167,6 +167,7 @@ onMounted(async () => {
   await SoundManager.initSoundmanager(camera)
   console.log("All sounds loaded, attaching to meshes...");
 
+  //Attach sound to chickens
   gameMapStore.mapContent.chickens.forEach((chicken) => {
     const chickenMesh = scene.getObjectById(chicken.meshId);
     if (!chickenMesh) {
@@ -176,8 +177,19 @@ onMounted(async () => {
     SoundManager.attachSoundToModelOrMesh(chickenMesh, SoundType.CHICKEN);
   });
 
+  //Attach sound to scriptGhosts
+  gameMapStore.mapContent.scriptGhosts.forEach((scriptGhost) => {
+    const ghostMesh = scene.getObjectById(scriptGhost.meshId);
+    if (!ghostMesh) {
+      console.warn(`Ghost mesh with ID ${scriptGhost.meshId} not found in the scene.`);
+      return;
+    }
+    SoundManager.attachSoundToModelOrMesh(ghostMesh, SoundType.GHOST);
+  });
+
   SoundManager.stopLobbySound()
   SoundManager.playSound(SoundType.CHICKEN)
+  SoundManager.playSound(SoundType.GHOST)
   SoundManager.playSound(SoundType.INGAME_BACKGROUND)
 })
 
