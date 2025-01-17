@@ -90,7 +90,9 @@ public class MessageLoop {
                     case SnackMan snackMan -> {
                         messages.add(new Message<>(EventEnum.SnackManUpdate, new MobUpdateMessage(snackMan.getPosition(),
                         snackMan.getQuat(), snackMan.getRadius(), snackMan.getSpeed(), client, snackMan.getSprintTimeLeft(),
-                                snackMan.isSprinting(), snackMan.isInCooldown(), snackMan.getCurrentCalories(), snackMan.getCurrentCalories() >= GameConfig.MAX_KALORIEN ? GameConfig.MAX_KALORIEN_MESSAGE : null
+                                snackMan.isSprinting(), snackMan.isInCooldown(), snackMan.getCurrentCalories(),
+                                snackMan.getCurrentCalories() >= GameConfig.MAX_KALORIEN ?
+                                        GameConfig.MAX_KALORIEN_MESSAGE : null, snackMan.isScared()
                         )));
                     }
                     case Ghost ghost ->{

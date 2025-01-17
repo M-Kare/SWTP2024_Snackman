@@ -64,6 +64,7 @@ export class SoundManager {
       this.initGameEndSound(),
       this.initEatSnackSound(),
       this.initChickenSounds(),
+      this.initGhostHitsSnackmanSound()
     ]);
     console.log("All sounds initialized.");
   }
@@ -116,7 +117,16 @@ export class SoundManager {
     sound.setRefDistance(20);
 
     this.characterSounds.set(SoundType.EAT_SNACK, sound);
-    console.log("Eat snack sound initialized.");
+  }
+
+  private static async initGhostHitsSnackmanSound(): Promise<void> {
+    const sound = new THREE.PositionalAudio(this.listener);
+    const buffer = await this.loadAudioAsync('src/assets/sounds/snackman/hitByGhostSound.mp3');
+    sound.setBuffer(buffer);
+    sound.setRefDistance(20);
+
+    this.characterSounds.set(SoundType.GHOST_HITS_SNACKMAN, sound);
+    console.log("Ghost hits snackman sound initialized.");
   }
 
   private static async initChickenSounds(): Promise<void> {

@@ -105,6 +105,12 @@ export const useGameMapStore = defineStore('gameMap', () => {
                 break;
               case EventType.SnackManUpdate:
                 const mobUpdate: ISnackmanUpdateDTD = mess.message
+
+                //play sound for ghost and snackman
+                if (mobUpdate.isScared) {
+                  SoundManager.playSound(SoundType.GHOST_HITS_SNACKMAN)
+                }
+
                 if (mobUpdate.playerId === lobbydata.currentPlayer.playerId) {
                   if (player == undefined) {
                     continue;
@@ -137,7 +143,6 @@ export const useGameMapStore = defineStore('gameMap', () => {
                   if (player == undefined) {
                     continue;
                   }
-
                   player.setPosition(ghostUpdate.position);
                   break;
                 } else {
@@ -146,6 +151,7 @@ export const useGameMapStore = defineStore('gameMap', () => {
                   }
                   otherPlayers.get(ghostUpdate.playerId)?.position.lerp(ghostUpdate.position, 0.3)
                   otherPlayers.get(ghostUpdate.playerId)?.setRotationFromQuaternion(ghostUpdate.rotation)
+
                 }
                 break;
               case EventType.SquareUpdate:
