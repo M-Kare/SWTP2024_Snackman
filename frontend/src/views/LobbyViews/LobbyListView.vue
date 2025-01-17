@@ -134,16 +134,9 @@ const joinLobby = async (lobby: ILobbyDTD) => {
     onMounted(async () => {
         await lobbiesStore.fetchLobbyList();
 
-  if (
-    !lobbiesStore.lobbydata.currentPlayer ||
-    lobbiesStore.lobbydata.currentPlayer.playerId === '' ||
-    lobbiesStore.lobbydata.currentPlayer.playerName === ''
-  ) {
-    lobbiesStore.createPlayer('Player Test')
-  }
+      lobbiesStore.startLobbyLiveUpdate();
+    })
 
-  lobbiesStore.startLobbyLiveUpdate()
-})
 </script>
 
 <style scoped>
@@ -227,5 +220,16 @@ const joinLobby = async (lobby: ILobbyDTD) => {
 .info-text {
   font-size: 1.8rem;
   padding: 1.2rem;
+}
+
+#darken-background {
+  z-index: 1;
+  position: fixed;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 50%);
+
+  transition: background 0.3s ease;
 }
 </style>
