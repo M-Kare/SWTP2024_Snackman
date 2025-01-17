@@ -61,7 +61,6 @@ export class SoundManager {
       meshOrModel.add(soundClone);
 
       this.chickenSounds.push(soundClone)
-      console.log("Random chicken sound attached to mesh.");
     } else {
       console.warn("No sounds available or invalid sound type.");
     }
@@ -92,7 +91,6 @@ export class SoundManager {
   public static playSound(soundType: SoundType) {
     if (soundType === SoundType.CHICKEN) {
       this.chickenSounds.forEach((chickenSound) => {
-        console.log("Chickens are playing")
         chickenSound.play();
       });
     } else {
