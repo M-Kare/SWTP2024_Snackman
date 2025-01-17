@@ -78,16 +78,6 @@
 
 <script lang="ts" setup>
 
-
-/*
- <SmallNavButton
-          id="start-game-button"
-          class="small-nav-buttons"
-          @click="startGame"
-        >
-          Start Game
-        </SmallNavButton>
- */
 import MenuBackground from '@/components/MenuBackground.vue'
 import SmallNavButton from '@/components/SmallNavButton.vue'
 import PopUp from '@/components/PopUp.vue'

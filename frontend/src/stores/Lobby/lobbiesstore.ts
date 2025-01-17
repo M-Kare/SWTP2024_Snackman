@@ -11,7 +11,7 @@ const ROLEDEST = "/topic/lobbies/chooseRole"
 const CELECTEDROLE = "/topic/selected"
 const ROLEUPDATE = "/topic/lobby/Role-Update"
 
-interface Button {
+export interface Button {
   id: number,
   name: string,
   image: string,
@@ -203,8 +203,6 @@ export const useLobbiesStore = defineStore('lobbiesstore', () => {
         stompclient.subscribe(ROLEUPDATE, async (message) => {
           console.log('STOMP Client subscribe to ROLE-UPDATE ')
           const data = JSON.parse(message.body)
-
-          // Daten aus backend empfangen
           const buttonId = data.buttonId
           const updatedLobby = data.lobby
           const lobbyId = updatedLobby.lobbyId
@@ -213,7 +211,7 @@ export const useLobbiesStore = defineStore('lobbiesstore', () => {
 
 
           // Lobby in lobbydata aktualisieren
-          const lobbyIndex = lobbydata.lobbies.findIndex(lobby => lobby.lobbyId === updatedLobby.lobbyId);
+          const lobbyIndex = lobbydata.lobbies.findIndex(lobby => lobby.lobbyId === updatedLobby.lobbyId); // wenn kein Element gefunden mit Index, wird -1 returnt
           if (lobbyIndex !== -1) {
             lobbydata.lobbies[lobbyIndex] = updatedLobby;
           } else {
@@ -301,6 +299,10 @@ export const useLobbiesStore = defineStore('lobbiesstore', () => {
       const currentLobby = await fetchLobbyById(lobbyId);
       if (currentLobby && currentLobby.members.length >= 5) {
         console.error('Lobby is full. Cannot join.');
+        return null;
+      }
+      if (currentLobby && currentLobby.chooseRole){
+        console.error('Game has already started.')
         return null;
       }
 

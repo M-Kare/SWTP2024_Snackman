@@ -52,17 +52,19 @@ import SmallNavButton from '@/components/SmallNavButton.vue';
 import {useRoute, useRouter} from "vue-router";
 import PopUp from "@/components/PopUp.vue";
 import {useLobbiesStore} from "@/stores/Lobby/lobbiesstore";
-import {Button} from "@/stores/Lobby/lobbiesstore"
+import type {Button} from "@/stores/Lobby/lobbiesstore"
+
 
 
 // TODO Finish ersetzten durch Start
 
-const route = useRoute();
-const lobbyId = route.params.lobbyId as string;
-
+const route = useRoute()
+const router = useRouter()
+const lobbyId = route.params.lobbyId as string
 const lobbiesStore = useLobbiesStore()
+
 const buttons = lobbiesStore.buttons
-const router = useRouter();
+
 const darkenBackground = ref(false)
 const showPopUp = ref(false)
 const showRolePopup = ref(false)
@@ -71,10 +73,6 @@ const hidePopUp = () => {
   showPopUp.value = false
 }
 const lobbyUrl = route.params.lobbyId
-
-const lobby = computed(() =>
-  lobbiesStore.lobbydata.lobbies.find(l => l.lobbyId === lobbyUrl),
-)
 
 
 /**
@@ -118,9 +116,6 @@ const selectCharacter = async (button: Button) => {    // TODO API Call to backe
     });
 
     if (response.ok) {
-      // schauen welche Buttons bereits selected sind und löschen
-      //  lobbiesStore.updateButtonSelection(button.id  , lobbiesStore.lobbydata.currentPlayer.playerId )
-
       selectedCharacter.value = button;
       darkenBackground.value = true;
       console.log("Character selected successfully");
@@ -149,17 +144,6 @@ onMounted(async () => {
 
   await lobbiesStore.startLobbyLiveUpdate()
 })
-/*
-watchEffect(() => {
-  const lobby = lobbiesStore.lobbydata.lobbies.find(l => l.lobbyId === lobbyUrl);
-  if (lobby) {
-    console.log("Aktuelle Lobby-Daten:", lobby);
-  }
-});
-
-
- */
-
 
 /**
  * Starts the game if the player is the admin and there are enough members in the lobby.
@@ -174,6 +158,7 @@ const startGame = async () => {
   let snackmanCounter:number = 0
   let memberCounter :number = 0
   const lobby = lobbiesStore.lobbydata.lobbies.find(l => l.lobbyId === lobbyId)
+  const player = lobbiesStore.lobbydata.currentPlayer
 
   console.log("Lobby bevore Start ", lobby)
 
@@ -203,6 +188,10 @@ const startGame = async () => {
     console.log("Es sind " , memberCounter, " Spieler und" , snackmanCounter, " Snackman")
     if ( snackmanCounter === 1 && memberCounter === lobby.members.length){
       await lobbiesStore.startGame(lobby.lobbyId)
+      await    router.push({
+        name: 'GameView',
+        query: {role: player.role  }
+      })
     }
     else {
       showPopUp.value = true
@@ -218,6 +207,26 @@ const startGame = async () => {
 
 
 // TODO die neue Lobby aus watch effect nutzen
+
+watchEffect(() => {
+  if (lobbiesStore.lobbydata && lobbiesStore.lobbydata.lobbies) {
+    const updatedLobby = lobbiesStore.lobbydata.lobbies.find(
+      l => l.lobbyId === lobbyUrl,
+    )
+    if (updatedLobby) {
+
+      if (updatedLobby.gameStarted) {
+        router.push({
+          name: 'GameView',
+          query: {
+            role: lobbiesStore.lobbydata.currentPlayer.role ,
+            lobbyId: lobbiesStore.lobbydata.currentPlayer.joinedLobbyId,
+          },
+        })
+      }
+    }
+  }
+})
 
 
 </script>
