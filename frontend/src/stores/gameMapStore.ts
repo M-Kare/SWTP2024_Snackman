@@ -108,7 +108,7 @@ export const useGameMapStore = defineStore('gameMap', () => {
 
                 //play sound for ghost and snackman
                 if (mobUpdate.isScared) {
-                  SoundManager.playSound(SoundType.GHOST_HITS_SNACKMAN)
+                  SoundManager.playSound(SoundType.GHOST_SCARES_SNACKMAN)
                 }
 
                 if (mobUpdate.playerId === lobbydata.currentPlayer.playerId) {
@@ -166,7 +166,12 @@ export const useGameMapStore = defineStore('gameMap', () => {
                 break;
               case EventType.ChickenUpdate:
                 const chickenUpdate: IChickenDTD = mess.message
+
                 updateChicken(chickenUpdate)
+                if (chickenUpdate.isScared) {
+                  console.log("Chicken is Scared")
+                  SoundManager.playSound(SoundType.GHOST_SCARES_CHICKEN)
+                }
                 break;
               case EventType.ScriptGhostUpdate:
                 const scriptGhostUpdate: IScriptGhostDTD = mess.message
