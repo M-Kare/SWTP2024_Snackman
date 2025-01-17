@@ -22,7 +22,7 @@ export class SoundManager {
      * @param camera - The camera to which the audio listener is attached.
      */
     public static async initSoundmanager(camera: THREE.Camera): Promise<void> {
-        console.log("InitSoundmanager");
+      console.debug("InitSoundmanager");
         this.ingameListener = new THREE.AudioListener();
         camera.add(this.ingameListener);
 
@@ -33,7 +33,7 @@ export class SoundManager {
      * Initializes the background music manager, setting up a lobby listener.
      */
     public static async initBackgroundMusicManager(): Promise<void> {
-        console.log("InitBackgroundMusicManager")
+      console.debug("InitBackgroundMusicManager")
         this.lobbyListener = new THREE.AudioListener();
         await this.initBackgroundSounds();
     }
@@ -121,7 +121,7 @@ export class SoundManager {
             this.initGhostHitsSnackmanSound(),
             this.initGhostSounds()
         ]);
-        console.log("All sounds initialized.");
+      console.debug("All sounds initialized.");
     }
 
     /**
@@ -158,7 +158,7 @@ export class SoundManager {
             });
         } else if (soundType === SoundType.GHOST) {
             this.ghostSounds.forEach((ghostSound) => {
-                console.log("ghost sound is playing");
+              console.debug("ghost sound is playing");
                 ghostSound.play();
             });
         } else {
@@ -188,7 +188,7 @@ export class SoundManager {
         sound.setVolume(0.1);
 
         this.backgroundSounds.set(SoundType.GAME_END, sound);
-        console.log("Endgame sound initialized.");
+      console.debug("Endgame sound initialized.");
     }
 
     /**
@@ -210,7 +210,7 @@ export class SoundManager {
         ingameMusic.setLoop(true);
 
         this.backgroundSounds.set(SoundType.INGAME_BACKGROUND, ingameMusic);
-        console.log("Ingame music initialized.");
+      console.debug("Ingame music initialized.");
     }
 
     /**
@@ -224,7 +224,7 @@ export class SoundManager {
         lobbyMusic.setLoop(true);
 
         this.backgroundSounds.set(SoundType.LOBBY_MUSIC, lobbyMusic);
-        console.log("Lobby music initialized.");
+      console.debug("Lobby music initialized.");
     }
 
     /**
@@ -248,7 +248,7 @@ export class SoundManager {
         sound.setBuffer(buffer);
 
         this.characterSounds.set(SoundType.GHOST, sound);
-        console.log("Ghost sound initialized.");
+      console.debug("Ghost sound initialized.");
     }
 
     /**
@@ -261,7 +261,7 @@ export class SoundManager {
         sound.setRefDistance(20);
 
         this.characterSounds.set(SoundType.GHOST_SCARES_SNACKMAN, sound);
-        console.log("Ghost hits snackman sound initialized.");
+      console.debug("Ghost hits snackman sound initialized.");
     }
 
     /**
@@ -289,7 +289,7 @@ export class SoundManager {
         // Add scared sound for chicken
         await this.initScaredChickenSound();
 
-        console.log("All chicken sounds initialized.");
+      console.debug("All chicken sounds initialized.");
     }
 
     /**
@@ -305,7 +305,7 @@ export class SoundManager {
         scaredChickenSound.setDistanceModel('linear');
         scaredChickenSound.setVolume(0.8);
 
-        console.log("Scare chicken sound initialized.");
+      console.debug("Scare chicken sound initialized.");
         this.characterSounds.set(SoundType.GHOST_SCARES_CHICKEN, scaredChickenSound);
     }
 }
