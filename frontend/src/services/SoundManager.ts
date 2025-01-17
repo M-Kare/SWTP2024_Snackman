@@ -2,6 +2,10 @@ import * as THREE from "three";
 import {Object3D} from "three";
 import {SoundType} from "@/services/SoundTypes";
 
+/**
+ * Manages the sounds for the game, including background music,
+ * positional audio, and sound effects for various game events.
+ */
 export class SoundManager {
     private static ingameListener: THREE.AudioListener;
     private static lobbyListener: THREE.AudioListener;
@@ -11,6 +15,12 @@ export class SoundManager {
     private static chickenSounds = new Array<THREE.PositionalAudio>();
     private static ghostSounds = new Array<THREE.PositionalAudio>();
 
+    /**
+     * Initializes the sound manager with the given camera.
+     * Attaches an audio listener to the camera.
+     *
+     * @param camera - The camera to which the audio listener is attached.
+     */
     public static async initSoundmanager(camera: THREE.Camera): Promise<void> {
         console.log("InitSoundmanager");
         this.ingameListener = new THREE.AudioListener();
@@ -19,12 +29,21 @@ export class SoundManager {
         await this.initSounds();
     }
 
+    /**
+     * Initializes the background music manager, setting up a lobby listener.
+     */
     public static async initBackgroundMusicManager(): Promise<void> {
         console.log("InitBackgroundMusicManager")
         this.lobbyListener = new THREE.AudioListener();
         await this.initBackgroundSounds();
     }
 
+    /**
+     * Loads an audio buffer asynchronously from the specified path.
+     *
+     * @param bufferPath - The path to the audio file.
+     * @returns A promise that resolves with the loaded audio buffer.
+     */
     private static async loadAudioAsync(bufferPath: string): Promise<AudioBuffer> {
         return new Promise((resolve, reject) => {
             const audioLoader = new THREE.AudioLoader();
@@ -37,6 +56,12 @@ export class SoundManager {
         });
     }
 
+    /**
+     * Attaches a sound to a 3D model or mesh based on the sound type.
+     *
+     * @param meshOrModel - The 3D object to which the sound will be attached.
+     * @param soundType - The type of sound to attach.
+     */
     public static attachSoundToModelOrMesh(
         meshOrModel: THREE.Group<THREE.Object3DEventMap> | THREE.Mesh | Object3D,
         soundType: SoundType
@@ -51,18 +76,18 @@ export class SoundManager {
             } else {
                 console.error("The selected sound's buffer is null and cannot be set.");
             }
-            soundClone.setRefDistance(3) // maximum volume at x units of distance
-            soundClone.setMaxDistance(12)
-            soundClone.setRolloffFactor(1) // how quickly the volume decreases with increasing distance
-            soundClone.setDistanceModel('linear') // decrease in volume (linear is a good choice for games)
-            soundClone.setLoop(true)
-            soundClone.setVolume(0.4)
+            soundClone.setRefDistance(3); // maximum volume at x units of distance
+            soundClone.setMaxDistance(12);
+            soundClone.setRolloffFactor(1); // how quickly the volume decreases with increasing distance
+            soundClone.setDistanceModel('linear'); // decrease in volume (linear is a good choice for games)
+            soundClone.setLoop(true);
+            soundClone.setVolume(0.4);
 
             meshOrModel.add(soundClone);
 
-            this.chickenSounds.push(soundClone)
+            this.chickenSounds.push(soundClone);
         } else if (soundType === SoundType.GHOST) {
-            const selectedSound = this.characterSounds.get(SoundType.GHOST)
+            const selectedSound = this.characterSounds.get(SoundType.GHOST);
 
             if (selectedSound) {
                 const soundClone = new THREE.PositionalAudio(selectedSound.listener);
@@ -71,21 +96,23 @@ export class SoundManager {
                 } else {
                     console.error("The selected sound's buffer is null and cannot be set.");
                 }
-                soundClone.setRefDistance(4) // maximum volume at x units of distance
-                soundClone.setMaxDistance(15)
-                soundClone.setRolloffFactor(0.7) // how quickly the volume decreases with increasing distance
-                soundClone.setDistanceModel('linear') // decrease in volume (linear is a good choice for games)
-                soundClone.setLoop(true)
-                soundClone.setVolume(0.4)
+                soundClone.setRefDistance(4); // maximum volume at x units of distance
+                soundClone.setMaxDistance(15);
+                soundClone.setRolloffFactor(0.7); // how quickly the volume decreases with increasing distance
+                soundClone.setDistanceModel('linear'); // decrease in volume (linear is a good choice for games)
+                soundClone.setLoop(true);
+                soundClone.setVolume(0.4);
 
-
-                this.ghostSounds.push(soundClone)
+                this.ghostSounds.push(soundClone);
             }
         } else {
             console.warn("No sounds available or invalid sound type.");
         }
     }
 
+    /**
+     * Initializes all game sounds, including background music and effects.
+     */
     public static async initSounds(): Promise<void> {
         await Promise.all([
             this.initGameEndSound(),
@@ -97,6 +124,9 @@ export class SoundManager {
         console.log("All sounds initialized.");
     }
 
+    /**
+     * Stops all in-game sounds.
+     */
     public static stopAllInGameSounds() {
         this.chickenSounds.forEach((chickenSound) => {
             chickenSound.stop();
@@ -109,10 +139,18 @@ export class SoundManager {
         this.backgroundSounds.get(SoundType.INGAME_BACKGROUND)?.stop();
     }
 
+    /**
+     * Stops the lobby background sound.
+     */
     public static stopLobbySound() {
         this.backgroundSounds.get(SoundType.LOBBY_MUSIC)?.stop();
     }
 
+    /**
+     * Plays the sound associated with the given sound type.
+     *
+     * @param soundType - The type of sound to play.
+     */
     public static playSound(soundType: SoundType) {
         if (soundType === SoundType.CHICKEN) {
             this.chickenSounds.forEach((chickenSound) => {
@@ -120,9 +158,9 @@ export class SoundManager {
             });
         } else if (soundType === SoundType.GHOST) {
             this.ghostSounds.forEach((ghostSound) => {
-                console.log("ghost sound is playing")
+                console.log("ghost sound is playing");
                 ghostSound.play();
-            })
+            });
         } else {
             const sound = this.characterSounds.get(soundType) || this.backgroundSounds.get(soundType);
 
@@ -140,6 +178,9 @@ export class SoundManager {
         }
     }
 
+    /**
+     * Initializes the endgame sound.
+     */
     private static async initGameEndSound(): Promise<void> {
         const sound = new THREE.Audio(this.ingameListener);
         const buffer = await this.loadAudioAsync('src/assets/sounds/backgroundMusic/Game_End_Sound.mp3');
@@ -150,11 +191,17 @@ export class SoundManager {
         console.log("Endgame sound initialized.");
     }
 
+    /**
+     * Initializes all background sounds, including in-game and lobby music.
+     */
     private static async initBackgroundSounds(): Promise<void> {
-        await this.initIngameBackgroundMusic()
-        await this.initLobbyBackgroundMusic()
+        await this.initIngameBackgroundMusic();
+        await this.initLobbyBackgroundMusic();
     }
 
+    /**
+     * Initializes the in-game background music.
+     */
     private static async initIngameBackgroundMusic(): Promise<void> {
         const ingameMusic = new THREE.Audio(this.lobbyListener);
         const buffer = await this.loadAudioAsync('src/assets/sounds/backgroundMusic/ingameBackgroundMusic.mp3');
@@ -166,6 +213,9 @@ export class SoundManager {
         console.log("Ingame music initialized.");
     }
 
+    /**
+     * Initializes the lobby background music.
+     */
     private static async initLobbyBackgroundMusic(): Promise<void> {
         const lobbyMusic = new THREE.Audio(this.lobbyListener);
         const buffer = await this.loadAudioAsync('src/assets/sounds/backgroundMusic/lobbyMusic.mp3');
@@ -177,6 +227,9 @@ export class SoundManager {
         console.log("Lobby music initialized.");
     }
 
+    /**
+     * Initializes the sound for eating a snack.
+     */
     private static async initEatSnackSound(): Promise<void> {
         const sound = new THREE.PositionalAudio(this.ingameListener);
         const buffer = await this.loadAudioAsync('src/assets/sounds/snackman/collect_snack_sound.mp3');
@@ -186,6 +239,9 @@ export class SoundManager {
         this.characterSounds.set(SoundType.EAT_SNACK, sound);
     }
 
+    /**
+     * Initializes the ghost sounds.
+     */
     private static async initGhostSounds(): Promise<void> {
         const sound = new THREE.PositionalAudio(this.ingameListener);
         const buffer = await this.loadAudioAsync('src/assets/sounds/ghost/Ghost_Sounds.mp3');
@@ -195,6 +251,9 @@ export class SoundManager {
         console.log("Ghost sound initialized.");
     }
 
+    /**
+     * Initializes the sound for when a ghost hits the Snackman.
+     */
     private static async initGhostHitsSnackmanSound(): Promise<void> {
         const sound = new THREE.PositionalAudio(this.ingameListener);
         const buffer = await this.loadAudioAsync('src/assets/sounds/snackman/hitByGhostSound.mp3');
@@ -205,6 +264,9 @@ export class SoundManager {
         console.log("Ghost hits snackman sound initialized.");
     }
 
+    /**
+     * Initializes chicken sounds from predefined paths.
+     */
     private static async initChickenSounds(): Promise<void> {
         const chickenPaths = [
             "src/assets/sounds/chicken/chicken-clucking.ogg",
@@ -224,23 +286,26 @@ export class SoundManager {
 
         await Promise.all(promises);
 
-        //Add scaredSound for chicken
+        // Add scared sound for chicken
         await this.initScaredChickenSound();
 
         console.log("All chicken sounds initialized.");
     }
 
+    /**
+     * Initializes the scared chicken sound.
+     */
     private static async initScaredChickenSound() {
-        const chickenScaredSoundPath = "src/assets/sounds/chicken/chicken-single-alarm-call.mp3"
+        const chickenScaredSoundPath = "src/assets/sounds/chicken/chicken-single-alarm-call.mp3";
 
-        const promiseChickenScaredSound = await this.loadAudioAsync(chickenScaredSoundPath)
-        const scaredChickenSound = new THREE.PositionalAudio(this.ingameListener)
+        const promiseChickenScaredSound = await this.loadAudioAsync(chickenScaredSoundPath);
+        const scaredChickenSound = new THREE.PositionalAudio(this.ingameListener);
         scaredChickenSound.setBuffer(promiseChickenScaredSound);
         scaredChickenSound.setRefDistance(15);
-        scaredChickenSound.setDistanceModel('linear')
+        scaredChickenSound.setDistanceModel('linear');
         scaredChickenSound.setVolume(0.8);
 
         console.log("Scare chicken sound initialized.");
-        this.characterSounds.set(SoundType.GHOST_SCARES_CHICKEN, scaredChickenSound)
+        this.characterSounds.set(SoundType.GHOST_SCARES_CHICKEN, scaredChickenSound);
     }
 }
