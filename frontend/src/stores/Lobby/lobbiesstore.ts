@@ -1,11 +1,24 @@
 import {defineStore} from 'pinia';
-import {reactive} from 'vue';
+import {reactive, ref} from 'vue';
 import {Client} from '@stomp/stompjs';
 import type {ILobbyDTD} from './ILobbyDTD';
 import type {IPlayerClientDTD} from './IPlayerClientDTD';
+import router from "@/router";
+
 
 // const wsurl = `ws://${window.location.host}/stompbroker`
 const DEST = '/topic/lobbies'
+const ROLEDEST = "/topic/lobbies/chooseRole"
+const ROLEUPDATE = "/topic/lobby/Role-Update"
+
+export interface Button {
+  id: number,
+  name: string,
+  image: string,
+  selected:boolean,
+  selectedBy?:string
+}
+
 
 export const useLobbiesStore = defineStore('lobbiesstore', () => {
   let stompclient: Client
@@ -18,6 +31,31 @@ export const useLobbiesStore = defineStore('lobbiesstore', () => {
       role: '',
     } as IPlayerClientDTD //PlayerClient for each window, for check the sync
   })
+  const buttons = ref<Button[]>([
+    {id: 1, name: 'Snackman', image: '/kirby.png', selected: false},
+    {id: 2, name: 'Ghost', image: '/ghost.png', selected: false},
+    {id: 3, name: 'Ghost', image: '/ghost.png', selected: false},
+    {id: 4, name: 'Ghost', image: '/ghost.png', selected: false},
+    {id: 5, name: 'Ghost', image: '/ghost.png', selected: false}
+  ])
+
+  const updateButtonSelection = (buttonId: string, playerId: string) => {
+    // Zuvor gewählte Buttons des Spielers zurücksetzen
+    buttons.value.forEach(button => {
+      if (button.selectedBy === playerId) {
+        button.selected = false
+        button.selectedBy = undefined
+      }
+    })
+    const buttonIdNumber = Number(buttonId);
+    // Gewählten Button aktualisieren
+    const button = buttons.value.find(btn => btn.id === buttonIdNumber)
+    if (button) {
+      button.selected = true
+      button.selectedBy = playerId
+    }
+  }
+
 
     /**
      * Creates a new player client.
@@ -63,7 +101,7 @@ export const useLobbiesStore = defineStore('lobbiesstore', () => {
   }
 
   /**
-   * Fetch Lobby-List from Backend
+   * Fetch Lobby-List from Backgit
    */
   async function fetchLobbyList() {
     try {
@@ -144,6 +182,75 @@ export const useLobbiesStore = defineStore('lobbiesstore', () => {
     stompclient.onStompError = (frame) => {
       console.error('Full STOMP Error Frame: ', frame)
     }
+    stompclient.onConnect = (frame) => {
+      console.log('STOMP connected:', frame)
+
+      if (stompclient) {
+        // Subscribe to Lobby updates (existing)
+        stompclient.subscribe(DEST, async (message) => {
+          console.log('STOMP Client subscribe to Lobbies')
+          const updatedLobbies = JSON.parse(message.body)
+          lobbydata.lobbies = [...updatedLobbies]
+          console.log('Received lobby update:', updatedLobbies)
+        })
+
+        // Subscribe to RoleView
+        stompclient.subscribe(ROLEDEST, async (message) => {
+          console.log('STOMP Client subscribe to Role Changes')
+          const updatedLobbyWithRole = JSON.parse(message.body)
+          const lobbyId = updatedLobbyWithRole.lobbyId
+
+          const updatedLobby = lobbydata.lobbies.find(lobby => lobby.lobbyId === lobbyId)
+          if (updatedLobbyWithRole.chooseRole) {
+
+            console.log(`Updated chooseRole state for lobby ${lobbyId}:`, updatedLobby!.chooseRole)
+
+            // Push the update to all clients at /ChooseRole/{lobbyId}
+            if (stompclient && stompclient.connected) {
+              router.push({name: 'ChooseRole', params: {lobbyId: updatedLobby!.lobbyId}})
+              console.log(`Pushed update to /ChooseRole/${lobbyId}`)
+            }
+          }
+        })
+        // Subscribe to ROLEUPDATE
+        stompclient.subscribe(ROLEUPDATE, async (message) => {
+          console.log('STOMP Client subscribe to ROLE-UPDATE ')
+          const data = JSON.parse(message.body)
+          const buttonId = data.buttonId
+          const updatedLobby = data.lobby
+          const lobbyId = updatedLobby.lobbyId
+          const selectedBy = data.selectedBy
+
+          // Lobby in lobbydata aktualisieren
+          const lobbyIndex = lobbydata.lobbies.findIndex(lobby => lobby.lobbyId === updatedLobby.lobbyId); // wenn kein Element gefunden mit Index, wird -1 returnt
+          if (lobbyIndex !== -1) {
+            lobbydata.lobbies[lobbyIndex] = updatedLobby;
+            for (let member of updatedLobby.members){
+              if (member.playerId == lobbydata.currentPlayer.playerId){
+                lobbydata.currentPlayer.role = member.role
+              }
+            }
+          } else {
+            lobbydata.lobbies.push(updatedLobby);
+
+          }
+          updateButtonSelection(buttonId, selectedBy)
+
+          // Push the update to all clients at /ChooseRole/{lobbyId}
+          if (stompclient && stompclient.connected) {
+            router.push({ path: `/ChooseRole/${lobbyId}` }).catch(() => {})
+          }
+        })
+      } else {
+        console.error('STOMP client is not initialized.')
+      }
+    }
+    stompclient.onWebSocketError = (error) => {
+      console.error('WebSocket Error:', error)
+    }
+    stompclient.onStompError = (frame) => {
+      console.error('Full STOMP Error Frame: ', frame)
+    }
 
     stompclient.onDisconnect = () => {
       console.log('Stompclient disconnected.')
@@ -175,7 +282,7 @@ export const useLobbiesStore = defineStore('lobbiesstore', () => {
         const lobby: ILobbyDTD = await response.json()
         lobbydata.currentPlayer.joinedLobbyId = lobby.lobbyId
 
-        // Admin client should have the SNACKMAN role
+        // Admin client should have the UNDEFINED role
         const adminPlayer = lobby.members.find((member) => member.playerId === adminClient.playerId)
         if (adminPlayer) {
           lobbydata.currentPlayer.role = adminPlayer.role
@@ -194,6 +301,7 @@ export const useLobbiesStore = defineStore('lobbiesstore', () => {
     }
   }
 
+
   /**
    * Joins an existing lobby.
    * @param lobbyId The ID of the lobby to join.
@@ -205,6 +313,10 @@ export const useLobbiesStore = defineStore('lobbiesstore', () => {
       const currentLobby = await fetchLobbyById(lobbyId);
       if (currentLobby && currentLobby.members.length >= 5) {
         console.error('Lobby is full. Cannot join.');
+        return null;
+      }
+      if (currentLobby && currentLobby.chooseRole){
+        console.error('Game has already started.')
         return null;
       }
 
@@ -292,6 +404,7 @@ export const useLobbiesStore = defineStore('lobbiesstore', () => {
       if (lobby) {
         lobby.gameStarted = true
       }
+      console.log(`Game started successfully in lobby: ${lobbyId}`)
     } catch (error: any) {
       console.error(`Error starting game in lobby ${lobbyId}:`, error)
       throw new Error('Could not start the game. Please try again.')
@@ -336,6 +449,40 @@ export const useLobbiesStore = defineStore('lobbiesstore', () => {
     }
   }
 
+
+  async function chooseRole(lobbyId: string): Promise<void> {
+    try {
+      const url = `/api/lobbies/chooseRole`;
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({lobbyId}),
+      })
+
+      if (!response.ok) {
+        throw new Error(`Failed to choose Roles: ${response.statusText}`)
+      }
+
+      const lobby = lobbydata.lobbies.find(l => l.lobbyId === lobbyId)
+      if (lobby) {
+
+        if (lobby.chooseRole) {
+          if (stompclient && stompclient.connected) {
+            stompclient.publish({
+              destination: `/api/lobbies/${lobbyId}/chooseRole`,
+              body: JSON.stringify({lobbyId}),
+            })
+          }
+        }
+      }
+    } catch (error: any) {
+      console.error(`Error choosing Role ${lobbyId}:`, error)
+      throw new Error('Could not choose Roles. Please try again.')
+    }
+  }
+
   return {
     lobbydata,
     createPlayer,
@@ -346,6 +493,9 @@ export const useLobbiesStore = defineStore('lobbiesstore', () => {
     leaveLobby,
     startGame,
     fetchLobbyById,
+    chooseRole,
+    buttons,
+    updateButtonSelection,
     startSingleplayerGame
   }
 })

@@ -99,7 +99,7 @@ export const useGameMapStore = defineStore('gameMap', () => {
             switch (mess.event) {
               case EventType.GameEnd:
                 const gameEndUpdate: IGameEndDTD = mess.message
-                endGame(gameEndUpdate)
+                endGame(gameEndUpdate, lobbydata.currentPlayer.joinedLobbyId!)
                 break;
               case EventType.SnackManUpdate:
                 const mobUpdate: ISnackmanUpdateDTD = mess.message
@@ -185,7 +185,7 @@ export const useGameMapStore = defineStore('gameMap', () => {
    * @param gameEndUpdate - Contains the details about the game end, including the winning role,
    *                        the time played, and the calories collected during the game.
    */
-  function endGame(gameEndUpdate: IGameEndDTD) {
+  function endGame(gameEndUpdate: IGameEndDTD , lobbyId: string ) {
     router.push({
       name: 'GameEnd',
       query: {
@@ -204,6 +204,15 @@ export const useGameMapStore = defineStore('gameMap', () => {
         for (let i = scene.children.length - 1; i >= 0; i--) {
           scene.remove(scene.children[i])
         }
+        const lobby = lobbydata.lobbies.find(l => l.lobbyId === lobbyId)
+      if ( lobby ){
+        for (const member of lobby.members){
+          if (member.playerId === lobbydata.currentPlayer.playerId){
+            member.role ='UNDEFINED'
+          }
+        }
+      }
+
         lobbydata.currentPlayer.joinedLobbyId = ""
       }
     )
