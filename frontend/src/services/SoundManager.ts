@@ -101,7 +101,7 @@ export class SoundManager {
                 soundClone.setRolloffFactor(0.7); // how quickly the volume decreases with increasing distance
                 soundClone.setDistanceModel('linear'); // decrease in volume (linear is a good choice for games)
                 soundClone.setLoop(true);
-                soundClone.setVolume(0.4);
+                soundClone.setVolume(0.1);
 
                 this.ghostSounds.push(soundClone);
             }
