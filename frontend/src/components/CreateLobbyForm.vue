@@ -34,47 +34,47 @@
 </template>
 
 <script setup lang="ts">
-import SmallNavButton from '@/components/SmallNavButton.vue';
-import {useRouter} from 'vue-router';
-import {onMounted, ref} from 'vue';
-import {useLobbiesStore} from '@/stores/Lobby/lobbiesstore';
-import type {IPlayerClientDTD} from '@/stores/Lobby/IPlayerClientDTD';
+    import SmallNavButton from '@/components/SmallNavButton.vue';
+    import { useRouter } from 'vue-router';
+    import { onMounted, ref } from 'vue';
+    import { useLobbiesStore } from '@/stores/Lobby/lobbiesstore';
+    import type { IPlayerClientDTD } from '@/stores/Lobby/IPlayerClientDTD';
 
-const router = useRouter();
-const lobbiesStore = useLobbiesStore();
-const currentPlayer = lobbiesStore.lobbydata.currentPlayer as IPlayerClientDTD;
+    const router = useRouter();
+    const lobbiesStore = useLobbiesStore();
+    const currentPlayer = lobbiesStore.lobbydata.currentPlayer as IPlayerClientDTD;
 
-const lobbyName = ref('');
-const lobbyInput = ref(); // needed for autofocus
-const errorMessage = ref('');
+    const lobbyName = ref('');
+    const lobbyInput = ref(); // needed for autofocus
+    const errorMessage = ref('');
 
-// defines event wich can be triggered by this component
-const emit = defineEmits<(event: 'cancelLobbyCreation') => void>()
+    // defines event wich can be triggered by this component
+    const emit = defineEmits< (event: 'cancelLobbyCreation') => void >()
 
-/**
- * Emits an event to cancel the lobby creation process.
- *
- * @function cancelLobbyCreation
- * @returns {void}
- */
-const cancelLobbyCreation = () => {
-  emit('cancelLobbyCreation');
-}
+    /**
+     * Emits an event to cancel the lobby creation process.
+     *
+     * @function cancelLobbyCreation
+     * @returns {void}
+     */
+    const cancelLobbyCreation = () => {
+        emit('cancelLobbyCreation');
+    }
 
-/**
- * Creates a new lobby with the specified name and admin client.
- * Validates the admin client and lobby name before attempting to create the lobby.
- * Alerts the user if there are any validation errors or if the lobby creation fails.
- * On success, redirects to the newly created lobby view.
- *
- * @async
- * @function createLobby
- * @throws {Error} Throws an alert if the admin client is invalid or the lobby name is empty or already taken.
- * @throws {Error} Shows a popup if there is an error creating the lobby.
- * @returns {void}
- */
-const createLobby = async () => {
-  const adminClient = currentPlayer;
+    /**
+     * Creates a new lobby with the specified name and admin client.
+     * Validates the admin client and lobby name before attempting to create the lobby.
+     * Alerts the user if there are any validation errors or if the lobby creation fails.
+     * On success, redirects to the newly created lobby view.
+     *
+     * @async
+     * @function createLobby
+     * @throws {Error} Throws an alert if the admin client is invalid or the lobby name is empty or already taken.
+     * @throws {Error} Shows a popup if there is an error creating the lobby.
+     * @returns {void}
+     */
+    const createLobby = async () => {
+        const adminClient = currentPlayer;
 
   if (
     !adminClient ||
@@ -85,10 +85,10 @@ const createLobby = async () => {
     return
   }
 
-  if (!lobbyName.value.trim()) {
-    errorMessage.value = "Lobbyname can't be empty";
-    return;
-  }
+        if (!lobbyName.value.trim()) {
+            errorMessage.value = "Lobbyname can't be empty";
+            return;
+        }
 
   const isDuplicateName = lobbiesStore.lobbydata.lobbies.some(
     lobby => lobby.name === lobbyName.value.trim(),
@@ -107,7 +107,7 @@ const createLobby = async () => {
     )
     if (newLobby && newLobby.lobbyId) {
       cancelLobbyCreation()
-      router.push({name: 'LobbyView', params: {lobbyId: newLobby.lobbyId}})
+      router.push({ name: 'LobbyView', params: { lobbyId: newLobby.lobbyId } })
     } else {
       throw new Error('Lobby creation returned invalid response.')
     }

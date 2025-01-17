@@ -7,21 +7,10 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.SortedMap;
 
-import de.hsrm.mi.swt.snackman.entities.lobby.Lobby;
-import de.hsrm.mi.swt.snackman.entities.lobby.PlayerClient;
-import de.hsrm.mi.swt.snackman.entities.lobby.ROLE;
-import de.hsrm.mi.swt.snackman.entities.map.GameMap;
-import de.hsrm.mi.swt.snackman.entities.map.Spawnpoint;
-import de.hsrm.mi.swt.snackman.entities.map.SpawnpointMobType;
-import de.hsrm.mi.swt.snackman.entities.mobileObjects.Mob;
-import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken.Chicken;
-import de.hsrm.mi.swt.snackman.messaging.MessageLoop.MessageLoop;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,11 +18,20 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.util.FileSystemUtils;
 
 import de.hsrm.mi.swt.snackman.SnackmanApplication;
+import de.hsrm.mi.swt.snackman.entities.lobby.Lobby;
+import de.hsrm.mi.swt.snackman.entities.lobby.PlayerClient;
+import de.hsrm.mi.swt.snackman.entities.lobby.ROLE;
+import de.hsrm.mi.swt.snackman.entities.map.GameMap;
+import de.hsrm.mi.swt.snackman.entities.map.Spawnpoint;
+import de.hsrm.mi.swt.snackman.entities.map.SpawnpointMobType;
 import de.hsrm.mi.swt.snackman.entities.map.Square;
 import de.hsrm.mi.swt.snackman.entities.mapObject.MapObjectType;
 import de.hsrm.mi.swt.snackman.entities.mapObject.snack.Snack;
 import de.hsrm.mi.swt.snackman.entities.mapObject.snack.SnackType;
+import de.hsrm.mi.swt.snackman.entities.mobileObjects.Mob;
+import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken.Chicken;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken.Direction;
+import de.hsrm.mi.swt.snackman.messaging.MessageLoop.MessageLoop;
 
 @SpringBootTest
 class MapServiceTest {
@@ -224,7 +222,7 @@ class MapServiceTest {
 
         String skriptName = mapService.loadChickenScripts();
 
-        Assertions.assertTrue(skriptName.equals("ChickenMovementSkript")  || skriptName.equals("TalaChickenMovementSkript"), skriptName);
+        Assertions.assertTrue(skriptName.equals("ChickenMovementSkript")  || skriptName.equals("TalaChickenMovementSkript") || skriptName.equals("SonicChickenMovementSkript"), skriptName);
 
     }
 

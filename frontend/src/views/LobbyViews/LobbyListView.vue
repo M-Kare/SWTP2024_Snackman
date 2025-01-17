@@ -223,13 +223,13 @@ const joinLobby = async (lobby: ILobbyDTD) => {
 }
 
 #darken-background {
-  z-index: 1;
-  position: fixed;
-  top: 0;
-  width: 100vw;
-  height: 100vh;
-  background: rgba(0, 0, 0, 50%);
+    z-index: 1;
+    position: fixed;
+    top: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 50%);
 
-  transition: background 0.3s ease;
+    transition: background 0.3s ease;
 }
 </style>

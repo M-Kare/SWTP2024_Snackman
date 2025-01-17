@@ -14,8 +14,7 @@
       <ul>
         <li v-for="member in members" class="player-list-items">
           <div class="player-name">
-            {{ member.playerName.replace(/"/g, '') }}
-            <!-- replace all " in String using RegEx modifier /g (find all) -->
+            {{ member.playerName.replace(/"/g, '') }} <!-- replace all " in String using RegEx modifier /g (find all) -->
           </div>
 
           <div class="player-character">
@@ -83,7 +82,7 @@
     </div>
   </div>
 
-  <div v-if="darkenBackground" id="darken-background"></div>
+    <div v-if="darkenBackground" id="darken-background"></div>
 
   <PlayerNameForm
     v-if="showPlayerNameForm && !playerNameSaved"
@@ -170,9 +169,9 @@ const hidePopUp = () => {
 }
 
 // needed for errorBox which shows up when lobby does not exist
-function hidePopUpAndRedirect() {
+function hidePopUpAndRedirect(){
   hidePopUp();
-  router.push({name: "LobbyListView"})
+  router.push({ name: "LobbyListView"})
 }
 
 const mapList = ref<{ mapName: string; fileName: string }[]>([
@@ -239,7 +238,7 @@ const uploadFileToServer = async (file: File, lobbyId: string) => {
         });
 
         if (response.ok) {
-          const mapName = 'Uploaded Map';
+            const mapName = 'Uploaded Map';
             const fileName = `SnackManMap_${lobbyId}.txt`;
 
             if (mapList.value.length > 1) {
@@ -368,32 +367,32 @@ onMounted(async () => {
   }
 })
 
-const savePlayerName = async (newName: string) => {
-  try {
-    await lobbiesStore.createPlayer(newName);
+  const savePlayerName = async (newName: string) => {
+    try {
+      await lobbiesStore.createPlayer(newName);
       await joinLobby(lobby.value!)
 
-  } catch (error) {
-    console.error("Error saving playerName:", error);
-    alert("Error saving playerName!");
+    } catch(error) {
+      console.error("Error saving playerName:", error);
+      alert("Error saving playerName!");
     }
   }
 
-const joinLobby = async (lobby: ILobbyDTD) => {
+  const joinLobby = async (lobby: ILobbyDTD) => {
 
-  try {
-    const joinedLobby = await lobbiesStore.joinLobby(
-      lobby.lobbyId,
-      lobbiesStore.lobbydata.currentPlayer.playerId,
-    )
+    try {
+      const joinedLobby = await lobbiesStore.joinLobby(
+        lobby.lobbyId,
+        lobbiesStore.lobbydata.currentPlayer.playerId,
+      )
 
-    if (joinedLobby) {
-      router.push({name: 'LobbyView', params: {lobbyId: lobby.lobbyId}})
+      if (joinedLobby) {
+        router.push({ name: 'LobbyView', params: { lobbyId: lobby.lobbyId } })
+      }
+    } catch (error: any) {
+      console.error('Error:', error)
     }
-  } catch (error: any) {
-    console.error('Error:', error)
   }
-}
 
 /**
  * Leaves the current lobby. If the player is the admin, it will remove other members from the lobby first.
@@ -604,14 +603,14 @@ function moveToMouse(element: HTMLElement) {
 }
 
 #darken-background {
-  z-index: 1;
-  position: fixed;
-  top: 0;
-  width: 100vw;
-  height: 100vh;
-  background: rgba(0, 0, 0, 50%);
+    z-index: 1;
+    position: fixed;
+    top: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 50%);
 
-  transition: background 0.3s ease;
+    transition: background 0.3s ease;
 }
 
 .map-choose{
