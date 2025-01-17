@@ -91,8 +91,9 @@
   >
   </PlayerNameForm>
 
+  <!-- TODO test if condition works fine -->
   <PopUp
-    v-if="errorBox"
+    v-if="errorBox && lobbiesStore.lobbydata.currentPlayer.playerName"
     class="popup-box"
     @hidePopUp="hidePopUpAndRedirect"
   >
@@ -160,7 +161,10 @@ const TIP_SIDE_DIST = 20
 
 const hidePlayerNameForm = () => {
   showPlayerNameForm.value = false;
-  darkenBackground.value = false;
+
+  if(!errorBox.value) {
+    darkenBackground.value = false;
+  }
 }
 
 const hidePopUp = () => {
@@ -355,14 +359,15 @@ onMounted(async () => {
     lobbiesStore.lobbydata.currentPlayer.playerId === '' ||
     lobbiesStore.lobbydata.currentPlayer.playerName === ''
   ) {
+    // save name to create player, no matter if lobby full or not
+    showPlayerNameForm.value = true;
+    darkenBackground.value = true;
+
     if (lobby.value!.members.length >= MAX_PLAYER_COUNT) {
       infoHeading.value = 'Lobby full'
       infoText.value = 'Please choose or create another one!'
       errorBox.value = true
       darkenBackground.value = true
-    } else {
-      showPlayerNameForm.value = true;
-      darkenBackground.value = true;
     }
   }
 })
