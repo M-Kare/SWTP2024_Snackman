@@ -1,19 +1,19 @@
 <template>
-    <MenuBackground>
-        <div v-if="darkenBackground" id="darken-background"></div>
+  <MenuBackground>
+    <div v-if="darkenBackground" id="darken-background"></div>
 
-        <PlayerNameForm
-          v-if="showPlayerNameForm && !playerNameSaved"
-          @hidePlayerNameForm="hidePlayerNameForm"
-          >
-        </PlayerNameForm>
+    <PlayerNameForm
+      v-if="showPlayerNameForm && !playerNameSaved"
+      @hidePlayerNameForm="hidePlayerNameForm"
+    >
+    </PlayerNameForm>
 
-        <div class="button-container">
-          <MainMenuButton @click="startSingleplayer">Singleplayer</MainMenuButton>
-          <MainMenuButton @click="showLobbies">Multiplayer</MainMenuButton>
-          <MainMenuButton @click="showLeaderboard">Leaderboard</MainMenuButton>
-        </div>
-    </MenuBackground>
+    <div class="button-container">
+      <MainMenuButton @click="startSingleplayer">Singleplayer</MainMenuButton>
+      <MainMenuButton @click="showLobbies">Multiplayer</MainMenuButton>
+      <MainMenuButton @click="showLeaderboard">Leaderboard</MainMenuButton>
+    </div>
+  </MenuBackground>
 </template>
 
 <script setup lang="ts">
@@ -22,7 +22,7 @@ import MainMenuButton from '@/components/MainMenuButton.vue'
 import MenuBackground from '@/components/MenuBackground.vue'
 import PlayerNameForm from '@/components/PlayerNameForm.vue';
 import {useRouter} from 'vue-router'
-import { onMounted, ref } from 'vue';
+import {onMounted, ref} from 'vue';
 import type {ILobbyDTD} from "@/stores/Lobby/ILobbyDTD";
 
 const router = useRouter()
@@ -85,13 +85,13 @@ onMounted(() => {
 }
 
 #darken-background {
-    z-index: 1;
-    position: fixed;
-    top: 0;
-    width: 100vw;
-    height: 100vh;
-    background: rgba(0, 0, 0, 50%);
+  z-index: 1;
+  position: fixed;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 50%);
 
-    transition: background 0.3s ease;
+  transition: background 0.3s ease;
 }
 </style>

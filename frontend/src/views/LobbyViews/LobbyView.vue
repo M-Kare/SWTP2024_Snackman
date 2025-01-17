@@ -186,8 +186,7 @@ const selectMap = (mapName: string) => {
 
   if (selectedMap.value === 'Generated Map') {
         usedCustomMap.value = false;
-    }
-    else if (selectedMap.value === 'Uploaded Map') {
+  } else if (selectedMap.value === 'Uploaded Map') {
         usedCustomMap.value = true;
     }
 };
