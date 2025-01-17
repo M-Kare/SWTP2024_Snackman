@@ -201,16 +201,15 @@ public class Chicken extends EatingMob implements Runnable {
                 currentSquare.setSnack(new Snack(SnackType.EMPTY));
                 if (super.getKcal() >= this.MAX_CALORIES) {
                     this.thickness = Thickness.VERY_HEAVY;
-
+                    blockingPath = true;
                     new Thread(() -> {
                         try {
-                            blockingPath = true;
                             Square chickensAktSquare = this.gameMap.getSquareAtIndexXZ(this.chickenPosX, this.chickenPosZ);
                             chickensAktSquare.setType(MapObjectType.WALL);
                             Thread.sleep(10000);
                             chickensAktSquare.setType(MapObjectType.FLOOR);
-                            blockingPath = false;
                             layEgg();
+                            blockingPath = false;
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
@@ -271,7 +270,7 @@ public class Chicken extends EatingMob implements Runnable {
     /**
      * TODO
      */
-    private void setWaitingTime(){
+    private void setWaitingTime() {
         this.pythonInterpreter.exec("from " + fileName + " import getWaitingTime");
 
         PyObject func = pythonInterpreter.get("getWaitingTime");
