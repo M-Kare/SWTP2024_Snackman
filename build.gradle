@@ -68,7 +68,7 @@ jacocoTestReport {
  }
 }
 
-/*
+
 // Frontend-Erstellung soll zusätzlich bei "./gradlew bootJar" ausgeführt werden
 task build_frontend {
      doLast {
@@ -100,6 +100,6 @@ task clean_frontend {
     delete files("${projectDir}/frontend/dist/")
     delete files("${projectDir}/bin/")
 }
-clean.dependsOn clean_frontend*/
+clean.dependsOn clean_frontend
 
 
