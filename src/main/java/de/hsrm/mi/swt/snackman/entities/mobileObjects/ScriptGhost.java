@@ -176,8 +176,8 @@ public class ScriptGhost extends Mob implements Runnable {
         } catch (Exception ex) {
             log.error("Error while executing ghost python script: ", ex);
             ex.printStackTrace();
+            return 0;
         }
-        return 0;
     }
 
     public int executeMovementSkriptDifficult(List<List<String>> pythonList) {
@@ -189,7 +189,7 @@ public class ScriptGhost extends Mob implements Runnable {
 
             return Integer.parseInt(result.toString());
         } catch (Exception ex) {
-            log.error("Error while executing ghost python script: ", ex);
+            log.error("Error while executing difficult ghost python script: ", ex);
             ex.printStackTrace();
             return 0;
         }
@@ -239,7 +239,7 @@ public class ScriptGhost extends Mob implements Runnable {
      */
     private void setNewPosition(int newMove) {
         //get positions
-        Direction walkingDirection = Direction.getDirection(String.valueOf(newMove));
+        Direction walkingDirection = Direction.getDirection(newMove);
         this.lookingDirection = walkingDirection;
         Square oldPosition = this.gameMap.getSquareAtIndexXZ(this.ghostPosX, this.ghostPosZ);
         Square newPosition = walkingDirection.getNewPosition(this.gameMap, this.ghostPosX, this.ghostPosZ, walkingDirection);
@@ -291,6 +291,7 @@ public class ScriptGhost extends Mob implements Runnable {
         try {
             Thread.sleep(WAITING_TIME);
             move();
+            log.debug("Stopping script ghost with id {}", id);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
@@ -324,5 +325,9 @@ public class ScriptGhost extends Mob implements Runnable {
                 ", id=" + id +
                 ", lookingDirection=" + lookingDirection +
                 '}';
+    }
+
+    public void setWalking(boolean walking) {
+        isWalking = walking;
     }
 }

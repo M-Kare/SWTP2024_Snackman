@@ -5,6 +5,7 @@ import type {ILobbyDTD} from './ILobbyDTD';
 import type {IPlayerClientDTD} from './IPlayerClientDTD';
 import router from "@/router";
 
+
 // const wsurl = `ws://${window.location.host}/stompbroker`
 const DEST = '/topic/lobbies'
 const ROLEDEST = "/topic/lobbies/chooseRole"
@@ -23,6 +24,14 @@ export interface Button {
 export const useLobbiesStore = defineStore('lobbiesstore', () => {
   let stompclient: Client
 
+  const lobbydata = reactive({
+    lobbies: [] as Array<ILobbyDTD>,
+    currentPlayer: {
+      playerId: '',
+      playerName: '',
+      role: '',
+    } as IPlayerClientDTD //PlayerClient for each window, for check the sync
+  })
   const buttons = ref<Button[]>([
     {id: 1, name: 'Snackman', image: '/kirby.png', selected: false},
     {id: 2, name: 'Ghost', image: '/ghost.png', selected: false},
@@ -48,27 +57,18 @@ export const useLobbiesStore = defineStore('lobbiesstore', () => {
     }
   }
 
-  const lobbydata = reactive({
-    lobbies: [] as Array<ILobbyDTD>,
-    currentPlayer: {
-      playerId: '',
-      playerName: '',
-      role: '',
-    } as IPlayerClientDTD //PlayerClient for each window, for check the sync
-  })
 
-  // For Test all Players have the same name 'Player Test'
-  /**
-   * Creates a new player client.
-   * @param name The name of the player.
-   * @returns The newly created player client object.
-   */
-  async function createPlayer(name: string) {
-    const newPlayerClient: IPlayerClientDTD = {
-      playerId: '',
-      playerName: name,
-      role: '',
-    }
+    /**
+     * Creates a new player client.
+     * @param name The name of the player.
+     * @returns The newly created player client object.
+     */
+    async function createPlayer(name: string){
+        const newPlayerClient: IPlayerClientDTD = {
+            playerId: '',
+            playerName: name,
+            role: '',
+        }
 
     try {
       const url = `/api/lobbies/create/player`
@@ -99,7 +99,6 @@ export const useLobbiesStore = defineStore('lobbiesstore', () => {
       console.error('Error: ', error)
 
     }
-
   }
 
   /**
@@ -121,10 +120,8 @@ export const useLobbiesStore = defineStore('lobbiesstore', () => {
       } else {
         console.error(`Failed to create a new player client: ${response.statusText}`)
       }
-
     } catch (error: any) {
       console.error('Error: ', error)
-
     }
   }
 
@@ -148,7 +145,6 @@ export const useLobbiesStore = defineStore('lobbiesstore', () => {
       }
 
       const lobby: ILobbyDTD = await response.json()
-      console.log('Fetched Lobby: ', lobby)
       return lobby
     } catch (error: any) {
       console.error('Error:', error)
@@ -169,6 +165,24 @@ export const useLobbiesStore = defineStore('lobbiesstore', () => {
       return
     }
 
+        stompclient.onConnect = (frame) => {
+            if (stompclient) {
+                stompclient.subscribe(DEST, async (message) => {
+                    const updatedLobbies = JSON.parse(message.body)
+                    lobbydata.lobbies = [...updatedLobbies]
+                })
+            } else {
+                console.error('STOMP client is not initialized.')
+            }
+        }
+
+    stompclient.onWebSocketError = (error) => {
+      console.error('WebSocket Error:', error)
+    }
+
+    stompclient.onStompError = (frame) => {
+      console.error('Full STOMP Error Frame: ', frame)
+    }
     stompclient.onConnect = (frame) => {
       console.log('STOMP connected:', frame)
 
@@ -371,7 +385,6 @@ export const useLobbiesStore = defineStore('lobbiesstore', () => {
    * Starts the game in the specified lobby.
    * @param lobbyId The ID of the lobby where the game is to be started.
    */
-
   async function startGame(lobbyId: string): Promise<void> {
     try {
       const url = `/api/lobbies/start`;
@@ -397,6 +410,45 @@ export const useLobbiesStore = defineStore('lobbiesstore', () => {
       throw new Error('Could not start the game. Please try again.')
     }
   }
+
+  /**
+   * Starts the singleplayer game.
+   * @param adminClient The ID of the player.
+   */
+  async function startSingleplayerGame(adminClient: IPlayerClientDTD): Promise<ILobbyDTD> {
+    const creatorUuid = adminClient.playerId
+
+    try {
+      const url = `/api/lobbies/start/singleplayer`;
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({creatorUuid}),
+      })
+
+      if (!response.ok) {
+        throw new Error(`Failed to start singleplayer game: ${response.statusText}`)
+      } else {
+        const lobby: ILobbyDTD = await response.json()
+        lobbydata.currentPlayer.joinedLobbyId = lobby.lobbyId
+
+        const adminPlayer = lobby.members.find((member) => member.playerId === adminClient.playerId)
+        if (adminPlayer) {
+          lobbydata.currentPlayer.role = adminPlayer.role
+        }
+
+        lobbydata.lobbies.push(lobby)
+
+        return lobby as ILobbyDTD
+      }
+    } catch (error: any) {
+      console.error(`Failed to start Singleplayer.`)
+      throw new Error('Could not start the singleplayer game. Please try again.')
+    }
+  }
+
 
   async function chooseRole(lobbyId: string): Promise<void> {
     try {
@@ -482,6 +534,7 @@ export const useLobbiesStore = defineStore('lobbiesstore', () => {
     chooseRole,
     chooseRoleFinish,
     buttons,
-    updateButtonSelection
+    updateButtonSelection,
+    startSingleplayerGame
   }
 })
