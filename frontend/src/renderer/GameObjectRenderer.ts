@@ -126,7 +126,8 @@ export const GameObjectRenderer = () => {
 
   const createGround = () => {
     // ground setup
-    const groundTexture = new THREE.TextureLoader().load('./textures/mossy_wall_by_lon_kamikaze_d3ziic.png')
+    // frontend/public/textures/stone_floor_by_lon_kamikaze_d4300e.png
+    const groundTexture = new THREE.TextureLoader().load('./textures/stone_floor_by_lon_kamikaze_d4300e.png')
     groundTexture.wrapS = THREE.RepeatWrapping;
     groundTexture.wrapT = THREE.RepeatWrapping;
     groundTexture.repeat.set(1000, 1000);
@@ -151,8 +152,8 @@ export const GameObjectRenderer = () => {
     height: number,
     sideLength: number,
   ) => {
-    // TODO add correct wall-material-design!!
-    const wallMaterial = new THREE.MeshStandardMaterial({ color: 'orange' })
+    const wallTexture = new THREE.TextureLoader().load('./textures/stylized_brickwall_texture_by_foxxtwo_dac6r16.jpg')
+    const wallMaterial = new THREE.MeshStandardMaterial({ map: wallTexture })
     const wallGeometry = new THREE.BoxGeometry(sideLength, height, sideLength)
     const wall = new THREE.Mesh(wallGeometry, wallMaterial)
 
