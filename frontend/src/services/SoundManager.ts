@@ -111,7 +111,7 @@ export class SoundManager {
 
   private static async initEatSnackSound(): Promise<void> {
     const sound = new THREE.PositionalAudio(this.listener);
-    const buffer = await this.loadAudioAsync('src/assets/sounds/eatingSounds/collect_snack_sound.mp3');
+    const buffer = await this.loadAudioAsync('src/assets/sounds/snackman/collect_snack_sound.mp3');
     sound.setBuffer(buffer);
     sound.setRefDistance(20);
 
