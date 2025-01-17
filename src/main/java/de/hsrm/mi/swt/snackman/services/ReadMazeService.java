@@ -1,5 +1,9 @@
 package de.hsrm.mi.swt.snackman.services;
 
+import de.hsrm.mi.swt.snackman.SnackmanApplication;
+import org.python.util.PythonInterpreter;
+import org.springframework.stereotype.Service;
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -7,17 +11,12 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.python.util.PythonInterpreter;
-import org.springframework.stereotype.Service;
-
-import de.hsrm.mi.swt.snackman.SnackmanApplication;
-
 @Service
 public class ReadMazeService {
 
     private PythonInterpreter interpreter;
 
-    public ReadMazeService(){
+    public ReadMazeService() {
         interpreter = new PythonInterpreter();
         interpreter.exec("import sys");
         URL path = SnackmanApplication.class.getProtectionDomain().getCodeSource().getLocation();

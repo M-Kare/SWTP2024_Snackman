@@ -3,19 +3,18 @@
   <div id="form-box">
     <h1 id="title">New Lobby</h1>
 
-        <form id="form" @submit.prevent="createLobby">
-            <label>
+    <form id="form" @submit.prevent="createLobby">
+      <label>
+        Enter Name:
+      </label>
+      <input ref="lobbyInput" v-model.trim="lobbyName" placeholder="Lobbyname" type="text">
+      <p
+        v-if="errorMessage"
+        id="error-message">
 
-                Enter Name:
-                <input v-model.trim="lobbyName" placeholder="Lobbyname" ref="lobbyInput" type="text">
-            </label>
-            <p
-            v-if="errorMessage"
-            id="error-message">
-
-                {{ errorMessage }}
-            </p>
-        </form>
+        {{ errorMessage }}
+      </p>
+    </form>
 
     <SmallNavButton
       id="cancel-lobby-creation-button"
@@ -51,7 +50,7 @@
 
     // defines event wich can be triggered by this component
     const emit = defineEmits< (event: 'cancelLobbyCreation') => void >()
-    
+
     /**
      * Emits an event to cancel the lobby creation process.
      *
@@ -119,7 +118,7 @@
 }
 
 onMounted(() => {
-    lobbyInput.value.focus();
+  lobbyInput.value.focus();
 })
 
 </script>
@@ -194,10 +193,9 @@ input::placeholder {
 
 #form > input {
   font-size: 1.2rem;
-  width: 90%;
+  width: auto;
   height: 2rem;
-  margin-top: 0.2rem;
-  margin-bottom: 2rem;
+  margin: 0.7rem 0 2rem 0.6rem;
   padding: 1.2rem;
 }
 
