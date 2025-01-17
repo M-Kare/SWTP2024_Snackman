@@ -29,8 +29,8 @@
     id="snackman"
     :src="
       winningRole === 'SNACKMAN'
-        ? '/src/assets/characters/kirby.png'
-        : '/src/assets/characters/kirby-monochrome.png'
+        ? '/characters/kirby.png'
+        : '/characters/kirby-monochrome.png'
     "
     alt="representation of snackman"
     class="character-image"
@@ -42,8 +42,8 @@
     id="ghost"
     :src="
       winningRole === 'GHOST'
-        ? '/src/assets/characters/ghost.png'
-        : '/src/assets/characters/ghost-monochrome.png'
+        ? '/characters/ghost.png'
+        : '/characters/ghost-monochrome.png'
     "
     alt="representation of ghost"
     class="character-image"
@@ -70,7 +70,7 @@ const winningRole = (route.query.winningRole as string) || '-'
 const playedTime = (route.query.timePlayed as unknown as number) || 0
 const formatedPlayedTime = formatTime(playedTime)
 const kcalCollected = (route.query.kcalCollected as unknown as number) || 0
-const gameResult = ref<'SNACKMAN' | 'GHOST'>(null)
+const gameResult = ref<string>("")
 
 if (winningRole == 'SNACKMAN') {
   gameResult.value = 'SNACKMAN IS THE WINNER'
