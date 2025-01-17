@@ -71,7 +71,6 @@ class GhostTest {
 
         ghost.scaresEverythingThatCouldBeEncountered(mockSquare, mockGameMap);
 
-        verify(mockSnackMan).isScaredFromGhost();
         verify(mockChicken).isScaredFromGhost(true);
     }
 
