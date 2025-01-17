@@ -104,7 +104,7 @@ public class LobbyManagerService {
     public Lobby joinLobby(String lobbyId, String playerId) throws GameAlreadyStartedException {
         Lobby lobby = findLobbyByLobbyId(lobbyId);
 
-        if (lobby.isGameStarted()) {
+        if (lobby.isGameStarted() || lobby.isChooseRole()) {
             throw new GameAlreadyStartedException("Game already started");
         }
 

@@ -6,6 +6,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.NoSuchElementException;
 
+import de.hsrm.mi.swt.snackman.messaging.MessageLoop.MessageLoop;
 import org.junit.jupiter.api.AfterAll;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -16,7 +17,7 @@ import org.junit.jupiter.api.BeforeAll;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 import java.util.Map;
-import java.util.NoSuchElementException;
+
 import de.hsrm.mi.swt.snackman.controller.Lobby.LobbyController;
 import de.hsrm.mi.swt.snackman.messaging.FrontendMessageService;
 import org.junit.jupiter.api.BeforeEach;
@@ -36,7 +37,6 @@ import de.hsrm.mi.swt.snackman.services.GameAlreadyStartedException;
 import de.hsrm.mi.swt.snackman.services.LobbyAlreadyExistsException;
 import de.hsrm.mi.swt.snackman.services.LobbyManagerService;
 import de.hsrm.mi.swt.snackman.services.MapService;
-import org.mockito.Mock;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
@@ -45,6 +45,9 @@ public class LobbyManagerServiceTest {
 
       @Mock
       private MapService mapService;
+
+      @Mock
+      private MessageLoop messageLoop;
 
       private LobbyManagerService lobbyManagerService;
       private static final Path workFolder = Paths.get("./extensions").toAbsolutePath();
@@ -73,6 +76,7 @@ public class LobbyManagerServiceTest {
                                 {new Square(2,0), new Square(2,1), new Square(2,2)} };
             GameMap gameMap = new GameMap(emptyMap);
             Mockito.when(mapService.createNewGameMap(Mockito.any())).thenReturn(gameMap);
+
             lobbyManagerService = new LobbyManagerService(mapService, null);
       }
     @Mock
@@ -83,7 +87,7 @@ public class LobbyManagerServiceTest {
 
     @BeforeEach
     void setUp() {
-        lobbyManagerService = new LobbyManagerService();
+        lobbyManagerService = new LobbyManagerService(mapService ,null);
         frontendMessageService = mock(FrontendMessageService.class);
         lobbyController = new LobbyController(lobbyManagerService, frontendMessageService);
     }
@@ -105,7 +109,7 @@ public class LobbyManagerServiceTest {
             assertNotNull(lobby);
             assertEquals("TestLobby", lobby.getName());
             assertEquals(adminPlayer.getPlayerId(), lobby.getAdminClientId());
-            assertEquals(ROLE.SNACKMAN, adminPlayer.getRole());
+            assertEquals(ROLE.UNDEFINED, adminPlayer.getRole());
       }
 
       @Test
@@ -222,14 +226,10 @@ public class LobbyManagerServiceTest {
     @Test
     public void testAssignSnackmanSuccess() throws LobbyAlreadyExistsException {
         PlayerClient adminPlayer = lobbyManagerService.createNewClient("AdminPlayer");
-        Lobby lobby = lobbyManagerService.createLobby("TestLobby", adminPlayer, null);
+        Lobby lobby = lobbyManagerService.createLobby("TestLobby", adminPlayer, messageLoop);
         lobby.setGameStarted();
 
-        ResponseEntity<Void> response = lobbyController.setPlayerRole(Map.of(
-                "lobbyId", lobby.getLobbyId(),
-                "playerId", adminPlayer.getPlayerId(),
-                "role", "SNACKMAN"
-        ));
+        ResponseEntity<Void> response = lobbyController.switchRoles("SNACKMAN", lobby, lobby.getLobbyId(), adminPlayer.getPlayerId(), adminPlayer, true, "1");
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertSame(adminPlayer.getRole(), ROLE.SNACKMAN);
@@ -238,64 +238,50 @@ public class LobbyManagerServiceTest {
     @Test
     public void testAssignGhostSuccess() throws LobbyAlreadyExistsException {
         PlayerClient adminPlayer = lobbyManagerService.createNewClient("AdminPlayer");
-        Lobby lobby = lobbyManagerService.createLobby("TestLobby", adminPlayer, null);
+        Lobby lobby = lobbyManagerService.createLobby("TestLobby", adminPlayer, messageLoop);
         lobby.setGameStarted();
 
-        ResponseEntity<Void> response = lobbyController.setPlayerRole(Map.of(
-                "lobbyId", lobby.getLobbyId(),
-                "playerId", adminPlayer.getPlayerId(),
-                "role", "GHOST"
-        ));
+        ResponseEntity<Void> response = lobbyController.switchRoles("GHOST", lobby, lobby.getLobbyId(), adminPlayer.getPlayerId(), adminPlayer, true, "1");
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertSame(adminPlayer.getRole(), ROLE.GHOST);
     }
 
     @Test
-    public void testRoleAssignmentLobbyNotStarted() throws LobbyAlreadyExistsException {
+    public void testNoJoiningWhenChoosingRoles() throws LobbyAlreadyExistsException {
         PlayerClient adminPlayer = lobbyManagerService.createNewClient("AdminPlayer");
-        Lobby lobby = lobbyManagerService.createLobby("TestLobby", adminPlayer, null);
+        Lobby lobby = lobbyManagerService.createLobby("TestLobby", adminPlayer, messageLoop);
+        lobby.setChooseRole();
 
-        ResponseEntity<Void> response = lobbyController.setPlayerRole(Map.of(
-                "lobbyId", lobby.getLobbyId(),
-                "playerId", adminPlayer.getPlayerId(),
-                "role", "GHOST"
-        ));
+        PlayerClient secondPlayer = lobbyManagerService.createNewClient("SecondPlayer");
 
-        assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
+        assertThrows(GameAlreadyStartedException.class, () -> {
+            lobbyManagerService.joinLobby(lobby.getLobbyId(), secondPlayer.getPlayerId());
+        });
     }
 
     @Test
     public void testRoleSnackmanAlreadySelected() throws LobbyAlreadyExistsException {
         PlayerClient adminPlayer = lobbyManagerService.createNewClient("AdminPlayer");
         PlayerClient secondPlayer = lobbyManagerService.createNewClient("SecondPlayer");
-        secondPlayer.setRole(ROLE.SNACKMAN);
-        Lobby lobby = lobbyManagerService.createLobby("TestLobby", adminPlayer, null);
+        Lobby lobby = lobbyManagerService.createLobby("TestLobby", adminPlayer, messageLoop);
+        adminPlayer.setRole(ROLE.SNACKMAN);
         lobby.getMembers().add(secondPlayer);
-        lobby.setGameStarted();
 
-        ResponseEntity<Void> response = lobbyController.setPlayerRole(Map.of(
-                "lobbyId", lobby.getLobbyId(),
-                "playerId", adminPlayer.getPlayerId(),
-                "role", "SNACKMAN"
-        ));
+        ResponseEntity<Void> response = lobbyController.switchRoles("SNACKMAN", lobby, lobby.getLobbyId(), secondPlayer.getPlayerId(), secondPlayer, true, "1");
 
         assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
-        assertSame(adminPlayer.getRole(), ROLE.GHOST);
-        assertSame(secondPlayer.getRole(), ROLE.SNACKMAN);
+        assertSame(adminPlayer.getRole(), ROLE.SNACKMAN);
+        assertSame(secondPlayer.getRole(), ROLE.UNDEFINED);
     }
 
     @Test
     public void testAssignInvalidRole() throws LobbyAlreadyExistsException {
         PlayerClient adminPlayer = lobbyManagerService.createNewClient("AdminPlayer");
-        Lobby lobby = lobbyManagerService.createLobby("TestLobby", adminPlayer, null);
+        Lobby lobby = lobbyManagerService.createLobby("TestLobby", adminPlayer, messageLoop);
         lobby.setGameStarted();
 
-        ResponseEntity<Void> response = lobbyController.setPlayerRole(Map.of(
-                "lobbyId", lobby.getLobbyId(),
-                "playerId", adminPlayer.getPlayerId(),
-                "role", "INVALID_ROLE"
-        ));
+        ResponseEntity<Void> response = lobbyController.switchRoles("UNDEFINED", lobby, lobby.getLobbyId(), adminPlayer.getPlayerId(), adminPlayer, true, "1");
 
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
     }
