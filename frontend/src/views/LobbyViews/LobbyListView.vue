@@ -134,7 +134,7 @@ const joinLobby = async (lobby: ILobbyDTD) => {
     onMounted(async () => {
         await lobbiesStore.fetchLobbyList();
 
-        lobbiesStore.startLobbyLiveUpdate();
+      lobbiesStore.startLobbyLiveUpdate();
     })
 
 </script>

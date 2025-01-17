@@ -1,37 +1,62 @@
 <template>
-  <div class="end-screen">
+  <ViewBackground></ViewBackground>
+  <div id="individual-outer-box-size" class="outer-box">
     <h1 class="result-title">{{ gameResult }}</h1>
     <p class="end-reason">{{ gameReason }}</p>
-    <p class="end-reason">Ihr habt {{ formatedPlayedTime }} Minuten lang gespielt</p>
-    <p class="end-reason" v-if="winningRole != 'GHOST'">SnackMan hat {{ kcalCollected }} Kalorien gesammelt!</p>
-    <MainMenuButton class="menu-button" @click="backToMainMenu">Zurück zum Hauptmenü
-    </MainMenuButton>
-    <MainMenuButton v-if="!alreadyEntered && lobbydata.currentPlayer.role == 'SNACKMAN' && winningRole == 'SNACKMAN'"
-                    class="menu-button"
-                    @click="showCreateNewLeaderboardEntryForm">
-      Create new leaderboard entry
-    </MainMenuButton>
-
+    <p class="end-reason">The playing time was {{ formatedPlayedTime }} minutes</p>
+    <div id="button-pair">
+      <SmallNavButton id="menu-back-button" @click="backToMainMenu">
+        Main menu
+      </SmallNavButton>
+      <SmallNavButton id="export-map-button" @click="downloadMap">
+        Export map
+      </SmallNavButton>
+      <SmallNavButton v-if="!alreadyEntered && lobbydata.currentPlayer.role == 'SNACKMAN' && winningRole == 'SNACKMAN'"
+                      id="create-leaderboard-entry-button"
+                      @click="showCreateNewLeaderboardEntryForm">
+        Create new leaderboard entry
+      </SmallNavButton>
+    </div>
     <CreateNewLeaderboardEntryForm
       v-if="showCreateNewLeaderboardEntry"
       :playedTime="formatTime(playedTime)"
       @cancelNewLeaderboardEntryCreation="cancelNewLeaderboardEntryCreation"
-      @entryCreated="hideCreateNewLeaderboardEntryForm">
+      @entryCreated="hideCreateNewLeaderboardEntryForm"
+    >
     </CreateNewLeaderboardEntryForm>
-
-    <MainMenuButton class="menu-button" @click="downloadMap">Export map</MainMenuButton>
-    <div v-if="feedbackMessage" :class="['feedback-message', feedbackClass]">
-      {{ feedbackMessage }}
-    </div>
   </div>
+  <img
+    id="snackman"
+    :src="
+      winningRole === 'SNACKMAN'
+        ? '/src/assets/characters/kirby.png'
+        : '/src/assets/characters/kirby-monochrome.png'
+    "
+    alt="representation of snackman"
+    class="character-image"
+  />
+  <div v-if="feedbackMessage" :class="['feedback-message', feedbackClass]">
+    {{ feedbackMessage }}
+  </div>
+  <img
+    id="ghost"
+    :src="
+      winningRole === 'GHOST'
+        ? '/src/assets/characters/ghost.png'
+        : '/src/assets/characters/ghost-monochrome.png'
+    "
+    alt="representation of ghost"
+    class="character-image"
+  />
 </template>
 
 <script lang="ts" setup>
-import MainMenuButton from '@/components/MainMenuButton.vue'
-import {computed, onMounted, ref} from 'vue'
+import {computed, ref} from 'vue'
 import {useRoute, useRouter} from 'vue-router'
-import CreateNewLeaderboardEntryForm from "@/components/CreateNewLeaderboardEntryForm.vue"
-import {useLobbiesStore} from "@/stores/Lobby/lobbiesstore";
+import CreateNewLeaderboardEntryForm from '@/components/CreateNewLeaderboardEntryForm.vue'
+import {useLobbiesStore} from '@/stores/Lobby/lobbiesstore'
+import ViewBackground from '@/components/ViewBackground.vue'
+import SmallNavButton from "@/components/SmallNavButton.vue";
 import {SoundManager} from "@/services/SoundManager";
 
 const route = useRoute()
@@ -41,17 +66,17 @@ const alreadyEntered = ref(false)
 const {lobbydata} = useLobbiesStore()
 
 // Read player role and game result from query parameters
-const lobbyId = (route.query.lobbyId as string) || '-';
+const lobbyId = (route.query.lobbyId as string) || '-'
 const winningRole = (route.query.winningRole as string) || '-'
 const playedTime = (route.query.timePlayed as unknown as number) || 0
 const formatedPlayedTime = formatTime(playedTime)
 const kcalCollected = (route.query.kcalCollected as unknown as number) || 0
-const gameResult = ref()
+const gameResult = ref<'SNACKMAN' | 'GHOST'>(null)
 
-if (winningRole == "SNACKMAN") {
-  gameResult.value = "Der Snackman hat gewonnen."
+if (winningRole == 'SNACKMAN') {
+  gameResult.value = 'SNACKMAN IS THE WINNER'
 } else {
-  gameResult.value = "Die Geister haben gewonnen."
+  gameResult.value = 'GHOSTS ARE THE WINNER'
 }
 
 /**
@@ -61,11 +86,11 @@ if (winningRole == "SNACKMAN") {
 // Compute the game reason dynamically or display '-' if no data is available
 const gameReason = computed(() => {
   if (winningRole === 'SNACKMAN') {
-    return 'SnackMan hat das Kalorienziel erreicht!'
+    return 'SnackMan has reached the calorie target!'
   } else if (winningRole === 'GHOST' && kcalCollected < 0) {
-    return 'Die Geister haben SnackMan auf negative Kalorien gebracht!'
+    return 'The ghosts scared Snackman too many times until he had no calories left!'
   }
-  return 'Die Zeit ist abgelaufen und SnackMan hat nicht genügend Kalorien gesammelt!'
+  return "The time is up and SnackMan hasn't collected enough calories!"
 })
 
 const showLeaderboard = () => {
@@ -109,46 +134,45 @@ function formatTime(seconds: number): string {
   return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
 }
 
-
-const feedbackMessage = ref('');
-const feedbackClass = ref('');
+const feedbackMessage = ref('')
+const feedbackClass = ref('')
 
 const downloadMap = async () => {
-  try{
-      const response = await fetch(`/api/download?lobbyId=${lobbyId}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-      });
+  try {
+    const response = await fetch(`/api/download?lobbyId=${lobbyId}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
 
-      if(!response.ok) throw new Error('Failed to download map.');
+    if (!response.ok) throw new Error('Failed to download map.')
 
-      const blob = await response.blob();
-      const link = document.createElement('a');   // Create an anchor element to trigger the download
-      const url = URL.createObjectURL(blob);
-      link.href = url;
-      link.download = 'SnackManMap.txt';
-      document.body.appendChild(link);            // Append the link to the DOM
-    link.click();                               // Simulate a click to start the download
-      document.body.removeChild(link);            // Remove the link after the download
+    const blob = await response.blob()
+    const link = document.createElement('a') // Create an anchor element to trigger the download
+    const url = URL.createObjectURL(blob)
+    link.href = url
+    link.download = 'SnackManMap.txt'
+    document.body.appendChild(link) // Append the link to the DOM
+    link.click() // Simulate a click to start the download
+    document.body.removeChild(link) // Remove the link after the download
 
-      // Revoke the object URL to free up memory
-      URL.revokeObjectURL(url);
+    // Revoke the object URL to free up memory
+    URL.revokeObjectURL(url)
 
     // Success feedback
-      feedbackMessage.value = 'Map saved';
-    feedbackClass.value = 'success';
-  } catch(error: any){
-      // Failure feedback
-      feedbackMessage.value = 'Map not saved';
-      feedbackClass.value = 'error';
+    feedbackMessage.value = 'Map saved'
+    feedbackClass.value = 'success'
+  } catch (error: any) {
+    // Failure feedback
+    feedbackMessage.value = 'Map not saved'
+    feedbackClass.value = 'error'
   }
   // Clear feedback after 3 seconds
   setTimeout(() => {
-    feedbackMessage.value = '';
-    feedbackClass.value = '';
-  }, 3000);
+    feedbackMessage.value = ''
+    feedbackClass.value = ''
+  }, 3000)
 }
 
 onMounted(() => {
@@ -157,59 +181,83 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.end-screen {
+#individual-outer-box-size {
+  top: 5%;
+  width: 80%;
   text-align: center;
-  color: #fff;
-  background-color: black;
-  min-height: 100vh;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  padding: 2rem;
-  box-sizing: border-box;
+  padding: 4rem;
 }
 
 .result-title {
-  font-size: clamp(3rem, 8vw, 8rem);
-  line-height: 1.2;
-  margin-bottom: 1rem;
+  color: var(--primary-highlight-color);
+  line-height: 1.1;
+  margin-bottom: 3rem;
   font-weight: bold;
 }
 
 .end-reason {
+  color: var(--background-for-text-color);
   font-size: 2rem;
-  margin-bottom: 4rem;
+  margin-bottom: 2rem;
 }
 
-.menu-button {
-  font-size: 1.5rem;
-  margin-top: 4rem;
+#button-pair {
+  width: 100%;
+  justify-content: space-around;
+  display: flex;
+  flex-direction: row;
+  padding-top: 2em;
 }
 
-.map-exportieren-button {
-  font-size: 1.5rem;
-  margin-top: 4rem;
+#menu-back-button:hover,
+#export-map-button:hover,
+#create-leaderboard-entry-button:hover {
+  background: var(--primary-highlight-color);
+}
+
+.character-image {
+  position: absolute;
+  bottom: 6%;
+  width: 20%;
+  height: auto;
+  z-index: 10;
+}
+
+#snackman {
+  left: 6%;
+}
+
+#ghost {
+  right: 6%;
 }
 
 .feedback-message {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: 20%;
   font-size: 2rem;
   margin-top: 4rem;
   font-weight: bold;
   padding: 10px 20px;
   border-radius: 5px;
   text-align: center;
+  align-content: center;
   animation: fadeIn 0.5s;
 }
 
 .feedback-message.success {
   color: #fff;
-  background-color: #50C878;
+  background-color: #50c878;
 }
 
 .feedback-message.error {
   color: #fff;
-  background-color: #C70039;
+  background-color: #c70039;
 }
 
 /* Fade-in animation */
@@ -219,6 +267,12 @@ onMounted(() => {
   }
   to {
     opacity: 1;
+  }
+}
+
+@media (max-width: 1000px) {
+  .result-title {
+    font-size: 60px;
   }
 }
 </style>
