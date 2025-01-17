@@ -10,15 +10,7 @@ public record FrontedLobbyRoleUpdateEvent(Lobby lobby, String selectedBy, boolea
         return lobby;
     }
 
-
-    public String characterId() {
-        return buttonId;
-    }
-
-    public String selectedBy(){return selectedBy;}
-
     public boolean selected(){return selected;}
-
 
     @Override
     public String toString() {

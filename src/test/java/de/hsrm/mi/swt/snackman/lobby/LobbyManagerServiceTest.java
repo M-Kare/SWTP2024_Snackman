@@ -229,7 +229,7 @@ public class LobbyManagerServiceTest {
         Lobby lobby = lobbyManagerService.createLobby("TestLobby", adminPlayer, messageLoop);
         lobby.setGameStarted();
 
-        ResponseEntity<Void> response = lobbyController.switchRoles("SNACKMAN", lobby, lobby.getLobbyId(), adminPlayer.getPlayerId(), adminPlayer, true, "1");
+        ResponseEntity<Void> response = lobbyController.switchRoles("SNACKMAN", lobby,   adminPlayer, true, "1");
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertSame(adminPlayer.getRole(), ROLE.SNACKMAN);
@@ -241,7 +241,7 @@ public class LobbyManagerServiceTest {
         Lobby lobby = lobbyManagerService.createLobby("TestLobby", adminPlayer, messageLoop);
         lobby.setGameStarted();
 
-        ResponseEntity<Void> response = lobbyController.switchRoles("GHOST", lobby, lobby.getLobbyId(), adminPlayer.getPlayerId(), adminPlayer, true, "1");
+        ResponseEntity<Void> response = lobbyController.switchRoles("GHOST", lobby, adminPlayer, true, "1");
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertSame(adminPlayer.getRole(), ROLE.GHOST);
@@ -268,7 +268,7 @@ public class LobbyManagerServiceTest {
         adminPlayer.setRole(ROLE.SNACKMAN);
         lobby.getMembers().add(secondPlayer);
 
-        ResponseEntity<Void> response = lobbyController.switchRoles("SNACKMAN", lobby, lobby.getLobbyId(), secondPlayer.getPlayerId(), secondPlayer, true, "1");
+        ResponseEntity<Void> response = lobbyController.switchRoles("SNACKMAN", lobby,  secondPlayer, true, "1");
 
         assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
         assertSame(adminPlayer.getRole(), ROLE.SNACKMAN);
@@ -281,7 +281,7 @@ public class LobbyManagerServiceTest {
         Lobby lobby = lobbyManagerService.createLobby("TestLobby", adminPlayer, messageLoop);
         lobby.setGameStarted();
 
-        ResponseEntity<Void> response = lobbyController.switchRoles("UNDEFINED", lobby, lobby.getLobbyId(), adminPlayer.getPlayerId(), adminPlayer, true, "1");
+        ResponseEntity<Void> response = lobbyController.switchRoles("UNDEFINED", lobby,  adminPlayer, true, "1");
 
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
     }

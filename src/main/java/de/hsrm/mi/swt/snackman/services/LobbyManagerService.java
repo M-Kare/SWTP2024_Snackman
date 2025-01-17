@@ -279,8 +279,6 @@ public class LobbyManagerService {
 
     public void chooseRoleTrue(String lobbyId) {
         Lobby lobby = findLobbyByLobbyId(lobbyId);
-
-        log.info("Choosing Roles lobby {}", lobby);
         lobby.setChooseRole();
     }
     public void chooseRoleFinish(String lobbyId) {

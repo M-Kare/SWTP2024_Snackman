@@ -52,11 +52,7 @@ import SmallNavButton from '@/components/SmallNavButton.vue';
 import {useRoute, useRouter} from "vue-router";
 import PopUp from "@/components/PopUp.vue";
 import {useLobbiesStore} from "@/stores/Lobby/lobbiesstore";
-import type {Button} from "@/stores/Lobby/lobbiesstore"
-
-
-
-// TODO Finish ersetzten durch Start
+import type{Button} from "@/stores/Lobby/lobbiesstore"
 
 const route = useRoute()
 const router = useRouter()
@@ -75,7 +71,6 @@ const hidePopUp = () => {
 const lobbyUrl = route.params.lobbyId
 const infoHeading = ref()
 
-
 /**
  * Starts the game if the player is the admin and there are enough members in the lobby.
  * If the player is not the admin or there are not enough members, a popup will be shown.
@@ -85,11 +80,10 @@ const infoHeading = ref()
  * @throws {Error} If the player or lobby is not found.
  */
 
-const selectedCharacter = ref<Button | null>(null); // TODO make responsive
+const selectedCharacter = ref<Button | null>(null);
 
 
-const selectCharacter = async (button: Button) => {    // TODO API Call to backend to see if you can pick this character
-  console.log("Trying to select this character", button)
+const selectCharacter = async (button: Button) => {
 
   // already choosen Role
   if (button.selected) {
@@ -119,27 +113,23 @@ const selectCharacter = async (button: Button) => {    // TODO API Call to backe
     if (response.ok) {
       selectedCharacter.value = button;
       darkenBackground.value = true;
-      console.log("Character selected successfully");
     } else if (response.status === 409) {
-      console.log("Value ", selectedCharacter.value, "Response ", response)
-      infoText.value = "Dieser Charakter wurde bereits gewählt!";
+      infoText.value = "This Character already selected!";
       showPopUp.value = true;
       darkenBackground.value = true;
     } else {
-      infoText.value = "Fehler beim Charakterauswählen!";
+      infoText.value = "Error while selecting character!";
       showPopUp.value = true;
       darkenBackground.value = true;
     }
 
   } catch (error) {
     console.error("Error selecting character:", error);
-    infoText.value = "Verbindung zum Server fehlgeschlagen!";
+    infoText.value = "Failed to connect to the server!";
     showPopUp.value = true;
     darkenBackground.value = true;
   }
 }
-
-
 onMounted(async () => {
   await lobbiesStore.fetchLobbyById(lobbyId)
 
@@ -160,10 +150,8 @@ const startGame = async () => {
   const playerId = lobbiesStore.lobbydata.currentPlayer.playerId
   let snackmanCounter:number = 0
   let memberCounter :number = 0
-  const lobby = lobbiesStore.lobbydata.lobbies.find(l => l.lobbyId === lobbyId)
+  const lobby = lobbiesStore.lobbydata.lobbies.find(lobby => lobby.lobbyId === lobbyId)
   const player = lobbiesStore.lobbydata.currentPlayer
-
-  console.log("Lobby bevore Start ", lobby)
 
   if (!playerId || !lobby) {
     console.error('Player or Lobby not found')
@@ -179,7 +167,6 @@ const startGame = async () => {
       return;
     }
     lobby.members.forEach(member => {
-      console.log("Überprüfe Mitglied : ", member.role)
       if (member.role === 'UNDEFINED') {
         showPopUp.value= true
         darkenBackground.value = true
@@ -189,14 +176,12 @@ const startGame = async () => {
       else if(member.role === 'SNACKMAN'){
         snackmanCounter ++
         memberCounter++
-
       }
       else if(member.role ==='GHOST'){
         memberCounter ++
       }
     })
 
-    console.log("Es sind " , memberCounter, " Spieler und" , snackmanCounter, " Snackman")
     if ( snackmanCounter === 1 && memberCounter === lobby.members.length){
       await lobbiesStore.startGame(lobby.lobbyId)
       buttons.forEach(button => button.selected = false)
@@ -222,8 +207,6 @@ const startGame = async () => {
     infoText.value = 'Only Admin can start the game!'
   }
 }
-
-
 
 /**
  * Sends a request to update the used map status for a specific lobby.
@@ -276,8 +259,6 @@ watchEffect(() => {
     }
   }
 })
-
-
 </script>
 
 <style scoped>

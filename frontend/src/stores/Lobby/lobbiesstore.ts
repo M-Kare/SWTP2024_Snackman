@@ -9,7 +9,6 @@ import router from "@/router";
 // const wsurl = `ws://${window.location.host}/stompbroker`
 const DEST = '/topic/lobbies'
 const ROLEDEST = "/topic/lobbies/chooseRole"
-const CELECTEDROLE = "/topic/selected"
 const ROLEUPDATE = "/topic/lobby/Role-Update"
 
 export interface Button {
@@ -102,7 +101,7 @@ export const useLobbiesStore = defineStore('lobbiesstore', () => {
   }
 
   /**
-   * Fetch Lobby-List from Backend
+   * Fetch Lobby-List from Backgit
    */
   async function fetchLobbyList() {
     try {
@@ -221,8 +220,6 @@ export const useLobbiesStore = defineStore('lobbiesstore', () => {
           const updatedLobby = data.lobby
           const lobbyId = updatedLobby.lobbyId
           const selectedBy = data.selectedBy
-          console.log("Lobby aus backend ",updatedLobby)
-
 
           // Lobby in lobbydata aktualisieren
           const lobbyIndex = lobbydata.lobbies.findIndex(lobby => lobby.lobbyId === updatedLobby.lobbyId); // wenn kein Element gefunden mit Index, wird -1 returnt
@@ -230,22 +227,17 @@ export const useLobbiesStore = defineStore('lobbiesstore', () => {
             lobbydata.lobbies[lobbyIndex] = updatedLobby;
             for (let member of updatedLobby.members){
               if (member.playerId == lobbydata.currentPlayer.playerId){
-                console.log("Character" ,member.role )
                 lobbydata.currentPlayer.role = member.role
-                console.log("2Character" ,member.role )
               }
             }
           } else {
             lobbydata.lobbies.push(updatedLobby);
 
           }
-
           updateButtonSelection(buttonId, selectedBy)
-          //console.log("BUTTONS", buttons.value)
 
           // Push the update to all clients at /ChooseRole/{lobbyId}
           if (stompclient && stompclient.connected) {
-            console.log(`Pushed update to /ChooseRole/${lobbyId}`);
             router.push({ path: `/ChooseRole/${lobbyId}` }).catch(() => {})
           }
         })
@@ -290,7 +282,7 @@ export const useLobbiesStore = defineStore('lobbiesstore', () => {
         const lobby: ILobbyDTD = await response.json()
         lobbydata.currentPlayer.joinedLobbyId = lobby.lobbyId
 
-        // Admin client should have the SNACKMAN role
+        // Admin client should have the UNDEFINED role
         const adminPlayer = lobby.members.find((member) => member.playerId === adminClient.playerId)
         if (adminPlayer) {
           lobbydata.currentPlayer.role = adminPlayer.role
@@ -477,8 +469,6 @@ export const useLobbiesStore = defineStore('lobbiesstore', () => {
       if (lobby) {
 
         if (lobby.chooseRole) {
-          console.log("chooseRole ist True ")
-
           if (stompclient && stompclient.connected) {
             stompclient.publish({
               destination: `/api/lobbies/${lobbyId}/chooseRole`,
@@ -487,42 +477,6 @@ export const useLobbiesStore = defineStore('lobbiesstore', () => {
           }
         }
       }
-      console.log(`Choose Role For Lobby : ${lobbyId}`)
-    } catch (error: any) {
-      console.error(`Error choosing Role ${lobbyId}:`, error)
-      throw new Error('Could not choose Roles. Please try again.')
-    }
-  }
-
-  async function chooseRoleFinish(lobbyId: string): Promise<void> {
-    try {
-      const url = `/api/lobbies/chooseRoleFinish`;
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({lobbyId}),
-      })
-
-      if (!response.ok) {
-        throw new Error(`Failed to choose Roles: ${response.statusText}`)
-      }
-
-      const lobby = lobbydata.lobbies.find(l => l.lobbyId === lobbyId)
-      if (lobby) {
-        if (!lobby.chooseRole) {
-          console.log("chooseRole ist Finish ")
-
-          if (stompclient && stompclient.connected) {
-            stompclient.publish({
-              destination: `/api/lobbies/`,
-              body: JSON.stringify({lobbyId}),
-            })
-          }
-        }
-      }
-      console.log(`Choose Role For Lobby : ${lobbyId}`)
     } catch (error: any) {
       console.error(`Error choosing Role ${lobbyId}:`, error)
       throw new Error('Could not choose Roles. Please try again.')
@@ -540,7 +494,6 @@ export const useLobbiesStore = defineStore('lobbiesstore', () => {
     startGame,
     fetchLobbyById,
     chooseRole,
-    chooseRoleFinish,
     buttons,
     updateButtonSelection,
     startSingleplayerGame

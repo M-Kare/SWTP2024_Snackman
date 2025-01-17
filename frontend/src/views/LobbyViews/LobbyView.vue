@@ -331,12 +331,6 @@ watchEffect(() => {
     )
     if (updatedLobby) {
       lobbyLoaded = true
-      if (updatedLobby.chooseRole) {
-      // .gameStarted
-
-        console.log('Game has started! Redirecting to ChooseRole...');
-        router.push({ name: 'ChooseRole' , });
-      }
     } else if (lobbyLoaded) {
       deleteUploadedFile(lobbyId);
       router.push({ name: 'LobbyListView' })
@@ -450,12 +444,10 @@ const chooseRole = async(lobby: ILobbyDTD | undefined ) =>{
 
   if (playerId === lobby.adminClient.playerId) {
     await lobbiesStore.chooseRole(lobby.lobbyId)
-
-    // router.push({name:'ChooseRole',  params: {lobbyId: lobby.lobbyId}})
   } else {
     showPopUp.value = true
     darkenBackground.value = true
-    infoText.value = 'The role selection can only be initiated by the host.!'
+    infoText.value = 'The role selection can only be initiated by the host!'
   }
 
 }

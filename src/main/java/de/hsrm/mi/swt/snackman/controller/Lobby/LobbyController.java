@@ -1,10 +1,9 @@
 package de.hsrm.mi.swt.snackman.controller.Lobby;
 
-import java.util.ArrayList;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-
 import de.hsrm.mi.swt.snackman.entities.lobby.ROLE;
 import de.hsrm.mi.swt.snackman.messaging.*;
 import de.hsrm.mi.swt.snackman.messaging.FrontendMessageService;
@@ -13,9 +12,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.messaging.handler.annotation.DestinationVariable;
-import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,7 +20,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
-
 import de.hsrm.mi.swt.snackman.entities.lobby.Lobby;
 import de.hsrm.mi.swt.snackman.entities.lobby.PlayerClient;
 import de.hsrm.mi.swt.snackman.services.GameAlreadyStartedException;
@@ -231,10 +226,10 @@ public class LobbyController {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
         }
 
-        return switchRoles(role, currentLobby, lobbyId, playerId, player.get(), selected, buttonId);
+        return switchRoles(role, currentLobby, player.get(), selected, buttonId);
     }
 
-    public ResponseEntity<Void> switchRoles(String role, Lobby currentLobby, String lobbyId, String playerId, PlayerClient player, boolean selected, String buttonId) {
+    public ResponseEntity<Void> switchRoles(String role, Lobby currentLobby, PlayerClient player, boolean selected, String buttonId) {
         switch (role) {
             case "SNACKMAN":
                 if (!lobbyManagerService.snackmanAlreadySelected(currentLobby) ) {
