@@ -82,6 +82,7 @@ let counter = 0
 
 // is called every frame, changes camera position and velocity
 // only sends updates to backend at 30hz
+// linearly interpolates the positions of the frontend mobs toward the backend position by t ammount every frame
 function animate() {
   currentCalories.value = player.getCalories()
   fps = 1 / clock.getDelta()
