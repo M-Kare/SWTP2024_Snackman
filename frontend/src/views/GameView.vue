@@ -174,7 +174,7 @@ onMounted(async () => {
   window.addEventListener('resize', resizeCallback)
 
   await SoundManager.initSoundmanager(camera)
-  console.log("All sounds loaded, attaching to meshes...");
+  console.debug("All sounds loaded, attaching to meshes...");
 
   //Attach sound to chickens
   gameMapStore.mapContent.chickens.forEach((chicken) => {
@@ -326,7 +326,7 @@ const getCurrentPlayingTime = async () => {
       return null
     }
 }
-   
+
 const formattedTime = computed(() => {
   const minutes = Math.floor(countdownTime.value / 60)
   const seconds = countdownTime.value % 60
@@ -392,7 +392,7 @@ const startCountDown = async () => {
   height: 60px;
   display: flex;
   justify-content: left;
-  align-items: center; 
+  align-items: center;
   box-shadow: 7px 7px 0 rgba(0, 0, 0, 0.8);
 }
 
