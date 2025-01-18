@@ -1,15 +1,5 @@
 package de.hsrm.mi.swt.snackman.entities.mobileObjects;
 
-import de.hsrm.mi.swt.snackman.entities.map.GameMap;
-import de.hsrm.mi.swt.snackman.entities.map.Square;
-import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken.Chicken;
-import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken.Direction;
-import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.SnackMan;
-import org.python.core.PyList;
-import org.python.core.PyObject;
-import org.python.util.PythonInterpreter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.nio.file.Paths;
@@ -17,6 +7,18 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
+
+import org.python.core.PyList;
+import org.python.core.PyObject;
+import org.python.util.PythonInterpreter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import de.hsrm.mi.swt.snackman.entities.map.GameMap;
+import de.hsrm.mi.swt.snackman.entities.map.Square;
+import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken.Chicken;
+import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken.Direction;
+import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.SnackMan;
 
 /**
  * The ScriptGhost represents a ghost entity in the game that
@@ -271,10 +273,17 @@ public class ScriptGhost extends Mob implements Runnable {
         this.lookingDirection = walkingDirection;
         Square oldPosition = this.gameMap.getSquareAtIndexXZ(this.ghostPosX, this.ghostPosZ);
         Square newPosition = walkingDirection.getNewPosition(this.gameMap, this.ghostPosX, this.ghostPosZ, walkingDirection);
+
+        try {
+            Thread.sleep(WAITING_TIME/2);
+        } catch (InterruptedException e) {
+            log.error(e.getMessage());
+        }
+
         propertyChangeSupport.firePropertyChange("scriptGhost", null, this);
 
         try {
-            Thread.sleep(WAITING_TIME);
+            Thread.sleep(WAITING_TIME/2);
         } catch (InterruptedException e) {
             log.error(e.getMessage());
         }

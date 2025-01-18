@@ -37,6 +37,7 @@ import type {IPlayerDTD} from '@/stores/Player/IPlayerDTD';
 import {SoundManager} from "@/services/SoundManager";
 import {SoundType} from "@/services/SoundTypes";
 import { GameObjectRenderer } from '@/renderer/GameObjectRenderer';
+import type { IOtherPlayer } from '@/stores/IOtherPlayer';
 
 const { lobbydata } = useLobbiesStore();
 const gameMapStore = useGameMapStore()
@@ -44,7 +45,7 @@ gameMapStore.startGameMapLiveUpdate()
 
 const targetHz = 30
 let clients: Array<IPlayerClientDTD>;
-let playerHashMap = new Map<String, THREE.Group<THREE.Object3DEventMap>>()
+let playerHashMap = new Map<String, IOtherPlayer>()
 
 const route = useRoute();
 const stompclient = gameMapStore.stompclient
@@ -84,7 +85,30 @@ let counter = 0
 function animate() {
   currentCalories.value = player.getCalories()
   fps = 1 / clock.getDelta()
-  player.updatePlayer()
+  // player.updatePlayer()
+  player.lerpPosition()
+  gameMapStore.mapContent.chickens.forEach((chicken)=>{
+    const chickenModel = scene.getObjectById(chicken.meshId)
+    if(chickenModel){
+      chickenModel.position.lerp(new THREE.Vector3(chicken.chickenPosX, 0, chicken.chickenPosZ), 0.2)
+      chickenModel.quaternion.slerp(chicken.lookingQuaternion, 0.05)
+    }
+  })
+  gameMapStore.mapContent.scriptGhosts.forEach((scriptGhost)=>{
+    const scriptGhostModel = scene.getObjectById(scriptGhost.meshId)
+    if(scriptGhostModel){
+      scriptGhostModel.position.lerp(new THREE.Vector3(scriptGhost.scriptGhostPosX, 0, scriptGhost.scriptGhostPosZ), 0.2)
+      scriptGhostModel.quaternion.slerp(scriptGhost.lookingQuaternion, 0.05)
+    }
+  })
+  gameMapStore.getOtherPlayers().forEach((otherPlayer)=>{
+    console.log(otherPlayer.targetPosition.x)
+    if(otherPlayer.model){
+      console.log(otherPlayer.model.quaternion.x, otherPlayer.model.quaternion.y, otherPlayer.model.quaternion.z)
+      otherPlayer.model.position.lerp(otherPlayer.targetPosition, 0.2)
+      otherPlayer.model.quaternion.slerp(otherPlayer.rotation, 0.5)
+    }
+  })
 
   if (counter >= fps / targetHz) {
     const time = performance.now()
@@ -213,7 +237,12 @@ async function loadPlayerModel(playerId: string, role: string, gameObjectRendere
       .then((ghostModel) => {
         ghostModel.position.set(playerData.posX, 0, playerData.posZ);
         scene.add(ghostModel);
-        playerHashMap.set(playerId, ghostModel);
+        const otherPlayer = {} as IOtherPlayer
+        otherPlayer.model = ghostModel
+        otherPlayer.rotation = new THREE.Quaternion()
+        otherPlayer.rotation.set(ghostModel.quaternion.x, ghostModel.quaternion.y, ghostModel.quaternion.z, ghostModel.quaternion.w)
+        otherPlayer.targetPosition = ghostModel.position.clone()
+        playerHashMap.set(playerId, otherPlayer);
       })
       .catch((error) => {
         console.error('Fehler beim Laden des Geister-Modells:', error);
@@ -225,7 +254,12 @@ async function loadPlayerModel(playerId: string, role: string, gameObjectRendere
       snackManModel.scale.set(1, 1, 1);
       snackManModel.position.set(playerData.posX, playerData.posY - 2, playerData.posZ);
       scene.add(snackManModel);
-      playerHashMap.set(playerId, snackManModel);
+      const otherPlayer = {} as IOtherPlayer
+      otherPlayer.model = snackManModel
+      otherPlayer.rotation = new THREE.Quaternion()
+      otherPlayer.rotation.set(snackManModel.quaternion.x, snackManModel.quaternion.y, snackManModel.quaternion.z, snackManModel.quaternion.w)
+      otherPlayer.targetPosition = snackManModel.position.clone()
+      playerHashMap.set(playerId, otherPlayer);
     });
   }
 }
