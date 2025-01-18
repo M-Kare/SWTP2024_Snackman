@@ -147,9 +147,9 @@ export const useGameMapStore = defineStore('gameMap', () => {
                   if (otherPlayers == undefined || otherPlayers.size == 0) {
                     continue;
                   }
-                  otherPlayers.get(mobUpdate.playerId).rotation.set(mobUpdate.rotation.x, mobUpdate.rotation.y, mobUpdate.rotation.z, mobUpdate.rotation.w)
+                  otherPlayers.get(mobUpdate.playerId)!.rotation.set(mobUpdate.rotation.x, mobUpdate.rotation.y, mobUpdate.rotation.z, mobUpdate.rotation.w)
                   //TODO adjust player height
-                  otherPlayers.get(mobUpdate.playerId).targetPosition.set(mobUpdate.position.x, mobUpdate.position.y-2, mobUpdate.position.z)
+                  otherPlayers.get(mobUpdate.playerId)!.targetPosition.set(mobUpdate.position.x, mobUpdate.position.y-2, mobUpdate.position.z)
                 }
                 break;
 
@@ -165,8 +165,8 @@ export const useGameMapStore = defineStore('gameMap', () => {
                   if (otherPlayers == undefined || otherPlayers.size == 0) {
                     continue;
                   }
-                  otherPlayers.get(ghostUpdate.playerId).rotation.set(ghostUpdate.rotation.x, ghostUpdate.rotation.y, ghostUpdate.rotation.z, ghostUpdate.rotation.w)
-                  otherPlayers.get(ghostUpdate.playerId).targetPosition.set(ghostUpdate.position.x, ghostUpdate.position.y-2, ghostUpdate.position.z)
+                  otherPlayers.get(ghostUpdate.playerId)!.rotation.set(ghostUpdate.rotation.x, ghostUpdate.rotation.y, ghostUpdate.rotation.z, ghostUpdate.rotation.w)
+                  otherPlayers.get(ghostUpdate.playerId)!.targetPosition.set(ghostUpdate.position.x, ghostUpdate.position.y-2, ghostUpdate.position.z)
 
                 }
                 break;
