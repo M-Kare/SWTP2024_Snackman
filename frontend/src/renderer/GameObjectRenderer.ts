@@ -126,17 +126,17 @@ export const GameObjectRenderer = () => {
 
   const createGround = () => {
     // ground setup
-    const groundTexture = new THREE.TextureLoader().load('./textures/stone_floor_by_lon_kamikaze_d4300e.png')
+    const groundTexture = new THREE.TextureLoader().load('./textures/ground_white_comic_2.jpg')
     groundTexture.wrapS = THREE.RepeatWrapping;
     groundTexture.wrapT = THREE.RepeatWrapping;
     groundTexture.repeat.set(1000, 1000);
     const groundGeometry = new THREE.PlaneGeometry(GROUNDSIZE, GROUNDSIZE)
-    const groundMaterial = new THREE.MeshStandardMaterial({ 
+    const groundMaterial = new THREE.MeshStandardMaterial({
                               map: groundTexture,
-                              color: 0xcccccc,  
+                              color: 0xffffff,
                               emissive: 0x000000,
                               roughness: 0.7,
-                              metalness: 0.1, 
+                              metalness: 0.1,
                             })
     const ground = new THREE.Mesh(groundGeometry, groundMaterial)
     ground.castShadow = true
@@ -163,9 +163,9 @@ export const GameObjectRenderer = () => {
     wallTexture.wrapT = THREE.RepeatWrapping;
     wallTexture.repeat.set(1, 1.87);
 
-    const wallMaterial = new THREE.MeshStandardMaterial({ 
+    const wallMaterial = new THREE.MeshStandardMaterial({
                                   map: wallTexture,
-                                  color: 0xffcc66,
+                                  color: 0xFFDE9D,
                                   emissive: 0x000000,
                                   roughness: 0.7,
                                   metalness: 0.1,
