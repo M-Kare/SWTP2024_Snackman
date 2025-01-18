@@ -183,7 +183,7 @@ export class SoundManager {
      */
     private static async initGameEndSound(): Promise<void> {
         const sound = new THREE.Audio(this.ingameListener);
-        const buffer = await this.loadAudioAsync('src/assets/sounds/backgroundMusic/Game_End_Sound.mp3');
+        const buffer = await this.loadAudioAsync('sounds/backgroundMusic/Game_End_Sound.mp3');
         sound.setBuffer(buffer);
         sound.setVolume(0.1);
 
@@ -204,7 +204,7 @@ export class SoundManager {
      */
     private static async initIngameBackgroundMusic(): Promise<void> {
         const ingameMusic = new THREE.Audio(this.lobbyListener);
-        const buffer = await this.loadAudioAsync('src/assets/sounds/backgroundMusic/ingameBackgroundMusic.mp3');
+        const buffer = await this.loadAudioAsync('sounds/backgroundMusic/ingameBackgroundMusic.mp3');
         ingameMusic.setBuffer(buffer);
         ingameMusic.setVolume(0.2);
         ingameMusic.setLoop(true);
@@ -218,7 +218,7 @@ export class SoundManager {
      */
     private static async initLobbyBackgroundMusic(): Promise<void> {
         const lobbyMusic = new THREE.Audio(this.lobbyListener);
-        const buffer = await this.loadAudioAsync('src/assets/sounds/backgroundMusic/lobbyMusic.mp3');
+        const buffer = await this.loadAudioAsync('sounds/backgroundMusic/lobbyMusic.mp3');
         lobbyMusic.setBuffer(buffer);
         lobbyMusic.setVolume(0.3);
         lobbyMusic.setLoop(true);
@@ -232,7 +232,7 @@ export class SoundManager {
      */
     private static async initEatSnackSound(): Promise<void> {
         const sound = new THREE.PositionalAudio(this.ingameListener);
-        const buffer = await this.loadAudioAsync('src/assets/sounds/snackman/collect_snack_sound.mp3');
+        const buffer = await this.loadAudioAsync('sounds/snackman/collect_snack_sound.mp3');
         sound.setBuffer(buffer);
         sound.setRefDistance(20);
 
@@ -244,7 +244,7 @@ export class SoundManager {
      */
     private static async initGhostSounds(): Promise<void> {
         const sound = new THREE.PositionalAudio(this.ingameListener);
-        const buffer = await this.loadAudioAsync('src/assets/sounds/ghost/Ghost_Sounds.mp3');
+        const buffer = await this.loadAudioAsync('sounds/ghost/Ghost_Sounds.mp3');
         sound.setBuffer(buffer);
 
         this.characterSounds.set(SoundType.GHOST, sound);
@@ -256,7 +256,7 @@ export class SoundManager {
      */
     private static async initGhostHitsSnackmanSound(): Promise<void> {
         const sound = new THREE.PositionalAudio(this.ingameListener);
-        const buffer = await this.loadAudioAsync('src/assets/sounds/snackman/hitByGhostSound.mp3');
+        const buffer = await this.loadAudioAsync('sounds/snackman/hitByGhostSound.mp3');
         sound.setBuffer(buffer);
         sound.setRefDistance(20);
 
@@ -269,8 +269,8 @@ export class SoundManager {
      */
     private static async initChickenSounds(): Promise<void> {
         const chickenPaths = [
-            "src/assets/sounds/chicken/chicken-clucking.ogg",
-            "src/assets/sounds/chicken/chicken_noises.ogg",
+            "sounds/chicken/chicken-clucking.ogg",
+            "sounds/chicken/chicken_noises.ogg",
         ];
 
         const promises = chickenPaths.map(async (path) => {
@@ -296,7 +296,7 @@ export class SoundManager {
      * Initializes the scared chicken sound.
      */
     private static async initScaredChickenSound() {
-        const chickenScaredSoundPath = "src/assets/sounds/chicken/chicken-single-alarm-call.mp3";
+        const chickenScaredSoundPath = "sounds/chicken/chicken-single-alarm-call.mp3";
 
         const promiseChickenScaredSound = await this.loadAudioAsync(chickenScaredSoundPath);
         const scaredChickenSound = new THREE.PositionalAudio(this.ingameListener);
