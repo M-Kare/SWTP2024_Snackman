@@ -129,17 +129,22 @@ class SnackManTest {
         assertFalse(snackMan.isJumping());
     }
 
-    @Test
+    @Test 
     void testDoubleJump() {
         snackMan.setKcal(300);
         snackMan.jump();
+
+        assertTrue(snackMan.isJumping());
+        assertFalse(snackMan.hasDoubleJumped());
+
         snackMan.doubleJump();
 
+        assertTrue(snackMan.hasDoubleJumped());
         assertEquals(100, snackMan.getKcal());
         assertEquals(GameConfig.JUMP_STRENGTH + GameConfig.DOUBLEJUMP_STRENGTH, snackMan.getVelocityY());
     }
 
-    @Test
+    @Test 
     void testDoubleJumpWithoutEnoughKcal() {
         snackMan.setKcal(100);
         snackMan.jump();
@@ -147,6 +152,8 @@ class SnackManTest {
 
         assertEquals(0, snackMan.getKcal());
         assertEquals(GameConfig.JUMP_STRENGTH, snackMan.getVelocityY());
+        assertTrue(snackMan.isJumping());
+        assertFalse(snackMan.hasDoubleJumped());
     }
 
     @Test

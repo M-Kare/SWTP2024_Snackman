@@ -319,4 +319,12 @@ public class SnackMan extends EatingMob {
     public void setSprintHandler(SprintHandler sprintHandler) {
         this.sprintHandler = sprintHandler;
     }
+
+    public boolean hasDoubleJumped() {
+        return hasDoubleJumped;
+    }
+
+    public void setHasDoubleJumped(boolean valueHasDoubleJumped) {
+        hasDoubleJumped = valueHasDoubleJumped;
+    }
 }
