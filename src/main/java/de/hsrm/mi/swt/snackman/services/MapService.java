@@ -285,7 +285,11 @@ public class MapService {
         return (index * GameConfig.SQUARE_SIZE) + (GameConfig.SQUARE_SIZE / 2);
     }
 
-
+    /**
+     * Removes and respawns snacks on all floor square with a set probability.
+     * Eggs are not removed.
+     * @param map
+     */
     public void respawnSnacks(GameMap map) {
         for (int i = 0; i < map.getGameMapSquares().length; i++) {
             for (int j = 0; j < map.getGameMapSquares()[0].length; j++) {
