@@ -48,7 +48,7 @@
 </template>
 
 <script setup lang="ts">
-import {onMounted, ref, watchEffect} from 'vue';
+import {onMounted, ref, watchEffect, computed} from 'vue';
 import MenuBackground from '@/components/MenuBackground.vue';
 import SmallNavButton from '@/components/SmallNavButton.vue';
 import {useRoute, useRouter} from "vue-router";
@@ -73,6 +73,12 @@ const hidePopUp = () => {
 const lobbyUrl = route.params.lobbyId
 const infoHeading = ref()
 
+const isPlayerAdmin = computed(() => {
+  const currentPlayer = lobbiesStore.lobbydata.currentPlayer;
+  const lobby = lobbiesStore.lobbydata.lobbies.find(l => l.lobbyId === lobbyId);
+  return currentPlayer && lobby && currentPlayer.playerId === lobby.adminClient.playerId;
+})
+
 /**
  * Starts the game if the player is the admin and there are enough members in the lobby.
  * If the player is not the admin or there are not enough members, a popup will be shown.
@@ -83,12 +89,6 @@ const infoHeading = ref()
  */
 
 const selectedCharacter = ref<Button | null>(null);
-
-const isPlayerAdmin = computed(() => {
-  const currentPlayer = lobbiesStore.lobbydata.currentPlayer;
-  const lobby = lobbiesStore.lobbydata.lobbies.find(l => l.lobbyId === lobbyId);
-  return currentPlayer && lobby && currentPlayer.playerId === lobby.adminClient.playerId;
-})
 
 const selectCharacter = async (button: Button) => {
 
@@ -137,6 +137,7 @@ const selectCharacter = async (button: Button) => {
     darkenBackground.value = true;
   }
 }
+
 onMounted(async () => {
   await lobbiesStore.fetchLobbyById(lobbyId)
 
@@ -152,8 +153,6 @@ onMounted(async () => {
  * @throws {Error} If the player or lobby is not found.
  */
 const startGame = async () => {
-
-
   const playerId = lobbiesStore.lobbydata.currentPlayer.playerId
   let snackmanCounter: number = 0
   let memberCounter: number = 0
