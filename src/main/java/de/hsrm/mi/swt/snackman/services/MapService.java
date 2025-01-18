@@ -262,7 +262,9 @@ public class MapService {
             log.info("Initialising scriptGhost {}", i);
             Square square = ghostSpawnSquares.get(ghostSpawnIndex);
 
-            ScriptGhost newScriptGhost = new ScriptGhost(lobby.getGameMap(), square, ScriptGhostDifficulty.EASY);
+            // TODO different for multiplayer / single player -> wirklich korrekt initialisiert??
+            ScriptGhost newScriptGhost = new ScriptGhost(lobby.getGameMap(), square, lobby.getScriptGhostDifficulty());
+            log.info("New script ghost is: {}", newScriptGhost);
 
             Thread ghostThread = new Thread(newScriptGhost);
             ghostThread.start();
