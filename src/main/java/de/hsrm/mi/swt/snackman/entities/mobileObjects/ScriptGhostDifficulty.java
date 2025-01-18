@@ -15,6 +15,6 @@ public enum ScriptGhostDifficulty {
         ScriptGhostDifficulty[] difficulties = {EASY, DIFFICULT};
         Random random = new Random();
         int randomIndex = random.nextInt(difficulties.length);
-        return EASY;
+        return difficulties[randomIndex];
     }
 }

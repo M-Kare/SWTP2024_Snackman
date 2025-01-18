@@ -1,14 +1,9 @@
 package de.hsrm.mi.swt.snackman.entities.mobileObjects;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import de.hsrm.mi.swt.snackman.entities.map.GameMap;
 
 import org.joml.Quaterniond;
 import org.joml.Vector3d;
-import org.python.jline.internal.Log;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
 
 import de.hsrm.mi.swt.snackman.configuration.GameConfig;
 import de.hsrm.mi.swt.snackman.entities.map.Square;
@@ -25,7 +20,6 @@ public abstract class Mob {
     private double speed;
     private Vector3d spawn;
     private  static long idCounter = 0;
-    private final static Logger log = LoggerFactory.getLogger(Mob.class);
 
     /**
      * Base constructor for Map with spawn-location at center of Map
@@ -41,8 +35,6 @@ public abstract class Mob {
                 (gameMap.getGameMapSquares()[0].length / 2.0) * GameConfig.SQUARE_SIZE);
         position = new Vector3d(spawn);
         quat = new Quaterniond();
-        // setCurrentSquareWithIndex(position.x, position.z);
-        // setPositionWithIndexXZ(position.x, position.z);
         id = generateId();
     }
 
@@ -122,20 +114,6 @@ public abstract class Mob {
     public Quaterniond getRotationQuaternion(){
         return this.quat;
     }
-    // /**
-    //  * Calculates the square-indices to set the currentSquare
-    //  *
-    //  * @param x x-position
-    //  * @param z z-position
-    //  */
-    // public void setCurrentSquareWithIndex(double x, double z) {
-    //     setPositionWithIndexXZ(calcMapIndexOfCoordinate(x), calcMapIndexOfCoordinate(z));
-    // }
-
-    // public void setPositionWithIndexXZ(double x, double z){
-    //     this.position.x = x;
-    //     this.position.z = z;
-    // }
 
     /**
      * Moves the player based on inputs and passed time since last update (delta). Forward is relative to the rotation of the player and handled by a quaternion.
@@ -222,7 +200,6 @@ public abstract class Mob {
             default:
                 break;
         }
-        // setPositionWithIndexXZ(position.x, position.z);
     }
 
     public Quaterniond getQuat() {
@@ -235,7 +212,6 @@ public abstract class Mob {
     public void respawn() {
         this.position.x = spawn.x;
         this.position.z = spawn.z;
-        // setCurrentSquareWithIndex(position.x, position.z);
 
     /*
     TODO unterschied zwischen snackman und geistern beachten in konstructor ändern!!
