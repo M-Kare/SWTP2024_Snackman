@@ -3,12 +3,6 @@ import {SnackType} from '@/stores/Snack/ISnackDTD'
 import {ChickenThickness} from '@/stores/Chicken/IChickenDTD'
 
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
-import ghostGLB from '@/assets/ghost.glb'
-import strawberryGLB from '@/assets/strawberry.glb'
-import orangeGLB from '@/assets/orange.glb'
-import cherryGLB from '@/assets/cherry.glb'
-import appleGLB from '@/assets/apple.glb'
-import eggGLB from '@/assets/yoshiegg.glb'
 
 /**
  * for creating the objects in the map
@@ -19,13 +13,14 @@ export const GameObjectRenderer = () => {
   const loader = new GLTFLoader()
 
   let ghostModel: THREE.Group | null = null 
+  const ghostGLB = "/ghost.glb"
 
   const snackModels = {
-    [SnackType.STRAWBERRY]: strawberryGLB,
-    [SnackType.ORANGE]: orangeGLB,
-    [SnackType.CHERRY]: cherryGLB,
-    [SnackType.APPLE]: appleGLB,
-    [SnackType.EGG]: eggGLB,
+    [SnackType.STRAWBERRY]: "/strawberry.glb",
+    [SnackType.ORANGE]: "/orange.glb",
+    [SnackType.CHERRY]: "/cherry.glb",
+    [SnackType.APPLE]: "/apple.glb",
+    [SnackType.EGG]: "/yoshiegg.glb",
     [SnackType.EMPTY]: null,
   };
 
@@ -34,6 +29,7 @@ export const GameObjectRenderer = () => {
   async function createSnackOnFloor(
     xPosition: number,
     zPosition: number,
+    yPosition: number,
     sideLength: number,
     type: SnackType
   ): Promise<THREE.Object3D> {
@@ -42,7 +38,7 @@ export const GameObjectRenderer = () => {
       console.error(`No model found for SnackType: ${type}`);
       return new THREE.Mesh(
         new THREE.BoxGeometry(sideLength / 3, 1, sideLength / 3),
-        new THREE.MeshStandardMaterial({ color: 'gray', opacity: 0.5, transparent: true })
+        new THREE.MeshStandardMaterial({ color: "gray", opacity: 0.5, transparent: true })
       );
     }
   
@@ -81,7 +77,7 @@ export const GameObjectRenderer = () => {
     }
   
     const clonedSnack = snackModelCache[type]!.clone();
-    clonedSnack.position.set(xPosition, 0, zPosition);
+    clonedSnack.position.set(xPosition, yPosition, zPosition);
     return clonedSnack;
   }
 

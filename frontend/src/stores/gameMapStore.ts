@@ -272,6 +272,7 @@ export const useGameMapStore = defineStore('gameMap', () => {
     const snackToAdd = await gameObjectRenderer.createSnackOnFloor(
       squareUpdate.square.indexX * DEFAULT_SIDE_LENGTH + OFFSET,
       squareUpdate.square.indexZ * DEFAULT_SIDE_LENGTH + OFFSET,
+      0, // yPosition für Snacks (z. B. Bodenhöhe)
       DEFAULT_SIDE_LENGTH,
       squareUpdate.square.snack?.snackType,
     )

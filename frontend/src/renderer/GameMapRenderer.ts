@@ -71,8 +71,9 @@ export const GameMapRenderer = () => {
           const snackToAdd = await gameObjectRenderer.createSnackOnFloor(
             square.indexX * DEFAULT_SIDE_LENGTH + OFFSET,
             square.indexZ * DEFAULT_SIDE_LENGTH + OFFSET,
+            0,
             DEFAULT_SIDE_LENGTH,
-            square.snack?.snackType,
+            square.snack.snackType
         )
         scene.add(snackToAdd)
         gameMapStore.setSnackMeshId(id, snackToAdd.id)
