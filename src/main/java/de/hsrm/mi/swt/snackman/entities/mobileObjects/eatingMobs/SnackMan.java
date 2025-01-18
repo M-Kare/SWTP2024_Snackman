@@ -11,8 +11,6 @@ import de.hsrm.mi.swt.snackman.entities.map.GameMap;
 import de.hsrm.mi.swt.snackman.entities.map.Square;
 import de.hsrm.mi.swt.snackman.entities.map.enums.WallAlignmentStatus;
 import de.hsrm.mi.swt.snackman.entities.map.enums.WallSectionStatus;
-import de.hsrm.mi.swt.snackman.entities.map.enums.WallAlignmentStatus;
-import de.hsrm.mi.swt.snackman.entities.map.enums.WallSectionStatus;
 import de.hsrm.mi.swt.snackman.entities.mapObject.snack.Snack;
 import de.hsrm.mi.swt.snackman.entities.mapObject.snack.SnackType;
 import de.hsrm.mi.swt.snackman.entities.mechanics.SprintHandler;
