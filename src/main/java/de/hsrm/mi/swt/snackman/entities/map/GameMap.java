@@ -47,17 +47,4 @@ public class GameMap {
         gameMapSquares[x][y] = square;
     }
 
-    public String[][] getStringMap(long ghostId){
-        int rows = gameMapSquares.length;
-        int cols = gameMapSquares[0].length;
-        String[][] result = new String[rows][cols];
-
-        for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < cols; j++) {
-                result[i][j] = gameMapSquares[i][j].getPrimaryTypeForGhostWithHighDifficulty(ghostId);
-            }
-        }
-
-        return result;
-    }
 }
