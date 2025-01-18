@@ -9,9 +9,13 @@ import org.slf4j.LoggerFactory;
 import de.hsrm.mi.swt.snackman.configuration.GameConfig;
 import de.hsrm.mi.swt.snackman.entities.map.GameMap;
 import de.hsrm.mi.swt.snackman.entities.map.Square;
+import de.hsrm.mi.swt.snackman.entities.map.enums.WallAlignmentStatus;
+import de.hsrm.mi.swt.snackman.entities.map.enums.WallSectionStatus;
 import de.hsrm.mi.swt.snackman.entities.mapObject.snack.Snack;
 import de.hsrm.mi.swt.snackman.entities.mapObject.snack.SnackType;
 import de.hsrm.mi.swt.snackman.entities.mechanics.SprintHandler;
+import de.hsrm.mi.swt.snackman.entities.mobileObjects.Ghost;
+import de.hsrm.mi.swt.snackman.entities.mobileObjects.Mob;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.ScriptGhost;
 
 public class SnackMan extends EatingMob {
@@ -46,7 +50,7 @@ public class SnackMan extends EatingMob {
     }
 
         public void jump() {
-        if (!isJumping && getKcal() >= 100) {
+            if (!isJumping && getKcal() >= 100) {
                 this.velocityY = GameConfig.JUMP_STRENGTH;
                 this.isJumping = true;
                 this.hasDoubleJumped = false;
@@ -69,122 +73,122 @@ public class SnackMan extends EatingMob {
             this.setPosY(this.getPosY() + this.velocityY * deltaTime);
 
             if (this.getPosY() <= GameConfig.SQUARE_HEIGHT && squareUnderneathIsWall()) {
-                int wallAlignment = checkWallAlignment();
-                int wallSection = getWallSection();
+                WallAlignmentStatus wallAlignment = checkWallAlignment();
+                WallSectionStatus wallSection = getWallSection();
 
                 switch (wallAlignment) {
-                    case 0:
+                    case WallAlignmentStatus.CASE0_NONE:
                         pushback();
                         break;
-                    case 1:
-                        if (wallSection == 1 || wallSection == 2) {
+                    case WallAlignmentStatus.CASE1_LEFT_RIGHT:
+                        if (wallSection == WallSectionStatus.CASE1_TOP_LEFT || wallSection == WallSectionStatus.CASE2_TOP_RIGHT) {
                             push_forward();
                         } else {
                             push_backward();
                         }
                         break;
-                    case 2:
-                        if (wallSection == 1 || wallSection == 3) {
+                    case WallAlignmentStatus.CASE2_TOP_BOTTOM:
+                        if (wallSection == WallSectionStatus.CASE1_TOP_LEFT || wallSection == WallSectionStatus.CASE3_BOTTOM_LEFT) {
                             push_left();
                         } else {
                             push_right();
                         }
                         break;
-                    case 3:
-                        if (wallSection == 1 || wallSection == 2) {
+                    case WallAlignmentStatus.CASE3_BOTTOM_LEFT:
+                        if (wallSection == WallSectionStatus.CASE1_TOP_LEFT || wallSection == WallSectionStatus.CASE2_TOP_RIGHT) {
                             push_forward();
-                        } else if (wallSection == 4) {
+                        } else if (wallSection == WallSectionStatus.CASE4_BOTTOM_RIGHT) {
                             push_right();
                         } else {
                             pushback();
                         }
                         break;
-                    case 4:
-                        if (wallSection == 3 || wallSection == 4) {
+                    case WallAlignmentStatus.CASE4_TOP_LEFT:
+                        if (wallSection == WallSectionStatus.CASE3_BOTTOM_LEFT || wallSection == WallSectionStatus.CASE4_BOTTOM_RIGHT) {
                             push_backward();
-                        } else if (wallSection == 2) {
+                        } else if (wallSection == WallSectionStatus.CASE2_TOP_RIGHT) {
                             push_right();
                         } else {
                             pushback();
                         }
                         break;
-                    case 5:
-                        if (wallSection == 1 || wallSection == 3) {
+                    case WallAlignmentStatus.CASE5_TOP_RIGHT:
+                        if (wallSection == WallSectionStatus.CASE1_TOP_LEFT || wallSection == WallSectionStatus.CASE3_BOTTOM_LEFT) {
                             push_left();
-                        } else if (wallSection == 4) {
-                            push_backward();
-                        } else {
-                            pushback();
-                        }
-                        break;
-                    case 6:
-                        if (wallSection == 1 || wallSection == 2) {
-                            push_forward();
-                        } else if (wallSection == 3) {
-                            push_left();
-                        } else {
-                            pushback();
-                        }
-                        break;
-                    case 7:
-                        if (wallSection == 1 || wallSection == 2) {
-                            push_forward();
-                        } else {
-                            pushback();
-                        }
-                        break;
-                    case 8:
-                        if (wallSection == 2 || wallSection == 4) {
-                            push_right();
-                        } else {
-                            pushback();
-                        }
-                        break;
-                    case 9:
-                        if (wallSection == 3 || wallSection == 4) {
+                        } else if (wallSection == WallSectionStatus.CASE4_BOTTOM_RIGHT) {
                             push_backward();
                         } else {
                             pushback();
                         }
                         break;
-                    case 10:
-                        if (wallSection == 1 || wallSection == 3) {
+                    case WallAlignmentStatus.CASE6_BOTTOM_RIGHT:
+                        if (wallSection == WallSectionStatus.CASE1_TOP_LEFT || wallSection == WallSectionStatus.CASE2_TOP_RIGHT) {
+                            push_forward();
+                        } else if (wallSection == WallSectionStatus.CASE3_BOTTOM_LEFT) {
                             push_left();
                         } else {
                             pushback();
                         }
                         break;
-                    case 11:
-                        if (wallSection == 1 || wallSection == 2) {
+                    case WallAlignmentStatus.CASE7_BOTTOM_LEFT_RIGHT:
+                        if (wallSection == WallSectionStatus.CASE1_TOP_LEFT || wallSection == WallSectionStatus.CASE2_TOP_RIGHT) {
                             push_forward();
-                        } else if (wallSection == 3 ) {
+                        } else {
+                            pushback();
+                        }
+                        break;
+                    case WallAlignmentStatus.CASE8_TOP_BOTTOM_LEFT:
+                        if (wallSection == WallSectionStatus.CASE2_TOP_RIGHT || wallSection == WallSectionStatus.CASE4_BOTTOM_RIGHT) {
+                            push_right();
+                        } else {
+                            pushback();
+                        }
+                        break;
+                    case WallAlignmentStatus.CASE9_TOP_LEFT_RIGHT:
+                        if (wallSection == WallSectionStatus.CASE3_BOTTOM_LEFT || wallSection == WallSectionStatus.CASE4_BOTTOM_RIGHT) {
+                            push_backward();
+                        } else {
+                            pushback();
+                        }
+                        break;
+                    case WallAlignmentStatus.CASE10_TOP_BOTTOM_RIGHT:
+                        if (wallSection == WallSectionStatus.CASE1_TOP_LEFT || wallSection == WallSectionStatus.CASE3_BOTTOM_LEFT) {
+                            push_left();
+                        } else {
+                            pushback();
+                        }
+                        break;
+                    case WallAlignmentStatus.CASE11_BOTTOM:
+                        if (wallSection == WallSectionStatus.CASE1_TOP_LEFT || wallSection == WallSectionStatus.CASE2_TOP_RIGHT) {
+                            push_forward();
+                        } else if (wallSection == WallSectionStatus.CASE3_BOTTOM_LEFT) {
                             push_left();
                         } else {
                             push_right();
                         }
                         break;
-                    case 12:
-                        if (wallSection == 1) {
+                    case WallAlignmentStatus.CASE12_LEFT:
+                        if (wallSection == WallSectionStatus.CASE1_TOP_LEFT) {
                             push_forward();
-                        } else if (wallSection == 2 || wallSection == 4 ) {
+                        } else if (wallSection == WallSectionStatus.CASE2_TOP_RIGHT || wallSection == WallSectionStatus.CASE4_BOTTOM_RIGHT) {
                             push_right();
                         } else {
                             push_backward();
                         }
                         break;
-                    case 13:
-                        if (wallSection == 1) {
+                    case WallAlignmentStatus.CASE13_TOP:
+                        if (wallSection == WallSectionStatus.CASE1_TOP_LEFT) {
                             push_left();
-                        } else if (wallSection == 2) {
+                        } else if (wallSection == WallSectionStatus.CASE2_TOP_RIGHT) {
                             push_right();
                         } else {
                             push_backward();
                         }
                         break;
-                    case 14:
-                        if (wallSection == 1 || wallSection == 3) {
+                    case WallAlignmentStatus.CASE14_RIGHT:
+                        if (wallSection == WallSectionStatus.CASE1_TOP_LEFT || wallSection == WallSectionStatus.CASE3_BOTTOM_LEFT) {
                             push_left();
-                        } else if (wallSection == 2) {
+                        } else if (wallSection == WallSectionStatus.CASE2_TOP_RIGHT) {
                             push_forward();
                         } else {
                             push_backward();
@@ -202,11 +206,11 @@ public class SnackMan extends EatingMob {
         }
     }
 
-    private void subtractCaloriesSingleJump() {
+    public void subtractCaloriesSingleJump() {
         setKcal(getKcal() - 100);
     }
 
-    private void subtractCaloriesDoubleJump() {
+    public void subtractCaloriesDoubleJump() {
         if (!hasDoubleJumped) {
             setKcal(getKcal() - 100);
         }
