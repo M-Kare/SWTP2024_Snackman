@@ -6,7 +6,6 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps } from 'vue';
 
 // Prop to control the color&blur overlay
 defineProps({

@@ -23,6 +23,7 @@
     </div>
 
     <SmallNavButton
+      v-if="isPlayerAdmin"
       id="start-game-button"
       class="small-nav-buttons"
       @click="startGame"
@@ -81,6 +82,12 @@ const infoHeading = ref()
  */
 
 const selectedCharacter = ref<Button | null>(null);
+
+const isPlayerAdmin = computed(() => {
+  const currentPlayer = lobbiesStore.lobbydata.currentPlayer;
+  const lobby = lobbiesStore.lobbydata.lobbies.find(l => l.lobbyId === lobbyId);
+  return currentPlayer && lobby && currentPlayer.playerId === lobby.adminClient.playerId;
+})
 
 
 const selectCharacter = async (button: Button) => {

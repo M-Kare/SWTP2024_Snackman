@@ -1,10 +1,12 @@
 import {useGameMapStore} from '@/stores/gameMapStore';
-import {MapObjectType, type IGameMap} from '@/stores/IGameMapDTD';
+import {MapObjectType} from '@/stores/IGameMapDTD';
 import type {ISquare} from '@/stores/Square/ISquareDTD';
-import {type WebGLRenderer} from 'three'
 import * as THREE from 'three'
+import {type WebGLRenderer} from 'three'
 import {PointerLockControls} from 'three/addons/controls/PointerLockControls.js'
 import {reactive, ref, type UnwrapNestedRefs} from "vue";
+import {SoundManager} from "@/services/SoundManager";
+import {SoundType} from "@/services/SoundTypes";
 
 export class Player {
   private prevTime: DOMHighResTimeStamp
@@ -440,6 +442,10 @@ export class Player {
   }
 
   public setCalories(cal: number): void {
+    if(cal > this.calories){
+      SoundManager.playSound(SoundType.EAT_SNACK)
+    }
+
     this.calories = cal;
   }
 
