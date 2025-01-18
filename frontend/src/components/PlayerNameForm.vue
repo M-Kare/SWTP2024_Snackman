@@ -69,11 +69,16 @@ const savePlayerName = async () => {
     emit('hidePlayerNameForm');
     emit('playerNameSaved', playerName.value);
 
+  } catch (error) {
+    alert("Error saving playername");
+    console.error(error);
+  }
+
+  try {
     await SoundManager.initBackgroundMusicManager()
     SoundManager.stopAllInGameSounds()
     SoundManager.playSound(SoundType.LOBBY_MUSIC)
   } catch (error) {
-    alert("Error saving playername");
     console.error(error);
   }
 }
