@@ -1,35 +1,42 @@
 # languages;en;de
 
 
-# MainMenu
-mainMenu.button.singlePlayer;Singleplayer;Einzelspieler
-mainMenu.button.multiPlayer;Multiplayer;Mehrspieler
+# Buttons
+button.singlePlayer;Singleplayer;Einzelspieler
+button.multiPlayer;Multiplayer;Mehrspieler
+
+button.save;Save;Speichern
+button.back;Back;Zurück
+
+button.createNewLobby;Create new Lobby;Neue Lobby erstellen
+button.cancelLobbyCreation;Cancel;Abbrechen
+button.createLobby;Create Lobby;Lobby erstellen
+button.leaveLobby;Leave Lobby;Lobby verlassen
+
+button.startGame;Start Game;Spiel starten
+
 
 # PlayerNameForm
 savePlayerName.label;Please enter your name:;Bitte gib deinen Namen ein:
-savePlayerName.button.save;Save;Speichern
 savePlayerName.error.playerNameEmpty;Player-name can’t be empty!;Der Spieler-Name kann nicht leer sein!
+
+
+# Difficulty
+difficulty.title;Choose the difficulty level for the ghosts!;Wähle den Schwierigkeitsgrad für die Geister!
 
 
 # LobbyListView
 lobbyList.title;Lobbies;Lobbies
-lobbyList.button.createNewLobby;Create new Lobby;Neue Lobby erstellen
-lobbyList.button.back;Back;Zurück
 
 
 # CreateLobbyForm
 createLobby.title;New Lobby;Neue Lobby
 createLobby.form.label;Enter name:;Namen eingeben:
-createLobby.button.cancelCreation;Cancel;Abbrechen
-createLobby.button.createLobby;Create Lobby;Lobby erstellen
-
 createLobby.error.lobbyNameEmpty;Lobby-name can’t be empty!;Der Lobby-Name kann nicht leer sein!
 createLobby.error.lobbyNameDuplicate;Lobby-name already exists! Please choose another name.;Lobby-Name existiert bereits! Bitte wähle einen anderen.
 
 
 # LobbyView
-lobby.button.leaveLobby;Leave Lobby;Lobby verlassen
-lobby.button.startGame;Start Game;Spiel starten
 lobby.playerCount;Players;Spieler
 lobby.role.ghost;Ghost;Geist
 
@@ -40,7 +47,7 @@ popup.lobbyFull.text;Please choose or create another one!;Bitte wähle oder erst
 
 popup.cantStart.title;Can’t start the game;Start nicht möglich
 popup.cantStart.notEnoughPlayers;Not enough players to start!;Nicht genug Spieler um zu starten!
-popup.cantStart.onlySnackMan;Only SnackMan can start the game!;Nur SnackMan kann das Spiel starten
+popup.cantStart.onlySnackMan;Only the host can start the game!;Nur der Host kann das Spiel starten!
 
 
 # GameView
