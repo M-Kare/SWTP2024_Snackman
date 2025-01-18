@@ -1,22 +1,25 @@
 package de.hsrm.mi.swt.snackman.entities.mobileObjects;
 
-import de.hsrm.mi.swt.snackman.entities.map.GameMap;
-import de.hsrm.mi.swt.snackman.entities.map.Square;
-import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken.Chicken;
-import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken.Direction;
-import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.SnackMan;
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import org.python.core.PyList;
 import org.python.core.PyObject;
 import org.python.util.PythonInterpreter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Properties;
+
+import de.hsrm.mi.swt.snackman.SnackmanApplication;
+import de.hsrm.mi.swt.snackman.configuration.GameConfig;
+import de.hsrm.mi.swt.snackman.entities.map.GameMap;
+import de.hsrm.mi.swt.snackman.entities.map.Square;
+import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken.Chicken;
+import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken.Direction;
+import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.SnackMan;
 
 /**
  * The ScriptGhost represents a ghost entity in the game that
@@ -37,7 +40,6 @@ public class ScriptGhost extends Mob implements Runnable {
     private int ghostPosX, ghostPosZ;
     // python
     private PythonInterpreter pythonInterpreter = null;
-    private final Properties pythonProps = new Properties();
     private ScriptGhostDifficulty difficulty;
     private GameMap gameMap;
 
@@ -139,14 +141,6 @@ public class ScriptGhost extends Mob implements Runnable {
                     }
                     newMove = executeMovementSkriptDifficult(pythonList);
                 }
-
-                if (difficulty == ScriptGhostDifficulty.EASY) {
-                    pythonInterpreter.exec("from GhostMovementSkript import choose_next_square");
-                } else {
-                    pythonInterpreter.exec("from SmartGhostMovementSkript import choose_next_square");
-                }
-
-                // set new square to move to
                 setNewPosition(newMove);
                 log.debug("New position is x {} z {}", this.ghostPosX, this.ghostPosZ);
             }
@@ -229,33 +223,23 @@ public class ScriptGhost extends Mob implements Runnable {
      */
     public void initJython() {
         this.pythonInterpreter = new PythonInterpreter();
-        String scriptPath = "";
-
-        try {
-            if(this.difficulty == ScriptGhostDifficulty.EASY) {
-                scriptPath = Paths.get("extensions/ghost/GhostMovementSkript.py").normalize().toAbsolutePath().toString();
-            } else {
-                scriptPath = Paths.get("extensions/ghost/SmartGhostMovementSkript.py").normalize().toAbsolutePath().toString();
-            }
-            log.debug("Resolved script path: {}", scriptPath);
-
-            // Get the directory of the script (without the .)
-            String scriptDir = Paths.get(scriptPath).getParent().toString();
-            this.pythonInterpreter.exec("import sys");
-            this.pythonInterpreter.exec(String.format("sys.path.append('%s')", scriptDir.replace("\\", "\\\\")));
-            // Log sys.path to ensure it's correct
-            this.pythonInterpreter.exec("import sys; print(sys.path)");
-            // Execute the Python script
-            this.pythonInterpreter.execfile(scriptPath);
-
-        } catch (Exception ex) {
-            log.error("Error initializing {} exception is: ", scriptPath, ex);
-        }
+        pythonInterpreter.exec("import sys");
+        URL path = SnackmanApplication.class.getProtectionDomain().getCodeSource().getLocation();
+        String jarClassesPath = path.getPath().replace("nested:", "").replace("!", "");
+        pythonInterpreter.exec("if './extensions/chicken' not in sys.path: sys.path.insert(0, './extensions/chicken')");
+        pythonInterpreter.exec("if './extensions/ghost' not in sys.path: sys.path.insert(0, './extensions/ghost')");
+        pythonInterpreter.exec("if './extensions/maze' not in sys.path: sys.path.insert(0, './extensions/maze')");
+        pythonInterpreter.exec("if './extensions' not in sys.path: sys.path.insert(0, './extensions')");
+        pythonInterpreter.exec("if '.' not in sys.path: sys.path.insert(0, '.')");
+        pythonInterpreter.exec("if '" + jarClassesPath + "/chicken' not in sys.path: sys.path.append('" + jarClassesPath + "/chicken')");
+        pythonInterpreter.exec("if '" + jarClassesPath + "/ghost' not in sys.path: sys.path.append('" + jarClassesPath + "/ghost')");
+        pythonInterpreter.exec("if '" + jarClassesPath + "/maze' not in sys.path: sys.path.append('" + jarClassesPath + "/maze')");
+        pythonInterpreter.exec("if '" + jarClassesPath + "/Lib' not in sys.path: sys.path.append('" + jarClassesPath + "/Lib')");
 
         if(this.difficulty == ScriptGhostDifficulty.EASY) {
-            this.pythonInterpreter.exec("from GhostMovementSkript import choose_next_square");
+            this.pythonInterpreter.exec("from " + GameConfig.GHOST_SCRIPT_EASY + " import choose_next_square");
         } else {
-            this.pythonInterpreter.exec("from SmartGhostMovementSkript import choose_next_square");
+            this.pythonInterpreter.exec("from " + GameConfig.GHOST_SCRIPT_HARD + " import choose_next_square");
         }
     }
 
