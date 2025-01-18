@@ -7,19 +7,19 @@ import { createI18n } from 'vue-i18n'
 import App from './App.vue'
 import router from './router'
 
-const i18n = createI18n({
+export const i18n = createI18n({
   legacy: false,
-  locale: 'en',
-  fallbackLocale: 'en',
+  locale: 'en' as 'en' | 'de',
+  fallbackLocale: 'en' as 'en' | 'de',
   messages: {
     en: {
       message: {
         hello: 'hello world'
       }
     },
-    ja: {
+    de: {
       message: {
-        hello: 'こんにちは、世界'
+        hello: 'Hallo Welt'
       }
     }
   }
