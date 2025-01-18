@@ -70,8 +70,6 @@ def choose_next_square(squares_liste):
         # choose random square, no snacks there + no ghosts
         return add_walking_direction(choose_random_square(solution_liste, EMPTY, direction))
 
-def getWaitingTime():
-    return 2000
 
 def eliminate_walls_as_options(squares):
     """

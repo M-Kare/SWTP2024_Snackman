@@ -14,6 +14,7 @@ import java.util.*;
 
 import de.hsrm.mi.swt.snackman.entities.map.GameMap;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.ScriptGhost;
+import de.hsrm.mi.swt.snackman.entities.mobileObjects.ScriptGhostDifficulty;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken.Chicken;
 import de.hsrm.mi.swt.snackman.messaging.MessageLoop.MessageLoop;
 import org.slf4j.Logger;
@@ -68,7 +69,7 @@ public class LobbyManagerService {
      * @return The lobby created
      * @throws LobbyAlreadyExistsException
      */
-    public Lobby createLobby(String name, PlayerClient admin, MessageLoop messageLoop) throws LobbyAlreadyExistsException {
+    public Lobby createLobby(String name, PlayerClient admin, MessageLoop messageLoop, String difficulty) throws LobbyAlreadyExistsException {
         if (lobbies.values().stream().anyMatch(lobby -> lobby.getName().equals(name))) {
             throw new LobbyAlreadyExistsException("Lobby name already exists");
         }
@@ -77,7 +78,8 @@ public class LobbyManagerService {
         var uuid = UUID.randomUUID().toString();
         GameMap gameMap = this.mapService.createNewGameMap(uuid);
 
-        Lobby lobby = new Lobby(uuid, name, admin, gameMap, messageLoop);
+        ScriptGhostDifficulty scriptGhostDifficulty = ScriptGhostDifficulty.getScriptGhostDifficulty(difficulty);
+        Lobby lobby = new Lobby(uuid, name, admin, gameMap, messageLoop, scriptGhostDifficulty);
         admin.setRole(ROLE.UNDEFINED);
 
         lobbies.put(lobby.getLobbyId(), lobby);
