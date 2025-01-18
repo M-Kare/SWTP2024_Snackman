@@ -6,12 +6,12 @@
       <h1 class="title">Choose your Character</h1>
       <div class="character-grid">
         <div
-          v-for="button in buttons"
-          :key="button.id"
-          @click="selectCharacter(button)"
-          class="character-item"
-          :class="{ 'selected': button.selected }"
-          :style="button.selected ? { opacity: 0.3, cursor: 'not-allowed' } : {}"
+            v-for="button in buttons"
+            :key="button.id"
+            :class="{ 'selected': button.selected }"
+            :style="button.selected ? { opacity: 0.3, cursor: 'not-allowed' } : {}"
+            class="character-item"
+            @click="selectCharacter(button)"
         >
           <div class="image-container"
                :style="button.selected ? { pointerEvents: 'none' } : {}">
@@ -20,15 +20,16 @@
           <p class="character-name">{{ button.name }}</p>
         </div>
       </div>
+      <div id="button-box">
+        <SmallNavButton
+            id="start-game-button"
+            class="small-nav-buttons"
+            @click="startGame"
+        >
+          Start Game
+        </SmallNavButton>
+      </div>
     </div>
-
-    <SmallNavButton
-      id="start-game-button"
-      class="small-nav-buttons"
-      @click="startGame"
-    >
-      Start Game
-    </SmallNavButton>
 
     <PopUp v-if="showPopUp" class="popup-box" @hidePopUp="hidePopUp">
       <p class="info-heading">Can't start the game</p>
@@ -148,8 +149,8 @@ const startGame = async () => {
 
 
   const playerId = lobbiesStore.lobbydata.currentPlayer.playerId
-  let snackmanCounter:number = 0
-  let memberCounter :number = 0
+  let snackmanCounter: number = 0
+  let memberCounter: number = 0
   const lobby = lobbiesStore.lobbydata.lobbies.find(lobby => lobby.lobbyId === lobbyId)
   const player = lobbiesStore.lobbydata.currentPlayer
 
@@ -168,21 +169,19 @@ const startGame = async () => {
     }
     lobby.members.forEach(member => {
       if (member.role === 'UNDEFINED') {
-        showPopUp.value= true
+        showPopUp.value = true
         darkenBackground.value = true
         infoText.value = 'Every Player has to choose a Role!'
         return
-      }
-      else if(member.role === 'SNACKMAN'){
-        snackmanCounter ++
+      } else if (member.role === 'SNACKMAN') {
+        snackmanCounter++
         memberCounter++
-      }
-      else if(member.role ==='GHOST'){
-        memberCounter ++
+      } else if (member.role === 'GHOST') {
+        memberCounter++
       }
     })
 
-    if ( snackmanCounter === 1 && memberCounter === lobby.members.length){
+    if (snackmanCounter === 1 && memberCounter === lobby.members.length) {
       await lobbiesStore.startGame(lobby.lobbyId)
       buttons.forEach(button => button.selected = false)
       buttons.forEach(button => button.selectedBy = '')
@@ -191,12 +190,11 @@ const startGame = async () => {
       await router.push({
         name: 'GameView',
         query: {
-          role: lobbiesStore.lobbydata.currentPlayer.role ,
+          role: lobbiesStore.lobbydata.currentPlayer.role,
           lobbyId: lobbiesStore.lobbydata.currentPlayer.joinedLobbyId,
         },
       })
-    }
-    else {
+    } else {
       showPopUp.value = true
       darkenBackground.value = true
       infoText.value = 'There must be exactly one SnackMan and all players must have a role!'
@@ -221,7 +219,7 @@ const changeUsedMapStatus = async (lobbyId: string, usedCustomMap: boolean): Pro
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ lobbyId, usedCustomMap })
+      body: JSON.stringify({lobbyId, usedCustomMap})
     });
 
     if (!response.ok) {
@@ -240,7 +238,7 @@ const changeUsedMapStatus = async (lobbyId: string, usedCustomMap: boolean): Pro
 watchEffect(() => {
   if (lobbiesStore.lobbydata && lobbiesStore.lobbydata.lobbies) {
     const updatedLobby = lobbiesStore.lobbydata.lobbies.find(
-      l => l.lobbyId === lobbyUrl,
+        l => l.lobbyId === lobbyUrl,
     )
     if (updatedLobby) {
 
@@ -251,7 +249,7 @@ watchEffect(() => {
         router.push({
           name: 'GameView',
           query: {
-            role: lobbiesStore.lobbydata.currentPlayer.role ,
+            role: lobbiesStore.lobbydata.currentPlayer.role,
             lobbyId: lobbiesStore.lobbydata.currentPlayer.joinedLobbyId,
           },
         })
@@ -270,28 +268,23 @@ watchEffect(() => {
   color: var(--background-for-text-color);
 }
 
-.outer-box {
-  position: absolute;
-  top: 30%;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 70vw;
-  max-width: 1000px;
-  height: 30rem;
-  max-height: 45rem;
-  background: rgba(255, 255, 255, 60%);
-  border-radius: 0.5rem;
+#button-box {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  padding: 3% 0;
 }
 
-.inner-box > ul {
-  list-style: none;
-  display: flex;
-  flex-direction: column;
+.outer-box {
+  position: absolute;
+  top: 25%;
   left: 50%;
   transform: translateX(-50%);
-  margin: 0;
-  padding: 0;
-  width: 100%;
+  width: 90%;
+  height: 60%;
+  background: rgba(255, 255, 255, 60%);
+  border-radius: 0.5rem;
+  padding: 0 20px;
 }
 
 .character-grid {
@@ -312,17 +305,22 @@ watchEffect(() => {
 }
 
 .character-item {
+  height: 100%;
+  padding: 10px;
   background: rgba(255, 255, 255, 70%);
   text-align: center;
   cursor: pointer;
   display: flex;
   flex-direction: column;
-  height: 100%;
+}
+
+.character-item:hover {
+  background-color: var(--primary-highlight-color);
 }
 
 .character-item.selected {
-  opacity: 0.3;
   cursor: not-allowed;
+  background-color: var(--primary-highlight-color);
 }
 
 .image-container {
@@ -342,27 +340,46 @@ watchEffect(() => {
 .character-name {
   font-weight: bold;
   color: #000000;
+  margin: 0;
 }
 
+#start-game-button:hover {
+  background-color: var(--primary-highlight-color);
+}
 
-@media (max-width: 800px) {
+@media (max-width: 1300px) {
+  .character-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 5fr);
+  }
+}
+
+@media (max-width: 1000px) {
   .title {
-    width: 100%;
     top: 0.5rem;
-    text-align: center;
-    font-size: 40px;
-    font-weight: bold;
-    color: var(--background-for-text-color);
+    font-size: 60px;
   }
 
   .character-grid {
     display: grid;
     grid-template-columns: repeat(3, 5fr);
-    grid-gap: 20px;
+  }
+}
+
+@media (max-width: 800px) {
+  .outer-box {
+    height: 70%;
+    top: 23%;
   }
 
-  #start-game-button:hover {
-    background-color: var(--primary-highlight-color);
+  .title {
+    top: 0.5rem;
+    font-size: 40px;
+  }
+
+  .character-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 5fr);
   }
 }
 </style>
