@@ -103,7 +103,7 @@ export const GameMapRenderer = () => {
         DEFAULT_SIDE_LENGTH
       ).then((scriptGhostToAdd) => {
         scene.add(scriptGhostToAdd)
-        gameMapStore.setScriptGhostModel(scriptGhostToAdd, currentGhost.id)
+        gameMapStore.setScriptGhostMeshId(scriptGhostToAdd.id, currentGhost.id)
       })
     }
   }

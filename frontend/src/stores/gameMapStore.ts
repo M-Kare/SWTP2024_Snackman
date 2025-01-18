@@ -350,23 +350,22 @@ export const useGameMapStore = defineStore('gameMap', () => {
   }
 
   function updateLookingDirectionScriptGhost(currentScriptGhost: IScriptGhost, scriptGhostUpdate: IScriptGhostDTD) {
-    console.log("ScriptGhost looking direction updated")
+    const scriptGhostMesh = scene.getObjectById(currentScriptGhost.meshId)
     currentScriptGhost.lookingDirection = Direction[scriptGhostUpdate.lookingDirection as unknown as keyof typeof Direction]
     switch (currentScriptGhost.lookingDirection) {
       case Direction.ONE_NORTH:
-        currentScriptGhost.model.rotation.y = Math.PI/2
+        scriptGhostMesh.rotation.y = Math.PI/2
         break;
       case Direction.ONE_SOUTH:
-        currentScriptGhost.model.rotation.y = (3*Math.PI)/2
+        scriptGhostMesh.rotation.y = (3*Math.PI)/2
         break;
       case Direction.ONE_EAST:
-        currentScriptGhost.model.rotation.y = Math.PI
+        scriptGhostMesh.rotation.y = Math.PI
         break
       case Direction.ONE_WEST:
-        currentScriptGhost.model.rotation.y = 0
+        scriptGhostMesh.rotation.y = 0
         break
     }
-    console.log("Look direction: " + (+scriptGhostUpdate.lookingDirection), " Rotation: " + currentScriptGhost.model.rotation.x , currentScriptGhost.model.rotation.y, currentScriptGhost.model.rotation.z)
   }
 
   function updateWalkingDirection(
@@ -389,10 +388,11 @@ export const useGameMapStore = defineStore('gameMap', () => {
   }
 
   function updateWalkingDirectionScriptGhost(currentScriptGhost: IScriptGhost, scriptGhostUpdate: IScriptGhostDTD, DEFAULT_SIDE_LENGTH: number, OFFSET: number) {
+    const scriptGhostMesh = scene.getObjectById(currentScriptGhost.meshId)
     currentScriptGhost.scriptGhostPosX = scriptGhostUpdate.scriptGhostPosX
     currentScriptGhost.scriptGhostPosZ = scriptGhostUpdate.scriptGhostPosZ
 
-    currentScriptGhost.model.position.set(currentScriptGhost.scriptGhostPosX * DEFAULT_SIDE_LENGTH + OFFSET, 0, currentScriptGhost.scriptGhostPosZ * DEFAULT_SIDE_LENGTH + OFFSET)
+    scriptGhostMesh!.position.set(currentScriptGhost.scriptGhostPosX * DEFAULT_SIDE_LENGTH + OFFSET, 0, currentScriptGhost.scriptGhostPosZ * DEFAULT_SIDE_LENGTH + OFFSET)
   }
 
   function setSnackMeshId(squareId: number, meshId: number) {
@@ -406,10 +406,10 @@ export const useGameMapStore = defineStore('gameMap', () => {
     if (chicken != undefined) chicken.meshId = meshId
   }
 
-  function setScriptGhostModel(model: THREE.Group, ghostId: number) {
+  function setScriptGhostMeshId(meshId: number, ghostId: number) {
     const ghost = mapData.scriptGhosts.find(ghost => ghost.id === ghostId);
     if (ghost != undefined)
-      ghost.model = model
+      ghost.meshId = meshId
   }
 
   function removeMeshFromScene(scene: Scene, meshId: number) {
@@ -433,6 +433,6 @@ export const useGameMapStore = defineStore('gameMap', () => {
     setPlayer,
     setOtherPlayers,
     stompclient: stompclient,
-    setScriptGhostModel,
+    setScriptGhostMeshId,
   };
 })
