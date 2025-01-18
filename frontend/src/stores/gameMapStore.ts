@@ -305,19 +305,19 @@ export const useGameMapStore = defineStore('gameMap', () => {
 
     switch (thicknessValue) {
       case ChickenThickness.THIN:
-        chickenMesh!.scale.set(1, 1, 1)
+        chickenMesh!.scale.set(ChickenThickness.THIN, ChickenThickness.THIN, ChickenThickness.THIN)
         break
       case ChickenThickness.SLIGHTLY_THICK:
-        chickenMesh!.scale.set(1.25, 1.25, 1.25)
+        chickenMesh!.scale.set(ChickenThickness.SLIGHTLY_THICK, ChickenThickness.SLIGHTLY_THICK, ChickenThickness.SLIGHTLY_THICK)
         break
       case ChickenThickness.MEDIUM:
-        chickenMesh!.scale.set(1.5, 1.5, 1.5)
+        chickenMesh!.scale.set(ChickenThickness.MEDIUM, ChickenThickness.MEDIUM, ChickenThickness.MEDIUM)
         break
       case ChickenThickness.HEAVY:
-        chickenMesh!.scale.set(1.75, 1.75, 1.75)
+        chickenMesh!.scale.set(ChickenThickness.HEAVY, ChickenThickness.HEAVY, ChickenThickness.HEAVY)
         break
       case ChickenThickness.VERY_HEAVY:
-        chickenMesh!.scale.set(2, 2, 2)
+        chickenMesh!.scale.set(ChickenThickness.VERY_HEAVY, ChickenThickness.VERY_HEAVY, ChickenThickness.VERY_HEAVY)
         break
       default:
         console.log('ETWAS IST SCHIED GELAUFEN...')

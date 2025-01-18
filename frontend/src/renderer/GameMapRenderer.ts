@@ -81,15 +81,15 @@ export const GameMapRenderer = () => {
     }
     // add chickens
     for (let currentChicken of mapData.chickens) {
-      const chickenToAdd = gameObjectRenderer.createChickenOnFloor(
+      gameObjectRenderer.createChickenOnFloor(
         currentChicken.chickenPosX * DEFAULT_SIDE_LENGTH + OFFSET,
         currentChicken.chickenPosZ * DEFAULT_SIDE_LENGTH + OFFSET,
-        DEFAULT_SIDE_LENGTH,
+        0,
         currentChicken.thickness,
-      )
-      scene.add(chickenToAdd)
-
-      gameMapStore.setChickenMeshId(chickenToAdd.id, currentChicken.id)
+      ).then((chickenToAdd) =>{
+        scene.add(chickenToAdd)
+        gameMapStore.setChickenMeshId(chickenToAdd.id, currentChicken.id)
+      })
     }
 
     console.log("GameMap data ", mapData)
