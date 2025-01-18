@@ -271,9 +271,6 @@ public class ScriptGhost extends Mob implements Runnable {
     private void scaresEverythingThatCouldBeEncountered(Square currentPosition, GameMap gameMap) {
         for (Mob mob : gameMap.getSquareAtIndexXZ(currentPosition.getIndexX(), currentPosition.getIndexZ()).getMobs()) {
             switch (mob) {
-                case SnackMan snackMan:
-                    snackMan.isScaredFromGhost();
-                    break;
                 case Chicken chicken:
                     chicken.isScaredFromGhost(true);
                     break;

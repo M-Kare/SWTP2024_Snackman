@@ -29,8 +29,10 @@
 
 <script setup lang="ts">
 import SmallNavButton from '@/components/SmallNavButton.vue';
-import {ref} from 'vue';
+import {onMounted, ref} from 'vue';
 import {useLobbiesStore} from '@/stores/Lobby/lobbiesstore';
+import {SoundManager} from "@/services/SoundManager";
+import {SoundType} from "@/services/SoundTypes";
 
 const lobbiesStore = useLobbiesStore();
 
@@ -66,6 +68,10 @@ const savePlayerName = async () => {
 
     emit('hidePlayerNameForm');
     emit('playerNameSaved', playerName.value);
+
+    await SoundManager.initBackgroundMusicManager()
+    SoundManager.stopAllInGameSounds()
+    SoundManager.playSound(SoundType.LOBBY_MUSIC)
   } catch (error) {
     alert("Error saving playername");
     console.error(error);

@@ -24,6 +24,8 @@ import PlayerNameForm from '@/components/PlayerNameForm.vue';
 import {useRouter} from 'vue-router'
 import {onMounted, ref} from 'vue';
 import type {ILobbyDTD} from "@/stores/Lobby/ILobbyDTD";
+import {SoundManager} from "@/services/SoundManager";
+import {SoundType} from "@/services/SoundTypes";
 
 const router = useRouter()
 const lobbiesStore = useLobbiesStore()
@@ -38,7 +40,7 @@ const hidePlayerNameForm = () => {
 }
 
 const showLobbies = () => {
-  router.push({ name: 'LobbyListView' })
+  router.push({name: 'LobbyListView'})
 }
 
 const showLeaderboard = () => {
@@ -71,6 +73,8 @@ onMounted(() => {
     darkenBackground.value = true;
     showPlayerNameForm.value = true;
   }
+
+  SoundManager.playSound(SoundType.LOBBY_MUSIC)
 })
 </script>
 
