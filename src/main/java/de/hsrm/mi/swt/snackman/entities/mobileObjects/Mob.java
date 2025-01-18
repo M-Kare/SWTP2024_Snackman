@@ -1,9 +1,10 @@
 package de.hsrm.mi.swt.snackman.entities.mobileObjects;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import de.hsrm.mi.swt.snackman.entities.map.GameMap;
+
 import org.joml.Quaterniond;
 import org.joml.Vector3d;
+
 import de.hsrm.mi.swt.snackman.configuration.GameConfig;
 import de.hsrm.mi.swt.snackman.entities.map.Square;
 import de.hsrm.mi.swt.snackman.entities.mapObject.MapObjectType;
@@ -34,8 +35,6 @@ public abstract class Mob {
                 (gameMap.getGameMapSquares()[0].length / 2.0) * GameConfig.SQUARE_SIZE);
         position = new Vector3d(spawn);
         quat = new Quaterniond();
-        setCurrentSquareWithIndex(position.x, position.z);
-        setPositionWithIndexXZ(position.x, position.z);
         id = generateId();
     }
 
@@ -115,20 +114,6 @@ public abstract class Mob {
     public Quaterniond getRotationQuaternion(){
         return this.quat;
     }
-    /**
-     * Calculates the square-indices to set the currentSquare
-     *
-     * @param x x-position
-     * @param z z-position
-     */
-    public void setCurrentSquareWithIndex(double x, double z) {
-        setPositionWithIndexXZ(calcMapIndexOfCoordinate(x), calcMapIndexOfCoordinate(z));
-    }
-
-    public void setPositionWithIndexXZ(double x, double z){
-        this.position.x = x;
-        this.position.z = z;
-    }
 
     /**
      * Moves the player based on inputs and passed time since last update (delta). Forward is relative to the rotation of the player and handled by a quaternion.
@@ -166,6 +151,9 @@ public abstract class Mob {
         move.z = move.z * delta * speed;
         double xNew = position.x + move.x;
         double zNew = position.z + move.z;
+        if (gameMap.getSquareAtIndexXZ(calcMapIndexOfCoordinate(xNew), calcMapIndexOfCoordinate(zNew)).getType() == MapObjectType.WALL) {
+            return;
+        }
         try {
             result = checkWallCollision(xNew, zNew, gameMap);
         } catch (IndexOutOfBoundsException e) {
@@ -179,16 +167,39 @@ public abstract class Mob {
                 break;
             case 1:
                 position.z += move.z;
+                position.x += move.x;
+                if (Math.round(position.x) < position.x) {
+                    position.x = Math.round(position.x) + this.radius;
+                } else {
+                    position.x = Math.round(position.x) - this.radius;
+                }
                 break;
             case 2:
                 position.x += move.x;
+                position.z += move.z;
+                if (Math.round(position.z) < position.z) {
+                    position.z = Math.round(position.z) + this.radius;
+                } else {
+                    position.z = Math.round(position.z) - this.radius;
+                }
                 break;
             case 3:
-                return;
+                position.x += move.x;
+                position.z += move.z;
+                if (Math.round(position.x) < position.x) {
+                    position.x = Math.round(position.x) + this.radius;
+                } else {
+                    position.x = Math.round(position.x) - this.radius;
+                }
+                if (Math.round(position.z) < position.z) {
+                    position.z = Math.round(position.z) + this.radius;
+                } else {
+                    position.z = Math.round(position.z) - this.radius;
+                }
+                break;
             default:
                 break;
         }
-        setPositionWithIndexXZ(position.x, position.z);
     }
 
     public Quaterniond getQuat() {
@@ -201,7 +212,6 @@ public abstract class Mob {
     public void respawn() {
         this.position.x = spawn.x;
         this.position.z = spawn.z;
-        setCurrentSquareWithIndex(position.x, position.z);
 
     /*
     TODO unterschied zwischen snackman und geistern beachten in konstructor ändern!!
@@ -228,9 +238,6 @@ public abstract class Mob {
      * 3 = both / diagonal collision / corner
      */
     public int checkWallCollision(double x, double z, GameMap gameMap) throws IndexOutOfBoundsException {
-        if (gameMap.getSquareAtIndexXZ(calcMapIndexOfCoordinate(x), calcMapIndexOfCoordinate(z)).getType() == MapObjectType.WALL) {
-            return 3;
-        }
 
         int collisionCase = 0;
         Square currentSquare = gameMap.getSquareAtIndexXZ(calcMapIndexOfCoordinate(x), calcMapIndexOfCoordinate(z));
@@ -276,7 +283,7 @@ public abstract class Mob {
             double diagZ = verticalRelativeToCenter > 0 ? (currentSquare.getIndexZ() + 1) * GameConfig.SQUARE_SIZE
                     : currentSquare.getIndexZ() * GameConfig.SQUARE_SIZE;
             double dist = Math.sqrt((diagX - x) * (diagX - x) + (diagZ - z) * (diagZ - z));
-            if (dist <= this.radius)
+            if (dist < this.radius)
                 collisionCase = 3;
         }
 
@@ -295,7 +302,7 @@ public abstract class Mob {
     public boolean calcIntersectionWithLine(double xNew, double zNew, Vector3d origin, Vector3d direction) {
         Vector3d line = origin.cross(direction);
         double dist = Math.abs(line.x * xNew + line.y * zNew + line.z) / Math.sqrt(line.x * line.x + line.y * line.y);
-        return dist <= this.radius;
+        return dist < this.radius;
     }
 
     public void setQuaternion(double qX, double qY, double qZ, double qW) {
