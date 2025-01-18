@@ -13,5 +13,5 @@ export interface IScriptGhost {
   scriptGhostPosX: number,
   scriptGhostPosZ: number,
   lookingDirection: Direction,
-  model: THREE.Group
+  meshId: number
 }
