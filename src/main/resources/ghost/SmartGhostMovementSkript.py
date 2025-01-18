@@ -27,10 +27,12 @@
 #    returns: indexOfNextPosition
 import heapq  # This module provides an implementation of the heap queue algorithm
 
+
 WALL = 'W'
 EMPTY = 'L'
 GHOST = 'G'
 SNACKMAN = 'M'
+
 
 def choose_next_square(labyrinth):
     """
@@ -38,16 +40,28 @@ def choose_next_square(labyrinth):
     :param labyrinth: Which the ghost can see
     :return: the index of the next cardinal point
     """
+    ghost_position = find_target_position(labyrinth, GHOST)   # (x, z)
+    snackman_position = find_target_position(labyrinth, SNACKMAN)    # (x, z)
 
-    ghost_position = find_ghost_position(labyrinth)   # (x, z)
-    snackman_position = find_snackman_position(labyrinth)    # (x, z)
+    # if either ghost or snackman cannot be found -> walk one step randomly
+    if ghost_position is None:
+        ghost_position = (0, 0)
+    if snackman_position is None:
+        snackman_position = (0, 0)
+
+    print("Start")
+    print(labyrinth)
+    print(ghost_position)
+    print(snackman_position)
+    print("Ende")
 
     return choose_next_square_finding_snackman(labyrinth, ghost_position, snackman_position)
+
 
 def find_snackman_position(maze):
     """
     calculates the snackmans position
-    :param maze: the labyrinth that the snackmans can see from where he is standing
+    :param maze: the labyrinth that the ghost can see from where he is standing
     :return: row and column index of the snackmans position
     """
     for row_index, row in enumerate(maze):
@@ -55,6 +69,7 @@ def find_snackman_position(maze):
             if cell == SNACKMAN:
                 return row_index, col_index
     return None
+
 
 def find_ghost_position(maze):
     """
@@ -67,6 +82,20 @@ def find_ghost_position(maze):
             if cell == GHOST:
                 return row_index, col_index
     return None
+
+
+def find_target_position(maze, target):
+    """
+    calculates the targets position
+    :param maze: the labyrinth that the ghost can see from where he is standing
+    :return: row and column index of the targets position
+    """
+    for row_index, row in enumerate(maze):
+        for col_index, cell in enumerate(row):
+            if cell == target:
+                return row_index, col_index
+    return None
+
 
 def choose_next_square_finding_snackman(labyrinth, ghostPosition, snackmanPosition):
     """
