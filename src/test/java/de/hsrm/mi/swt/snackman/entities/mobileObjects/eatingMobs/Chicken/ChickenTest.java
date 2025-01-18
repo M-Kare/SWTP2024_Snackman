@@ -101,6 +101,26 @@ class ChickenTest {
     }
 
     @Test
+    void testCalculateEggCalories_AboveMinimum() {
+        Square square = new Square(MapObjectType.FLOOR, 0, 0);
+
+        Chicken chicken = new Chicken(square, gameMap, "ChickenMovementSkript");
+        chicken.setKcal(2000);
+
+        assertEquals(600, chicken.calculateEggCalories(), "Egg calories should be 30 % of 2000, which is 600");
+    }
+
+    @Test
+    void testCalculateEggCalories_eggShouldBeHaveMaximumCalories() {
+        Square square = new Square(MapObjectType.FLOOR, 0, 0);
+
+        Chicken chicken = new Chicken(square, gameMap, "ChickenMovementSkript");
+        chicken.setKcal(chicken.getMAX_CALORIES());
+
+        assertEquals(900, chicken.calculateEggCalories(), "Egg calories should be 30 % of max. chicken-kcal, which is 900");
+    }
+
+    @Test
     void testLayEgg_ChickenThicknessAndKcalReset_caseIfChickenHasNoKcal() {
         Square square = new Square(MapObjectType.FLOOR, 0, 0);
         Chicken chicken = new Chicken(square, gameMap, "ChickenMovementSkript");

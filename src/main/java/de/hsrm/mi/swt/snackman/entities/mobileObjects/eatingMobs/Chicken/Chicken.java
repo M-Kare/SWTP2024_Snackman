@@ -495,4 +495,8 @@ public class Chicken extends EatingMob implements Runnable {
     public void setWalking(boolean walking) {
         isWalking = walking;
     }
+
+    public int getMAX_CALORIES() {
+        return MAX_CALORIES;
+    }
 }
