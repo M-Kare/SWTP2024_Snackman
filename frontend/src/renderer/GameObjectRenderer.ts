@@ -11,9 +11,10 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 export const GameObjectRenderer = () => {
   const GROUNDSIZE = 1000
   const loader = new GLTFLoader()
-
-  let ghostModel: THREE.Group | null = null 
   const ghostGLB = "/ghost.glb"
+  const chickenGLB = "/chicken.glb"
+  let ghostModel: THREE.Group | null = null 
+  let chickenModel: THREE.Group | null = null
 
   const snackModels = {
     [SnackType.STRAWBERRY]: "/strawberry.glb",
@@ -81,57 +82,78 @@ export const GameObjectRenderer = () => {
     return clonedSnack;
   }
 
-  const createChickenOnFloor = (
+  async function createChickenOnFloor(
     xPosition: number,
     zPosition: number,
-    sideLength: number,
+    yPosition: number,
     thickness: ChickenThickness,
-  ) => {
-    const color = 'black'
-    const CHICKEN_WIDTH_AND_DEPTH = sideLength / 2
-    const CHICKEN_HEIGHT = 15
-    const scale =
-      ChickenThickness[thickness as unknown as keyof typeof ChickenThickness]
-
-    //@TODO add correct chicken-material-design
-    const chickenMaterial = new THREE.MeshStandardMaterial({ color: color })
-    const chickenGeometry = new THREE.BoxGeometry(
-      CHICKEN_WIDTH_AND_DEPTH * scale,
-      CHICKEN_HEIGHT,
-      CHICKEN_WIDTH_AND_DEPTH * scale,
-    )
-    const chicken = new THREE.Mesh(chickenGeometry, chickenMaterial)
-    chicken.castShadow = true
-    chicken.receiveShadow = true
-
-    chicken.position.set(xPosition, 0, zPosition)
-
-    return chicken
+  ): Promise<THREE.Group> {  
+    const scale = ChickenThickness[thickness as unknown as keyof typeof ChickenThickness]
+    // If the model is already loaded, clone it
+    if (chickenModel) {
+      const clonedChicken = chickenModel.clone()
+      clonedChicken.position.set(xPosition, yPosition, zPosition)
+      clonedChicken.scale.set(scale, scale, scale)
+      clonedChicken.castShadow = true
+      clonedChicken.receiveShadow = true
+      return clonedChicken
+    }
+  
+    // Load model asynchronously and replace placeholder
+    return new Promise((resolve, reject) => {
+      loader.load(
+        chickenGLB,
+        (gltf) => {
+          chickenModel = gltf.scene
+          chickenModel.position.set(xPosition, yPosition, zPosition)
+          chickenModel.scale.set(scale, scale, scale)
+          chickenModel.castShadow = true
+          chickenModel.receiveShadow = true
+          resolve(chickenModel.clone())
+        },
+        undefined,
+      )
+    })
   }
+  //   xPosition: number,
+  //   zPosition: number,
+  //   sideLength: number,
+  //   thickness: ChickenThickness,
+  // ) => {
+  //   const color = 'black'
+  //   const CHICKEN_WIDTH_AND_DEPTH = sideLength / 2
+  //   const CHICKEN_HEIGHT = 15
+  //   const scale =
+  //     ChickenThickness[thickness as unknown as keyof typeof ChickenThickness]
+
+  //   //@TODO add correct chicken-material-design
+  //   const chickenMaterial = new THREE.MeshStandardMaterial({ color: color })
+  //   const chickenGeometry = new THREE.BoxGeometry(
+  //     CHICKEN_WIDTH_AND_DEPTH * scale,
+  //     CHICKEN_HEIGHT,
+  //     CHICKEN_WIDTH_AND_DEPTH * scale,
+  //   )
+  //   const chicken = new THREE.Mesh(chickenGeometry, chickenMaterial)
+  //   chicken.castShadow = true
+  //   chicken.receiveShadow = true
+
+  //   chicken.position.set(xPosition, 0, zPosition)
+
+  //   return chicken
 
   async function createGhostOnFloor(
     xPosition: number,
     zPosition: number,
     yPosition: number,
     sideLength: number
-  ): Promise<THREE.Object3D> {
-    const placeholder = new THREE.Mesh(
-      new THREE.SphereGeometry(0.5, 16, 16),
-      new THREE.MeshStandardMaterial({ color: 'gray', opacity: 0.5, transparent: true })
-    )
-    placeholder.position.set(xPosition, yPosition, zPosition)
-  
+  ): Promise<THREE.Group> {  
     // If the model is already loaded, clone it
     if (ghostModel) {
       const clonedGhost = ghostModel.clone()
       clonedGhost.position.set(xPosition, yPosition, zPosition)
       clonedGhost.scale.set(0.5, 0.5, 0.5)
-      clonedGhost.traverse((child: any) => {
-        if (child.isMesh) {
-          child.castShadow = true
-          child.receiveShadow = true
-        }
-      })
+      clonedGhost.castShadow = true
+      clonedGhost.receiveShadow = true
       return clonedGhost
     }
   
@@ -143,12 +165,8 @@ export const GameObjectRenderer = () => {
           ghostModel = gltf.scene
           ghostModel.position.set(xPosition, yPosition, zPosition)
           ghostModel.scale.set(0.5, 0.5, 0.5)
-          ghostModel.traverse((child: any) => {
-            if (child.isMesh) {
-              child.castShadow = true
-              child.receiveShadow = true
-            }
-          })
+          ghostModel.castShadow = true
+          ghostModel.receiveShadow = true
           resolve(ghostModel.clone())
         },
         undefined,
@@ -218,10 +236,10 @@ export const GameObjectRenderer = () => {
 
     const wallMaterial = new THREE.MeshStandardMaterial({
                                   map: wallTexture,
-                                  color: 0xFFDE9D,
+                                  color: 0xffd133,
                                   emissive: 0x000000,
-                                  roughness: 0.7,
-                                  metalness: 0.1,
+                                  emissiveIntensity: 0.5,
+                                  roughness: 0.9,
                                 })
     const wallGeometry = new THREE.BoxGeometry(sideLength, height, sideLength)
     const wall = new THREE.Mesh(wallGeometry, wallMaterial)

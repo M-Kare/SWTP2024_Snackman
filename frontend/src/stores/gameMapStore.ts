@@ -72,6 +72,7 @@ export const useGameMapStore = defineStore('gameMap', () => {
       }
 
       for (const ghost of response.scriptGhosts) {
+        console.log("GHOST INIT: " + ghost.lookingDirection)
         mapData.scriptGhosts.push(ghost as IScriptGhost)
       }
     } catch (reason) {
@@ -174,6 +175,7 @@ export const useGameMapStore = defineStore('gameMap', () => {
                 break;
               case EventType.ScriptGhostUpdate:
                 const scriptGhostUpdate: IScriptGhostDTD = mess.message
+
                 updateScriptGhost(scriptGhostUpdate)
                 break;
               default:
@@ -305,19 +307,19 @@ export const useGameMapStore = defineStore('gameMap', () => {
 
     switch (thicknessValue) {
       case ChickenThickness.THIN:
-        chickenMesh!.scale.set(1, 1, 1)
+        chickenMesh!.scale.set(ChickenThickness.THIN, ChickenThickness.THIN, ChickenThickness.THIN)
         break
       case ChickenThickness.SLIGHTLY_THICK:
-        chickenMesh!.scale.set(1.25, 1.25, 1.25)
+        chickenMesh!.scale.set(ChickenThickness.SLIGHTLY_THICK  * 1.2, ChickenThickness.SLIGHTLY_THICK, ChickenThickness.SLIGHTLY_THICK * 1.2)
         break
       case ChickenThickness.MEDIUM:
-        chickenMesh!.scale.set(1.5, 1.5, 1.5)
+        chickenMesh!.scale.set(ChickenThickness.MEDIUM  * 1.3, ChickenThickness.MEDIUM, ChickenThickness.MEDIUM * 1.3)
         break
       case ChickenThickness.HEAVY:
-        chickenMesh!.scale.set(1.75, 1.75, 1.75)
+        chickenMesh!.scale.set(ChickenThickness.HEAVY  * 1.5, ChickenThickness.HEAVY, ChickenThickness.HEAVY * 1.4)
         break
       case ChickenThickness.VERY_HEAVY:
-        chickenMesh!.scale.set(2, 2, 2)
+        chickenMesh!.scale.set(ChickenThickness.VERY_HEAVY  * 2, ChickenThickness.VERY_HEAVY, ChickenThickness.VERY_HEAVY * 1.5)
         break
       default:
         console.log('ETWAS IST SCHIED GELAUFEN...')
@@ -330,30 +332,42 @@ export const useGameMapStore = defineStore('gameMap', () => {
   ) {
     const chickenMesh = scene.getObjectById(currentChicken.meshId)
 
-    currentChicken.lookingDirection = chickenUpdate.lookingDirection
+    currentChicken.lookingDirection = Direction[chickenUpdate.lookingDirection as unknown as keyof typeof Direction]
     switch (
       currentChicken.lookingDirection // rotates the chicken depending on what its looking direction is
       ) {
-      case Direction.NORTH || Direction.SOUTH:
-        chickenMesh!.setRotationFromEuler(new THREE.Euler(0))
+      case Direction.ONE_NORTH:
+        chickenMesh!.rotation.y = Math.PI/2
+        break;
+      case Direction.ONE_SOUTH:
+        chickenMesh!.rotation.y = (3*Math.PI)/2
+        break;
+      case Direction.ONE_EAST:
+        chickenMesh!.rotation.y = Math.PI
         break
-      case Direction.EAST || Direction.WEST:
-        chickenMesh!.setRotationFromEuler(new THREE.Euler(Math.PI / 2))
+      case Direction.ONE_WEST:
+        chickenMesh!.rotation.y = 0
         break
     }
   }
 
   function updateLookingDirectionScriptGhost(currentScriptGhost: IScriptGhost, scriptGhostUpdate: IScriptGhostDTD) {
     const scriptGhostMesh = scene.getObjectById(currentScriptGhost.meshId)
-
-    currentScriptGhost.lookingDirection = scriptGhostUpdate.lookingDirection
+    currentScriptGhost.lookingDirection = Direction[scriptGhostUpdate.lookingDirection as unknown as keyof typeof Direction]
+    if(!scriptGhostMesh) return;
     switch (currentScriptGhost.lookingDirection) {
-      case Direction.NORTH || Direction.SOUTH:
-        scriptGhostMesh!.setRotationFromEuler(new THREE.Euler(0))
+      case Direction.ONE_NORTH:
+        scriptGhostMesh!.rotation.y = Math.PI/2
         break;
-      case Direction.EAST || Direction.WEST:
-        scriptGhostMesh!.setRotationFromEuler(new THREE.Euler(Math.PI / 2))
+      case Direction.ONE_SOUTH:
+        scriptGhostMesh!.rotation.y = (3*Math.PI)/2
         break;
+      case Direction.ONE_EAST:
+        scriptGhostMesh!.rotation.y = Math.PI
+        break
+      case Direction.ONE_WEST:
+        scriptGhostMesh!.rotation.y = 0
+        break
     }
   }
 
@@ -378,7 +392,6 @@ export const useGameMapStore = defineStore('gameMap', () => {
 
   function updateWalkingDirectionScriptGhost(currentScriptGhost: IScriptGhost, scriptGhostUpdate: IScriptGhostDTD, DEFAULT_SIDE_LENGTH: number, OFFSET: number) {
     const scriptGhostMesh = scene.getObjectById(currentScriptGhost.meshId)
-
     currentScriptGhost.scriptGhostPosX = scriptGhostUpdate.scriptGhostPosX
     currentScriptGhost.scriptGhostPosZ = scriptGhostUpdate.scriptGhostPosZ
 

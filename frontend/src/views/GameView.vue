@@ -205,9 +205,8 @@ onMounted(async () => {
   SoundManager.playSound(SoundType.INGAME_BACKGROUND)
 })
 
-async function loadPlayerModel(playerId: string, role: string, textureOrRenderer: string | ReturnType<typeof GameObjectRenderer>) {
-  const loader = new GLTFLoader();
-
+// initially loads the playerModel (Snackman or Model) & attaches playerModel to playerCamera
+async function loadPlayerModel(playerId: string, role: string, gameObjectRenderer: ReturnType<typeof GameObjectRenderer>) {
   if (role === 'GHOST') {
     const gameObjectRenderer = textureOrRenderer as ReturnType<typeof GameObjectRenderer>;
     gameObjectRenderer
@@ -227,10 +226,6 @@ async function loadPlayerModel(playerId: string, role: string, textureOrRenderer
       snackManModel.position.set(playerData.posX, playerData.posY - 2, playerData.posZ);
       scene.add(snackManModel);
       playerHashMap.set(playerId, snackManModel);
-
-      // optional offset for thirdPersonView
-      // snackManModel.position.set(0, -1.55, -5);
-      // player.getCamera().add(snackManModel)
     });
   }
 }
