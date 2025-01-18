@@ -219,8 +219,7 @@ public class ScriptGhost extends Mob implements Runnable {
             pyListList.append(convertToPyStringList(list));
         }
         try {
-            log.info("Running python ghost script with: {}", pythonList.toString());
-            log.info("Skript: " + GameConfig.GHOST_SCRIPT_HARD);
+            log.debug("Running python ghost script with: {}", pythonList.toString());
             PyObject result = pythonInterpreter.eval(GameConfig.GHOST_SCRIPT_HARD + ".choose_next_square("+ pyListList +")");
             // PyObject result = func.__call__(new PyList(pythonList));
 
