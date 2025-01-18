@@ -121,7 +121,7 @@ public class MessageLoop {
             messagingTemplate.convertAndSend("/topic/lobbies/" + lobby.getLobbyId() + "/update", messages);
             long currentTime = System.currentTimeMillis();
             if ((currentTime - lobby.getTimeSinceLastSnackSpawn()) > GameConfig.TIME_FOR_SNACKS_TO_RESPAWN) {
-                this.mapService.respawnSnacks(lobbyService.getGameMapByLobbyId(lobby.getLobbyId()));
+                this.mapService.respawnSnacks(lobbyService.getGameMapByLobbyId(lobby.getLobbyId()), GameConfig.SNACK_SPAWN_RATE);
                 lobby.setTimeSinceLastSnackSpawn(System.currentTimeMillis());
             }
         }

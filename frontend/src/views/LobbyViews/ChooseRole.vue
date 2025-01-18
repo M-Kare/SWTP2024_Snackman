@@ -1,17 +1,17 @@
 <template>
   <MenuBackground></MenuBackground>
 
-  <h1 class="title">Choose Your Character</h1>
   <div class="outer-box">
     <div class="inner-box">
+      <h1 class="title">Choose your Character</h1>
       <div class="character-grid">
         <div
-          v-for="button in buttons"
-          :key="button.id"
-          @click="selectCharacter(button)"
-          class="character-item"
-          :class="{ 'selected': button.selected }"
-          :style="button.selected ? { opacity: 0.3, cursor: 'not-allowed' } : {}"
+            v-for="button in buttons"
+            :key="button.id"
+            :class="{ 'selected': button.selected }"
+            :style="button.selected ? { opacity: 0.3, cursor: 'not-allowed' } : {}"
+            class="character-item"
+            @click="selectCharacter(button)"
         >
           <div class="image-container"
                :style="button.selected ? { pointerEvents: 'none' } : {}">
@@ -20,16 +20,17 @@
           <p class="character-name">{{ button.name }}</p>
         </div>
       </div>
+      <div id="button-box">
+        <SmallNavButton
+            v-if="isPlayerAdmin"
+            id="start-game-button"
+            class="small-nav-buttons"
+            @click="startGame"
+        >
+          Start Game
+        </SmallNavButton>
+      </div>
     </div>
-
-    <SmallNavButton
-      v-if="isPlayerAdmin"
-      id="start-game-button"
-      class="small-nav-buttons"
-      @click="startGame"
-    >
-      Start Game
-    </SmallNavButton>
 
     <PopUp v-if="showPopUp" class="popup-box" @hidePopUp="hidePopUp">
       <p class="info-heading">Can't start the game</p>
@@ -47,13 +48,13 @@
 </template>
 
 <script setup lang="ts">
-import {computed, onMounted, reactive, ref, watchEffect} from 'vue';
+import {onMounted, ref, watchEffect, computed} from 'vue';
 import MenuBackground from '@/components/MenuBackground.vue';
 import SmallNavButton from '@/components/SmallNavButton.vue';
 import {useRoute, useRouter} from "vue-router";
 import PopUp from "@/components/PopUp.vue";
+import type {Button} from "@/stores/Lobby/lobbiesstore"
 import {useLobbiesStore} from "@/stores/Lobby/lobbiesstore";
-import type{Button} from "@/stores/Lobby/lobbiesstore"
 
 const route = useRoute()
 const router = useRouter()
@@ -72,6 +73,12 @@ const hidePopUp = () => {
 const lobbyUrl = route.params.lobbyId
 const infoHeading = ref()
 
+const isPlayerAdmin = computed(() => {
+  const currentPlayer = lobbiesStore.lobbydata.currentPlayer;
+  const lobby = lobbiesStore.lobbydata.lobbies.find(l => l.lobbyId === lobbyId);
+  return currentPlayer && lobby && currentPlayer.playerId === lobby.adminClient.playerId;
+})
+
 /**
  * Starts the game if the player is the admin and there are enough members in the lobby.
  * If the player is not the admin or there are not enough members, a popup will be shown.
@@ -82,13 +89,6 @@ const infoHeading = ref()
  */
 
 const selectedCharacter = ref<Button | null>(null);
-
-const isPlayerAdmin = computed(() => {
-  const currentPlayer = lobbiesStore.lobbydata.currentPlayer;
-  const lobby = lobbiesStore.lobbydata.lobbies.find(l => l.lobbyId === lobbyId);
-  return currentPlayer && lobby && currentPlayer.playerId === lobby.adminClient.playerId;
-})
-
 
 const selectCharacter = async (button: Button) => {
 
@@ -137,6 +137,7 @@ const selectCharacter = async (button: Button) => {
     darkenBackground.value = true;
   }
 }
+
 onMounted(async () => {
   await lobbiesStore.fetchLobbyById(lobbyId)
 
@@ -152,11 +153,9 @@ onMounted(async () => {
  * @throws {Error} If the player or lobby is not found.
  */
 const startGame = async () => {
-
-
   const playerId = lobbiesStore.lobbydata.currentPlayer.playerId
-  let snackmanCounter:number = 0
-  let memberCounter :number = 0
+  let snackmanCounter: number = 0
+  let memberCounter: number = 0
   const lobby = lobbiesStore.lobbydata.lobbies.find(lobby => lobby.lobbyId === lobbyId)
 
   if (!playerId || !lobby) {
@@ -174,21 +173,19 @@ const startGame = async () => {
     }
     lobby.members.forEach(member => {
       if (member.role === 'UNDEFINED') {
-        showPopUp.value= true
+        showPopUp.value = true
         darkenBackground.value = true
         infoText.value = 'Every Player has to choose a Role!'
         return
-      }
-      else if(member.role === 'SNACKMAN'){
-        snackmanCounter ++
+      } else if (member.role === 'SNACKMAN') {
+        snackmanCounter++
         memberCounter++
-      }
-      else if(member.role ==='GHOST'){
-        memberCounter ++
+      } else if (member.role === 'GHOST') {
+        memberCounter++
       }
     })
 
-    if ( snackmanCounter === 1 && memberCounter === lobby.members.length){
+    if (snackmanCounter === 1 && memberCounter === lobby.members.length) {
       await lobbiesStore.startGame(lobby.lobbyId)
       buttons.forEach(button => button.selected = false)
       buttons.forEach(button => button.selectedBy = '')
@@ -197,12 +194,11 @@ const startGame = async () => {
       await router.push({
         name: 'GameView',
         query: {
-          role: lobbiesStore.lobbydata.currentPlayer.role ,
+          role: lobbiesStore.lobbydata.currentPlayer.role,
           lobbyId: lobbiesStore.lobbydata.currentPlayer.joinedLobbyId,
         },
       })
-    }
-    else {
+    } else {
       showPopUp.value = true
       darkenBackground.value = true
       infoText.value = 'There must be exactly one SnackMan and all players must have a role!'
@@ -227,7 +223,7 @@ const changeUsedMapStatus = async (lobbyId: string, usedCustomMap: boolean): Pro
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ lobbyId, usedCustomMap })
+      body: JSON.stringify({lobbyId, usedCustomMap})
     });
 
     if (!response.ok) {
@@ -260,7 +256,7 @@ watchEffect(() => {
         router.push({
           name: 'GameView',
           query: {
-            role: lobbiesStore.lobbydata.currentPlayer.role ,
+            role: lobbiesStore.lobbydata.currentPlayer.role,
             lobbyId: lobbiesStore.lobbydata.currentPlayer.joinedLobbyId,
           },
         })
@@ -272,45 +268,36 @@ watchEffect(() => {
 
 <style scoped>
 .title {
-  position: absolute;
-  top: 3rem;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 3rem;
-  font-weight: bold;
-  color: #fff;
+  width: 100%;
+  top: 1rem;
   text-align: center;
+  font-weight: bold;
+  color: var(--background-for-text-color);
+}
+
+#button-box {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  padding: 3% 0;
 }
 
 .outer-box {
   position: absolute;
-  top: 30%;
+  top: 25%;
   left: 50%;
   transform: translateX(-50%);
-  width: 70vw;
-  max-width: 1000px;
-  height: 30rem;
-  max-height: 45rem;
+  width: 90%;
+  height: 60%;
   background: rgba(255, 255, 255, 60%);
   border-radius: 0.5rem;
-}
-
-.inner-box > ul {
-  list-style: none;
-  display: flex;
-  flex-direction: column;
-  left: 50%;
-  transform: translateX(-50%);
-  margin: 0;
-  padding: 0;
-  width: 100%;
+  padding: 0 20px;
 }
 
 .character-grid {
   display: grid;
-  grid-template-columns: repeat(2, 5fr);
-  grid-template-rows: repeat(2, 18vw);
-  grid-gap: 15px;
+  grid-template-columns: repeat(5, 5fr);
+  grid-gap: 20px;
 }
 
 #confirm-button {
@@ -325,21 +312,22 @@ watchEffect(() => {
 }
 
 .character-item {
+  height: 100%;
+  padding: 10px;
   background: rgba(255, 255, 255, 70%);
   text-align: center;
   cursor: pointer;
   display: flex;
   flex-direction: column;
-  height: 100%;
-}
-
-.character-item.selected {
-  opacity: 0.3;
-  cursor: not-allowed;
 }
 
 .character-item:hover {
-  transform: scale(1.05);
+  background-color: var(--primary-highlight-color);
+}
+
+.character-item.selected {
+  cursor: not-allowed;
+  background-color: var(--primary-highlight-color);
 }
 
 .image-container {
@@ -352,30 +340,53 @@ watchEffect(() => {
 }
 
 .character-image {
-  max-width: 100%;
-  max-height: 100%;
+  max-width: 80%;
   object-fit: contain;
 }
 
 .character-name {
   font-weight: bold;
   color: #000000;
+  margin: 0;
 }
 
-.overlay {
-  position: absolute; /* Overlay über dem Bild platzieren */
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.5); /* Dunkler halbtransparenter Hintergrund */
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-size: 1.5rem;
-  font-weight: bold;
+#start-game-button:hover {
+  background-color: var(--primary-highlight-color);
 }
 
+@media (max-width: 1300px) {
+  .character-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 5fr);
+  }
+}
 
+@media (max-width: 1000px) {
+  .title {
+    top: 0.5rem;
+    font-size: 60px;
+  }
+
+  .character-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 5fr);
+  }
+}
+
+@media (max-width: 800px) {
+  .outer-box {
+    height: 70%;
+    top: 23%;
+  }
+
+  .title {
+    top: 0.5rem;
+    font-size: 40px;
+  }
+
+  .character-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 5fr);
+  }
+}
 </style>
