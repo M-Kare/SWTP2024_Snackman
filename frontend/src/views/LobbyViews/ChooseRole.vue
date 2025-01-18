@@ -23,6 +23,7 @@
     </div>
 
     <SmallNavButton
+      v-if="isPlayerAdmin"
       id="start-game-button"
       class="small-nav-buttons"
       @click="startGame"
@@ -81,6 +82,12 @@ const infoHeading = ref()
  */
 
 const selectedCharacter = ref<Button | null>(null);
+
+const isPlayerAdmin = computed(() => {
+  const currentPlayer = lobbiesStore.lobbydata.currentPlayer;
+  const lobby = lobbiesStore.lobbydata.lobbies.find(l => l.lobbyId === lobbyId);
+  return currentPlayer && lobby && currentPlayer.playerId === lobby.adminClient.playerId;
+})
 
 
 const selectCharacter = async (button: Button) => {
@@ -151,7 +158,6 @@ const startGame = async () => {
   let snackmanCounter:number = 0
   let memberCounter :number = 0
   const lobby = lobbiesStore.lobbydata.lobbies.find(lobby => lobby.lobbyId === lobbyId)
-  const player = lobbiesStore.lobbydata.currentPlayer
 
   if (!playerId || !lobby) {
     console.error('Player or Lobby not found')
@@ -240,11 +246,14 @@ const changeUsedMapStatus = async (lobbyId: string, usedCustomMap: boolean): Pro
 watchEffect(() => {
   if (lobbiesStore.lobbydata && lobbiesStore.lobbydata.lobbies) {
     const updatedLobby = lobbiesStore.lobbydata.lobbies.find(
-      l => l.lobbyId === lobbyUrl,
+      lobby => lobby.lobbyId === lobbyUrl,
     )
-    if (updatedLobby) {
+    if (updatedLobby &&  updatedLobby.gameStarted) {
 
-      if (updatedLobby.gameStarted) {
+      const currentPlayerId = lobbiesStore.lobbydata.currentPlayer.playerId
+      const currentPlayerInUpdatedLobby = updatedLobby.members.find( member => member.playerId == currentPlayerId)
+
+      if (currentPlayerInUpdatedLobby) {
         buttons.forEach(button => button.selected = false)
         buttons.forEach(button => button.selectedBy = '')
         selectedCharacter.value = null
