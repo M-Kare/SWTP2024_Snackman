@@ -1,9 +1,9 @@
 <template>
   <MenuBackground></MenuBackground>
 
-  <h1 class="title">Choose Your Character</h1>
   <div class="outer-box">
     <div class="inner-box">
+      <h1 class="title">Choose your Character</h1>
       <div class="character-grid">
         <div
           v-for="button in buttons"
@@ -46,13 +46,13 @@
 </template>
 
 <script setup lang="ts">
-import {computed, onMounted, reactive, ref, watchEffect} from 'vue';
+import {onMounted, ref, watchEffect} from 'vue';
 import MenuBackground from '@/components/MenuBackground.vue';
 import SmallNavButton from '@/components/SmallNavButton.vue';
 import {useRoute, useRouter} from "vue-router";
 import PopUp from "@/components/PopUp.vue";
+import type {Button} from "@/stores/Lobby/lobbiesstore"
 import {useLobbiesStore} from "@/stores/Lobby/lobbiesstore";
-import type{Button} from "@/stores/Lobby/lobbiesstore"
 
 const route = useRoute()
 const router = useRouter()
@@ -263,14 +263,11 @@ watchEffect(() => {
 
 <style scoped>
 .title {
-  position: absolute;
-  top: 3rem;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 3rem;
-  font-weight: bold;
-  color: #fff;
+  width: 100%;
+  top: 1rem;
   text-align: center;
+  font-weight: bold;
+  color: var(--background-for-text-color);
 }
 
 .outer-box {
@@ -299,9 +296,8 @@ watchEffect(() => {
 
 .character-grid {
   display: grid;
-  grid-template-columns: repeat(2, 5fr);
-  grid-template-rows: repeat(2, 18vw);
-  grid-gap: 15px;
+  grid-template-columns: repeat(5, 5fr);
+  grid-gap: 20px;
 }
 
 #confirm-button {
@@ -329,10 +325,6 @@ watchEffect(() => {
   cursor: not-allowed;
 }
 
-.character-item:hover {
-  transform: scale(1.05);
-}
-
 .image-container {
   flex-grow: 1;
   display: flex;
@@ -343,8 +335,7 @@ watchEffect(() => {
 }
 
 .character-image {
-  max-width: 100%;
-  max-height: 100%;
+  max-width: 80%;
   object-fit: contain;
 }
 
@@ -353,20 +344,25 @@ watchEffect(() => {
   color: #000000;
 }
 
-.overlay {
-  position: absolute; /* Overlay über dem Bild platzieren */
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.5); /* Dunkler halbtransparenter Hintergrund */
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-size: 1.5rem;
-  font-weight: bold;
+
+@media (max-width: 800px) {
+  .title {
+    width: 100%;
+    top: 0.5rem;
+    text-align: center;
+    font-size: 40px;
+    font-weight: bold;
+    color: var(--background-for-text-color);
+  }
+
+  .character-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 5fr);
+    grid-gap: 20px;
+  }
+
+  #start-game-button:hover {
+    background-color: var(--primary-highlight-color);
+  }
 }
-
-
 </style>
