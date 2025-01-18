@@ -36,6 +36,7 @@ import {useRoute} from 'vue-router';
 import type {IPlayerDTD} from '@/stores/Player/IPlayerDTD';
 import {SoundManager} from "@/services/SoundManager";
 import {SoundType} from "@/services/SoundTypes";
+import { GameObjectRenderer } from '@/renderer/GameObjectRenderer';
 
 const { lobbydata } = useLobbiesStore();
 const gameMapStore = useGameMapStore()
@@ -119,6 +120,8 @@ onMounted(async () => {
 
   // for rendering the scene, create gameMap in 3d and change window size
   const {initRenderer, createGameMap, getScene} = GameMapRenderer()
+  const gameObjectRenderer = GameObjectRenderer();
+  
   scene = getScene()
   renderer = initRenderer(canvasRef.value)
   //Add gameMap
@@ -143,7 +146,7 @@ onMounted(async () => {
         playerData.speed, playerData.sprintMultiplier)
     } else {
       // other players that are not you
-      loadPlayerModel(it.playerId, SNACKMAN_TEXTURE);
+      loadPlayerModel(it.playerId, it.role, gameObjectRenderer);
     }
   });
   gameMapStore.setOtherPlayers(playerHashMap)
@@ -202,20 +205,29 @@ onMounted(async () => {
   SoundManager.playSound(SoundType.INGAME_BACKGROUND)
 })
 
-// initially loads the playerModel & attaches playerModel to playerCamera
-async function loadPlayerModel(playerId: string, texture: string) {
-  const loader = new GLTFLoader()
-  loader.load(texture, gltf => {
-    snackManModel = gltf.scene
-    snackManModel.scale.set(1, 1, 1)
-    scene.add(snackManModel)
-    snackManModel.position.lerp(new THREE.Vector3(playerData.posX, playerData.posY - 2, playerData.posZ), 0.5)
-    playerHashMap.set(playerId, snackManModel);
-
-    // optional offset for thirdPersonView
-    // snackManModel.position.set(0, -1.55, -5);
-    // player.getCamera().add(snackManModel)
-  })
+// initially loads the playerModel (Snackman or Model) & attaches playerModel to playerCamera
+async function loadPlayerModel(playerId: string, role: string, gameObjectRenderer: ReturnType<typeof GameObjectRenderer>) {
+  if (role === 'GHOST') {
+    gameObjectRenderer
+      .createGhostOnFloor(playerData.posX, playerData.posZ, 0, playerData.radius)
+      .then((ghostModel) => {
+        ghostModel.position.set(playerData.posX, 0, playerData.posZ);
+        scene.add(ghostModel);
+        playerHashMap.set(playerId, ghostModel);
+      })
+      .catch((error) => {
+        console.error('Fehler beim Laden des Geister-Modells:', error);
+      });
+  } else if (role === 'SNACKMAN') {
+    const loader = new GLTFLoader();
+    loader.load(SNACKMAN_TEXTURE, (gltf) => {
+      snackManModel = gltf.scene;
+      snackManModel.scale.set(1, 1, 1);
+      snackManModel.position.set(playerData.posX, playerData.posY - 2, playerData.posZ);
+      scene.add(snackManModel);
+      playerHashMap.set(playerId, snackManModel);
+    });
+  }
 }
 
 onUnmounted(() => {

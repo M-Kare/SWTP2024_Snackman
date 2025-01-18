@@ -1,4 +1,5 @@
 import {Direction} from "@/stores/Chicken/IChickenDTD";
+import * as THREE from "three";
 
 export interface IScriptGhostDTD {
   id: number,

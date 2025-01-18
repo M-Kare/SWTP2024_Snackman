@@ -36,8 +36,8 @@
     id="snackman"
     :src="
       gameResult === 'SNACKMAN'
-        ? '/src/assets/characters/kirby.png'
-        : '/src/assets/characters/kirby-monochrome.png'
+        ? '/characters/kirby.png'
+        : '/characters/kirby-monochrome.png'
     "
     alt="representation of snackman"
     class="character-image"
@@ -46,8 +46,8 @@
     id="ghost"
     :src="
       gameResult === 'GHOST'
-        ? '/src/assets/characters/ghost.png'
-        : '/src/assets/characters/ghost-monochrome.png'
+        ? '/characters/ghost.png'
+        : '/characters/ghost-monochrome.png'
     "
     alt="representation of ghost"
     class="character-image"
