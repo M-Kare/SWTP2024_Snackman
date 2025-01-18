@@ -92,6 +92,7 @@ public class LobbyController {
             Optional<PlayerClient> client = lobbyManagerService.findClientByClientId(creatorUuid);
             try {
                   Lobby newLobby = lobbyManagerService.createLobby(client.get().getPlayerId(), client.get(), lobbyManagerService.getMessageLoop());
+                  client.get().setRole(ROLE.SNACKMAN);
                   lobbyManagerService.startSingleplayer(newLobby.getLobbyId());
 
                   messagingTemplate.convertAndSend("/topic/lobbies/singleplayer", newLobby);
