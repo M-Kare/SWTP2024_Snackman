@@ -33,6 +33,7 @@ public class GameConfig {
     public static final int GHOST_SPEED = 10;
     public  static  final int GHOST_DAMAGE = 300;
     public  static  final int AMOUNT_PLAYERS = 5;
+    public static final String SCRIPT_GHOST_DIFFICULTY_MULTIPLAYER = "EASY";
 
     //GAME
     public static final long PLAYING_TIME = 300000; // 5 mins = 300.000 milisecs

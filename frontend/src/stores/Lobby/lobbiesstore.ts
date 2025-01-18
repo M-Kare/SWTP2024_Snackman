@@ -201,44 +201,42 @@ export const useLobbiesStore = defineStore('lobbiesstore', () => {
           const lobbyId = updatedLobbyWithRole.lobbyId
 
           const updatedLobby = lobbydata.lobbies.find(lobby => lobby.lobbyId === lobbyId)
-          if (updatedLobbyWithRole.chooseRole) {
-
-            console.log(`Updated chooseRole state for lobby ${lobbyId}:`, updatedLobby!.chooseRole)
-
+          if (updatedLobbyWithRole.chooseRole && updatedLobbyWithRole.members.some((member :{ playerId: string}) => member.playerId === lobbydata.currentPlayer.playerId) ){
             // Push the update to all clients at /ChooseRole/{lobbyId}
             if (stompclient && stompclient.connected) {
-              router.push({name: 'ChooseRole', params: {lobbyId: updatedLobby!.lobbyId}})
-              console.log(`Pushed update to /ChooseRole/${lobbyId}`)
+              router.push({ name: 'ChooseRole', params: { lobbyId: updatedLobbyWithRole.lobbyId } })
+              console.log(`Pushed update to /ChooseRole/${updatedLobbyWithRole.lobbyId}`)
             }
           }
         })
-        // Subscribe to ROLEUPDATE
+        // In der ROLEUPDATE-Subscription
         stompclient.subscribe(ROLEUPDATE, async (message) => {
-          console.log('STOMP Client subscribe to ROLE-UPDATE ')
           const data = JSON.parse(message.body)
           const buttonId = data.buttonId
           const updatedLobby = data.lobby
           const lobbyId = updatedLobby.lobbyId
           const selectedBy = data.selectedBy
 
-          // Lobby in lobbydata aktualisieren
-          const lobbyIndex = lobbydata.lobbies.findIndex(lobby => lobby.lobbyId === updatedLobby.lobbyId); // wenn kein Element gefunden mit Index, wird -1 returnt
+          //wenn kein Element gefunden mit Index, wird -1 returnt
+          const lobbyIndex = lobbydata.lobbies.findIndex(lobby => lobby.lobbyId === updatedLobby.lobbyId)
           if (lobbyIndex !== -1) {
             lobbydata.lobbies[lobbyIndex] = updatedLobby;
-            for (let member of updatedLobby.members){
-              if (member.playerId == lobbydata.currentPlayer.playerId){
+            for (let member of updatedLobby.members) {
+              if (member.playerId == lobbydata.currentPlayer.playerId) {
                 lobbydata.currentPlayer.role = member.role
               }
             }
-          } else {
-            lobbydata.lobbies.push(updatedLobby);
-
           }
           updateButtonSelection(buttonId, selectedBy)
-
-          // Push the update to all clients at /ChooseRole/{lobbyId}
-          if (stompclient && stompclient.connected) {
-            router.push({ path: `/ChooseRole/${lobbyId}` }).catch(() => {})
+          const isMember = updatedLobby.members.some( (member :{ playerId: string})=>
+            member.playerId === lobbydata.currentPlayer.playerId
+          )
+          // Nur Mitglieder der Lobby weiterleiten
+          if (isMember) {
+            if (stompclient && stompclient.connected) {
+              router.push({name: 'ChooseRole', params: {lobbyId}}).catch(() => {
+              })
+            }
           }
         })
       } else {
@@ -415,7 +413,7 @@ export const useLobbiesStore = defineStore('lobbiesstore', () => {
    * Starts the singleplayer game.
    * @param adminClient The ID of the player.
    */
-  async function startSingleplayerGame(adminClient: IPlayerClientDTD): Promise<ILobbyDTD> {
+  async function startSingleplayerGame(adminClient: IPlayerClientDTD, difficulty: string): Promise<ILobbyDTD> {
     const creatorUuid = adminClient.playerId
 
     try {
@@ -425,7 +423,7 @@ export const useLobbiesStore = defineStore('lobbiesstore', () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({creatorUuid}),
+        body: JSON.stringify({creatorUuid, difficulty}),
       })
 
       if (!response.ok) {

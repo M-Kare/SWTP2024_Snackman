@@ -40,7 +40,7 @@ public class ScriptGhost extends Mob implements Runnable {
     // python
     private PythonInterpreter pythonInterpreter = null;
     private final Properties pythonProps = new Properties();
-    private ScriptGhostDifficulty difficulty = ScriptGhostDifficulty.EASY;
+    private ScriptGhostDifficulty difficulty;
     private GameMap gameMap;
 
     public ScriptGhost() {
@@ -60,12 +60,12 @@ public class ScriptGhost extends Mob implements Runnable {
 
     public ScriptGhost(GameMap gameMap, Square initialPosition, ScriptGhostDifficulty difficulty) {
         this(gameMap, initialPosition);
-        //this.difficulty = difficulty;     // todo giving every ghost its own difficulty
+        this.difficulty = difficulty;
     }
 
     public ScriptGhost(GameMap gameMap, Square initialPosition) {
         super();
-        this.difficulty = ScriptGhostDifficulty.getRandomScriptGhostDifficulty();
+        this.difficulty = ScriptGhostDifficulty.EASY;
         this.gameMap = gameMap;
         id = generateId();
         this.ghostPosX = initialPosition.getIndexX();
@@ -354,10 +354,12 @@ public class ScriptGhost extends Mob implements Runnable {
     @Override
     public String toString() {
         return "ScriptGhost{" +
-                "ghostPosZ=" + ghostPosZ +
-                ", ghostPosX=" + ghostPosX +
-                ", id=" + id +
+                "id=" + id +
                 ", lookingDirection=" + lookingDirection +
+                ", ghostPosX=" + ghostPosX +
+                ", ghostPosZ=" + ghostPosZ +
+                ", difficulty=" + difficulty +
+                ", id=" + id +
                 '}';
     }
 
