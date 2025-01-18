@@ -308,16 +308,16 @@ export const useGameMapStore = defineStore('gameMap', () => {
         chickenMesh!.scale.set(ChickenThickness.THIN, ChickenThickness.THIN, ChickenThickness.THIN)
         break
       case ChickenThickness.SLIGHTLY_THICK:
-        chickenMesh!.scale.set(ChickenThickness.SLIGHTLY_THICK, ChickenThickness.SLIGHTLY_THICK, ChickenThickness.SLIGHTLY_THICK)
+        chickenMesh!.scale.set(ChickenThickness.SLIGHTLY_THICK  * 1.2, ChickenThickness.SLIGHTLY_THICK, ChickenThickness.SLIGHTLY_THICK * 1.2)
         break
       case ChickenThickness.MEDIUM:
-        chickenMesh!.scale.set(ChickenThickness.MEDIUM, ChickenThickness.MEDIUM, ChickenThickness.MEDIUM)
+        chickenMesh!.scale.set(ChickenThickness.MEDIUM  * 1.3, ChickenThickness.MEDIUM, ChickenThickness.MEDIUM * 1.3)
         break
       case ChickenThickness.HEAVY:
-        chickenMesh!.scale.set(ChickenThickness.HEAVY, ChickenThickness.HEAVY, ChickenThickness.HEAVY)
+        chickenMesh!.scale.set(ChickenThickness.HEAVY  * 1.5, ChickenThickness.HEAVY, ChickenThickness.HEAVY * 1.4)
         break
       case ChickenThickness.VERY_HEAVY:
-        chickenMesh!.scale.set(ChickenThickness.VERY_HEAVY, ChickenThickness.VERY_HEAVY, ChickenThickness.VERY_HEAVY)
+        chickenMesh!.scale.set(ChickenThickness.VERY_HEAVY  * 2, ChickenThickness.VERY_HEAVY, ChickenThickness.VERY_HEAVY * 1.5)
         break
       default:
         console.log('ETWAS IST SCHIED GELAUFEN...')
@@ -352,18 +352,19 @@ export const useGameMapStore = defineStore('gameMap', () => {
   function updateLookingDirectionScriptGhost(currentScriptGhost: IScriptGhost, scriptGhostUpdate: IScriptGhostDTD) {
     const scriptGhostMesh = scene.getObjectById(currentScriptGhost.meshId)
     currentScriptGhost.lookingDirection = Direction[scriptGhostUpdate.lookingDirection as unknown as keyof typeof Direction]
+    if(!scriptGhostMesh) return;
     switch (currentScriptGhost.lookingDirection) {
       case Direction.ONE_NORTH:
-        scriptGhostMesh.rotation.y = Math.PI/2
+        scriptGhostMesh!.rotation.y = Math.PI/2
         break;
       case Direction.ONE_SOUTH:
-        scriptGhostMesh.rotation.y = (3*Math.PI)/2
+        scriptGhostMesh!.rotation.y = (3*Math.PI)/2
         break;
       case Direction.ONE_EAST:
-        scriptGhostMesh.rotation.y = Math.PI
+        scriptGhostMesh!.rotation.y = Math.PI
         break
       case Direction.ONE_WEST:
-        scriptGhostMesh.rotation.y = 0
+        scriptGhostMesh!.rotation.y = 0
         break
     }
   }
