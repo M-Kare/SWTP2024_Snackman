@@ -287,13 +287,18 @@ public class MapService {
         return (index * GameConfig.SQUARE_SIZE) + (GameConfig.SQUARE_SIZE / 2);
     }
 
-    public void respawnSnacks(GameMap map) {
+    /**
+     * Removes and respawns snacks on all floor square with a set probability.
+     * Eggs are not removed.
+     * @param map
+     */
+    public void respawnSnacks(GameMap map, double probability) {
         for (int i = 0; i < map.getGameMapSquares().length; i++) {
             for (int j = 0; j < map.getGameMapSquares()[0].length; j++) {
                 Square square = map.getSquareAtIndexXZ(i, j);
-                if (square.getType() == MapObjectType.FLOOR) {
+                if (square.getType() == MapObjectType.FLOOR && square.getSnack().getSnackType() != SnackType.EGG) {
                     double rand = Math.random();
-                    if (rand <= GameConfig.SNACK_SPAWN_RATE) {
+                    if (rand <= probability) {
                         addRandomSnackToSquare(square);
                     } else {
                         square.setSnack(new Snack(SnackType.EMPTY));

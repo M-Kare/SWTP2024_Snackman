@@ -18,7 +18,7 @@ public class GameConfig {
     public static final double DOUBLEJUMP_STRENGTH = JUMP_STRENGTH * 0.1;
     public static final double GRAVITY = -20;
 
-    //LOBBY
+    //SNACK SPAWN
     public static final int TIME_FOR_SNACKS_TO_RESPAWN = 30000;
     public static final double SNACK_SPAWN_RATE = 0.5;
 
