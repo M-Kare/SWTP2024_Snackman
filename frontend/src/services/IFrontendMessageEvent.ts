@@ -1,4 +1,4 @@
-import {LeaderboardEntryDTD} from "@/stores/Leaderboard/LeaderboardDTD";
+import type { LeaderboardEntryDTD } from "@/stores/Leaderboard/LeaderboardDTD";
 import {EventType} from "@/stores/messaging/IMessageDTD";
 
 export interface IFrontendLeaderboardMessageEvent {

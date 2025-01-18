@@ -183,8 +183,18 @@ export const GameObjectRenderer = () => {
 
   const createGround = () => {
     // ground setup
+    const groundTexture = new THREE.TextureLoader().load('./textures/ground_white_comic_2.jpg')
+    groundTexture.wrapS = THREE.RepeatWrapping;
+    groundTexture.wrapT = THREE.RepeatWrapping;
+    groundTexture.repeat.set(1000, 1000);
     const groundGeometry = new THREE.PlaneGeometry(GROUNDSIZE, GROUNDSIZE)
-    const groundMaterial = new THREE.MeshMatcapMaterial({ color: 'lightgrey' })
+    const groundMaterial = new THREE.MeshStandardMaterial({
+                              map: groundTexture,
+                              color: 0xffffff,
+                              emissive: 0x000000,
+                              roughness: 0.7,
+                              metalness: 0.1,
+                            })
     const ground = new THREE.Mesh(groundGeometry, groundMaterial)
     ground.castShadow = true
     ground.receiveShadow = true
@@ -204,8 +214,19 @@ export const GameObjectRenderer = () => {
     height: number,
     sideLength: number,
   ) => {
-    // TODO add correct wall-material-design!!
-    const wallMaterial = new THREE.MeshStandardMaterial({ color: 'orange' })
+    //frontend/public/textures/pngtree_cartoon_style_seamless_textured_surface_square.jpg
+    const wallTexture = new THREE.TextureLoader().load('./textures/pngtree_cartoon_style_seamless_textured_surface_square.jpg')
+    wallTexture.wrapS = THREE.RepeatWrapping;
+    wallTexture.wrapT = THREE.RepeatWrapping;
+    wallTexture.repeat.set(1, 1.87);
+
+    const wallMaterial = new THREE.MeshStandardMaterial({
+                                  map: wallTexture,
+                                  color: 0xFFDE9D,
+                                  emissive: 0x000000,
+                                  roughness: 0.7,
+                                  metalness: 0.1,
+                                })
     const wallGeometry = new THREE.BoxGeometry(sideLength, height, sideLength)
     const wall = new THREE.Mesh(wallGeometry, wallMaterial)
 

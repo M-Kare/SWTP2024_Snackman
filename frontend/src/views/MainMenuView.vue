@@ -1,85 +1,97 @@
 <template>
-  <MenuBackground></MenuBackground>
+  <MenuBackground>
+    <div v-if="darkenBackground" id="darken-background"></div>
 
-  <h1 class="title">Snackman</h1>
-  <!--
-  Buttons will be merged later on,
-  right now we need a fast entry into the game to test things (Singpleplayer-Button)
-   -->
-  <MainMenuButton class="menu-button" id="singleplayer-button" @click="startSingleplayer">Singleplayer</MainMenuButton>
-  <MainMenuButton class="menu-button" id="multiplayer-button" @click="showLobbies">Multiplayer</MainMenuButton>
-  <MainMenuButton class="menu-button" id="leaderboard-button" @click="showLeaderboard">Leaderboard</MainMenuButton>
+    <PlayerNameForm
+      v-if="showPlayerNameForm && !playerNameSaved"
+      @hidePlayerNameForm="hidePlayerNameForm"
+    >
+    </PlayerNameForm>
 
-  <Leaderboard
-    v-if="showLeaderboardPopUp"
-    :show="showLeaderboardPopUp"
-    @close="hideLeaderboard"
-  />
+    <ChooseDifficultySingleplayer
+      v-if="showChooseSingleplayerDifficulty"
+      @hideChooseDifficultySingleplayer="hideChooseDifficultySingleplayer">
+    </ChooseDifficultySingleplayer>
 
+    <div class="button-container">
+      <MainMenuButton v-if="!showChooseSingleplayerDifficulty" @click="startSingleplayer">Singleplayer</MainMenuButton>
+      <MainMenuButton v-if="!showChooseSingleplayerDifficulty" @click="showLobbies">Multiplayer</MainMenuButton>
+      <MainMenuButton v-if="!showChooseSingleplayerDifficulty" @click="showLeaderboard">Leaderboard</MainMenuButton>
+    </div>
+  </MenuBackground>
 </template>
 
 <script setup lang="ts">
 import {useLobbiesStore} from '@/stores/Lobby/lobbiesstore'
 import MainMenuButton from '@/components/MainMenuButton.vue'
 import MenuBackground from '@/components/MenuBackground.vue'
+import PlayerNameForm from '@/components/PlayerNameForm.vue';
 import {useRouter} from 'vue-router'
-import {ref} from "vue"
-import Leaderboard from "@/components/Leaderboard.vue"
+import {onMounted, ref} from 'vue';
+import {SoundManager} from "@/services/SoundManager";
+import {SoundType} from "@/services/SoundTypes";
+import ChooseDifficultySingleplayer from "@/views/ChooseDifficultySingleplayer.vue";
 
 const router = useRouter()
 const lobbiesStore = useLobbiesStore()
-const showLeaderboardPopUp = ref(false)
+
+const playerNameSaved = lobbiesStore.lobbydata.currentPlayer.playerName;
+const darkenBackground = ref(false);
+const showPlayerNameForm = ref(false);
+const showChooseSingleplayerDifficulty = ref(false);
+
+const hidePlayerNameForm = () => {
+  showPlayerNameForm.value = false;
+  darkenBackground.value = false;
+}
+
+const hideChooseDifficultySingleplayer = () => {
+  showChooseSingleplayerDifficulty.value = false
+}
 
 const showLobbies = () => {
   router.push({name: 'LobbyListView'})
 }
 
 const showLeaderboard = () => {
-  showLeaderboardPopUp.value = true
-}
-
-const hideLeaderboard = () => {
-  showLeaderboardPopUp.value = false
+  router.push({name: 'Leaderboard'})
 }
 
 const startSingleplayer = () => {
-  lobbiesStore.lobbydata.currentPlayer.role = 'SNACKMAN'
-
-  router.push({
-    name: 'GameView',
-    query: {role: 'SNACKMAN'}
-  })
+  showChooseSingleplayerDifficulty.value = true
 }
 
+onMounted(() => {
+  if (!playerNameSaved) {
+    darkenBackground.value = true;
+    showPlayerNameForm.value = true;
+  }
+
+  SoundManager.playSound(SoundType.LOBBY_MUSIC)
+})
 </script>
 
 <style scoped>
-.title {
-  position: absolute;
-  top: 50px;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 10rem;
-  font-weight: bold;
-  color: #fff;
+.button-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.button-container > * {
+  width: 100%;
   text-align: center;
 }
 
-.menu-button {
-  position: absolute;
-  left: 50%;
-  transform: translate(-50%, -50%); /* h & v centered */
-}
+#darken-background {
+  z-index: 1;
+  position: fixed;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 50%);
 
-#singleplayer-button {
-  top: 45%
-}
-
-#multiplayer-button {
-  top: 65%
-}
-
-#leaderboard-button {
-  top: 85%
+  transition: background 0.3s ease;
 }
 </style>

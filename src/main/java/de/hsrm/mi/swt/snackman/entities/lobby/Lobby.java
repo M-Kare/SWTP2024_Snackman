@@ -4,6 +4,9 @@ import java.util.*;
 import de.hsrm.mi.swt.snackman.configuration.GameConfig;
 import de.hsrm.mi.swt.snackman.entities.map.GameMap;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.Mob;
+import de.hsrm.mi.swt.snackman.entities.mobileObjects.ScriptGhost;
+import de.hsrm.mi.swt.snackman.entities.mobileObjects.ScriptGhostDifficulty;
+import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken.Chicken;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.SnackMan;
 import de.hsrm.mi.swt.snackman.messaging.MessageLoop.MessageLoop;
 import org.slf4j.Logger;
@@ -17,9 +20,12 @@ public class Lobby {
     private String name;
     private PlayerClient adminClient;
     private boolean isGameStarted;
+    private boolean isChooseRole;
     private List<PlayerClient> members;
     private GameMap gameMap;
     private SortedMap<String, Mob> clientMobMap;
+    private List<Chicken> chickens = new ArrayList<>();
+    private List<ScriptGhost> scriptGhosts = new ArrayList<>();
     private long timeSinceLastSnackSpawn;
     private Timer gameTimer;
     private long timePlayed = 0;
@@ -29,18 +35,23 @@ public class Lobby {
     private long endTime;
     private final Logger log = LoggerFactory.getLogger(Lobby.class);
     private MessageLoop messageLoop;
+    private boolean usedCustomMap;
+    private ScriptGhostDifficulty scriptGhostDifficulty;
 
-    public Lobby(String lobbyId, String name, PlayerClient adminClient, GameMap gameMap, MessageLoop messageLoop) {
+    public Lobby(String lobbyId, String name, PlayerClient adminClient, GameMap gameMap, MessageLoop messageLoop, ScriptGhostDifficulty scriptGhostDifficulty) {
         this.lobbyId = lobbyId;
         this.gameMap = gameMap;
         this.name = name;
         this.adminClient = adminClient;
         this.isGameStarted = false;
+        this.isChooseRole = false;
         this.members = new ArrayList<>();
         this.members.add(adminClient);
         this.clientMobMap = new TreeMap<>();
         this.messageLoop = messageLoop;
+        this.scriptGhostDifficulty = scriptGhostDifficulty;
         initTimer();
+        this.usedCustomMap = false;
     }
 
     /**
@@ -96,7 +107,8 @@ public class Lobby {
         SnackMan snackMan = getSnackman();
 
         if(snackMan != null) {
-            GameEnd gameEnd = new GameEnd(winningRole, this.timePlayed, snackMan.getKcal());
+            this.gameTimer.cancel();
+            GameEnd gameEnd = new GameEnd(winningRole, this.timePlayed, snackMan.getKcal(), this.lobbyId);
             setGameFinished(true, gameEnd);
         }
     }
@@ -167,6 +179,10 @@ public class Lobby {
         return gameMap;
     }
 
+    public void setGameMap(GameMap newGameMap){
+        this.gameMap = newGameMap;
+    }
+
     public String getLobbyId() {
         return lobbyId;
     }
@@ -179,6 +195,16 @@ public class Lobby {
         timeSinceLastSnackSpawn = time;
     }
 
+    public void setChooseRole(){
+        this.isChooseRole = true;
+    }
+    public void setChooseRoleFinsih(){
+        this.isChooseRole = false;
+    }
+    public boolean isChooseRole() {
+        return isChooseRole;
+    }
+
     @Override
     public String toString() {
         return "Lobby{" +
@@ -186,10 +212,43 @@ public class Lobby {
                 ", name='" + name + '\'' +
                 ", adminClient=" + adminClient +
                 ", isGameStarted=" + isGameStarted +
+                ", isChooseRole="+ isChooseRole +
                 ", members=" + members +
                 ", gameMap=" + gameMap +
                 ", clientMobMap=" + clientMobMap +
                 ", timeSinceLastSnackSpawn=" + timeSinceLastSnackSpawn +
                 '}';
+    }
+
+    public void addChicken(Chicken chicken){
+        this.chickens.add(chicken);
+    }
+
+    public void addScriptGhost(ScriptGhost scriptGhost){
+        this.scriptGhosts.add(scriptGhost);
+    }
+
+    public List<Chicken> getChickens() {
+        return chickens;
+    }
+
+    public List<ScriptGhost> getScriptGhosts() {
+        return scriptGhosts;
+    }
+
+    public boolean getUsedCustomMap(){
+        return usedCustomMap;
+    }
+
+    public void setUsedCustomMap(boolean value){
+        this.usedCustomMap = value;
+    }
+
+    public long getGameStartTime(){
+        return this.gameStartTime;
+    }
+
+    public ScriptGhostDifficulty getScriptGhostDifficulty() {
+        return scriptGhostDifficulty;
     }
 }

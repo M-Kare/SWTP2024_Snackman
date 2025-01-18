@@ -19,6 +19,7 @@ public class SnackMan extends EatingMob {
     private double velocityY = 0.0;
     private boolean isSprinting = false;
     private SprintHandler sprintHandler = new SprintHandler();
+    private boolean isScared = false;
 
     public SnackMan(GameMap gameMap, Square currentSquare, double posX, double posY, double posZ) {
         this(gameMap, GameConfig.SNACKMAN_SPEED, GameConfig.SNACKMAN_RADIUS, posX, posY, posZ);
@@ -35,11 +36,15 @@ public class SnackMan extends EatingMob {
         super(gameMap, speed, radius, posX, posY, posZ);
     }
 
-    public void isScaredFromGhost() {
-        // Calorsies reduced by 300 if Ghost hit
-        if (super.getKcal() > GameConfig.GHOST_DAMAGE) {
-            setKcal(getKcal() - GameConfig.GHOST_DAMAGE);
-        } else super.setKcal(GAME_FINISH_BECAUSE_OF_TOO_FEW_CKAL);
+    public void isScaredFromGhost(boolean scared) {
+        if (scared) {
+            if (super.getKcal() > GameConfig.GHOST_DAMAGE) {
+                setKcal(getKcal() - GameConfig.GHOST_DAMAGE);
+                isScared = true;
+            } else super.setKcal(GAME_FINISH_BECAUSE_OF_TOO_FEW_CKAL);
+        } else {
+            isScared = false;
+        }
     }
 
     //JUMPING
@@ -95,17 +100,19 @@ public class SnackMan extends EatingMob {
         super.move(forward, backward, left, right, delta, gameMap);
         Square newSquare = gameMap.getSquareAtIndexXZ(calcMapIndexOfCoordinate(super.getPosX()), calcMapIndexOfCoordinate(super.getPosZ()));
 
+        for (Mob mob : newSquare.getMobs()) {
+            if (mob instanceof Ghost || mob instanceof ScriptGhost) {
+                this.isScaredFromGhost(true);
+            } else {
+                this.isScaredFromGhost(false);
+            }
+        }
+
         if (!oldSquare.equals(newSquare)) {
             oldSquare.removeMob(this);
             newSquare.addMob(this);
         }
 
-        // when snackman runs into a ghost
-        for (Mob mob : newSquare.getMobs()) {
-            if (mob instanceof Ghost || mob instanceof ScriptGhost) {
-                this.isScaredFromGhost();
-            }
-        }
     }
 
     public int getSprintTimeLeft() {
@@ -154,6 +161,10 @@ public class SnackMan extends EatingMob {
             //set snack to null after consuming it
             square.setSnack(new Snack(SnackType.EMPTY));
         }
+    }
+
+    public boolean isScared() {
+        return isScared;
     }
 
     public boolean isJumping() {
