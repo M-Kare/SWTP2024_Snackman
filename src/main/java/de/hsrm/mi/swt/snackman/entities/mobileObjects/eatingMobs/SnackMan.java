@@ -1,8 +1,16 @@
 package de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import de.hsrm.mi.swt.snackman.configuration.GameConfig;
 import de.hsrm.mi.swt.snackman.entities.map.GameMap;
 import de.hsrm.mi.swt.snackman.entities.map.Square;
+import de.hsrm.mi.swt.snackman.entities.map.enums.WallAlignmentStatus;
+import de.hsrm.mi.swt.snackman.entities.map.enums.WallSectionStatus;
 import de.hsrm.mi.swt.snackman.entities.map.enums.WallAlignmentStatus;
 import de.hsrm.mi.swt.snackman.entities.map.enums.WallSectionStatus;
 import de.hsrm.mi.swt.snackman.entities.mapObject.snack.Snack;
@@ -11,8 +19,6 @@ import de.hsrm.mi.swt.snackman.entities.mechanics.SprintHandler;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.Ghost;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.Mob;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.ScriptGhost;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class SnackMan extends EatingMob {
     private final Logger log = LoggerFactory.getLogger(SnackMan.class);
@@ -39,15 +45,11 @@ public class SnackMan extends EatingMob {
         super(gameMap, speed, radius, posX, posY, posZ);
     }
 
-    public void isScaredFromGhost(boolean scared) {
-        if (scared) {
-            if (super.getKcal() > GameConfig.GHOST_DAMAGE) {
-                setKcal(getKcal() - GameConfig.GHOST_DAMAGE);
-                isScared = true;
-            } else super.setKcal(GAME_FINISH_BECAUSE_OF_TOO_FEW_CKAL);
-        } else {
-            isScared = false;
-        }
+    public void isScaredFromGhost() {
+        // Calorsies reduced by 300 if Ghost hit
+        if (super.getKcal() > GameConfig.GHOST_DAMAGE) {
+            setKcal(getKcal() - GameConfig.GHOST_DAMAGE);
+        } else super.setKcal(GAME_FINISH_BECAUSE_OF_TOO_FEW_CKAL);
     }
 
     //JUMPING
@@ -67,7 +69,6 @@ public class SnackMan extends EatingMob {
             subtractCaloriesDoubleJump();
             this.hasDoubleJumped = true;
         }
-
     }
 
     public void updateJumpPosition(double deltaTime) {
@@ -241,19 +242,17 @@ public class SnackMan extends EatingMob {
         super.move(forward, backward, left, right, delta, gameMap);
         Square newSquare = gameMap.getSquareAtIndexXZ(calcMapIndexOfCoordinate(super.getPosX()), calcMapIndexOfCoordinate(super.getPosZ()));
 
-        for (Mob mob : newSquare.getMobs()) {
-            if (mob instanceof Ghost || mob instanceof ScriptGhost) {
-                this.isScaredFromGhost(true);
-            } else {
-                this.isScaredFromGhost(false);
-            }
-        }
-
         if (!oldSquare.equals(newSquare)) {
             oldSquare.removeMob(this);
             newSquare.addMob(this);
         }
 
+        // when snackman runs into a ghost
+        for (Mob mob : newSquare.getMobs()) {
+            if (mob instanceof Ghost || mob instanceof ScriptGhost) {
+                this.isScaredFromGhost();
+            }
+        }
     }
 
     public int getSprintTimeLeft() {
@@ -302,10 +301,6 @@ public class SnackMan extends EatingMob {
             //set snack to null after consuming it
             square.setSnack(new Snack(SnackType.EMPTY));
         }
-    }
-
-    public boolean isScared() {
-        return isScared;
     }
 
     public boolean isJumping() {
