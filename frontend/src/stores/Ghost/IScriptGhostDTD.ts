@@ -1,4 +1,5 @@
 import {Direction} from "@/stores/Chicken/IChickenDTD";
+import * as THREE from "three";
 
 export interface IScriptGhostDTD {
   id: number,
@@ -12,5 +13,5 @@ export interface IScriptGhost {
   scriptGhostPosX: number,
   scriptGhostPosZ: number,
   lookingDirection: Direction,
-  meshId: number
+  model: THREE.Group
 }

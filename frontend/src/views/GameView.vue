@@ -34,6 +34,7 @@ import type {IPlayerClientDTD} from "@/stores/Lobby/IPlayerClientDTD";
 import {GLTFLoader} from 'three/examples/jsm/Addons.js'
 import {useRoute} from 'vue-router';
 import type {IPlayerDTD} from '@/stores/Player/IPlayerDTD';
+import { GameObjectRenderer } from '@/renderer/GameObjectRenderer';
 import {SoundManager} from "@/services/SoundManager";
 import {SoundType} from "@/services/SoundTypes";
 import { GameObjectRenderer } from '@/renderer/GameObjectRenderer';

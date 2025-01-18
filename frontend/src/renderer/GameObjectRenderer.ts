@@ -92,7 +92,7 @@ export const GameObjectRenderer = () => {
     zPosition: number,
     yPosition: number,
     sideLength: number
-  ): Promise<THREE.Object3D> {
+  ): Promise<THREE.Group> {
     const placeholder = new THREE.Mesh(
       new THREE.SphereGeometry(0.5, 16, 16),
       new THREE.MeshStandardMaterial({ color: 'gray', opacity: 0.5, transparent: true })
@@ -121,12 +121,8 @@ export const GameObjectRenderer = () => {
           ghostModel = gltf.scene
           ghostModel.position.set(xPosition, yPosition, zPosition)
           ghostModel.scale.set(0.5, 0.5, 0.5)
-          ghostModel.traverse((child: any) => {
-            if (child.isMesh) {
-              child.castShadow = true
-              child.receiveShadow = true
-            }
-          })
+          ghostModel.castShadow = true
+          ghostModel.receiveShadow = true
           resolve(ghostModel.clone())
         },
         undefined,

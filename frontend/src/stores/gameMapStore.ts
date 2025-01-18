@@ -72,6 +72,7 @@ export const useGameMapStore = defineStore('gameMap', () => {
       }
 
       for (const ghost of response.scriptGhosts) {
+        console.log("GHOST INIT: " + ghost.lookingDirection)
         mapData.scriptGhosts.push(ghost as IScriptGhost)
       }
     } catch (reason) {
@@ -174,6 +175,7 @@ export const useGameMapStore = defineStore('gameMap', () => {
                 break;
               case EventType.ScriptGhostUpdate:
                 const scriptGhostUpdate: IScriptGhostDTD = mess.message
+
                 updateScriptGhost(scriptGhostUpdate)
                 break;
               default:
@@ -328,31 +330,43 @@ export const useGameMapStore = defineStore('gameMap', () => {
   ) {
     const chickenMesh = scene.getObjectById(currentChicken.meshId)
 
-    currentChicken.lookingDirection = chickenUpdate.lookingDirection
+    currentChicken.lookingDirection = Direction[chickenUpdate.lookingDirection as unknown as keyof typeof Direction]
     switch (
       currentChicken.lookingDirection // rotates the chicken depending on what its looking direction is
       ) {
-      case Direction.NORTH || Direction.SOUTH:
-        chickenMesh!.setRotationFromEuler(new THREE.Euler(0))
+      case Direction.ONE_NORTH:
+        chickenMesh!.rotation.y = Math.PI/2
+        break;
+      case Direction.ONE_SOUTH:
+        chickenMesh!.rotation.y = (3*Math.PI)/2
+        break;
+      case Direction.ONE_EAST:
+        chickenMesh!.rotation.y = Math.PI
         break
-      case Direction.EAST || Direction.WEST:
-        chickenMesh!.setRotationFromEuler(new THREE.Euler(Math.PI / 2))
+      case Direction.ONE_WEST:
+        chickenMesh!.rotation.y = 0
         break
     }
   }
 
   function updateLookingDirectionScriptGhost(currentScriptGhost: IScriptGhost, scriptGhostUpdate: IScriptGhostDTD) {
-    const scriptGhostMesh = scene.getObjectById(currentScriptGhost.meshId)
-
-    currentScriptGhost.lookingDirection = scriptGhostUpdate.lookingDirection
+    console.log("ScriptGhost looking direction updated")
+    currentScriptGhost.lookingDirection = Direction[scriptGhostUpdate.lookingDirection as unknown as keyof typeof Direction]
     switch (currentScriptGhost.lookingDirection) {
-      case Direction.NORTH || Direction.SOUTH:
-        scriptGhostMesh!.setRotationFromEuler(new THREE.Euler(0))
+      case Direction.ONE_NORTH:
+        currentScriptGhost.model.rotation.y = Math.PI/2
         break;
-      case Direction.EAST || Direction.WEST:
-        scriptGhostMesh!.setRotationFromEuler(new THREE.Euler(Math.PI / 2))
+      case Direction.ONE_SOUTH:
+        currentScriptGhost.model.rotation.y = (3*Math.PI)/2
         break;
+      case Direction.ONE_EAST:
+        currentScriptGhost.model.rotation.y = Math.PI
+        break
+      case Direction.ONE_WEST:
+        currentScriptGhost.model.rotation.y = 0
+        break
     }
+    console.log("Look direction: " + (+scriptGhostUpdate.lookingDirection), " Rotation: " + currentScriptGhost.model.rotation.x , currentScriptGhost.model.rotation.y, currentScriptGhost.model.rotation.z)
   }
 
   function updateWalkingDirection(
@@ -375,12 +389,10 @@ export const useGameMapStore = defineStore('gameMap', () => {
   }
 
   function updateWalkingDirectionScriptGhost(currentScriptGhost: IScriptGhost, scriptGhostUpdate: IScriptGhostDTD, DEFAULT_SIDE_LENGTH: number, OFFSET: number) {
-    const scriptGhostMesh = scene.getObjectById(currentScriptGhost.meshId)
-
     currentScriptGhost.scriptGhostPosX = scriptGhostUpdate.scriptGhostPosX
     currentScriptGhost.scriptGhostPosZ = scriptGhostUpdate.scriptGhostPosZ
 
-    scriptGhostMesh!.position.set(currentScriptGhost.scriptGhostPosX * DEFAULT_SIDE_LENGTH + OFFSET, 0, currentScriptGhost.scriptGhostPosZ * DEFAULT_SIDE_LENGTH + OFFSET)
+    currentScriptGhost.model.position.set(currentScriptGhost.scriptGhostPosX * DEFAULT_SIDE_LENGTH + OFFSET, 0, currentScriptGhost.scriptGhostPosZ * DEFAULT_SIDE_LENGTH + OFFSET)
   }
 
   function setSnackMeshId(squareId: number, meshId: number) {
@@ -394,10 +406,10 @@ export const useGameMapStore = defineStore('gameMap', () => {
     if (chicken != undefined) chicken.meshId = meshId
   }
 
-  function setScriptGhostMeshId(meshId: number, ghostId: number) {
+  function setScriptGhostModel(model: THREE.Group, ghostId: number) {
     const ghost = mapData.scriptGhosts.find(ghost => ghost.id === ghostId);
     if (ghost != undefined)
-      ghost.meshId = meshId
+      ghost.model = model
   }
 
   function removeMeshFromScene(scene: Scene, meshId: number) {
@@ -421,6 +433,6 @@ export const useGameMapStore = defineStore('gameMap', () => {
     setPlayer,
     setOtherPlayers,
     stompclient: stompclient,
-    setScriptGhostMeshId,
+    setScriptGhostModel,
   };
 })
