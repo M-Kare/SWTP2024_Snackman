@@ -235,15 +235,15 @@ export class Player {
    */
   public setPosition(pos: THREE.Vector3) {
     this.targetPosition = pos;
+    if (this.targetPosition.y <= 2) {
+      this.isJumping = false
+      this.doubleJump = false
+    }
 
   }
   
   public lerpPosition(){
     this.camera.position.lerp(this.targetPosition, 0.1)
-    if (this.targetPosition.y <= 2) {
-      this.isJumping = false
-      this.doubleJump = false
-    }
   }
 
   /**
