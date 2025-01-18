@@ -18,22 +18,34 @@ public class FrontendMessageService {
         this.messagingTemplate = messagingTemplate;
     }
 
-    public void sendEvent(FrontendMessageEvent ev) {
-        //log.info("Send Event: eventType {}, changeTyp {}, square {}", ev.eventType(), ev.changeType(),
-                //ev.square().toString());
+    public void sendLeaderboardEvent(FrontendLeaderboardMessageEvent ev){
+        log.debug("Send Event: eventType {}, changeTyp {}, leaderboardEntries {}", ev.eventType(), ev.changeType(), ev.leaderboardDTO());
 
-        messagingTemplate.convertAndSend("/topic/square", ev);
+        messagingTemplate.convertAndSend("/topic/leaderboard", ev);
     }
 
-    public void sendChickenEvent(FrontendChickenMessageEvent ev) {
-        //log.info("Send Event: eventType {}, changeTyp {}, chicken {}", ev.eventType(), ev.changeType(), ev.chicken().toString());
+    public void sendLeaderboardEntryEvent(FrontendLeaderboardEntryMessageEvent ev){
+        log.debug("Send Event: eventType {}, changeTyp {}, leaderboardEntry {}", ev.eventType(), ev.changeType(), ev.leaderboardEntry());
 
-        messagingTemplate.convertAndSend("/topic/chicken", ev);
+        messagingTemplate.convertAndSend("/topic/leaderboard", ev);
     }
 
-    public void sendUpdateCaloriesEvent(FrontendMessageCaloriesEvent ev) {
-        log.info("Send Event: eventType {}, changeTyp {}", ev.eventType(), ev.changeType());
+    public void sendLobbyEvent(FrontendLobbyMessageEvent ev) {
+        log.debug("Send Event: lobbies {}", ev.lobbies().toString());
 
-        messagingTemplate.convertAndSend("/topic/calories", ev);
+        messagingTemplate.convertAndSend("/topic/lobbies", ev.lobbies());
     }
+
+    public void sendChooseEvent ( FrontendChooseRoleEvent ev){
+        log.debug("Send Event: lobby {}", ev.lobby().toString());
+        messagingTemplate.convertAndSend("/topic/lobbies/chooseRole", ev.lobby());
+    }
+
+    public void sendRoleChooseUpdate( FrontedLobbyRoleUpdateEvent ev){
+        log.debug("Sendet Role Update " , ev.lobby());
+        messagingTemplate.convertAndSend("/topic/lobby/Role-Update", ev);
+    }
+
+
+
 }

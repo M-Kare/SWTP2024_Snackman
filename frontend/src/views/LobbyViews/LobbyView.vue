@@ -1,272 +1,597 @@
 <template>
-    <MenuBackground></MenuBackground>
+  <MenuBackground></MenuBackground>
 
-    <h1 class="title"> {{ lobby?.name || 'Lobby Name' }} </h1>
-    <div class="outer-box">
-        <SmallNavButton
-            id="menu-back-button"
-            class="small-nav-buttons"
-            @click="leaveLobby">
-            
-            Leave Lobby
-        </SmallNavButton>
-        <SmallNavButton
-            id="start-game-button"
-            class="small-nav-buttons"
-            @click="startGame">
+  <div id="individual-outer-box-size" class="outer-box">
+    <div class="item-row">
+      <h1 class="title">{{ lobby?.name || 'Lobby Name' }}</h1>
 
-            Start Game
-        </SmallNavButton>
-
-        <div id="player-count">
-                {{ playerCount }} / {{ maxPlayerCount }} Players
-        </div>
-
-        <div class="inner-box">
-            <ul>
-                <li
-                    v-for="member in members"
-                    class="player-list-items">
-
-                    <div class="player-name">
-                        {{ member.playerName }}
-                    </div>
-
-                    <div class="player-character">
-                        {{ member.role }}
-                    </div>
-
-                </li>
-            </ul>
-
-        </div>
+      <div id="player-count">
+        {{ playerCount }} / {{ MAX_PLAYER_COUNT }} Player
+      </div>
     </div>
+
+    <div class="inner-box">
+      <ul>
+        <li v-for="member in members" class="player-list-items">
+          <div class="player-name">
+            {{ member.playerName.replace(/"/g, '') }} <!-- replace all " in String using RegEx modifier /g (find all) -->
+          </div>
+
+          <div class="player-character">
+            {{ member.role }}
+          </div>
+        </li>
+      </ul>
+    </div>
+
+    <div class="item-row">
+      <ul class="map-list" v-if="playerId == adminClientId">
+        <li class="map-list-item" v-for="map in mapList" :key="map.mapName" v-if="mapList.length > 1">
+            <input class="map-choose"
+              type="radio"
+              :value="map.mapName"
+              :checked="selectedMap === map.mapName"
+              @change="selectMap(map.mapName)"
+          />
+          <span>{{ map.mapName }}</span>
+        </li>
+      </ul>
+    </div>
+
+    <div class="item-row">
+      <div id="button-pair">
+        <SmallNavButton
+          id="menu-back-button"
+          class="small-nav-buttons"
+          @click="leaveLobby"
+        >
+          Leave Lobby
+        </SmallNavButton>
+        <SmallNavButton
+          id="menu-map-importieren"
+          class="small-nav-button"
+          v-if="playerId == adminClientId"
+          @click="triggerFileInput"
+        >
+          Import map
+        </SmallNavButton>
+        <input class="input-feld"
+            ref="fileInput"
+            type="file"
+            accept=".txt"
+            @change="handleFileImport"
+        />
+      </div>
+
+      <div id="button-pair">
+        <SmallNavButton
+          id="copyToClip"
+          class="small-nav-buttons"
+          @click="copyToClip()"
+        >
+          Copy Link
+        </SmallNavButton>
+
+
+        <SmallNavButton
+          id="start-game-button"
+          class="small-nav-buttons"
+          @click="chooseRole(lobby)"
+        >
+          Start Game
+        </SmallNavButton>
+      </div>
+    </div>
+  </div>
 
     <div v-if="darkenBackground" id="darken-background"></div>
 
-    <PopUp class="popup-box"
-        v-if="showPopUp"
-        @hidePopUp="hidePopUp">
+  <PlayerNameForm
+    v-if="showPlayerNameForm && !playerNameSaved"
+    @hidePlayerNameForm="hidePlayerNameForm"
+    @playerNameSaved="savePlayerName"
+  >
+  </PlayerNameForm>
 
-        <p class="info-heading"> - Can't start the game -  </p>
-        <p class="info-text"> {{ infoText }} </p>
-    </PopUp>
+  <!-- TODO test if condition works fine -->
+  <PopUp
+    v-if="errorBox && lobbiesStore.lobbydata.currentPlayer.playerName"
+    class="popup-box"
+    @hidePopUp="hidePopUpAndRedirect"
+  >
+    <p class="info-heading">{{ infoHeading }}</p>
+    <p class="info-text">{{ infoText }}</p>
+  </PopUp>
 
+  <PopUp v-if="showPopUp" class="popup-box" @hidePopUp="hidePopUp">
+    <p class="info-heading">{{ infoHeading }}</p>
+    <p class="info-text">{{ infoText }}</p>
+  </PopUp>
+
+  <PopUp v-if="showRolePopup" class="popup-box" @hidePopUp="hidePopUp">
+    <p class="info-heading">Can't start the game</p>
+    <p class="info-text">{{ infoText }}</p>
+  </PopUp>
+
+  <div v-show="showInfo" id="infoBox">{{ infoText }}</div>
 </template>
 
-<script setup lang="ts">
-    import MenuBackground from '@/components/MenuBackground.vue';
-    import SmallNavButton from '@/components/SmallNavButton.vue';
-    import PopUp from '@/components/PopUp.vue';
+<script lang="ts" setup>
 
-    import { useRoute, useRouter } from 'vue-router';
-    import { computed, onMounted, ref, watchEffect } from 'vue';
-    import { useLobbiesStore } from '@/stores/Lobby/lobbiesstore';
-    import type { IPlayerClientDTD } from '@/stores/Lobby/IPlayerClientDTD';
+import MenuBackground from '@/components/MenuBackground.vue'
+import SmallNavButton from '@/components/SmallNavButton.vue'
+import PlayerNameForm from '@/components/PlayerNameForm.vue'
+import PopUp from '@/components/PopUp.vue'
 
-    const router = useRouter();
-    const route = useRoute();
-    const lobbiesStore = useLobbiesStore();
+import {useRoute, useRouter} from 'vue-router'
+import {computed, onMounted, ref, watchEffect} from 'vue'
+import {useLobbiesStore} from '@/stores/Lobby/lobbiesstore'
+import type {IPlayerClientDTD} from '@/stores/Lobby/IPlayerClientDTD'
+import type {ILobbyDTD} from '@/stores/Lobby/ILobbyDTD'
 
-    const lobby = computed(() => lobbiesStore.lobbydata.lobbies.find(l => l.uuid === route.params.lobbyId));
-    const members = computed(() => lobby.value?.members || [] as Array<IPlayerClientDTD>);
-    const playerCount = computed(() => members.value.length);
-    const maxPlayerCount = ref(4);
+const router = useRouter()
+const route = useRoute()
+const lobbiesStore = useLobbiesStore()
 
-    const darkenBackground = ref(false);
-    const showPopUp = ref(false);
-    const infoText = ref();
+const playerId = lobbiesStore.lobbydata.currentPlayer.playerId;
+const lobbyId = route.params.lobbyId as string;
 
-    const hidePopUp = () => {
-        showPopUp.value = false;
-        darkenBackground.value = false;
+const lobbyUrl = route.params.lobbyId
+let lobbyLoaded = false
+const lobby = computed(() =>
+  lobbiesStore.lobbydata.lobbies.find(l => l.lobbyId === lobbyUrl),
+)
+const adminClientId = lobby.value?.adminClient.playerId;
+const members = computed(
+  () => lobby.value?.members || ([] as Array<IPlayerClientDTD>),
+)
+const playerCount = computed(() => members.value.length)
+const maxPlayerCount = ref(5)
+const playerNameSaved = lobbiesStore.lobbydata.currentPlayer.playerName;
+const showPlayerNameForm = ref(false);
+
+const darkenBackground = ref(false)
+const showPopUp = ref(false)
+const showRolePopup = ref(false)
+const errorBox = ref(false)
+const infoText = ref()
+const infoHeading = ref()
+const showInfo = ref(false)
+
+const mouseX = ref(0)
+const mouseY = ref(0)
+
+const mouseInfoBox = ref(document.getElementById('infoBox'))
+
+const MAX_PLAYER_COUNT = 5
+
+const TIP_TOP_DIST = 30
+const TIP_SIDE_DIST = 20
+
+const hidePlayerNameForm = () => {
+  showPlayerNameForm.value = false;
+
+  if(!errorBox.value) {
+    darkenBackground.value = false;
+  }
+}
+
+const hidePopUp = () => {
+  showPopUp.value = false
+  darkenBackground.value = false
+}
+
+// needed for errorBox which shows up when lobby does not exist
+function hidePopUpAndRedirect(){
+  hidePopUp();
+  router.push({ name: "LobbyListView"})
+}
+
+const mapList = ref<{ mapName: string; fileName: string }[]>([
+  {mapName: 'Generated Map', fileName: `Maze.txt`},
+]);
+
+const usedCustomMap = ref(false);
+const selectedMap = ref<string | null>(null);
+
+const selectMap = (mapName: string) => {
+    selectedMap.value = mapName;
+
+  if (selectedMap.value === 'Generated Map') {
+        usedCustomMap.value = false;
+  } else if (selectedMap.value === 'Uploaded Map') {
+        usedCustomMap.value = true;
     }
-    
-    watchEffect(() => {
-        if (lobbiesStore.lobbydata) {
-            const lobbyId = route.params.lobbyId as string;
-            
-            const updatedLobby = lobbiesStore.lobbydata.lobbies.find(l => l.uuid === lobbyId);
-            console.log("Updated Lobby in Lobby-View", updatedLobby)
+};
 
-            if (updatedLobby) {
-                console.log("Gamestarted in Lobby-View", updatedLobby.gameStarted) 
-                if (updatedLobby.gameStarted){
-                    console.log('Game has started! Redirecting to GameView...');
-                    router.push({ name: 'GameView' });
-                }
-            }else {
-                router.push({ name: 'LobbyListView' });
-            }
+const triggerFileInput = () => {
+    fileInput.value?.click();
+}
 
-        }
-    });
+const fileInput = ref<HTMLInputElement | null>(null);
 
-    onMounted(async () => {
-        if(!lobby.value){
-            alert('Lobby not found or failed to load.');
-            router.push({name: 'LobbyListView'});
-        }
+/**
+ * This function processes the file selected by the user in an input field.
+ * It ensures the file is a `.txt` file.
+ * If the file is valid, it triggers an upload to the server.
+ * Otherwise, it displays a popup with error information.
+ *
+ * @param event - The event triggered by the file input change.
+ */
+const handleFileImport = (event: Event) => {
+    const input = event.target as HTMLInputElement;
 
-        lobbiesStore.startLobbyLiveUpdate();
-
-    })
-
-    /**
-     * Leaves the current lobby. If the player is the admin, it will remove other members from the lobby first.
-     * After leaving the lobby, the user is redirected to the Lobby List View.
-     * 
-     * @async
-     * @function leaveLobby
-     * @throws {Error} If the player or lobby is not found.
-     */
-    const leaveLobby = async () => {
-        const playerId = lobbiesStore.lobbydata.currentPlayer.playerId;
-        if (!playerId || !lobby.value) {
-            console.error('Player or Lobby not found');
-            return;
-        }
-
-        if(playerId === lobby.value.adminClient.playerId){
-            for (const member of lobby.value.members) {
-                if (member.playerId !== playerId) {
-                    await lobbiesStore.leaveLobby(lobby.value.uuid, member.playerId);
-                }
-            }
-        } 
-
-        await lobbiesStore.leaveLobby(lobby.value.uuid, playerId);
-        router.push({ name: 'LobbyListView' });
-    }
-
-    /**
-     * Starts the game if the player is the admin and there are enough members in the lobby.
-     * If the player is not the admin or there are not enough members, a popup will be shown.
-     * 
-     * @async
-     * @function startGame
-     * @throws {Error} If the player or lobby is not found.
-     */
-    const startGame = async () => {
-        const playerId = lobbiesStore.lobbydata.currentPlayer.playerId;
-
-        if (!playerId ||!lobby.value) {
-            console.error('Player or Lobby not found');
-            return;
-        }
-
-        if(lobby.value.members.length < 2){
-            showPopUp.value = true;
-            darkenBackground.value = true;
-            infoText.value = "Not enough players to start the game!"
-        }
-
-        if(playerId === lobby.value.adminClient.playerId){
-            await lobbiesStore.startGame(lobby.value.uuid);
+    if (input.files && input.files.length > 0) {
+        const file = input.files[0];
+        if (file.name.endsWith('.txt')) {
+            uploadFileToServer(file, lobbyId);
         } else {
             showPopUp.value = true;
             darkenBackground.value = true;
-            infoText.value = "Only SnackMan can start the game!"
+            infoHeading.value = "File Map is not valid"
+            infoText.value = "Please upload file .txt"
         }
     }
+}
 
+/**
+ * Upload file to server
+ * @param file - new custom map in file .txt
+ * @param lobbyId - The unique identifier of the lobby.
+ */
+const uploadFileToServer = async (file: File, lobbyId: string) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('lobbyId', lobbyId);
+
+    try {
+        const response = await fetch('/api/upload', {
+            method: 'POST',
+            body: formData
+        });
+
+        if (response.ok) {
+            const mapName = 'Uploaded Map';
+            const fileName = `SnackManMap_${lobbyId}.txt`;
+
+            if (mapList.value.length > 1) {
+                mapList.value[1] = { mapName, fileName };
+            } else {
+                mapList.value.push({ mapName, fileName });
+            }
+
+            selectMap(mapName);
+        } else {
+            const errorMessage = await response.text();
+            showPopUp.value = true;
+            darkenBackground.value = true;
+            infoHeading.value = "File Map is not valid";
+            infoText.value = errorMessage;
+        }
+    } catch (error) {
+        console.error('Error uploading file:', error);
+        showPopUp.value = true;
+        darkenBackground.value = true;
+        infoHeading.value = "Error uploading file";
+        infoText.value = error;
+    }
+}
+
+/**
+ * Delete uploaded File, when the lobby doesn't exist anymore.
+ * @param lobbyId - The unique identifier of the lobby.
+ */
+const deleteUploadedFile = async (lobbyId: string) => {
+    const formData = new FormData();
+    formData.append('lobbyId', lobbyId);
+
+    fetch('/api/deleteMap', {
+        method: 'DELETE',
+        body: formData
+    })
+    .then(response => {
+        if (!response.ok) {
+            console.error('Error deleting file:', response.text());
+        }
+    })
+    .catch(error => {
+        console.error('Error deleting file:', error);
+    });
+}
+
+/**
+ * Sends a request to update the used map status for a specific lobby.
+ *
+ * @param {string} lobbyId - The unique identifier of the lobby.
+ * @param {boolean} usedCustomMap - Indicates whether a custom map is used (true) or not (false).
+*/
+const changeUsedMapStatus = async (lobbyId: string, usedCustomMap: boolean): Promise<string> => {
+    try {
+        const response = await fetch('/api/change-used-map-status', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ lobbyId, usedCustomMap })
+        });
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error('Error changing the used map status:', errorText);
+            throw new Error(`Failed to change map status: ${errorText}`);
+        }
+
+        return "done";
+    } catch (error) {
+        console.error('Error changing the used map status:', error);
+        throw error;
+    }
+}
+
+watchEffect(() => {
+  if (lobbiesStore.lobbydata && lobbiesStore.lobbydata.lobbies) {
+    const updatedLobby = lobbiesStore.lobbydata.lobbies.find(
+      l => l.lobbyId === lobbyUrl,
+    )
+    if (updatedLobby) {
+      lobbyLoaded = true
+    } else if (lobbyLoaded) {
+      deleteUploadedFile(lobbyId);
+      router.push({ name: 'LobbyListView' })
+    }
+  }
+})
+
+onMounted(async () => {
+  await lobbiesStore.fetchLobbyList()
+
+  if (!lobby.value) {
+    infoHeading.value = 'Lobby does not exist'
+    infoText.value = 'Please choose or create another one!'
+    errorBox.value = true
+    darkenBackground.value = true;
+  }
+  await lobbiesStore.startLobbyLiveUpdate()
+
+  // player joined via link
+  if (
+    !lobbiesStore.lobbydata.currentPlayer ||
+    lobbiesStore.lobbydata.currentPlayer.playerId === '' ||
+    lobbiesStore.lobbydata.currentPlayer.playerName === ''
+  ) {
+    // save name to create player, no matter if lobby full or not
+    showPlayerNameForm.value = true;
+    darkenBackground.value = true;
+
+    if (lobby.value!.members.length >= MAX_PLAYER_COUNT) {
+      infoHeading.value = 'Lobby full'
+      infoText.value = 'Please choose or create another one!'
+      errorBox.value = true
+      darkenBackground.value = true
+    }
+  }
+})
+
+  const savePlayerName = async (newName: string) => {
+    try {
+      await lobbiesStore.createPlayer(newName);
+      await joinLobby(lobby.value!)
+
+    } catch(error) {
+      console.error("Error saving playerName:", error);
+      alert("Error saving playerName!");
+    }
+  }
+
+  const joinLobby = async (lobby: ILobbyDTD) => {
+
+    try {
+      const joinedLobby = await lobbiesStore.joinLobby(
+        lobby.lobbyId,
+        lobbiesStore.lobbydata.currentPlayer.playerId,
+      )
+
+      if (joinedLobby) {
+        router.push({ name: 'LobbyView', params: { lobbyId: lobby.lobbyId } })
+      }
+    } catch (error: any) {
+      console.error('Error:', error)
+    }
+  }
+
+/**
+ * Leaves the current lobby. If the player is the admin, it will remove other members from the lobby first.
+ * After leaving the lobby, the user is redirected to the Lobby List View.
+ *
+ * @async
+ * @function leaveLobby
+ * @throws {Error} If the player or lobby is not found.
+ */
+const leaveLobby = async () => {
+  const playerId = lobbiesStore.lobbydata.currentPlayer.playerId
+  if (!playerId || !lobby.value) {
+    console.error('Player or Lobby not found')
+    return
+  }
+
+  if (playerId === lobby.value.adminClient.playerId) {
+    for (const member of lobby.value.members) {
+      if (member.playerId !== playerId) {
+        await lobbiesStore.leaveLobby(lobby.value.lobbyId, member.playerId)
+      }
+    }
+    // If Admin-Player leave Lobby, delete the uploaded map
+    deleteUploadedFile(lobbyId);
+  }
+
+  await lobbiesStore.leaveLobby(lobby.value.lobbyId, playerId)
+  router.push({ name: 'LobbyListView' })
+}
+
+const chooseRole = async(lobby: ILobbyDTD | undefined ) =>{
+  const playerId = lobbiesStore.lobbydata.currentPlayer.playerId
+
+  if (!lobby){
+    return
+  }
+
+  if (!playerId || !lobby.members) {
+    console.error('Player or Lobbymembers not found')
+    return
+  }
+
+  if (lobby.members.length < 2) {
+    showPopUp.value = true
+    darkenBackground.value = true
+    infoText.value = 'Not enough players to choose Role!'
+    return
+  }
+
+  if (playerId === lobby.adminClient.playerId) {
+    await lobbiesStore.chooseRole(lobby.lobbyId)
+  } else {
+    showPopUp.value = true
+    darkenBackground.value = true
+    infoText.value = 'The role selection can only be initiated by the host!'
+  }
+
+}
+
+function copyToClip() {
+  navigator.clipboard.writeText(document.URL)
+  infoText.value = 'Link copied to clipboard'
+  showInfo.value = true
+  mouseInfoBox.value = document.getElementById('infoBox')
+  moveToMouse(mouseInfoBox.value!)
+  setTimeout(() => {
+    showInfo.value = false
+  }, 1000)
+}
+
+window.onmousemove = function (e) {
+  mouseX.value = e.clientX
+  mouseY.value = e.clientY
+  if (showInfo.value) {
+    moveToMouse(mouseInfoBox.value!)
+  }
+}
+
+function moveToMouse(element: HTMLElement) {
+  const offset = mouseInfoBox.value!.parentElement!.getBoundingClientRect()
+  element.style.top = mouseY.value - offset.top - TIP_TOP_DIST + 'px'
+  element.style.left = mouseX.value - offset.left + TIP_SIDE_DIST + 'px'
+}
 </script>
 
 <style scoped>
 .title {
-    position: absolute;
-    top: 3rem;
-    left: 50%;
-    transform: translateX(-50%);
-    font-size: 3rem;
-    font-weight: bold;
-    color: #fff;
-    text-align: center;
+  font-size: 3rem;
+  font-weight: bold;
+  color: var(--background-for-text-color);
+  text-align: left;
 }
 
-.outer-box {
-    position: absolute;
-    top: 30%;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 70vw;
-    max-width: 1000px;
-    height: 30rem;
-    max-height: 45rem;
-    background: rgba(255, 255, 255, 60%);
-    border-radius: 0.5rem;
+#individual-outer-box-size {
+  width: 60%;
+  height: 60%;
+  max-height: 70%;
+  padding: 2%;
+}
+
+#infoBox {
+  position: absolute;
+  border-radius: 0.5rem;
+  background: rgba(255, 255, 255, 60%);
+  color: #000000;
 }
 
 #player-count {
-    top: 1%;
-    left: 50%;
-    transform: translateX(-50%);
-    text-align: center;
-    font-size: 1.8rem;
-    font-weight: bold;
-    color: #000000;
-    padding: 1rem;
+  font-size: 3rem;
+  font-weight: bold;
+  color: var(--background-for-text-color);
+  text-align: right;
 }
 
 .inner-box {
-    position: relative;
-    margin-top: 1vh;
-    margin-bottom: 1vh;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 90%;
-    height: auto;
-    background: rgba(255, 255, 255, 70%);
-    border-radius: 0.3rem;
-    color: #000000;
+  position: relative;
+  margin-top: 1vh;
+  margin-bottom: 1vh;
+  left: 50%;
+  transform: translateX(-50%);
+  height: auto;
+  border-radius: 0.3rem;
+  color: var(--primary-text-color);
 }
 
 .inner-box > ul {
-    list-style: none;
-    display: flex;
-    flex-direction: column;
-    left: 50%;
-    transform: translateX(-50%);
-    margin: 0;
-    padding: 0;
-    width: 100%;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  left: 50%;
+  transform: translateX(-50%);
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  min-height: 30vh;
 }
 
 .player-list-items {
-    display: flex;
-    justify-content: space-between;
-    border: 0.5px solid black;
-    border-radius: 0.2rem;
-    font-size: 1.2rem;
-    padding: 0.5rem;
-    margin: 0.6rem;
+  display: flex;
+  justify-content: space-between;
+  background: var(--background-for-text-color);
+  border: 4px solid var(--primary-text-color);
+  border-radius: 0.1rem;
+  box-shadow: 4px 3px 0 var(--primary-text-color);
+  font-size: 1.2rem;
+  padding: 0.5rem 0.8rem;
+  margin: 0.4rem 0;
 }
 
-.small-nav-buttons {
-    bottom: 3%;
-    font-weight: bold;
+.player-list-items:hover {
+  cursor: pointer;
 }
 
 .info-heading {
-    font-size: 3rem;
-    font-weight: bold;
+  font-size: 3rem;
+  font-weight: bold;
 }
 
 .info-text {
-    font-size: 1.8rem;
-    padding: 1.2rem;
+  font-size: 1.8rem;
 }
 
-#menu-back-button {
-    left: 5%;
+.item-row {
+  display: flex;
+  justify-content: space-between;
 }
 
-#start-game-button {
-    right: 5%;
+#button-pair {
+  display: flex;
+  gap: 20px;
 }
 
-#menu-back-button:hover, #start-game-button:hover {
-  box-shadow: 0px 0px 35px 5px rgba(255, 255, 255, 0.5);
+#menu-back-button:hover,
+#copyToClip:hover,
+#start-game-button:hover,
+#menu-map-importieren:hover {
+  background: var(--primary-highlight-color);
+}
+
+.map-list{
+  margin-top: 1vh;
+  margin-bottom: 1vh;
+  display: flex;
+  list-style: none;
+  padding: 0;
+}
+
+.map-list-item{
+  margin-right: 40px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  font-size: 1.5rem;
+  color: white;
 }
 
 #darken-background {
@@ -280,4 +605,13 @@
     transition: background 0.3s ease;
 }
 
+.map-choose{
+  width: 20px;
+  height: 20px;
+  transform: scale(1.5);
+}
+
+.input-feld{
+  display: none;
+}
 </style>

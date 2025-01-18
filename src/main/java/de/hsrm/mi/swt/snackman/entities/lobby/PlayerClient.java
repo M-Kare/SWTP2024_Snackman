@@ -8,16 +8,11 @@ public class PlayerClient {
       private String playerId;
       private String playerName;
       private ROLE role;
-      
-      public PlayerClient(String playerId, String playerName, ROLE role) {
-            this.playerId = playerId;
-            this.playerName = playerName;
-            this.role = role;
-      }
 
       public PlayerClient(String playerId, String playerName) {
             this.playerId = playerId;
             this.playerName = playerName;
+            this.role = ROLE.UNDEFINED;
       }
 
       public String getPlayerId() {
@@ -36,6 +31,12 @@ public class PlayerClient {
             this.role = role;
       }
 
-      
-      
+      @Override
+      public String toString() {
+            return "PlayerClient{" +
+                    "playerId='" + playerId + '\'' +
+                    ", playerName='" + playerName + '\'' +
+                    ", role=" + role +
+                    '}';
+      }
 }

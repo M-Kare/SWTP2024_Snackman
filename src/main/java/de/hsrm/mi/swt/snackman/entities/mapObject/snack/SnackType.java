@@ -6,25 +6,35 @@ public enum SnackType {
     CHERRY(100),
     STRAWBERRY(300),
     ORANGE(500),
-    APPLE(700);
+    APPLE(700),
+    EMPTY(0),
+    EGG(0);
 
     private final int calories;
+
     SnackType(int calories) {
         this.calories = calories;
     }
 
-    public int getCalories() {
-        return calories;
-    }
-
     /**
      * Gets a random snack
+     *
      * @return random snack
      */
     public static SnackType getRandomSnack() {
-        SnackType[] snacks = values();
+        SnackType[] snacks = {CHERRY, STRAWBERRY, ORANGE, APPLE};
         Random random = new Random();
         int randomIndex = random.nextInt(snacks.length);
-        return snacks[randomIndex];
+        SnackType returnSnack = snacks[randomIndex];
+
+        if (returnSnack != SnackType.EGG) {
+            return snacks[randomIndex];
+        } else {
+            return getRandomSnack();
+        }
+    }
+
+    public int getCalories() {
+        return calories;
     }
 }

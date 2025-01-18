@@ -1,15 +1,27 @@
 package de.hsrm.mi.swt.snackman.services;
 
+import de.hsrm.mi.swt.snackman.SnackmanApplication;
+import org.python.util.PythonInterpreter;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
 @Service
 public class ReadMazeService {
+
+    private PythonInterpreter interpreter;
+
+    public ReadMazeService() {
+        interpreter = new PythonInterpreter();
+        interpreter.exec("import sys");
+        URL path = SnackmanApplication.class.getProtectionDomain().getCodeSource().getLocation();
+        interpreter.exec("sys.path.append('" + path.getPath().replace("nested:", "").replace("!", "") + "/Lib')");
+    }
 
     /**
      * Reads maze data from a file and converts it into a char array with [x][z]-coordinates
@@ -43,4 +55,22 @@ public class ReadMazeService {
 
         return mazeAsCharArray;
     }
+
+    public void generateNewMaze() {
+        String mazeScriptPath = "./extensions/maze/Maze.py";
+        interpreter.execfile(mazeScriptPath);
+    }
+
+    // /**
+    //  * Generates a new Maze and saves it in a Maze.txt file
+    //  */
+    // public void generateNewMaze() {
+    //     pythonProps.setProperty("python.path", "src/main/java/de/hsrm/mi/swt/snackman");
+    //     PythonInterpreter.initialize(System.getProperties(), pythonProps, new String[0]);
+    //     this.pythonInterpreter = new PythonInterpreter();
+    //     pythonInterpreter.exec("from Maze import main");
+    //     PyObject func = pythonInterpreter.get("main");
+    //     func.__call__();
+    // }
+
 }

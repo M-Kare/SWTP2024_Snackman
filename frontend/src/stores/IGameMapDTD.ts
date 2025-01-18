@@ -1,11 +1,14 @@
 import type {ISquare, ISquareDTD} from "@/stores/Square/ISquareDTD";
 import type {IChicken, IChickenDTD} from "@/stores/Chicken/IChickenDTD";
+import type {IGhost, IGhostDTD} from "@/stores/Ghost/IGhostDTD";
+import type {IScriptGhost, IScriptGhostDTD} from "@/stores/Ghost/IScriptGhostDTD";
 
 export interface IGameMapDTD {
   DEFAULT_WALL_HEIGHT: number,
   DEFAULT_SQUARE_SIDE_LENGTH: number,
   gameMap: Array<ISquareDTD>,
-  chickens: IChickenDTD[]
+  chickens: IChickenDTD[],
+  scriptGhosts: IScriptGhostDTD[]
 }
 
 export enum MapObjectType {
@@ -15,6 +18,7 @@ export enum MapObjectType {
 export interface IGameMap {
   DEFAULT_WALL_HEIGHT: number,
   DEFAULT_SQUARE_SIDE_LENGTH: number,
-  gameMap: Map<number, ISquare>
-  chickens: IChicken[]
+  gameMap: Map<number, ISquare>,
+  chickens: IChicken[],
+  scriptGhosts: IScriptGhost[]
 }
