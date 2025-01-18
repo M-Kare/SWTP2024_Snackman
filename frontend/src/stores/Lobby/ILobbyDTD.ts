@@ -5,5 +5,6 @@ export interface ILobbyDTD{
     name: string
     adminClient: IPlayerClientDTD
     gameStarted: boolean
+    chooseRole: boolean
     members: Array<IPlayerClientDTD>
 }
