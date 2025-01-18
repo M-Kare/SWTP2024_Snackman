@@ -58,7 +58,10 @@ const startSingleplayer = async () => {
   if (player.playerId === lobby.adminClient.playerId) {
     await router.push({
       name: 'GameView',
-      query: {role: lobbiesStore.lobbydata.currentPlayer.role},
+      query: {
+        role: lobbiesStore.lobbydata.currentPlayer.role,
+        lobbyId: lobbiesStore.lobbydata.currentPlayer.joinedLobbyId,
+      },
     })
   }
 }

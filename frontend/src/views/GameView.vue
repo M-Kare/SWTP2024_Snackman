@@ -12,6 +12,12 @@
         <p v-else>{{ caloriesMessage }}</p>
       </div>
     </div>
+
+    <div class="time">
+      <img alt="clock" class="clock-icon" src="@/assets/clock-icon.svg" />
+      <p>{{ formattedTime }}</p>
+    </div>
+
   </div>
 </template>
 
@@ -106,6 +112,9 @@ function animate() {
 }
 
 onMounted(async () => {
+  startCountDown()
+  console.log(formattedTime)
+
   // for rendering the scene, create gameMap in 3d and change window size
   const {initRenderer, createGameMap, getScene} = GameMapRenderer()
   scene = getScene()
@@ -256,14 +265,94 @@ const sprintBarStyle = computed(() => {
     backgroundColor: color,
   }
 })
+
+const countdownTime = ref(300) // 5 Minute in seconds
+const lobbyId = ref(route.query.lobbyId || '');
+
+/**
+ * Get Current Playing Time From Backend
+ */
+const getCurrentPlayingTime = async () => {
+  try {
+    const url = `/api/lobby/${lobbyId.value}/current-playing-time`
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+    })
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`)
+    }
+
+    const currentPlayingTime = await response.json();
+    console.log('Current Playing Time:', currentPlayingTime);
+    return currentPlayingTime;
+
+    } catch (error: any) {
+      console.error('Error:', error)
+      return null
+    }
+}
+   
+const formattedTime = computed(() => {
+  const minutes = Math.floor(countdownTime.value / 60)
+  const seconds = countdownTime.value % 60
+  return `${minutes < 10 ? '0' : ''}${minutes}:${seconds < 10 ? '0' : ''}${seconds}`
+})
+
+const startCountDown = async () => {
+  const currentTime = await getCurrentPlayingTime();
+  if (currentTime !== null) {
+    countdownTime.value = Math.floor(currentTime / 1000); // Change from milis second to second
+  } else {
+    console.error('Failed to fetch current playing time. Using default value.');
+  }
+
+  const interval = setInterval(() => {
+    if (countdownTime.value > 0) {
+      countdownTime.value -= 1;
+    } else {
+      clearInterval(interval); // Stop when countdown reaches 0
+    }
+  }, 1000)
+}
+
 </script>
 
 <style>
+.time {
+  position: absolute;
+  color: black;
+  font-weight: bold;
+  top: 3vh;
+  right: 3vh;
+  font-size: 40px;
+  z-index: 10;
+  display: flex;
+  width: 400px;
+  height: 60px;
+  gap: 10px;
+  justify-content: right;
+  align-items: center;
+}
+
+.time p {
+  margin: 0;
+  line-height: 1;
+}
+
+.clock-icon {
+  width: 40px;
+  height: 40px;
+}
+
 .Calories-Overlay {
   color: black;
   position: fixed;
-  top: 10px;
-  right: 10px;
+  top: 3vh;
+  left: 3vh;
   padding: 10px;
   border-radius: 5px;
   z-index: 10;
@@ -272,12 +361,19 @@ const sprintBarStyle = computed(() => {
   height: 60px;
   display: flex;
   justify-content: left;
+  align-items: center; 
+  box-shadow: 7px 7px 0 rgba(0, 0, 0, 0.8);
 }
 
 .overlayContent {
   display: flex;
   align-items: center;
   gap: 16px;
+}
+
+.overlayContent p {
+  margin: 0;
+  line-height: 1;
 }
 
 .calories-icon {
@@ -287,14 +383,16 @@ const sprintBarStyle = computed(() => {
 
 .sprint-bar {
   position: absolute;
+  z-index: 10;
   bottom: 3vh;
-  right: 3vh;
+  left: 3vh;
   width: 25rem;
   height: 2.5rem;
   background-color: #ccc;
   border: 0.25rem solid #000;
   border-radius: 0.5rem;
   overflow: hidden;
+  box-shadow: 7px 7px 0 rgba(0, 0, 0, 0.8);
 }
 
 .sprint-bar-inner {

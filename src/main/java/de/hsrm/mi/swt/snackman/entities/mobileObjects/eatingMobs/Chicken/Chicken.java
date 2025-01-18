@@ -419,6 +419,16 @@ public class Chicken extends EatingMob implements Runnable {
         layEgg();
     }
 
+    // For Testing
+    public boolean isScared(){
+        return this.isScared;
+    }
+
+    // For Testing
+    public void setScared(boolean b){
+        this.isScared = b;
+    }
+
     /**
      * timer should restart if chicken kcal == 0
      *
