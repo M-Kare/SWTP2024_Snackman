@@ -290,13 +290,13 @@ public class MapService {
      * Eggs are not removed.
      * @param map
      */
-    public void respawnSnacks(GameMap map) {
+    public void respawnSnacks(GameMap map, double probability) {
         for (int i = 0; i < map.getGameMapSquares().length; i++) {
             for (int j = 0; j < map.getGameMapSquares()[0].length; j++) {
                 Square square = map.getSquareAtIndexXZ(i, j);
                 if (square.getType() == MapObjectType.FLOOR && square.getSnack().getSnackType() != SnackType.EGG) {
                     double rand = Math.random();
-                    if (rand <= GameConfig.SNACK_SPAWN_RATE) {
+                    if (rand <= probability) {
                         addRandomSnackToSquare(square);
                     } else {
                         square.setSnack(new Snack(SnackType.EMPTY));
