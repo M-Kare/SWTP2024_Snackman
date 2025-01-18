@@ -205,7 +205,6 @@ export const useLobbiesStore = defineStore('lobbiesstore', () => {
             // Push the update to all clients at /ChooseRole/{lobbyId}
             if (stompclient && stompclient.connected) {
               router.push({ name: 'ChooseRole', params: { lobbyId: updatedLobbyWithRole.lobbyId } })
-                .catch(() => {})
               console.log(`Pushed update to /ChooseRole/${updatedLobbyWithRole.lobbyId}`)
             }
           }
