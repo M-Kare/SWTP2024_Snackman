@@ -189,11 +189,35 @@ public abstract class Mob {
                 break;
             case 1:
                 position.z += move.z;
+                position.x += move.x;
+                if (Math.round(position.x) < position.x) {
+                    position.x = Math.round(position.x) + this.radius;
+                } else {
+                    position.x = Math.round(position.x) - this.radius;
+                }
                 break;
             case 2:
                 position.x += move.x;
+                position.z += move.z;
+                if (Math.round(position.z) < position.z) {
+                    position.z = Math.round(position.z) + this.radius;
+                } else {
+                    position.z = Math.round(position.z) - this.radius;
+                }
                 break;
             case 3:
+                position.x += move.x;
+                position.z += move.z;
+                if (Math.round(position.x) < position.x) {
+                    position.x = Math.round(position.x) + this.radius;
+                } else {
+                    position.x = Math.round(position.x) - this.radius;
+                }
+                if (Math.round(position.z) < position.z) {
+                    position.z = Math.round(position.z) + this.radius;
+                } else {
+                    position.z = Math.round(position.z) - this.radius;
+                }
                 break;
             default:
                 break;
@@ -283,7 +307,7 @@ public abstract class Mob {
             double diagZ = verticalRelativeToCenter > 0 ? (currentSquare.getIndexZ() + 1) * GameConfig.SQUARE_SIZE
                     : currentSquare.getIndexZ() * GameConfig.SQUARE_SIZE;
             double dist = Math.sqrt((diagX - x) * (diagX - x) + (diagZ - z) * (diagZ - z));
-            if (dist <= this.radius)
+            if (dist < this.radius)
                 collisionCase = 3;
         }
 
@@ -302,7 +326,7 @@ public abstract class Mob {
     public boolean calcIntersectionWithLine(double xNew, double zNew, Vector3d origin, Vector3d direction) {
         Vector3d line = origin.cross(direction);
         double dist = Math.abs(line.x * xNew + line.y * zNew + line.z) / Math.sqrt(line.x * line.x + line.y * line.y);
-        return dist <= this.radius;
+        return dist < this.radius;
     }
 
     public void setQuaternion(double qX, double qY, double qZ, double qW) {

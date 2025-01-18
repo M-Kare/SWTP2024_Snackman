@@ -292,11 +292,35 @@ export class Player {
         break;
       case 1:
         this.camera.position.z += move.z;
+        this.camera.position.x += move.x;        
+        if (Math.round(this.camera.position.x) < this.camera.position.x) {
+          this.camera.position.x = Math.round(this.camera.position.x) + this.radius;
+        } else {
+          this.camera.position.x = Math.round(this.camera.position.x) - this.radius;
+        }
         break;
       case 2:
         this.camera.position.x += move.x;
+        this.camera.position.z += move.z;
+        if (Math.round(this.camera.position.z) < this.camera.position.z) {
+          this.camera.position.z = Math.round(this.camera.position.z) + this.radius;
+        } else {
+          this.camera.position.z = Math.round(this.camera.position.z) - this.radius;
+        }
         break;
       case 3:
+        this.camera.position.x += move.x;
+        this.camera.position.z += move.z;
+        if (Math.round(this.camera.position.x) < this.camera.position.x) {
+          this.camera.position.x = Math.round(this.camera.position.x) + this.radius;
+        } else {
+          this.camera.position.x = Math.round(this.camera.position.x) - this.radius;
+        }
+        if (Math.round(this.camera.position.z) < this.camera.position.z) {
+          this.camera.position.z = Math.round(this.camera.position.z) + this.radius;
+        } else {
+          this.camera.position.z = Math.round(this.camera.position.z) - this.radius;
+        }
         break;
       default:
         break;
@@ -368,7 +392,7 @@ export class Player {
       const diagZ = verticalRelativeToCenter > 0 ? (this.currentSquare.indexZ + 1) * this.squareSize
         : this.currentSquare.indexZ * this.squareSize;
       const dist = Math.sqrt((diagX - x) * (diagX - x) + (diagZ - z) * (diagZ - z));
-      if (dist <= this.radius)
+      if (dist < this.radius)
         collisionCase = 3;
     }
 
@@ -386,7 +410,7 @@ export class Player {
   public calcIntersectionWithLine(xNew: number, zNew: number, origin: THREE.Vector3, direction: THREE.Vector3): boolean {
     const line = origin.cross(direction);
     const dist = Math.abs(line.x * xNew + line.y * zNew + line.z) / Math.sqrt(line.x * line.x + line.y * line.y);
-    return dist <= this.radius;
+    return dist < this.radius;
   }
 
   public getIsJumping() {
