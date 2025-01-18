@@ -20,5 +20,5 @@ export enum ChickenThickness {
 }
 
 export enum Direction {
-  NORTH_WEST, NORTH, NORTH_EAST, EAST, SOUTH_EAST, SOUTH, SOUTH_WEST, WEST
+  ONE_NORTH, ONE_SOUTH, ONE_EAST, ONE_WEST
 }

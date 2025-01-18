@@ -162,6 +162,7 @@ export const useGameMapStore = defineStore('gameMap', () => {
                 break;
               case EventType.ScriptGhostUpdate:
                 const scriptGhostUpdate: IScriptGhostDTD = mess.message
+
                 updateScriptGhost(scriptGhostUpdate)
                 break;
               default:
@@ -317,16 +318,16 @@ export const useGameMapStore = defineStore('gameMap', () => {
     switch (
       currentChicken.lookingDirection // rotates the chicken depending on what its looking direction is
       ) {
-      case Direction.NORTH:
+      case Direction.ONE_NORTH:
         chickenMesh!.setRotationFromEuler(new THREE.Euler(0))
         break;
-      case Direction.SOUTH:
+      case Direction.ONE_SOUTH:
         chickenMesh!.setRotationFromEuler(new THREE.Euler(Math.PI))
         break;
-      case Direction.EAST:
+      case Direction.ONE_EAST:
         chickenMesh!.setRotationFromEuler(new THREE.Euler(Math.PI / 2))
         break
-      case Direction.WEST:
+      case Direction.ONE_WEST:
         chickenMesh!.setRotationFromEuler(new THREE.Euler(3 * Math.PI / 2))
         break
     }
@@ -334,23 +335,22 @@ export const useGameMapStore = defineStore('gameMap', () => {
 
   function updateLookingDirectionScriptGhost(currentScriptGhost: IScriptGhost, scriptGhostUpdate: IScriptGhostDTD) {
     console.log("ScriptGhost looking direction updated")
-    currentScriptGhost.lookingDirection = scriptGhostUpdate.lookingDirection
-    console.log(currentScriptGhost.model.children.length)
-    switch (currentScriptGhost.lookingDirection) {
-      case Direction.NORTH:
-        currentScriptGhost.model.rotation.set(0, 0, 0)
+    currentScriptGhost.lookingDirection = Direction[scriptGhostUpdate.lookingDirection as unknown as keyof typeof Direction]
+    switch (+currentScriptGhost.lookingDirection) {
+      case Direction.ONE_NORTH:
+        currentScriptGhost.model.rotation.y = 0
         break;
-      case Direction.SOUTH:
-        currentScriptGhost.model.rotation.set(0, 180, 0)
+      case Direction.ONE_SOUTH:
+        currentScriptGhost.model.rotation.y = 180
         break;
-      case Direction.EAST:
-        currentScriptGhost.model.rotation.set(0, 90, 0)
+      case Direction.ONE_EAST:
+        currentScriptGhost.model.rotation.y = 90
         break
-      case Direction.WEST:
-      currentScriptGhost.model.rotation.set(0, 270, 0)
+      case Direction.ONE_WEST:
+        currentScriptGhost.model.rotation.y = 270
         break
     }
-    console.log("Look direction: " + scriptGhostUpdate.lookingDirection, " Rotation: " + currentScriptGhost.model.rotation.x , currentScriptGhost.model.rotation.y, currentScriptGhost.model.rotation.z)
+    console.log("Look direction: " + (+scriptGhostUpdate.lookingDirection), " Rotation: " + currentScriptGhost.model.rotation.x , currentScriptGhost.model.rotation.y, currentScriptGhost.model.rotation.z)
   }
 
   function updateWalkingDirection(

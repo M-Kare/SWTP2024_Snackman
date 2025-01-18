@@ -121,12 +121,8 @@ export const GameObjectRenderer = () => {
           ghostModel = gltf.scene
           ghostModel.position.set(xPosition, yPosition, zPosition)
           ghostModel.scale.set(0.5, 0.5, 0.5)
-          ghostModel.traverse((child: any) => {
-            if (child.isMesh) {
-              child.castShadow = true
-              child.receiveShadow = true
-            }
-          })
+          ghostModel.castShadow = true
+          ghostModel.receiveShadow = true
           resolve(ghostModel.clone())
         },
         undefined,
