@@ -135,12 +135,19 @@ public class Chicken extends EatingMob implements Runnable {
         this.lookingDirection = walkingDirection;
         Square oldPosition = this.gameMap.getSquareAtIndexXZ(this.chickenPosX, this.chickenPosZ);
         Square newPosition = walkingDirection.getNewPosition(this.gameMap, this.chickenPosX, this.chickenPosZ,
-                walkingDirection);
+        walkingDirection);
+        try {
+            log.debug("Waiting " + waitingTime + " sec before walking on next square.");
+            Thread.sleep(waitingTime/2);
+        } catch (InterruptedException e) {
+            log.error(e.getMessage());
+            Thread.currentThread().interrupt();
+        }
         propertyChangeSupport.firePropertyChange("chicken", null, this);
 
         try {
             log.debug("Waiting " + waitingTime + " sec before walking on next square.");
-            Thread.sleep(waitingTime);
+            Thread.sleep(waitingTime/2);
         } catch (InterruptedException e) {
             log.error(e.getMessage());
             Thread.currentThread().interrupt();
