@@ -3,6 +3,7 @@ import { type IGameMap, MapObjectType } from '@/stores/IGameMapDTD'
 import { useGameMapStore } from '@/stores/gameMapStore'
 import { GameObjectRenderer } from '@/renderer/GameObjectRenderer'
 import { SnackType } from '@/stores/Snack/ISnackDTD'
+import { Sky } from 'three/examples/jsm/Addons.js'
 
 /**
  * for rendering the game map
@@ -106,6 +107,23 @@ export const GameMapRenderer = () => {
         gameMapStore.setScriptGhostMeshId(scriptGhostToAdd.id, currentGhost.id)
       })
     }
+
+    // Skybox
+    const sky = new Sky()
+    sky.scale.setScalar(450000)
+    scene.add(sky)
+
+    const phi = THREE.MathUtils.degToRad( 90 );
+    const theta = THREE.MathUtils.degToRad( 180 );
+    const sunPosition = new THREE.Vector3().setFromSphericalCoords( 1, phi, theta );
+    sky.material.uniforms.turbidity.value = 2
+    sky.material.uniforms.mieCoefficient.value = 0.01
+    sky.material.uniforms.mieDirectionalG.value = 0.25
+    sky.material.uniforms.sunPosition.value = sunPosition
+
+    renderer.toneMapping = THREE.ACESFilmicToneMapping
+
+    
   }
 
   const getScene = () => {
@@ -113,4 +131,10 @@ export const GameMapRenderer = () => {
   }
 
   return {initRenderer, createGameMap, getScene}
+}
+
+
+
+function initSky(){
+  
 }
