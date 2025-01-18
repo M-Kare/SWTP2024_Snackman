@@ -4,7 +4,7 @@ public class GameConfig {
 
     //MAP
     public static final int SQUARE_SIZE = 2;
-    public static final int SQUARE_HEIGHT = 1;
+    public static final int SQUARE_HEIGHT = 5;
     
     // SNACKMAN
     public static final int SNACKMAN_GROUND_LEVEL = 2;
