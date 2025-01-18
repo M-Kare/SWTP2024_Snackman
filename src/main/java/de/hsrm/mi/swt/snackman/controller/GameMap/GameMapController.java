@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import de.hsrm.mi.swt.snackman.configuration.GameConfig;
 import de.hsrm.mi.swt.snackman.entities.lobby.Lobby;
 import de.hsrm.mi.swt.snackman.services.LobbyManagerService;
 
@@ -187,5 +188,21 @@ public class GameMapController {
             log.error("Error occurred: ", e);
             return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
         }
+    }
+
+    /**
+     * Retrieve the current playing time for a specific lobby.
+     *
+     * @param lobbyId the ID of the lobby to fetch the playing time for
+     * @return the remaining playing time in milliseconds
+     */
+    @GetMapping("/lobby/{lobbyId}/current-playing-time")
+    public ResponseEntity<Long> getCurrentPlayTime(@PathVariable("lobbyId") String lobbyId){
+        long gameStartTime = lobbyManagerService.findLobbyByLobbyId(lobbyId).getGameStartTime();
+        long currentTime = System.currentTimeMillis();
+
+        long currentPlayingTime = GameConfig.PLAYING_TIME - (currentTime - gameStartTime);
+
+        return ResponseEntity.ok(currentPlayingTime);
     }
 }
