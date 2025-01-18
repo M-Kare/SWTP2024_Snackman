@@ -31,43 +31,6 @@ SNACKMAN = 'SM'
 INVALID = 'X'
 
 
-"""
-def choose_next_square(one_North_square, one_East_square, one_South_square, one_West_square, directionNew):
-    solution_liste = [one_North_square, one_East_square, one_South_square, one_West_square]
-    direction = int(directionNew)
-
-    print("Start")
-    print(solution_liste)
-    print(direction)
-
-    # make sure you cannot walk into a wall
-    solution_liste = eliminate_walls_as_options(solution_liste)
-    solution_liste = eliminate_snackman_as_option(solution_liste)
-    solution_liste = eliminate_snackman_as_option(solution_liste)
-
-    print(solution_liste)
-    print(direction)
-    print("End")
-
-    # make sure you do not walk into a ghost
-    if all_squares_have(solution_liste, GHOST):
-        return add_walking_direction(choose_random_square(solution_liste, GHOST, direction))
-    # choose square with snack
-    if all_squares_have_snack(solution_liste):
-        # choose random snack
-        return add_walking_direction(choose_random_square(solution_liste, SNACK, direction))
-    elif any_square_has(solution_liste, SNACK):
-        # choose a square with snack (far away from ghost)
-        return add_walking_direction(choose_snack_away_from_ghost(solution_liste, direction))
-    elif any_square_has(solution_liste, GHOST):
-        # choose square without snack, away from ghosts
-        north, east, south, west = solution_liste
-        return add_walking_direction(choose_square_without_snack_away_from_ghost(north, east, south, west, direction))
-    else:
-        # choose random square, no snacks there + no ghosts
-        return add_walking_direction(choose_random_square(solution_liste, EMPTY, direction))
-"""
-
 def choose_next_square(squares_liste):
     """
     Bestimmt das nächste Feld für Snackman basierend auf den Regeln.
@@ -84,18 +47,10 @@ def choose_next_square(squares_liste):
     solution_liste = [one_North_square, one_East_square, one_South_square, one_West_square]
     direction = int(squares_liste[len(squares_liste) - 1])
 
-    print("Start")
-    print(solution_liste)
-    print(direction)
-
     # make sure you cannot walk into a wall
     solution_liste = eliminate_walls_as_options(solution_liste)
     solution_liste = eliminate_snackman_as_option(solution_liste)
     solution_liste = eliminate_chicken_as_option(solution_liste)
-
-    print(solution_liste)
-    print(direction)
-    print("End")
 
     # make sure you do not walk into a ghost
     if all_squares_have(solution_liste, GHOST):
@@ -131,22 +86,22 @@ def eliminate_walls_as_options(squares):
 
 def eliminate_snackman_as_option(squares):
     """
-    Replaces Snackman with invalid squares.
+    Replaces Snackman with empty squares.
     Args:
         squares (list): List of squares.
     Returns:
-        list: Updated list where Snackman is replaced with invalid squares.
+        list: Updated list where Snackman is replaced with empty squares.
     """
     return [EMPTY if sq == SNACKMAN else sq for sq in squares]
 
 
 def eliminate_chicken_as_option(squares):
     """
-    Replaces Snackman with invalid squares.
+    Replaces a chicken with empty squares.
     Args:
         squares (list): List of squares.
     Returns:
-        list: Updated list where Snackman is replaced with invalid squares.
+        list: Updated list where chicken is replaced with empty squares.
     """
     return [EMPTY if sq == CHICKEN else sq for sq in squares]
 
@@ -202,9 +157,6 @@ def choose_random_square(squares, toReplace, direction):
     try:
         zufall_index = random.choice(indexes_to_choose_from)
     except (ValueError,IndexError):
-        print(indexes_to_choose_from)
-        print(squares)
-        print("Walking into last direction")
         squares[last_step] = " "
         return squares
     squares[zufall_index] = " "
