@@ -1,11 +1,13 @@
 package de.hsrm.mi.swt.snackman;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.List;
 import java.util.logging.Logger;
 
 import org.springframework.boot.SpringApplication;
@@ -24,6 +26,17 @@ public class SnackmanApplication {
     public static void checkAndCopyResources() {
         Path workFolder = Paths.get("extensions").toAbsolutePath();
         String[] foldersToCopy = {"maze", "ghost", "chicken"};
+        for(String folder : foldersToCopy){
+            Path temp = workFolder.resolve(folder);
+            if(!Files.exists(temp)){
+                try {
+                    Files.createDirectories(temp);
+                } catch (IOException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+            }
+        }
         String folderToCreate = "map";
         Path srcFolder = Paths.get("src", "main", "resources");
 
@@ -31,6 +44,21 @@ public class SnackmanApplication {
             createWorkFolderAndCopyResources(workFolder, foldersToCopy, folderToCreate, srcFolder);
         } else {
             copyResourcesIfNotExist(workFolder, foldersToCopy, folderToCreate, srcFolder);
+        }
+        Path leaderboardPath = Paths.get(workFolder.toString() + "/leaderboard.txt");
+        File leaderboardFile = leaderboardPath.toFile();
+        if(!leaderboardFile.exists()){
+            try {
+                Files.write(leaderboardFile.toPath(), List.of(
+                    "Mulan;02:23;2024-03-04",
+                    "König der Löwen, Mufasa;01:05;2024-03-02",
+                    "Biene Maja;00:58;2024-12-10",
+                    "Livia;00:20;2025-01-01"
+                ));
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
         }
     }
 

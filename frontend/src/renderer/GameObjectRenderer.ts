@@ -214,10 +214,10 @@ export const GameObjectRenderer = () => {
 
     const wallMaterial = new THREE.MeshStandardMaterial({
                                   map: wallTexture,
-                                  color: 0xFFDE9D,
+                                  color: 0xffd133,
                                   emissive: 0x000000,
-                                  roughness: 0.7,
-                                  metalness: 0.1,
+                                  emissiveIntensity: 0.5,
+                                  roughness: 0.9,
                                 })
     const wallGeometry = new THREE.BoxGeometry(sideLength, height, sideLength)
     const wall = new THREE.Mesh(wallGeometry, wallMaterial)

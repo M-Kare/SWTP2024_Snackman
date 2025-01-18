@@ -2,8 +2,14 @@ package de.hsrm.mi.swt.snackman;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -12,6 +18,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.util.FileSystemUtils;
 
 import de.hsrm.mi.swt.snackman.controller.GameMap.GameMapController;
 
@@ -20,6 +27,27 @@ public class MapUploadTest {
     
     @Autowired
     private GameMapController gameMapController;
+
+    private static final Path workFolder = Paths.get("./extensions").toAbsolutePath();
+
+    @BeforeAll
+    static void fileSetUp() {
+        try{
+            tearDownAfter();  
+        }catch(Exception e){
+            System.out.println("No file to delete");
+        }   
+        SnackmanApplication.checkAndCopyResources();
+        assert Files.exists(workFolder.resolve("maze"));
+        assert Files.exists(workFolder.resolve("map"));
+    }
+
+    @AfterAll
+    static void tearDownAfter() throws IOException {
+        if (Files.exists(workFolder)) {
+            FileSystemUtils.deleteRecursively(workFolder.toFile());
+        }
+    }
 
     @Test
     void testUploadMap_InvalidMapContent(){
