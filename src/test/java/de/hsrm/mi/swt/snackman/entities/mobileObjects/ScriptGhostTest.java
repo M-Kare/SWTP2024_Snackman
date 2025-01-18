@@ -147,7 +147,7 @@ class ScriptGhostTest {
         Square initialPosition = gameMap.getSquareAtIndexXZ(1, 1);
         ScriptGhost scriptGhost = new ScriptGhost(gameMap, initialPosition);
 
-        boolean isNotSameSquare = scriptGhost.standingOnSameSquareAsSnackman();
+        boolean isNotSameSquare = scriptGhost.notStandingOnSameSquareAsSnackman();
 
         Assertions.assertTrue(isNotSameSquare);
     }
