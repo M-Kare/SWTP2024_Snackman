@@ -1,7 +1,5 @@
 package de.hsrm.mi.swt.snackman.entities.mobileObjects;
 
-import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken.Direction;
-
 import java.util.Random;
 
 public enum ScriptGhostDifficulty {
@@ -16,5 +14,17 @@ public enum ScriptGhostDifficulty {
         Random random = new Random();
         int randomIndex = random.nextInt(difficulties.length);
         return difficulties[randomIndex];
+    }
+
+    /**
+     * Converts a string into a difficulty level for the script ghosts.
+     * @param difficulty to be converted
+     * @return the difficulty as enum type
+     */
+    public static ScriptGhostDifficulty getScriptGhostDifficulty(String difficulty){
+        if (difficulty.equals("DIFFICULT")) {
+            return ScriptGhostDifficulty.DIFFICULT;
+        }
+        return ScriptGhostDifficulty.EASY;
     }
 }
