@@ -436,7 +436,7 @@ export const useLobbiesStore = defineStore('lobbiesstore', () => {
 
         const adminPlayer = lobby.members.find((member) => member.playerId === adminClient.playerId)
         if (adminPlayer) {
-          lobbydata.currentPlayer.role = adminPlayer.role
+          lobbydata.currentPlayer.role = "SNACKMAN"
         }
 
         lobbydata.lobbies.push(lobby)
