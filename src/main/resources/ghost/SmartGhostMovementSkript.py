@@ -45,6 +45,11 @@ def choose_next_square(labyrinth):
     return choose_next_square_finding_snackman(labyrinth, ghost_position, snackman_position)
 
 def find_snackman_position(maze):
+    """
+    calculates the snackmans position
+    :param maze: the labyrinth that the snackmans can see from where he is standing
+    :return: row and column index of the snackmans position
+    """
     for row_index, row in enumerate(maze):
         for col_index, cell in enumerate(row):
             if cell == SNACKMAN:
@@ -52,6 +57,11 @@ def find_snackman_position(maze):
     return None
 
 def find_ghost_position(maze):
+    """
+    calculates the ghosts position
+    :param maze: the labyrinth that the ghost can see from where he is standing
+    :return: row and column index of the ghosts position
+    """
     for row_index, row in enumerate(maze):
         for col_index, cell in enumerate(row):
             if cell == GHOST:
