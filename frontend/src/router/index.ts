@@ -6,6 +6,9 @@ import LobbyView from '@/views/LobbyViews/LobbyView.vue'
 import GameEndView from '@/views/GameEndView.vue'
 import LeaderboardView from "@/views/LeaderboardView.vue";
 
+import ChooseRole from "@/views/LobbyViews/ChooseRole.vue";
+
+
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -42,6 +45,12 @@ const router = createRouter({
       path: '/GameEnd',
       name: 'GameEnd',
       component: GameEndView
+    },
+    {
+      path: '/ChooseRole/:lobbyId',
+      name: 'ChooseRole',
+      component: ChooseRole,
+      props: true
     }
   ]
 })

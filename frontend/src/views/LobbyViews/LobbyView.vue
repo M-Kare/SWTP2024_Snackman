@@ -71,10 +71,12 @@
         >
           Copy Link
         </SmallNavButton>
+
+
         <SmallNavButton
           id="start-game-button"
           class="small-nav-buttons"
-          @click="startGame"
+          @click="chooseRole(lobby)"
         >
           Start Game
         </SmallNavButton>
@@ -106,10 +108,16 @@
     <p class="info-text">{{ infoText }}</p>
   </PopUp>
 
+  <PopUp v-if="showRolePopup" class="popup-box" @hidePopUp="hidePopUp">
+    <p class="info-heading">Can't start the game</p>
+    <p class="info-text">{{ infoText }}</p>
+  </PopUp>
+
   <div v-show="showInfo" id="infoBox">{{ infoText }}</div>
 </template>
 
 <script lang="ts" setup>
+
 import MenuBackground from '@/components/MenuBackground.vue'
 import SmallNavButton from '@/components/SmallNavButton.vue'
 import PlayerNameForm from '@/components/PlayerNameForm.vue'
@@ -138,12 +146,13 @@ const members = computed(
   () => lobby.value?.members || ([] as Array<IPlayerClientDTD>),
 )
 const playerCount = computed(() => members.value.length)
-
+const maxPlayerCount = ref(5)
 const playerNameSaved = lobbiesStore.lobbydata.currentPlayer.playerName;
 const showPlayerNameForm = ref(false);
 
 const darkenBackground = ref(false)
 const showPopUp = ref(false)
+const showRolePopup = ref(false)
 const errorBox = ref(false)
 const infoText = ref()
 const infoHeading = ref()
@@ -326,15 +335,6 @@ watchEffect(() => {
     )
     if (updatedLobby) {
       lobbyLoaded = true
-      if (updatedLobby.gameStarted) {
-        router.push({
-          name: 'GameView',
-          query: {
-            role: lobbiesStore.lobbydata.currentPlayer.role ,
-            lobbyId: lobbiesStore.lobbydata.currentPlayer.joinedLobbyId,
-          },
-        })
-      }
     } else if (lobbyLoaded) {
       deleteUploadedFile(lobbyId);
       router.push({ name: 'LobbyListView' })
@@ -428,46 +428,33 @@ const leaveLobby = async () => {
   router.push({ name: 'LobbyListView' })
 }
 
-/**
- * Starts the game if the player is the admin and there are enough members in the lobby.
- * If the player is not the admin or there are not enough members, a popup will be shown.
- *
- * @async
- * @function startGame
- * @throws {Error} If the player or lobby is not found.
- */
-const startGame = async () => {
+const chooseRole = async(lobby: ILobbyDTD | undefined ) =>{
   const playerId = lobbiesStore.lobbydata.currentPlayer.playerId
 
-  if (!playerId || !lobby.value) {
-    console.error('Player or Lobby not found')
+  if (!lobby){
     return
   }
 
-  if (lobby.value.members.length < 2) {
+  if (!playerId || !lobby.members) {
+    console.error('Player or Lobbymembers not found')
+    return
+  }
+
+  if (lobby.members.length < 2) {
     showPopUp.value = true
     darkenBackground.value = true
-    infoText.value = 'Not enough players to start the game!'
+    infoText.value = 'Not enough players to choose Role!'
     return
   }
 
-  if(playerId === lobby.value.adminClient.playerId){
-    const status = await changeUsedMapStatus(lobby.value.lobbyId, usedCustomMap.value);
-    if (status !== "done") {
-      showPopUp.value = true;
-      darkenBackground.value = true;
-      infoHeading.value = "Map Status Error";
-      infoText.value = "Failed to update the map status.";
-      return;
-    }
-
-    await lobbiesStore.startGame(lobby.value.lobbyId);
+  if (playerId === lobby.adminClient.playerId) {
+    await lobbiesStore.chooseRole(lobby.lobbyId)
   } else {
-    showPopUp.value = true;
-    darkenBackground.value = true;
-    infoHeading.value = "Can't start the game"
-    infoText.value = "Only SnackMan can start the game!"
+    showPopUp.value = true
+    darkenBackground.value = true
+    infoText.value = 'The role selection can only be initiated by the host!'
   }
+
 }
 
 function copyToClip() {

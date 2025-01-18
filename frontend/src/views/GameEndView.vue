@@ -51,12 +51,13 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, ref} from 'vue'
+import {computed, onMounted, ref} from 'vue'
 import {useRoute, useRouter} from 'vue-router'
 import CreateNewLeaderboardEntryForm from '@/components/CreateNewLeaderboardEntryForm.vue'
 import {useLobbiesStore} from '@/stores/Lobby/lobbiesstore'
 import ViewBackground from '@/components/ViewBackground.vue'
 import SmallNavButton from "@/components/SmallNavButton.vue";
+import {SoundManager} from "@/services/SoundManager";
 
 const route = useRoute()
 const router = useRouter()
@@ -173,6 +174,10 @@ const downloadMap = async () => {
     feedbackClass.value = ''
   }, 3000)
 }
+
+onMounted(() => {
+  SoundManager.stopAllInGameSounds()
+})
 </script>
 
 <style scoped>
