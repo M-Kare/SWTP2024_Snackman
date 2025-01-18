@@ -8,6 +8,9 @@ import org.joml.Vector3d;
 import de.hsrm.mi.swt.snackman.configuration.GameConfig;
 import de.hsrm.mi.swt.snackman.entities.map.Square;
 import de.hsrm.mi.swt.snackman.entities.mapObject.MapObjectType;
+import de.hsrm.mi.swt.snackman.entities.mapObject.MapObjectType;
+import de.hsrm.mi.swt.snackman.entities.map.enums.WallAlignmentStatus;
+import de.hsrm.mi.swt.snackman.entities.map.enums.WallSectionStatus;
 
 /**
  * A mobile object with the ability to move its position
