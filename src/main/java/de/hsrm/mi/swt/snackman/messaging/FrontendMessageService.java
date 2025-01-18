@@ -40,10 +40,7 @@ public class FrontendMessageService {
         log.debug("Send Event: lobby {}", ev.lobby().toString());
         messagingTemplate.convertAndSend("/topic/lobbies/chooseRole", ev.lobby());
     }
-    public void sendChooseFinishEvent ( FrontendChooseRoleEvent ev){
-        log.debug("Send Event: lobby {}", ev.lobby().toString());
-        messagingTemplate.convertAndSend("/topic/lobbies/chooseRoleFinish", ev.lobby());
-    }
+
     public void sendRoleChooseUpdate( FrontedLobbyRoleUpdateEvent ev){
         log.debug("Sendet Role Update " , ev.lobby());
         messagingTemplate.convertAndSend("/topic/lobby/Role-Update", ev);

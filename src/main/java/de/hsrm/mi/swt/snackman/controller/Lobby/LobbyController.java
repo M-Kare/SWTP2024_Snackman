@@ -277,19 +277,5 @@ public class LobbyController {
           return ResponseEntity.ok().build();
 
     }
-    @PostMapping("/chooseRoleFinish")
-    public ResponseEntity<Void> setChooseRoleFinsih(@RequestBody Map<String, String> requestBody){
-        String lobbyId = requestBody.get("lobbyId");
-
-        if(lobbyId == null || lobbyId.isEmpty()){
-            System.out.println("Lobby data  not found ");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-        }
-        lobbyManagerService.chooseRoleFinish(lobbyId);
-        logger.info("Sending chooseRoleFinish update for lobby: {}", lobbyManagerService.findLobbyByLobbyId(lobbyId));
-        frontendMessageService.sendChooseFinishEvent(new FrontendChooseRoleEvent(lobbyManagerService.findLobbyByLobbyId(lobbyId)));
-        return ResponseEntity.ok().build();
-
-    }
 
 }
