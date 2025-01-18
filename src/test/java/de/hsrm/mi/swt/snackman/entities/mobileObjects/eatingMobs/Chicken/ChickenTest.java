@@ -90,6 +90,15 @@ class ChickenTest {
         Assertions.assertEquals(0, chicken.getKcal());
     }
 
+    @Test
+    void testCalculateEggCalories_BelowMinimum() {
+        Square square = new Square(MapObjectType.FLOOR, 0, 0);
+
+        Chicken chicken = new Chicken(square, gameMap, "ChickenMovementSkript");
+        chicken.setKcal(50);
+
+        assertEquals(300, chicken.calculateEggCalories(), "Egg calories should be the minimum of 300");
+    }
 
     @Test
     void testLayEgg_ChickenThicknessAndKcalReset_caseIfChickenHasNoKcal() {
