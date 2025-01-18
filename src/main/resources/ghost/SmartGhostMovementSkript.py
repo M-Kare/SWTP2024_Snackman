@@ -29,11 +29,8 @@ import heapq  # This module provides an implementation of the heap queue algorit
 
 WALL = 'W'
 EMPTY = 'L'
-SNACK = 'S'
 GHOST = 'G'
-CHICKEN = 'C'
 SNACKMAN = 'M'
-INVALID = 'X'
 
 def choose_next_square(labyrinth):
     """
