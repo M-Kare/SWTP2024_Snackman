@@ -38,7 +38,7 @@ public class ScriptGhost extends Mob implements Runnable {
     // python
     private PythonInterpreter pythonInterpreter = null;
     private final Properties pythonProps = new Properties();
-    private ScriptGhostDifficulty difficulty = ScriptGhostDifficulty.EASY;
+    private ScriptGhostDifficulty difficulty;
     private GameMap gameMap;
 
     public ScriptGhost() {
@@ -58,12 +58,12 @@ public class ScriptGhost extends Mob implements Runnable {
 
     public ScriptGhost(GameMap gameMap, Square initialPosition, ScriptGhostDifficulty difficulty) {
         this(gameMap, initialPosition);
-        //this.difficulty = difficulty;     // todo giving every ghost its own difficulty
+        this.difficulty = difficulty;
     }
 
     public ScriptGhost(GameMap gameMap, Square initialPosition) {
         super();
-        this.difficulty = ScriptGhostDifficulty.getRandomScriptGhostDifficulty();
+        this.difficulty = ScriptGhostDifficulty.EASY;
         this.gameMap = gameMap;
         id = generateId();
         this.ghostPosX = initialPosition.getIndexX();
@@ -128,13 +128,13 @@ public class ScriptGhost extends Mob implements Runnable {
             log.debug("Squares ghost is seeing: {}", squares);
             log.debug("Current position is x {} z {}", this.ghostPosX, this.ghostPosZ);
 
-            if (standingOnSameSquareAsSnackman()) {
+            if (notStandingOnSameSquareAsSnackman()) {
                 int newMove = 0;
                 if (this.difficulty == ScriptGhostDifficulty.EASY) {
                     newMove = executeMovementSkript(squares);
                 } else {
                     List<List<String>> pythonList = new ArrayList<>();
-                    for (String[] row : this.gameMap.getStringMap(this.id)) {
+                    for (String[] row : getStringMap()) {
                         pythonList.add(Arrays.asList(row));
                     }
                     newMove = executeMovementSkriptDifficult(pythonList);
@@ -154,7 +154,28 @@ public class ScriptGhost extends Mob implements Runnable {
         }
     }
 
-    protected boolean standingOnSameSquareAsSnackman(){
+    /**
+     * @return an array of strings representing the game map
+     */
+    public String[][] getStringMap(){
+        int rows = this.gameMap.getGameMapSquares().length;
+        int cols = this.gameMap.getGameMapSquares()[0].length;
+        String[][] result = new String[rows][cols];
+
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                result[i][j] = this.gameMap.getGameMapSquares()[i][j].getPrimaryTypeForGhostWithHighDifficulty(this.id);
+            }
+        }
+        result[this.ghostPosX][this.ghostPosZ] = "G";
+
+        return result;
+    }
+
+    /**
+     * @return true if the ghost is not standing on the same square as snackman
+     */
+    protected boolean notStandingOnSameSquareAsSnackman(){
         return this.gameMap.getSquareAtIndexXZ(this.ghostPosX, this.ghostPosZ).getMobs().stream().noneMatch(mob -> mob instanceof SnackMan);
     }
 
@@ -180,6 +201,13 @@ public class ScriptGhost extends Mob implements Runnable {
         }
     }
 
+    /**
+     * Executes the ghost's movement script written in Python and determines the
+     * next move.
+     *
+     * @param pythonList a list of squares visible from the ghost's current position.
+     * @return the index of the next move resulting from the Python script's execution.
+     */
     public int executeMovementSkriptDifficult(List<List<String>> pythonList) {
         try {
             log.debug("Running python ghost script with: {}", pythonList.toString());
@@ -268,12 +296,9 @@ public class ScriptGhost extends Mob implements Runnable {
      * @param currentPosition current position
      * @param gameMap         gamemap
      */
-    private void scaresEverythingThatCouldBeEncountered(Square currentPosition, GameMap gameMap) {
+    private synchronized void scaresEverythingThatCouldBeEncountered(Square currentPosition, GameMap gameMap) {
         for (Mob mob : gameMap.getSquareAtIndexXZ(currentPosition.getIndexX(), currentPosition.getIndexZ()).getMobs()) {
             switch (mob) {
-                case SnackMan snackMan:
-                    snackMan.isScaredFromGhost();
-                    break;
                 case Chicken chicken:
                     chicken.isScaredFromGhost(true);
                     break;
@@ -320,10 +345,12 @@ public class ScriptGhost extends Mob implements Runnable {
     @Override
     public String toString() {
         return "ScriptGhost{" +
-                "ghostPosZ=" + ghostPosZ +
-                ", ghostPosX=" + ghostPosX +
-                ", id=" + id +
+                "id=" + id +
                 ", lookingDirection=" + lookingDirection +
+                ", ghostPosX=" + ghostPosX +
+                ", ghostPosZ=" + ghostPosZ +
+                ", difficulty=" + difficulty +
+                ", id=" + id +
                 '}';
     }
 

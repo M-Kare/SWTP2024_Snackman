@@ -34,6 +34,8 @@ import type {IPlayerClientDTD} from "@/stores/Lobby/IPlayerClientDTD";
 import {GLTFLoader} from 'three/examples/jsm/Addons.js'
 import {useRoute} from 'vue-router';
 import type {IPlayerDTD} from '@/stores/Player/IPlayerDTD';
+import {SoundManager} from "@/services/SoundManager";
+import {SoundType} from "@/services/SoundTypes";
 
 const { lobbydata } = useLobbiesStore();
 const gameMapStore = useGameMapStore()
@@ -170,6 +172,34 @@ onMounted(async () => {
   renderer.render(scene, camera)
   renderer.setAnimationLoop(animate)
   window.addEventListener('resize', resizeCallback)
+
+  await SoundManager.initSoundmanager(camera)
+  console.debug("All sounds loaded, attaching to meshes...");
+
+  //Attach sound to chickens
+  gameMapStore.mapContent.chickens.forEach((chicken) => {
+    const chickenMesh = scene.getObjectById(chicken.meshId);
+    if (!chickenMesh) {
+      console.warn(`Chicken mesh with ID ${chicken.meshId} not found in the scene.`);
+      return;
+    }
+    SoundManager.attachSoundToModelOrMesh(chickenMesh, SoundType.CHICKEN);
+  });
+
+  //Attach sound to scriptGhosts
+  gameMapStore.mapContent.scriptGhosts.forEach((scriptGhost) => {
+    const ghostMesh = scene.getObjectById(scriptGhost.meshId);
+    if (!ghostMesh) {
+      console.warn(`Ghost mesh with ID ${scriptGhost.meshId} not found in the scene.`);
+      return;
+    }
+    SoundManager.attachSoundToModelOrMesh(ghostMesh, SoundType.GHOST);
+  });
+
+  SoundManager.stopLobbySound()
+  SoundManager.playSound(SoundType.CHICKEN)
+  SoundManager.playSound(SoundType.GHOST)
+  SoundManager.playSound(SoundType.INGAME_BACKGROUND)
 })
 
 // initially loads the playerModel & attaches playerModel to playerCamera
@@ -181,6 +211,7 @@ async function loadPlayerModel(playerId: string, texture: string) {
     scene.add(snackManModel)
     snackManModel.position.lerp(new THREE.Vector3(playerData.posX, playerData.posY - 2, playerData.posZ), 0.5)
     playerHashMap.set(playerId, snackManModel);
+
     // optional offset for thirdPersonView
     // snackManModel.position.set(0, -1.55, -5);
     // player.getCamera().add(snackManModel)
@@ -295,7 +326,7 @@ const getCurrentPlayingTime = async () => {
       return null
     }
 }
-   
+
 const formattedTime = computed(() => {
   const minutes = Math.floor(countdownTime.value / 60)
   const seconds = countdownTime.value % 60
@@ -361,7 +392,7 @@ const startCountDown = async () => {
   height: 60px;
   display: flex;
   justify-content: left;
-  align-items: center; 
+  align-items: center;
   box-shadow: 7px 7px 0 rgba(0, 0, 0, 0.8);
 }
 

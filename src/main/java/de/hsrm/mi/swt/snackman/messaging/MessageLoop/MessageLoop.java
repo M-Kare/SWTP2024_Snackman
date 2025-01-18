@@ -88,7 +88,9 @@ public class MessageLoop {
                     case SnackMan snackMan -> {
                         messages.add(new Message<>(EventEnum.SnackManUpdate, new MobUpdateMessage(snackMan.getPosition(),
                         snackMan.getQuat(), snackMan.getRadius(), snackMan.getSpeed(), client, snackMan.getSprintTimeLeft(),
-                                snackMan.isSprinting(), snackMan.isInCooldown(), snackMan.getCurrentCalories(), snackMan.getCurrentCalories() >= GameConfig.MAX_KALORIEN ? GameConfig.MAX_KALORIEN_MESSAGE : null
+                                snackMan.isSprinting(), snackMan.isInCooldown(), snackMan.getCurrentCalories(),
+                                snackMan.getCurrentCalories() >= GameConfig.MAX_KALORIEN ?
+                                        GameConfig.MAX_KALORIEN_MESSAGE : null, snackMan.isScared()
                         )));
                     }
                     case Ghost ghost ->{
@@ -119,7 +121,7 @@ public class MessageLoop {
             messagingTemplate.convertAndSend("/topic/lobbies/" + lobby.getLobbyId() + "/update", messages);
             long currentTime = System.currentTimeMillis();
             if ((currentTime - lobby.getTimeSinceLastSnackSpawn()) > GameConfig.TIME_FOR_SNACKS_TO_RESPAWN) {
-                this.mapService.respawnSnacks(lobbyService.getGameMapByLobbyId(lobby.getLobbyId()));
+                this.mapService.respawnSnacks(lobbyService.getGameMapByLobbyId(lobby.getLobbyId()), GameConfig.SNACK_SPAWN_RATE);
                 lobby.setTimeSinceLastSnackSpawn(System.currentTimeMillis());
             }
         }

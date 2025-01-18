@@ -4,7 +4,7 @@ public class GameConfig {
 
     //MAP
     public static final int SQUARE_SIZE = 2;
-    public static final int SQUARE_HEIGHT = 1;
+    public static final int SQUARE_HEIGHT = 5;
     
     // SNACKMAN
     public static final int SNACKMAN_GROUND_LEVEL = 2;
@@ -18,9 +18,9 @@ public class GameConfig {
     public static final double DOUBLEJUMP_STRENGTH = JUMP_STRENGTH * 0.1;
     public static final double GRAVITY = -20;
 
-    //LOBBY
+    //SNACK SPAWN
     public static final int TIME_FOR_SNACKS_TO_RESPAWN = 30000;
-    public static final double SNACK_SPAWN_RATE = 1;
+    public static final double SNACK_SPAWN_RATE = 0.5;
 
     //Chicken
     public static final int WAITING_TIME = 2000;
@@ -33,6 +33,7 @@ public class GameConfig {
     public static final int GHOST_SPEED = 10;
     public  static  final int GHOST_DAMAGE = 300;
     public  static  final int AMOUNT_PLAYERS = 5;
+    public static final String SCRIPT_GHOST_DIFFICULTY_MULTIPLAYER = "EASY";
 
     //GAME
     public static final long PLAYING_TIME = 300000; // 5 mins = 300.000 milisecs

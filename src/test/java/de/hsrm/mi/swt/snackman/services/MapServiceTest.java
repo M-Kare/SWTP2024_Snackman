@@ -226,4 +226,65 @@ class MapServiceTest {
 
     }
 
+    @Test
+    void snackRespawnWithZeroProbability(){
+        char[][] mockMazeData = new char[][]{
+            {'L', 'L', 'L', 'L', 'L'},
+            {'L', 'L', 'L', 'L', 'L'},
+            {'L', 'L', 'L', 'L', 'L'},
+            {'L', 'L', 'L', 'L', 'L'},
+            {'L', 'L', 'L', 'L', 'L'}
+        };
+        GameMap gameMap = mapService.convertMazeDataGameMap("1", mockMazeData);
+        mapService.respawnSnacks(gameMap, 0.0);
+        for (int i = 0; i < gameMap.getGameMapSquares().length; i++) {
+            for (int j = 0; j < gameMap.getGameMapSquares()[0].length; j++) {
+                Square square = gameMap.getSquareAtIndexXZ(i, j);
+                Assertions.assertEquals(SnackType.EMPTY, square.getSnack().getSnackType());
+            }
+        }
+    }
+
+    @Test
+    void snackRespawnWithFullProbability(){
+        char[][] mockMazeData = new char[][]{
+            {'L', 'L', 'L', 'L', 'L'},
+            {'L', 'L', 'L', 'L', 'L'},
+            {'L', 'L', 'L', 'L', 'L'},
+            {'L', 'L', 'L', 'L', 'L'},
+            {'L', 'L', 'L', 'L', 'L'}
+        };
+        GameMap gameMap = mapService.convertMazeDataGameMap("1", mockMazeData);
+        mapService.respawnSnacks(gameMap, 1.0);
+        for (int i = 0; i < gameMap.getGameMapSquares().length; i++) {
+            for (int j = 0; j < gameMap.getGameMapSquares()[0].length; j++) {
+                Square square = gameMap.getSquareAtIndexXZ(i, j);
+                Assertions.assertNotEquals(SnackType.EMPTY, square.getSnack().getSnackType());
+            }
+        }
+    }
+
+    @Test
+    void snackRespawnWithHalfProbability(){
+        char[][] mockMazeData = new char[][]{
+            {'L', 'L', 'L', 'L', 'L'},
+            {'L', 'L', 'L', 'L', 'L'},
+            {'L', 'L', 'L', 'L', 'L'},
+            {'L', 'L', 'L', 'L', 'L'},
+            {'L', 'L', 'L', 'L', 'L'}
+        };
+        boolean atLeastOneSnack = false;
+        GameMap gameMap = mapService.convertMazeDataGameMap("1", mockMazeData);
+        mapService.respawnSnacks(gameMap, 0.5);
+        for (int i = 0; i < gameMap.getGameMapSquares().length; i++) {
+            for (int j = 0; j < gameMap.getGameMapSquares()[0].length; j++) {
+                Square square = gameMap.getSquareAtIndexXZ(i, j);
+                if (square.getSnack().getSnackType() != SnackType.EMPTY) {
+                    atLeastOneSnack = true;
+                }
+            }
+        }
+        Assertions.assertTrue(atLeastOneSnack);
+    }
+
 }
