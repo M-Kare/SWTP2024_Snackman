@@ -43,7 +43,7 @@ public class Chicken extends EatingMob implements Runnable {
     private boolean timerRestarted = false;
     private boolean isWalking;
     private boolean blockingPath = false;
-    private boolean isScared = false;
+    private volatile boolean isScared = false;
     private Timer eggLayingTimer;
     // python
     private PythonInterpreter pythonInterpreter = null;
@@ -175,9 +175,6 @@ public class Chicken extends EatingMob implements Runnable {
                 // set new square you move to
                 setNewPosition(newMove);
                 log.debug("New position is x {} z {}", this.chickenPosX, this.chickenPosZ);
-            }else{
-                Square chickensAktSquare = this.gameMap.getSquareAtIndexXZ(chickenPosX, chickenPosZ);
-                chickensAktSquare.setType(MapObjectType.WALL);
             }
 
             // consume snack if present
@@ -204,13 +201,15 @@ public class Chicken extends EatingMob implements Runnable {
                 currentSquare.setSnack(new Snack(SnackType.EMPTY));
                 if (super.getKcal() >= this.MAX_CALORIES) {
                     this.thickness = Thickness.VERY_HEAVY;
-
+                    blockingPath = true;
                     new Thread(() -> {
                         try {
-                            blockingPath = true;
+                            Square chickensAktSquare = this.gameMap.getSquareAtIndexXZ(this.chickenPosX, this.chickenPosZ);
+                            chickensAktSquare.setType(MapObjectType.WALL);
                             Thread.sleep(10000);
-                            blockingPath = false;
+                            chickensAktSquare.setType(MapObjectType.FLOOR);
                             layEgg();
+                            blockingPath = false;
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
@@ -271,7 +270,7 @@ public class Chicken extends EatingMob implements Runnable {
     /**
      * TODO
      */
-    private void setWaitingTime(){
+    private void setWaitingTime() {
         this.pythonInterpreter.exec("from " + fileName + " import getWaitingTime");
 
         PyObject func = pythonInterpreter.get("getWaitingTime");
@@ -357,20 +356,28 @@ public class Chicken extends EatingMob implements Runnable {
             eggLayingTimer.cancel();
         }
         eggLayingTimer = new Timer();
+        Timer isScaredTimer = new Timer();
 
         TimerTask task = new TimerTask() {
             public void run() {
                 layEgg();
             }
         };
+        //Set isScared false after a several of seconds because the messageLoop does not recognize changes
+        TimerTask scaredTimerTask = new TimerTask() {
+            public void run() {
+                setScared(false);
+            }
+        };
 
         // Random interval between 30 and 60 seconds
         long randomIntervalForLayingANewEgg = new Random().nextInt(30000, 60000);
         long delayBecauseIsScared = 10000;
+        long timeIsScared = 2300;
 
         if (this.isScared) {
             eggLayingTimer.scheduleAtFixedRate(task, (randomIntervalForLayingANewEgg) + delayBecauseIsScared, randomIntervalForLayingANewEgg);
-            this.isScared = false;
+            isScaredTimer.schedule(scaredTimerTask, timeIsScared);
         } else {
             this.eggLayingTimer.scheduleAtFixedRate(task, randomIntervalForLayingANewEgg, randomIntervalForLayingANewEgg);
         }
@@ -416,8 +423,16 @@ public class Chicken extends EatingMob implements Runnable {
      * Sets the chicken to be scared and restarts the timer with a delay
      */
     public void isScaredFromGhost(boolean scared) {
-        this.isScared = scared;
+        isScared = scared;
         layEgg();
+    }
+
+    public boolean isScared() {
+        return isScared;
+    }
+
+    public void setScared(boolean scared) {
+        isScared = scared;
     }
 
     /**

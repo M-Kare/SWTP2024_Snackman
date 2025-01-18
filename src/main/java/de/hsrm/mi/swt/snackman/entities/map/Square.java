@@ -128,9 +128,10 @@ public class Square {
         if (type == MapObjectType.WALL) {
             return "W";
         } else if (type == MapObjectType.FLOOR) {
-            if(this.mobs.stream().anyMatch(mob -> mob instanceof Ghost || mob instanceof ScriptGhost)) return "G";
-            else if(this.mobs.stream().anyMatch(mob -> mob instanceof SnackMan)) return "SM";
-            else if(this.mobs.stream().anyMatch(mob -> mob instanceof Chicken)) return "C";
+            List<Mob> mobsCopy = new ArrayList<>(mobs);
+            if(mobsCopy.stream().anyMatch(mob -> mob instanceof Ghost || mob instanceof ScriptGhost)) return "G";
+            else if(mobsCopy.stream().anyMatch(mob -> mob instanceof SnackMan)) return "SM";
+            else if(mobsCopy.stream().anyMatch(mob -> mob instanceof Chicken)) return "C";
             else if(this.snack != null && !this.snack.getSnackType().equals(SnackType.EGG)) return "S";     // eats all snacks except for eggs
         }
         return "L";
@@ -140,14 +141,15 @@ public class Square {
      *
      * @return the dominant type of MapObject for the ghost
      */
-    public String getPrimaryTypeForGhost() {
+    public synchronized String getPrimaryTypeForGhost() {
         if (type == MapObjectType.WALL) {
             return  "W";
         } else if (type == MapObjectType.FLOOR) {
-            if(this.mobs.stream().anyMatch(mob -> mob instanceof SnackMan)) return "M";
-            if(this.mobs.stream().anyMatch(mob -> mob instanceof Chicken)) return "C";
-            if(this.mobs.stream().anyMatch(mob -> mob instanceof Ghost)) return "G";
-            if(this.mobs.stream().anyMatch(mob -> mob instanceof ScriptGhost)) return "G";
+            List<Mob> mobsCopy = new ArrayList<>(mobs);
+            if(mobsCopy.stream().anyMatch(mob -> mob instanceof SnackMan)) return "M";
+            if(mobsCopy.stream().anyMatch(mob -> mob instanceof Chicken)) return "C";
+            if(mobsCopy.stream().anyMatch(mob -> mob instanceof Ghost)) return "G";
+            if(mobsCopy.stream().anyMatch(mob -> mob instanceof ScriptGhost)) return "G";
             else if(this.snack != null) return "S";
         }
         return "L";
@@ -162,7 +164,6 @@ public class Square {
             return  "W";
         } else if (type == MapObjectType.FLOOR) {
             if(this.mobs.stream().anyMatch(mob -> mob instanceof SnackMan)) return "M";
-            if(this.mobs.stream().anyMatch(mob -> mob instanceof ScriptGhost && ((ScriptGhost) mob).getId() == ghostId)) return "G";
         }
         return "L";
     }

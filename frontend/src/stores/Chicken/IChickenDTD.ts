@@ -4,6 +4,7 @@ export interface IChickenDTD {
   chickenPosZ: number,
   thickness: ChickenThickness;
   lookingDirection: Direction
+  isScared: boolean
 }
 
 export interface IChicken {
@@ -12,6 +13,7 @@ export interface IChicken {
   chickenPosZ: number,
   thickness: ChickenThickness;
   lookingDirection: Direction
+  isScared: boolean
   meshId: number
 }
 
