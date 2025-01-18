@@ -85,7 +85,6 @@ let counter = 0
 function animate() {
   currentCalories.value = player.getCalories()
   fps = 1 / clock.getDelta()
-  // player.updatePlayer()
   player.lerpPosition()
   gameMapStore.mapContent.chickens.forEach((chicken)=>{
     const chickenModel = scene.getObjectById(chicken.meshId)
