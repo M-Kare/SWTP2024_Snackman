@@ -415,7 +415,7 @@ export const useLobbiesStore = defineStore('lobbiesstore', () => {
    * Starts the singleplayer game.
    * @param adminClient The ID of the player.
    */
-  async function startSingleplayerGame(adminClient: IPlayerClientDTD): Promise<ILobbyDTD> {
+  async function startSingleplayerGame(adminClient: IPlayerClientDTD, difficulty: string): Promise<ILobbyDTD> {
     const creatorUuid = adminClient.playerId
 
     try {
@@ -425,7 +425,7 @@ export const useLobbiesStore = defineStore('lobbiesstore', () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({creatorUuid}),
+        body: JSON.stringify({creatorUuid, difficulty}),
       })
 
       if (!response.ok) {
