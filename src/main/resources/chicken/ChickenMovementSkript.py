@@ -21,13 +21,52 @@
 #    returns: [north_square, east_square, south_square, west_square, indexOfNextPosition]
 import random
 
+
 WALL = 'W'
+CHICKEN = 'C'
 EMPTY = 'L'
 SNACK = 'S'
 GHOST = 'G'
 SNACKMAN = 'SM'
 INVALID = 'X'
 
+
+"""
+def choose_next_square(one_North_square, one_East_square, one_South_square, one_West_square, directionNew):
+    solution_liste = [one_North_square, one_East_square, one_South_square, one_West_square]
+    direction = int(directionNew)
+
+    print("Start")
+    print(solution_liste)
+    print(direction)
+
+    # make sure you cannot walk into a wall
+    solution_liste = eliminate_walls_as_options(solution_liste)
+    solution_liste = eliminate_snackman_as_option(solution_liste)
+    solution_liste = eliminate_snackman_as_option(solution_liste)
+
+    print(solution_liste)
+    print(direction)
+    print("End")
+
+    # make sure you do not walk into a ghost
+    if all_squares_have(solution_liste, GHOST):
+        return add_walking_direction(choose_random_square(solution_liste, GHOST, direction))
+    # choose square with snack
+    if all_squares_have_snack(solution_liste):
+        # choose random snack
+        return add_walking_direction(choose_random_square(solution_liste, SNACK, direction))
+    elif any_square_has(solution_liste, SNACK):
+        # choose a square with snack (far away from ghost)
+        return add_walking_direction(choose_snack_away_from_ghost(solution_liste, direction))
+    elif any_square_has(solution_liste, GHOST):
+        # choose square without snack, away from ghosts
+        north, east, south, west = solution_liste
+        return add_walking_direction(choose_square_without_snack_away_from_ghost(north, east, south, west, direction))
+    else:
+        # choose random square, no snacks there + no ghosts
+        return add_walking_direction(choose_random_square(solution_liste, EMPTY, direction))
+"""
 
 def choose_next_square(squares_liste):
     """
@@ -45,9 +84,18 @@ def choose_next_square(squares_liste):
     solution_liste = [one_North_square, one_East_square, one_South_square, one_West_square]
     direction = int(squares_liste[len(squares_liste) - 1])
 
+    print("Start")
+    print(solution_liste)
+    print(direction)
+
     # make sure you cannot walk into a wall
     solution_liste = eliminate_walls_as_options(solution_liste)
     solution_liste = eliminate_snackman_as_option(solution_liste)
+    solution_liste = eliminate_chicken_as_option(solution_liste)
+
+    print(solution_liste)
+    print(direction)
+    print("End")
 
     # make sure you do not walk into a ghost
     if all_squares_have(solution_liste, GHOST):
@@ -89,7 +137,18 @@ def eliminate_snackman_as_option(squares):
     Returns:
         list: Updated list where Snackman is replaced with invalid squares.
     """
-    return [INVALID if sq == SNACKMAN else sq for sq in squares]
+    return [EMPTY if sq == SNACKMAN else sq for sq in squares]
+
+
+def eliminate_chicken_as_option(squares):
+    """
+    Replaces Snackman with invalid squares.
+    Args:
+        squares (list): List of squares.
+    Returns:
+        list: Updated list where Snackman is replaced with invalid squares.
+    """
+    return [EMPTY if sq == CHICKEN else sq for sq in squares]
 
 
 def all_squares_have(squares, target):
@@ -127,19 +186,27 @@ def choose_random_square(squares, toReplace, direction):
         list: Updated list with a random target square replaced.
     """
     # check if current walking direction is ok
-    if squares[direction] == toReplace:
-        squares[direction] = " "
+    index = int(direction)
+    if squares[index] == toReplace:
+        squares[index] = " "
         return squares
     # get list of indexes of things to replace
     indexes_to_choose_from = []
     for i in range(len(squares)):
         if squares[i] == toReplace:
             indexes_to_choose_from.append(i)
-    last_step = get_last_step(direction)  # the last square as the sky direction on which the chicken stood
-    if len(indexes_to_choose_from) > 1 and last_step in indexes_to_choose_from:
+    last_step = get_last_step(index)  # the last square as the sky direction on which the chicken stood
+    if len(indexes_to_choose_from) > 1 and int(last_step) in indexes_to_choose_from:
         indexes_to_choose_from.remove(last_step)  # delete the previous walking direction
     # replace random index
-    zufall_index = random.choice(indexes_to_choose_from)
+    try:
+        zufall_index = random.choice(indexes_to_choose_from)
+    except (ValueError,IndexError):
+        print(indexes_to_choose_from)
+        print(squares)
+        print("Walking into last direction")
+        squares[last_step] = " "
+        return squares
     squares[zufall_index] = " "
     return squares
 
@@ -217,14 +284,19 @@ def choose_snack_away_from_ghost(original_liste, direction):
         return [north_square, " ", south_square, west_square]
     if west_square == "S" and east_square == "G":
         return [north_square, east_square, south_square, " "]
+    # if ghost and snack are next to each other -> choose snack
+    if north_square == "G" and (east_square == "S" or west_square == "S"):
+        return choose_random_square(original_liste, SNACK, direction)
+    if east_square == "G" and (north_square == "S" or south_square == "S"):
+        return choose_random_square(original_liste, SNACK, direction)
+    if south_square == "G" and (east_square == "S" or west_square == "S"):
+        return choose_random_square(original_liste, SNACK, direction)
+    if west_square == "G" and (north_square == "S" or south_square == "S"):
+        return choose_random_square(original_liste, SNACK, direction)
+
     # if L there: continue looking for S opposite G
     return choose_square_without_snack_away_from_ghost(north_square, east_square, south_square, west_square, direction)
 
-def getWaitingTime():
-    return 2000
-
-def getWaitingTime():
-    return 2000
 
 def choose_square_without_snack_away_from_ghost(north_square, east_square, south_square, west_square, direction):
     """
