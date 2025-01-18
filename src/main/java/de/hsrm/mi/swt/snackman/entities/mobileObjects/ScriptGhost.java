@@ -40,7 +40,6 @@ public class ScriptGhost extends Mob implements Runnable {
     private int ghostPosX, ghostPosZ;
     // python
     private PythonInterpreter pythonInterpreter = null;
-    private final Properties pythonProps = new Properties();
     private ScriptGhostDifficulty difficulty;
     private GameMap gameMap;
 
