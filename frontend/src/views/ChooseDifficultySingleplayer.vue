@@ -84,7 +84,7 @@ const startSingleplayer = async () => {
   width: 80%;
   height: 80%;
   padding: 2%;
-  top: 50%;
+  top: 10%;
 }
 
 .title {
