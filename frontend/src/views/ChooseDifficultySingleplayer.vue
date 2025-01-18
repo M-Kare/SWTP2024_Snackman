@@ -3,10 +3,14 @@
     <div class="inner-box">
       <h1 class="title">Choose the difficulty level for the ghosts!</h1>
       <div id="button-pair">
-        <MainMenuButton id="easy-button" @click="setDifficulty(ScriptGhostDifficulty.EASY)">
+        <MainMenuButton id="easy-button"
+                        :class="{ 'selected': difficulty === ScriptGhostDifficulty.EASY }"
+                        @click="setDifficulty(ScriptGhostDifficulty.EASY)">
           {{ ScriptGhostDifficulty.EASY }}
         </MainMenuButton>
-        <MainMenuButton id="difficult-button" @click="setDifficulty(ScriptGhostDifficulty.DIFFICULT)">
+        <MainMenuButton id="difficult-button"
+                        :class="{ 'selected': difficulty === ScriptGhostDifficulty.DIFFICULT }"
+                        @click="setDifficulty(ScriptGhostDifficulty.DIFFICULT)">
           {{ ScriptGhostDifficulty.DIFFICULT }}
         </MainMenuButton>
       </div>
@@ -38,7 +42,7 @@ import {useLobbiesStore} from "@/stores/Lobby/lobbiesstore";
 import MainMenuButton from "@/components/MainMenuButton.vue";
 
 const router = useRouter()
-const difficulty = ref(ScriptGhostDifficulty.EASY)    // TODO standardmäßig ist easy ausgewählt -> das kann man dann ändern
+const difficulty = ref(ScriptGhostDifficulty.EASY)    // standardmäßig ist easy ausgewählt -> das kann man dann ändern
 const lobbiesStore = useLobbiesStore()
 
 const emit = defineEmits<{
@@ -123,11 +127,13 @@ const startSingleplayer = async () => {
   color: var(--accent-color);
 }
 
-#easy-button:hover {
+#easy-button:hover,
+#easy-button.selected {
   background-color: var(--primary-sprint-bar-color);
 }
 
-#difficult-button:hover {
+#difficult-button:hover,
+#difficult-button.selected {
   background-color: var(--accent-color);
 }
 
