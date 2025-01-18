@@ -20,5 +20,6 @@
   border: var(--primary-text-color) solid 4px;
   border-radius: 0.2rem;
   box-shadow: 4px 3px 0 var(--primary-text-color);
+  font-family: var(--font-main);
 }
 </style>

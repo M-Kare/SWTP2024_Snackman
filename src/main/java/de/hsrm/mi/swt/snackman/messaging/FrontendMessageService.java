@@ -29,4 +29,23 @@ public class FrontendMessageService {
 
         messagingTemplate.convertAndSend("/topic/leaderboard", ev);
     }
+
+    public void sendLobbyEvent(FrontendLobbyMessageEvent ev) {
+        log.debug("Send Event: lobbies {}", ev.lobbies().toString());
+
+        messagingTemplate.convertAndSend("/topic/lobbies", ev.lobbies());
+    }
+
+    public void sendChooseEvent ( FrontendChooseRoleEvent ev){
+        log.debug("Send Event: lobby {}", ev.lobby().toString());
+        messagingTemplate.convertAndSend("/topic/lobbies/chooseRole", ev.lobby());
+    }
+
+    public void sendRoleChooseUpdate( FrontedLobbyRoleUpdateEvent ev){
+        log.debug("Sendet Role Update " , ev.lobby());
+        messagingTemplate.convertAndSend("/topic/lobby/Role-Update", ev);
+    }
+
+
+
 }

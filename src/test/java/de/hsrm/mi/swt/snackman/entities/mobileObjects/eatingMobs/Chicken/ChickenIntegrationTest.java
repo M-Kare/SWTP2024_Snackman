@@ -59,11 +59,9 @@ public class ChickenIntegrationTest {
             pyInterp.exec("from ChickenMovementSkript import choose_next_square");
             pyInterp.exec("result = choose_next_square([" + mapAroundChicken + "])");
 
-            String result = pyInterp.get("result").toString();
+            int result = Integer.parseInt(pyInterp.get("result").toString());
 
-            String expectedResult = "['X', 'X', 'X', ' ', 3]";
-            assertEquals(expectedResult, result,
-                    "The Python script should correctly determine the next move (' ').");
+            assertEquals(3, result,"The Python script should correctly determine the next move.");
         }
     }
 }
