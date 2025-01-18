@@ -208,19 +208,19 @@ onMounted(async () => {
 // initially loads the playerModel (Snackman or Model) & attaches playerModel to playerCamera
 async function loadPlayerModel(playerId: string, role: string, gameObjectRenderer: ReturnType<typeof GameObjectRenderer>) {
   if (role === 'GHOST') {
-    const gameObjectRenderer = textureOrRenderer as ReturnType<typeof GameObjectRenderer>;
     gameObjectRenderer
       .createGhostOnFloor(playerData.posX, playerData.posZ, 0, playerData.radius)
       .then((ghostModel) => {
         ghostModel.position.set(playerData.posX, 0, playerData.posZ);
         scene.add(ghostModel);
-        if (ghostModel instanceof THREE.Group) {
-          playerHashMap.set(playerId, ghostModel);
-        }
+        playerHashMap.set(playerId, ghostModel);
+      })
+      .catch((error) => {
+        console.error('Fehler beim Laden des Geister-Modells:', error);
       });
   } else if (role === 'SNACKMAN') {
-    const texture = textureOrRenderer as string;
-    loader.load(texture, (gltf) => {
+    const loader = new GLTFLoader();
+    loader.load(SNACKMAN_TEXTURE, (gltf) => {
       snackManModel = gltf.scene;
       snackManModel.scale.set(1, 1, 1);
       snackManModel.position.set(playerData.posX, playerData.posY - 2, playerData.posZ);
