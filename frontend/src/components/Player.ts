@@ -277,6 +277,9 @@ export class Player {
     move.z = move.z * adjustedDelta * currentSpeed;
     const xNew = this.camera.position.x + move.x;
     const zNew = this.camera.position.z + move.z;
+    if (this.gameMap[this.calcMapIndexOfCoordinate(xNew)][this.calcMapIndexOfCoordinate(zNew)].type === MapObjectType.WALL) {
+      return;
+    }
     try {
       result = this.checkWallCollision(xNew, zNew);
     } catch (e) {

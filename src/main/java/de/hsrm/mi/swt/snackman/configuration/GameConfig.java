@@ -11,7 +11,7 @@ public class GameConfig {
     public static final double SNACKMAN_RADIUS = 0.3;
     public static final double SNACKMAN_SPEED = 10.0;
     public static final double SNACKMAN_SPRINT_MULTIPLIER = 1.5;
-    public static final int SNACKMAN_MAX_CALORIES = 20000;
+    public static final int SNACKMAN_MAX_CALORIES = 20000000;
 
     //SNACKMAN JUMPING PARAM
     public static final double JUMP_STRENGTH = 8;
