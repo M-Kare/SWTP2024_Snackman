@@ -20,9 +20,9 @@
     </ChooseDifficultySingleplayer>
 
     <div class="button-container">
-      <MainMenuButton v-if="!showChooseSingleplayerDifficulty" @click="startSingleplayer">Singleplayer</MainMenuButton>
-      <MainMenuButton v-if="!showChooseSingleplayerDifficulty" @click="showLobbies">Multiplayer</MainMenuButton>
-      <MainMenuButton v-if="!showChooseSingleplayerDifficulty" @click="showLeaderboard">Leaderboard</MainMenuButton>
+      <MainMenuButton v-if="!showChooseSingleplayerDifficulty" @click="startSingleplayer">{{$t('button.singlePlayer')}}</MainMenuButton>
+      <MainMenuButton v-if="!showChooseSingleplayerDifficulty" @click="showLobbies">{{$t('button.multiPlayer')}}</MainMenuButton>
+      <MainMenuButton v-if="!showChooseSingleplayerDifficulty" @click="showLeaderboard">{{$t('button.leaderBoard')}}</MainMenuButton>
     </div>
   </MenuBackground>
 </template>
@@ -48,7 +48,7 @@ const showPlayerNameForm = ref(false);
 const showChooseSingleplayerDifficulty = ref(false);
 
 /**
- * triggered by click von imgs
+ * triggered by clicking on flag images
  * changes locale and therefore the language
  * 
  * @param locale with according language

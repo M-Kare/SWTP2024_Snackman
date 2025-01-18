@@ -4,6 +4,7 @@
 # Buttons
 button.singlePlayer;Singleplayer;Einzelspieler
 button.multiPlayer;Multiplayer;Mehrspieler
+button.leaderBoard;Leaderboard;Bestenliste
 
 button.save;Save;Speichern
 button.back;Back;Zurück
