@@ -255,10 +255,17 @@ public class ScriptGhost extends Mob implements Runnable {
         this.lookingDirection = walkingDirection;
         Square oldPosition = this.gameMap.getSquareAtIndexXZ(this.ghostPosX, this.ghostPosZ);
         Square newPosition = walkingDirection.getNewPosition(this.gameMap, this.ghostPosX, this.ghostPosZ, walkingDirection);
+
+        try {
+            Thread.sleep(WAITING_TIME/2);
+        } catch (InterruptedException e) {
+            log.error(e.getMessage());
+        }
+
         propertyChangeSupport.firePropertyChange("scriptGhost", null, this);
 
         try {
-            Thread.sleep(WAITING_TIME);
+            Thread.sleep(WAITING_TIME/2);
         } catch (InterruptedException e) {
             log.error(e.getMessage());
         }
