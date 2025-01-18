@@ -57,6 +57,10 @@ export const useGameMapStore = defineStore('gameMap', () => {
       OFFSET = mapData.DEFAULT_SQUARE_SIDE_LENGTH / 2
       DEFAULT_SIDE_LENGTH = mapData.DEFAULT_SQUARE_SIDE_LENGTH
 
+      mapData.chickens = []
+      mapData.scriptGhosts = []
+      mapData.gameMap = new Map<number, ISquare>()
+
       for (const square of response.gameMap) {
         mapData.gameMap.set(square.id, square as ISquare)
       }
@@ -95,7 +99,7 @@ export const useGameMapStore = defineStore('gameMap', () => {
             switch (mess.event) {
               case EventType.GameEnd:
                 const gameEndUpdate: IGameEndDTD = mess.message
-                endGame(gameEndUpdate)
+                endGame(gameEndUpdate, lobbydata.currentPlayer.joinedLobbyId!)
                 break;
               case EventType.SnackManUpdate:
                 const mobUpdate: ISnackmanUpdateDTD = mess.message
@@ -181,15 +185,37 @@ export const useGameMapStore = defineStore('gameMap', () => {
    * @param gameEndUpdate - Contains the details about the game end, including the winning role,
    *                        the time played, and the calories collected during the game.
    */
-  function endGame(gameEndUpdate: IGameEndDTD) {
+  function endGame(gameEndUpdate: IGameEndDTD , lobbyId: string ) {
     router.push({
       name: 'GameEnd',
       query: {
         winningRole: gameEndUpdate.role,
         timePlayed: gameEndUpdate.timePlayed,
-        kcalCollected: gameEndUpdate.kcalCollected
+        kcalCollected: gameEndUpdate.kcalCollected,
+        lobbyId : gameEndUpdate.lobbyId
       }
-    })
+    }).then(r => {
+        stompclient.deactivate()
+        mapData.DEFAULT_SQUARE_SIDE_LENGTH = 0
+        mapData.DEFAULT_WALL_HEIGHT = 0
+        mapData.scriptGhosts = []
+        mapData.chickens = []
+        mapData.gameMap = new Map<number, ISquare>()
+        for (let i = scene.children.length - 1; i >= 0; i--) {
+          scene.remove(scene.children[i])
+        }
+        const lobby = lobbydata.lobbies.find(l => l.lobbyId === lobbyId)
+      if ( lobby ){
+        for (const member of lobby.members){
+          if (member.playerId === lobbydata.currentPlayer.playerId){
+            member.role ='UNDEFINED'
+          }
+        }
+      }
+
+        lobbydata.currentPlayer.joinedLobbyId = ""
+      }
+    )
   }
 
   function updateChicken(change: IChickenDTD) {
@@ -291,28 +317,40 @@ export const useGameMapStore = defineStore('gameMap', () => {
     switch (
       currentChicken.lookingDirection // rotates the chicken depending on what its looking direction is
       ) {
-      case Direction.NORTH || Direction.SOUTH:
+      case Direction.NORTH:
         chickenMesh!.setRotationFromEuler(new THREE.Euler(0))
-        break
-      case Direction.EAST || Direction.WEST:
+        break;
+      case Direction.SOUTH:
+        chickenMesh!.setRotationFromEuler(new THREE.Euler(Math.PI))
+        break;
+      case Direction.EAST:
         chickenMesh!.setRotationFromEuler(new THREE.Euler(Math.PI / 2))
+        break
+      case Direction.WEST:
+        chickenMesh!.setRotationFromEuler(new THREE.Euler(3 * Math.PI / 2))
         break
     }
   }
 
   function updateLookingDirectionScriptGhost(currentScriptGhost: IScriptGhost, scriptGhostUpdate: IScriptGhostDTD) {
     console.log("ScriptGhost looking direction updated")
-    const scriptGhostMesh = scene.getObjectById(currentScriptGhost.meshId)
-
     currentScriptGhost.lookingDirection = scriptGhostUpdate.lookingDirection
+    console.log(currentScriptGhost.model.children.length)
     switch (currentScriptGhost.lookingDirection) {
-      case Direction.NORTH || Direction.SOUTH:
-        scriptGhostMesh!.setRotationFromEuler(new THREE.Euler(0))
+      case Direction.NORTH:
+        currentScriptGhost.model.rotation.set(0, 0, 0)
         break;
-      case Direction.EAST || Direction.WEST:
-        scriptGhostMesh!.setRotationFromEuler(new THREE.Euler(Math.PI / 2))
+      case Direction.SOUTH:
+        currentScriptGhost.model.rotation.set(0, 180, 0)
         break;
+      case Direction.EAST:
+        currentScriptGhost.model.rotation.set(0, 90, 0)
+        break
+      case Direction.WEST:
+      currentScriptGhost.model.rotation.set(0, 270, 0)
+        break
     }
+    console.log("Look direction: " + scriptGhostUpdate.lookingDirection, " Rotation: " + currentScriptGhost.model.rotation.x , currentScriptGhost.model.rotation.y, currentScriptGhost.model.rotation.z)
   }
 
   function updateWalkingDirection(
@@ -335,12 +373,10 @@ export const useGameMapStore = defineStore('gameMap', () => {
   }
 
   function updateWalkingDirectionScriptGhost(currentScriptGhost: IScriptGhost, scriptGhostUpdate: IScriptGhostDTD, DEFAULT_SIDE_LENGTH: number, OFFSET: number) {
-    const scriptGhostMesh = scene.getObjectById(currentScriptGhost.meshId)
-
     currentScriptGhost.scriptGhostPosX = scriptGhostUpdate.scriptGhostPosX
     currentScriptGhost.scriptGhostPosZ = scriptGhostUpdate.scriptGhostPosZ
 
-    scriptGhostMesh!.position.set(currentScriptGhost.scriptGhostPosX * DEFAULT_SIDE_LENGTH + OFFSET, 0, currentScriptGhost.scriptGhostPosZ * DEFAULT_SIDE_LENGTH + OFFSET)
+    currentScriptGhost.model.position.set(currentScriptGhost.scriptGhostPosX * DEFAULT_SIDE_LENGTH + OFFSET, 0, currentScriptGhost.scriptGhostPosZ * DEFAULT_SIDE_LENGTH + OFFSET)
   }
 
   function setSnackMeshId(squareId: number, meshId: number) {
@@ -354,10 +390,10 @@ export const useGameMapStore = defineStore('gameMap', () => {
     if (chicken != undefined) chicken.meshId = meshId
   }
 
-  function setScriptGhostMeshId(meshId: number, ghostId: number) {
+  function setScriptGhostModel(model: THREE.Group, ghostId: number) {
     const ghost = mapData.scriptGhosts.find(ghost => ghost.id === ghostId);
     if (ghost != undefined)
-      ghost.meshId = meshId
+      ghost.model = model
   }
 
   function removeMeshFromScene(scene: Scene, meshId: number) {
@@ -381,6 +417,6 @@ export const useGameMapStore = defineStore('gameMap', () => {
     setPlayer,
     setOtherPlayers,
     stompclient: stompclient,
-    setScriptGhostMeshId,
+    setScriptGhostModel,
   };
 })

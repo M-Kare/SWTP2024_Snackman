@@ -110,7 +110,7 @@ class SnackManTest {
         assertEquals(square1.getSnack().getSnackType(), SnackType.EMPTY);
     }
 
-    @Test 
+    @Test
     void testJump() {
         snackMan.setKcal(200);
         snackMan.jump();
@@ -120,7 +120,7 @@ class SnackManTest {
         assertTrue(snackMan.isJumping());
     }
 
-    @Test 
+    @Test
     void testJumpInsufficientKcal() {
         snackMan.setKcal(50);
         snackMan.jump();
@@ -129,7 +129,7 @@ class SnackManTest {
         assertFalse(snackMan.isJumping());
     }
 
-    @Test 
+    @Test
     void testDoubleJump() {
         snackMan.setKcal(300);
         snackMan.jump();
@@ -139,7 +139,7 @@ class SnackManTest {
         assertEquals(GameConfig.JUMP_STRENGTH + GameConfig.DOUBLEJUMP_STRENGTH, snackMan.getVelocityY());
     }
 
-    @Test 
+    @Test
     void testDoubleJumpWithoutEnoughKcal() {
         snackMan.setKcal(100);
         snackMan.jump();
@@ -149,7 +149,7 @@ class SnackManTest {
         assertEquals(GameConfig.JUMP_STRENGTH, snackMan.getVelocityY());
     }
 
-    @Test 
+    @Test
     void testUpdateJumpPosition() {
         snackMan.setKcal(100);
         snackMan.jump();
@@ -169,7 +169,7 @@ class SnackManTest {
     }
 
 
-    @Test 
+    @Test
     void testMoveWhileSprintingCanSprint() {
         when(sprintHandler.canSprint()).thenReturn(true);
         snackMan.setSprinting(true);
@@ -179,7 +179,7 @@ class SnackManTest {
         assertEquals(GameConfig.SNACKMAN_SPEED * GameConfig.SNACKMAN_SPRINT_MULTIPLIER, snackMan.getSpeed());
     }
 
-    @Test 
+    @Test
     void testMoveWhileSprintingCannotSprint() {
         when(sprintHandler.canSprint()).thenReturn(false);
         snackMan.setSprinting(true);

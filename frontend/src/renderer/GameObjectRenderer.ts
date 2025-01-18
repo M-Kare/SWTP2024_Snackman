@@ -92,7 +92,7 @@ export const GameObjectRenderer = () => {
     zPosition: number,
     yPosition: number,
     sideLength: number
-  ): Promise<THREE.Object3D> {
+  ): Promise<THREE.Group> {
     const placeholder = new THREE.Mesh(
       new THREE.SphereGeometry(0.5, 16, 16),
       new THREE.MeshStandardMaterial({ color: 'gray', opacity: 0.5, transparent: true })
