@@ -12,6 +12,12 @@
         <p v-else>{{ caloriesMessage }}</p>
       </div>
     </div>
+
+    <div class="time">
+      <img alt="clock" class="clock-icon" src="@/assets/clock-icon.svg" />
+      <p>{{ formattedTime }}</p>
+    </div>
+
   </div>
 </template>
 
@@ -28,6 +34,10 @@ import type {IPlayerClientDTD} from "@/stores/Lobby/IPlayerClientDTD";
 import {GLTFLoader} from 'three/examples/jsm/Addons.js'
 import {useRoute} from 'vue-router';
 import type {IPlayerDTD} from '@/stores/Player/IPlayerDTD';
+import {SoundManager} from "@/services/SoundManager";
+import {SoundType} from "@/services/SoundTypes";
+import { GameObjectRenderer } from '@/renderer/GameObjectRenderer';
+import type { IOtherPlayer } from '@/stores/IOtherPlayer';
 
 const { lobbydata } = useLobbiesStore();
 const gameMapStore = useGameMapStore()
@@ -35,7 +45,7 @@ gameMapStore.startGameMapLiveUpdate()
 
 const targetHz = 30
 let clients: Array<IPlayerClientDTD>;
-let playerHashMap = new Map<String, THREE.Group<THREE.Object3DEventMap>>()
+let playerHashMap = new Map<String, IOtherPlayer>()
 
 const route = useRoute();
 const stompclient = gameMapStore.stompclient
@@ -72,10 +82,33 @@ let counter = 0
 
 // is called every frame, changes camera position and velocity
 // only sends updates to backend at 30hz
+// linearly interpolates the positions of the frontend mobs toward the backend position by t ammount every frame
 function animate() {
   currentCalories.value = player.getCalories()
   fps = 1 / clock.getDelta()
-  player.updatePlayer()
+  player.lerpPosition()
+  gameMapStore.mapContent.chickens.forEach((chicken)=>{
+    const chickenModel = scene.getObjectById(chicken.meshId)
+    if(chickenModel){
+      chickenModel.position.lerp(new THREE.Vector3(chicken.chickenPosX, 0, chicken.chickenPosZ), 0.2)
+      chickenModel.quaternion.slerp(chicken.lookingQuaternion, 0.05)
+    }
+  })
+  gameMapStore.mapContent.scriptGhosts.forEach((scriptGhost)=>{
+    const scriptGhostModel = scene.getObjectById(scriptGhost.meshId)
+    if(scriptGhostModel){
+      scriptGhostModel.position.lerp(new THREE.Vector3(scriptGhost.scriptGhostPosX, 0, scriptGhost.scriptGhostPosZ), 0.2)
+      scriptGhostModel.quaternion.slerp(scriptGhost.lookingQuaternion, 0.05)
+    }
+  })
+  gameMapStore.getOtherPlayers().forEach((otherPlayer)=>{
+    console.log(otherPlayer.targetPosition.x)
+    if(otherPlayer.model){
+      console.log(otherPlayer.model.quaternion.x, otherPlayer.model.quaternion.y, otherPlayer.model.quaternion.z)
+      otherPlayer.model.position.lerp(otherPlayer.targetPosition, 0.2)
+      otherPlayer.model.quaternion.slerp(otherPlayer.rotation, 0.5)
+    }
+  })
 
   if (counter >= fps / targetHz) {
     const time = performance.now()
@@ -106,8 +139,13 @@ function animate() {
 }
 
 onMounted(async () => {
+  startCountDown()
+  console.log(formattedTime)
+
   // for rendering the scene, create gameMap in 3d and change window size
   const {initRenderer, createGameMap, getScene} = GameMapRenderer()
+  const gameObjectRenderer = GameObjectRenderer();
+  
   scene = getScene()
   renderer = initRenderer(canvasRef.value)
   //Add gameMap
@@ -132,7 +170,7 @@ onMounted(async () => {
         playerData.speed, playerData.sprintMultiplier)
     } else {
       // other players that are not you
-      loadPlayerModel(it.playerId, SNACKMAN_TEXTURE);
+      loadPlayerModel(it.playerId, it.role, gameObjectRenderer);
     }
   });
   gameMapStore.setOtherPlayers(playerHashMap)
@@ -161,21 +199,69 @@ onMounted(async () => {
   renderer.render(scene, camera)
   renderer.setAnimationLoop(animate)
   window.addEventListener('resize', resizeCallback)
+
+  await SoundManager.initSoundmanager(camera)
+  console.debug("All sounds loaded, attaching to meshes...");
+
+  //Attach sound to chickens
+  gameMapStore.mapContent.chickens.forEach((chicken) => {
+    const chickenMesh = scene.getObjectById(chicken.meshId);
+    if (!chickenMesh) {
+      console.warn(`Chicken mesh with ID ${chicken.meshId} not found in the scene.`);
+      return;
+    }
+    SoundManager.attachSoundToModelOrMesh(chickenMesh, SoundType.CHICKEN);
+  });
+
+  //Attach sound to scriptGhosts
+  gameMapStore.mapContent.scriptGhosts.forEach((scriptGhost) => {
+    const ghostMesh = scene.getObjectById(scriptGhost.meshId);
+    if (!ghostMesh) {
+      console.warn(`Ghost mesh with ID ${scriptGhost.meshId} not found in the scene.`);
+      return;
+    }
+    SoundManager.attachSoundToModelOrMesh(ghostMesh, SoundType.GHOST);
+  });
+
+  SoundManager.stopLobbySound()
+  SoundManager.playSound(SoundType.CHICKEN)
+  SoundManager.playSound(SoundType.GHOST)
+  SoundManager.playSound(SoundType.INGAME_BACKGROUND)
 })
 
-// initially loads the playerModel & attaches playerModel to playerCamera
-async function loadPlayerModel(playerId: string, texture: string) {
-  const loader = new GLTFLoader()
-  loader.load(texture, gltf => {
-    snackManModel = gltf.scene
-    snackManModel.scale.set(1, 1, 1)
-    scene.add(snackManModel)
-    snackManModel.position.lerp(new THREE.Vector3(playerData.posX, playerData.posY - 2, playerData.posZ), 0.5)
-    playerHashMap.set(playerId, snackManModel);
-    // optional offset for thirdPersonView
-    // snackManModel.position.set(0, -1.55, -5);
-    // player.getCamera().add(snackManModel)
-  })
+// initially loads the playerModel (Snackman or Model) & attaches playerModel to playerCamera
+async function loadPlayerModel(playerId: string, role: string, gameObjectRenderer: ReturnType<typeof GameObjectRenderer>) {
+  if (role === 'GHOST') {
+    gameObjectRenderer
+      .createGhostOnFloor(playerData.posX, playerData.posZ, 0, playerData.radius)
+      .then((ghostModel) => {
+        ghostModel.position.set(playerData.posX, 0, playerData.posZ);
+        scene.add(ghostModel);
+        const otherPlayer = {} as IOtherPlayer
+        otherPlayer.model = ghostModel
+        otherPlayer.rotation = new THREE.Quaternion()
+        otherPlayer.rotation.set(ghostModel.quaternion.x, ghostModel.quaternion.y, ghostModel.quaternion.z, ghostModel.quaternion.w)
+        otherPlayer.targetPosition = ghostModel.position.clone()
+        playerHashMap.set(playerId, otherPlayer);
+      })
+      .catch((error) => {
+        console.error('Fehler beim Laden des Geister-Modells:', error);
+      });
+  } else if (role === 'SNACKMAN') {
+    const loader = new GLTFLoader();
+    loader.load(SNACKMAN_TEXTURE, (gltf) => {
+      snackManModel = gltf.scene;
+      snackManModel.scale.set(1, 1, 1);
+      snackManModel.position.set(playerData.posX, playerData.posY - 2, playerData.posZ);
+      scene.add(snackManModel);
+      const otherPlayer = {} as IOtherPlayer
+      otherPlayer.model = snackManModel
+      otherPlayer.rotation = new THREE.Quaternion()
+      otherPlayer.rotation.set(snackManModel.quaternion.x, snackManModel.quaternion.y, snackManModel.quaternion.z, snackManModel.quaternion.w)
+      otherPlayer.targetPosition = snackManModel.position.clone()
+      playerHashMap.set(playerId, otherPlayer);
+    });
+  }
 }
 
 onUnmounted(() => {
@@ -256,14 +342,94 @@ const sprintBarStyle = computed(() => {
     backgroundColor: color,
   }
 })
+
+const countdownTime = ref(300) // 5 Minute in seconds
+const lobbyId = ref(route.query.lobbyId || '');
+
+/**
+ * Get Current Playing Time From Backend
+ */
+const getCurrentPlayingTime = async () => {
+  try {
+    const url = `/api/lobby/${lobbyId.value}/current-playing-time`
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+    })
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`)
+    }
+
+    const currentPlayingTime = await response.json();
+    console.log('Current Playing Time:', currentPlayingTime);
+    return currentPlayingTime;
+
+    } catch (error: any) {
+      console.error('Error:', error)
+      return null
+    }
+}
+
+const formattedTime = computed(() => {
+  const minutes = Math.floor(countdownTime.value / 60)
+  const seconds = countdownTime.value % 60
+  return `${minutes < 10 ? '0' : ''}${minutes}:${seconds < 10 ? '0' : ''}${seconds}`
+})
+
+const startCountDown = async () => {
+  const currentTime = await getCurrentPlayingTime();
+  if (currentTime !== null) {
+    countdownTime.value = Math.floor(currentTime / 1000); // Change from milis second to second
+  } else {
+    console.error('Failed to fetch current playing time. Using default value.');
+  }
+
+  const interval = setInterval(() => {
+    if (countdownTime.value > 0) {
+      countdownTime.value -= 1;
+    } else {
+      clearInterval(interval); // Stop when countdown reaches 0
+    }
+  }, 1000)
+}
+
 </script>
 
 <style>
+.time {
+  position: absolute;
+  color: black;
+  font-weight: bold;
+  top: 3vh;
+  right: 3vh;
+  font-size: 40px;
+  z-index: 10;
+  display: flex;
+  width: 400px;
+  height: 60px;
+  gap: 10px;
+  justify-content: right;
+  align-items: center;
+}
+
+.time p {
+  margin: 0;
+  line-height: 1;
+}
+
+.clock-icon {
+  width: 40px;
+  height: 40px;
+}
+
 .Calories-Overlay {
   color: black;
   position: fixed;
-  top: 10px;
-  right: 10px;
+  top: 3vh;
+  left: 3vh;
   padding: 10px;
   border-radius: 5px;
   z-index: 10;
@@ -272,12 +438,19 @@ const sprintBarStyle = computed(() => {
   height: 60px;
   display: flex;
   justify-content: left;
+  align-items: center;
+  box-shadow: 7px 7px 0 rgba(0, 0, 0, 0.8);
 }
 
 .overlayContent {
   display: flex;
   align-items: center;
   gap: 16px;
+}
+
+.overlayContent p {
+  margin: 0;
+  line-height: 1;
 }
 
 .calories-icon {
@@ -287,14 +460,16 @@ const sprintBarStyle = computed(() => {
 
 .sprint-bar {
   position: absolute;
+  z-index: 10;
   bottom: 3vh;
-  right: 3vh;
+  left: 3vh;
   width: 25rem;
   height: 2.5rem;
   background-color: #ccc;
   border: 0.25rem solid #000;
   border-radius: 0.5rem;
   overflow: hidden;
+  box-shadow: 7px 7px 0 rgba(0, 0, 0, 0.8);
 }
 
 .sprint-bar-inner {

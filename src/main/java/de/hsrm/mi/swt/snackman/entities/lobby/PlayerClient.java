@@ -12,6 +12,7 @@ public class PlayerClient {
       public PlayerClient(String playerId, String playerName) {
             this.playerId = playerId;
             this.playerName = playerName;
+            this.role = ROLE.UNDEFINED;
       }
 
       public String getPlayerId() {

@@ -17,11 +17,20 @@ public class ReadMazeService {
 
     private PythonInterpreter interpreter;
 
-    public ReadMazeService(){
+    public ReadMazeService() {
         interpreter = new PythonInterpreter();
         interpreter.exec("import sys");
         URL path = SnackmanApplication.class.getProtectionDomain().getCodeSource().getLocation();
-        interpreter.exec("sys.path.append('" + path.getPath().replace("nested:", "").replace("!", "") + "/Lib')");
+        String jarClassesPath = path.getPath().replace("nested:", "").replace("!", "");
+        interpreter.exec("if './extensions/chicken' not in sys.path: sys.path.insert(0, './extensions/chicken')");
+        interpreter.exec("if './extensions/ghost' not in sys.path: sys.path.insert(0, './extensions/ghost')");
+        interpreter.exec("if './extensions/maze' not in sys.path: sys.path.insert(0, './extensions/maze')");
+        interpreter.exec("if './extensions' not in sys.path: sys.path.insert(0, './extensions')");
+        interpreter.exec("if '.' not in sys.path: sys.path.insert(0, '.')");
+        interpreter.exec("if '" + jarClassesPath + "/chicken' not in sys.path: sys.path.append('" + jarClassesPath + "/chicken')");
+        interpreter.exec("if '" + jarClassesPath + "/ghost' not in sys.path: sys.path.append('" + jarClassesPath + "/ghost')");
+        interpreter.exec("if '" + jarClassesPath + "/maze' not in sys.path: sys.path.append('" + jarClassesPath + "/maze')");
+        interpreter.exec("if '" + jarClassesPath + "/Lib' not in sys.path: sys.path.append('" + jarClassesPath + "/Lib')");
     }
 
     /**
@@ -58,8 +67,8 @@ public class ReadMazeService {
     }
 
     public void generateNewMaze() {
-        String mazeScriptPath = "./extensions/maze/Maze.py";
-        interpreter.execfile(mazeScriptPath);
+        interpreter.exec("import Maze");
+        interpreter.exec("Maze.main()");
     }
 
     // /**

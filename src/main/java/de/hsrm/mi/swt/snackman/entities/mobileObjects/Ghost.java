@@ -28,9 +28,6 @@ public class Ghost extends Mob {
     public void scaresEverythingThatCouldBeEncountered(Square position, GameMap gameMap) {
         for (Mob mob : gameMap.getSquareAtIndexXZ(position.getIndexX(), position.getIndexZ()).getMobs()) {
             switch (mob) {
-                case SnackMan snackMan:
-                    snackMan.isScaredFromGhost();
-                    break;
                 case Chicken chicken:
                     chicken.isScaredFromGhost(true);
                     break;
@@ -50,7 +47,6 @@ public class Ghost extends Mob {
             oldSquare.removeMob(this);
             newSquare.addMob(this);
         }
-
     }
 
     /**

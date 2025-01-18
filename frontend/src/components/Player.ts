@@ -1,10 +1,12 @@
 import {useGameMapStore} from '@/stores/gameMapStore';
-import {MapObjectType, type IGameMap} from '@/stores/IGameMapDTD';
+import {MapObjectType} from '@/stores/IGameMapDTD';
 import type {ISquare} from '@/stores/Square/ISquareDTD';
-import {type WebGLRenderer} from 'three'
 import * as THREE from 'three'
+import {type WebGLRenderer} from 'three'
 import {PointerLockControls} from 'three/addons/controls/PointerLockControls.js'
 import {reactive, ref, type UnwrapNestedRefs} from "vue";
+import {SoundManager} from "@/services/SoundManager";
+import {SoundType} from "@/services/SoundTypes";
 
 export class Player {
   private prevTime: DOMHighResTimeStamp
@@ -16,14 +18,15 @@ export class Player {
   private moveRight: boolean;
   private canJump: boolean;
   private sprinting: boolean;
-
+  
   private radius: number;
   private speed: number;
   private sprintMultiplier: number;
-
+  
   private camera: THREE.PerspectiveCamera;
   private controls: PointerLockControls;
-
+  
+  private targetPosition: THREE.Vector3
   private movementDirection: THREE.Vector3;
 
   private isJumping: boolean;
@@ -64,6 +67,7 @@ export class Player {
     this.canJump = true;
     this.sprinting = false;
     this.movementDirection = new THREE.Vector3();
+    this.targetPosition = new THREE.Vector3(posX, posY, posZ) // marks the current position in the backend (used as a target for moving (lerping) the camera position towards)
     this.calories = 0;
 
     this.isJumping = false;
@@ -87,6 +91,8 @@ export class Player {
     this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 60)
     this.camera.position.set(posX, posY, posZ)
     this.controls = new PointerLockControls(this.camera, renderer.domElement)
+    this.controls.maxPolarAngle = (170/180)*Math.PI;
+    this.controls.minPolarAngle = (10/180)*Math.PI;
     document.addEventListener('keydown', (event) => {
       this.onKeyDown(event)
     })
@@ -225,15 +231,22 @@ export class Player {
   }
 
   /**
-   * lerp is used to interpolate the two positions
+   * Set target position to lerp towards
    */
   public setPosition(pos: THREE.Vector3) {
-    this.camera.position.lerp(pos, 0.5);
-
-    if (pos.y <= 2) {
+    this.targetPosition = pos;
+    if (this.targetPosition.y <= 2) {
       this.isJumping = false
       this.doubleJump = false
     }
+
+  }
+  
+  /**
+   * Moves the camera position towards the target position by t (0.1) ammount
+   */
+  public lerpPosition(){
+    this.camera.position.lerp(this.targetPosition, 0.1)
   }
 
   /**
@@ -277,6 +290,9 @@ export class Player {
     move.z = move.z * adjustedDelta * currentSpeed;
     const xNew = this.camera.position.x + move.x;
     const zNew = this.camera.position.z + move.z;
+    if (this.gameMap[this.calcMapIndexOfCoordinate(xNew)][this.calcMapIndexOfCoordinate(zNew)].type === MapObjectType.WALL) {
+      return;
+    }
     try {
       result = this.checkWallCollision(xNew, zNew);
     } catch (e) {
@@ -289,11 +305,35 @@ export class Player {
         break;
       case 1:
         this.camera.position.z += move.z;
+        this.camera.position.x += move.x;        
+        if (Math.round(this.camera.position.x) < this.camera.position.x) {
+          this.camera.position.x = Math.round(this.camera.position.x) + this.radius;
+        } else {
+          this.camera.position.x = Math.round(this.camera.position.x) - this.radius;
+        }
         break;
       case 2:
         this.camera.position.x += move.x;
+        this.camera.position.z += move.z;
+        if (Math.round(this.camera.position.z) < this.camera.position.z) {
+          this.camera.position.z = Math.round(this.camera.position.z) + this.radius;
+        } else {
+          this.camera.position.z = Math.round(this.camera.position.z) - this.radius;
+        }
         break;
       case 3:
+        this.camera.position.x += move.x;
+        this.camera.position.z += move.z;
+        if (Math.round(this.camera.position.x) < this.camera.position.x) {
+          this.camera.position.x = Math.round(this.camera.position.x) + this.radius;
+        } else {
+          this.camera.position.x = Math.round(this.camera.position.x) - this.radius;
+        }
+        if (Math.round(this.camera.position.z) < this.camera.position.z) {
+          this.camera.position.z = Math.round(this.camera.position.z) + this.radius;
+        } else {
+          this.camera.position.z = Math.round(this.camera.position.z) - this.radius;
+        }
         break;
       default:
         break;
@@ -365,7 +405,7 @@ export class Player {
       const diagZ = verticalRelativeToCenter > 0 ? (this.currentSquare.indexZ + 1) * this.squareSize
         : this.currentSquare.indexZ * this.squareSize;
       const dist = Math.sqrt((diagX - x) * (diagX - x) + (diagZ - z) * (diagZ - z));
-      if (dist <= this.radius)
+      if (dist < this.radius)
         collisionCase = 3;
     }
 
@@ -383,7 +423,7 @@ export class Player {
   public calcIntersectionWithLine(xNew: number, zNew: number, origin: THREE.Vector3, direction: THREE.Vector3): boolean {
     const line = origin.cross(direction);
     const dist = Math.abs(line.x * xNew + line.y * zNew + line.z) / Math.sqrt(line.x * line.x + line.y * line.y);
-    return dist <= this.radius;
+    return dist < this.radius;
   }
 
   public getIsJumping() {
@@ -411,6 +451,10 @@ export class Player {
   }
 
   public setCalories(cal: number): void {
+    if(cal > this.calories){
+      SoundManager.playSound(SoundType.EAT_SNACK)
+    }
+
     this.calories = cal;
   }
 

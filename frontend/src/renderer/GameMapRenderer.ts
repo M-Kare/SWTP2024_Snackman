@@ -44,7 +44,7 @@ export const GameMapRenderer = () => {
     return renderer
   }
 
-  const createGameMap = (mapData: IGameMap) => {
+  const createGameMap = async (mapData: IGameMap) => {
     const OFFSET = mapData.DEFAULT_SQUARE_SIDE_LENGTH / 2
     const DEFAULT_SIDE_LENGTH = mapData.DEFAULT_SQUARE_SIDE_LENGTH
     const WALL_HEIGHT = mapData.DEFAULT_WALL_HEIGHT
@@ -68,42 +68,43 @@ export const GameMapRenderer = () => {
       if (square.type === MapObjectType.FLOOR) {
 
         if (square.snack != null && square.snack.snackType != SnackType.EMPTY) {
-          const snackToAdd = gameObjectRenderer.createSnackOnFloor(
+          const snackToAdd = await gameObjectRenderer.createSnackOnFloor(
             square.indexX * DEFAULT_SIDE_LENGTH + OFFSET,
             square.indexZ * DEFAULT_SIDE_LENGTH + OFFSET,
+            0,
             DEFAULT_SIDE_LENGTH,
-            square.snack?.snackType,
-          )
-          scene.add(snackToAdd)
-          gameMapStore.setSnackMeshId(id, snackToAdd.id)
-        }
-      }
+            square.snack.snackType
+        )
+        scene.add(snackToAdd)
+        gameMapStore.setSnackMeshId(id, snackToAdd.id)
+      }}
     }
     // add chickens
     for (let currentChicken of mapData.chickens) {
-      const chickenToAdd = gameObjectRenderer.createChickenOnFloor(
-        currentChicken.chickenPosX * DEFAULT_SIDE_LENGTH + OFFSET,
-        currentChicken.chickenPosZ * DEFAULT_SIDE_LENGTH + OFFSET,
-        DEFAULT_SIDE_LENGTH,
+      gameObjectRenderer.createChickenOnFloor(
+        currentChicken.chickenPosX,
+        currentChicken.chickenPosZ,
+        0,
         currentChicken.thickness,
-      )
-      scene.add(chickenToAdd)
-
-      gameMapStore.setChickenMeshId(chickenToAdd.id, currentChicken.id)
+      ).then((chickenToAdd) =>{
+        scene.add(chickenToAdd)
+        gameMapStore.setChickenMeshId(chickenToAdd.id, currentChicken.id)
+      })
     }
 
     console.log("GameMap data ", mapData)
     for (let currentGhost of mapData.scriptGhosts) {
       console.log("Initialising script ghost with x {} y {}", currentGhost.scriptGhostPosX, currentGhost.scriptGhostPosZ)
-      const scriptGhostToAdd = gameObjectRenderer.createGhostOnFloor(
-        currentGhost.scriptGhostPosX * DEFAULT_SIDE_LENGTH + OFFSET,
-        currentGhost.scriptGhostPosZ * DEFAULT_SIDE_LENGTH + OFFSET,
+      
+      gameObjectRenderer.createGhostOnFloor(
+        currentGhost.scriptGhostPosX,
+        currentGhost.scriptGhostPosZ,
         0,
         DEFAULT_SIDE_LENGTH
-      )
-      scene.add(scriptGhostToAdd)
-
-      gameMapStore.setScriptGhostMeshId(scriptGhostToAdd.id, currentGhost.id)
+      ).then((scriptGhostToAdd) => {
+        scene.add(scriptGhostToAdd)
+        gameMapStore.setScriptGhostMeshId(scriptGhostToAdd.id, currentGhost.id)
+      })
     }
   }
 

@@ -11,4 +11,5 @@ export interface ISnackmanUpdateDTD {
   isSprinting: boolean,
   isInCooldown: boolean,
   message: string,
+  isScared: boolean
 }

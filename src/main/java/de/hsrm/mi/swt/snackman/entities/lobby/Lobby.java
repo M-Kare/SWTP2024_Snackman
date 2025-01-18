@@ -5,6 +5,7 @@ import de.hsrm.mi.swt.snackman.configuration.GameConfig;
 import de.hsrm.mi.swt.snackman.entities.map.GameMap;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.Mob;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.ScriptGhost;
+import de.hsrm.mi.swt.snackman.entities.mobileObjects.ScriptGhostDifficulty;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken.Chicken;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.SnackMan;
 import de.hsrm.mi.swt.snackman.messaging.MessageLoop.MessageLoop;
@@ -19,6 +20,7 @@ public class Lobby {
     private String name;
     private PlayerClient adminClient;
     private boolean isGameStarted;
+    private boolean isChooseRole;
     private List<PlayerClient> members;
     private GameMap gameMap;
     private SortedMap<String, Mob> clientMobMap;
@@ -34,17 +36,20 @@ public class Lobby {
     private final Logger log = LoggerFactory.getLogger(Lobby.class);
     private MessageLoop messageLoop;
     private boolean usedCustomMap;
+    private ScriptGhostDifficulty scriptGhostDifficulty;
 
-    public Lobby(String lobbyId, String name, PlayerClient adminClient, GameMap gameMap, MessageLoop messageLoop) {
+    public Lobby(String lobbyId, String name, PlayerClient adminClient, GameMap gameMap, MessageLoop messageLoop, ScriptGhostDifficulty scriptGhostDifficulty) {
         this.lobbyId = lobbyId;
         this.gameMap = gameMap;
         this.name = name;
         this.adminClient = adminClient;
         this.isGameStarted = false;
+        this.isChooseRole = false;
         this.members = new ArrayList<>();
         this.members.add(adminClient);
         this.clientMobMap = new TreeMap<>();
         this.messageLoop = messageLoop;
+        this.scriptGhostDifficulty = scriptGhostDifficulty;
         initTimer();
         this.usedCustomMap = false;
     }
@@ -190,6 +195,16 @@ public class Lobby {
         timeSinceLastSnackSpawn = time;
     }
 
+    public void setChooseRole(){
+        this.isChooseRole = true;
+    }
+    public void setChooseRoleFinsih(){
+        this.isChooseRole = false;
+    }
+    public boolean isChooseRole() {
+        return isChooseRole;
+    }
+
     @Override
     public String toString() {
         return "Lobby{" +
@@ -197,6 +212,7 @@ public class Lobby {
                 ", name='" + name + '\'' +
                 ", adminClient=" + adminClient +
                 ", isGameStarted=" + isGameStarted +
+                ", isChooseRole="+ isChooseRole +
                 ", members=" + members +
                 ", gameMap=" + gameMap +
                 ", clientMobMap=" + clientMobMap +
@@ -226,5 +242,13 @@ public class Lobby {
 
     public void setUsedCustomMap(boolean value){
         this.usedCustomMap = value;
+    }
+
+    public long getGameStartTime(){
+        return this.gameStartTime;
+    }
+
+    public ScriptGhostDifficulty getScriptGhostDifficulty() {
+        return scriptGhostDifficulty;
     }
 }

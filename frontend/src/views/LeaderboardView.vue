@@ -1,5 +1,5 @@
 <template>
-  <LeaderboardBackground></LeaderboardBackground>
+  <ViewBackground></ViewBackground>
   <div id="individual-outer-box-size" class="outer-box">
     <h1 class="info-heading">Leaderboard</h1>
     <div class="table-container">
@@ -36,8 +36,8 @@
     id="snackman"
     :src="
       gameResult === 'SNACKMAN'
-        ? '/src/assets/characters/kirby.png'
-        : '/src/assets/characters/kirby-monochrome.png'
+        ? '/characters/kirby.png'
+        : '/characters/kirby-monochrome.png'
     "
     alt="representation of snackman"
     class="character-image"
@@ -46,8 +46,8 @@
     id="ghost"
     :src="
       gameResult === 'GHOST'
-        ? '/src/assets/characters/ghost.png'
-        : '/src/assets/characters/ghost-monochrome.png'
+        ? '/characters/ghost.png'
+        : '/characters/ghost-monochrome.png'
     "
     alt="representation of ghost"
     class="character-image"
@@ -59,7 +59,7 @@ import {useLeaderboardStore} from '@/stores/Leaderboard/leaderboardStore'
 import {computed, onMounted, ref} from 'vue'
 import SmallNavButton from '@/components/SmallNavButton.vue'
 import {useRoute, useRouter} from 'vue-router'
-import LeaderboardBackground from '@/components/LeaderboardBackground.vue'
+import ViewBackground from "@/components/ViewBackground.vue";
 
 const leaderboardStore = useLeaderboardStore()
 const router = useRouter()
@@ -68,10 +68,6 @@ const gameResult = ref<'SNACKMAN' | 'GHOST' | null>(null)
 
 const backToMainMenu = () => {
   router.push({ name: 'MainMenu' })
-}
-
-const mapExport = () => {
-  // TODO add logic for map export
 }
 
 /**
@@ -208,8 +204,7 @@ tr td:not(:first-child):not(:last-child) {
   padding-top: 2em;
 }
 
-#menu-back-button:hover,
-#export-map-button:hover {
+#menu-back-button:hover {
   background: var(--primary-highlight-color);
 }
 

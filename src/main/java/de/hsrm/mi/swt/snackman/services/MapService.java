@@ -2,21 +2,22 @@ package de.hsrm.mi.swt.snackman.services;
 
 import java.beans.PropertyChangeEvent;
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
-import de.hsrm.mi.swt.snackman.entities.mobileObjects.Ghost;
-import de.hsrm.mi.swt.snackman.entities.mobileObjects.ScriptGhost;
-import de.hsrm.mi.swt.snackman.entities.mobileObjects.ScriptGhostDifficulty;
-import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken.Chicken;
-import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.SnackMan;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+
 import de.hsrm.mi.swt.snackman.configuration.GameConfig;
 import de.hsrm.mi.swt.snackman.entities.lobby.Lobby;
 import de.hsrm.mi.swt.snackman.entities.lobby.PlayerClient;
@@ -27,12 +28,12 @@ import de.hsrm.mi.swt.snackman.entities.map.Square;
 import de.hsrm.mi.swt.snackman.entities.mapObject.MapObjectType;
 import de.hsrm.mi.swt.snackman.entities.mapObject.snack.Snack;
 import de.hsrm.mi.swt.snackman.entities.mapObject.snack.SnackType;
+import de.hsrm.mi.swt.snackman.entities.mobileObjects.Ghost;
+import de.hsrm.mi.swt.snackman.entities.mobileObjects.ScriptGhost;
+import de.hsrm.mi.swt.snackman.entities.mobileObjects.ScriptGhostDifficulty;
+import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken.Chicken;
+import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.SnackMan;
 import de.hsrm.mi.swt.snackman.messaging.MessageLoop.MessageLoop;
-
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
 
 /**
  * Service class for managing the game map
@@ -158,16 +159,22 @@ public class MapService {
     protected String loadChickenScripts() {
         String name = Paths.get("extensions/chicken/").normalize().toAbsolutePath().toString();
         File folder = new File(name);
+        
         List<String> filenames = new ArrayList<String>();
+        if(folder.exists()){
 
-        for (File currFile : folder.listFiles()) {
-            if (currFile.getName().endsWith(".py")) {
-                if (!currFile.getName().equals("Maze.py")) {
-                    filenames.add(currFile.getName().replaceAll("\\.py$", ""));
+            for (File currFile : folder.listFiles()) {
+                if (currFile.getName().endsWith(".py")) {
+                    if (!currFile.getName().equals("Maze.py")) {
+                        filenames.add(currFile.getName().replaceAll("\\.py$", ""));
+                    }
                 }
             }
         }
-
+        
+        if(filenames.isEmpty()){
+            filenames.addAll(Arrays.asList(GameConfig.DEFAULT_CHICKEN_SCRIPTS));
+        }
         Random rn = new Random();
         int randomeFileNumber = rn.nextInt(0, filenames.size());
         return filenames.get(randomeFileNumber);
@@ -262,7 +269,9 @@ public class MapService {
             log.info("Initialising scriptGhost {}", i);
             Square square = ghostSpawnSquares.get(ghostSpawnIndex);
 
-            ScriptGhost newScriptGhost = new ScriptGhost(lobby.getGameMap(), square, ScriptGhostDifficulty.EASY);
+            // TODO different for multiplayer / single player -> wirklich korrekt initialisiert??
+            ScriptGhost newScriptGhost = new ScriptGhost(lobby.getGameMap(), square, lobby.getScriptGhostDifficulty());
+            log.info("New script ghost is: {}", newScriptGhost);
 
             Thread ghostThread = new Thread(newScriptGhost);
             ghostThread.start();
@@ -285,13 +294,18 @@ public class MapService {
         return (index * GameConfig.SQUARE_SIZE) + (GameConfig.SQUARE_SIZE / 2);
     }
 
-    public void respawnSnacks(GameMap map) {
+    /**
+     * Removes and respawns snacks on all floor square with a set probability.
+     * Eggs are not removed.
+     * @param map
+     */
+    public void respawnSnacks(GameMap map, double probability) {
         for (int i = 0; i < map.getGameMapSquares().length; i++) {
             for (int j = 0; j < map.getGameMapSquares()[0].length; j++) {
                 Square square = map.getSquareAtIndexXZ(i, j);
-                if (square.getType() == MapObjectType.FLOOR) {
+                if (square.getType() == MapObjectType.FLOOR && square.getSnack().getSnackType() != SnackType.EGG) {
                     double rand = Math.random();
-                    if (rand <= GameConfig.SNACK_SPAWN_RATE) {
+                    if (rand <= probability) {
                         addRandomSnackToSquare(square);
                     } else {
                         square.setSnack(new Snack(SnackType.EMPTY));

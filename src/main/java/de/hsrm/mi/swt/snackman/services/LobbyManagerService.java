@@ -10,9 +10,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.UUID;
+import java.util.*;
 
 import de.hsrm.mi.swt.snackman.entities.map.GameMap;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.ScriptGhost;
+import de.hsrm.mi.swt.snackman.entities.mobileObjects.ScriptGhostDifficulty;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken.Chicken;
 import de.hsrm.mi.swt.snackman.messaging.MessageLoop.MessageLoop;
 import org.slf4j.Logger;
@@ -67,7 +69,7 @@ public class LobbyManagerService {
      * @return The lobby created
      * @throws LobbyAlreadyExistsException
      */
-    public Lobby createLobby(String name, PlayerClient admin, MessageLoop messageLoop) throws LobbyAlreadyExistsException {
+    public Lobby createLobby(String name, PlayerClient admin, MessageLoop messageLoop, String difficulty) throws LobbyAlreadyExistsException {
         if (lobbies.values().stream().anyMatch(lobby -> lobby.getName().equals(name))) {
             throw new LobbyAlreadyExistsException("Lobby name already exists");
         }
@@ -76,9 +78,9 @@ public class LobbyManagerService {
         var uuid = UUID.randomUUID().toString();
         GameMap gameMap = this.mapService.createNewGameMap(uuid);
 
-        Lobby lobby = new Lobby(uuid, name, admin, gameMap, messageLoop);
-        log.debug("Creating new lobby with id {}", lobby.getLobbyId());
-        admin.setRole(ROLE.SNACKMAN);
+        ScriptGhostDifficulty scriptGhostDifficulty = ScriptGhostDifficulty.getScriptGhostDifficulty(difficulty);
+        Lobby lobby = new Lobby(uuid, name, admin, gameMap, messageLoop, scriptGhostDifficulty);
+        admin.setRole(ROLE.UNDEFINED);
 
         lobbies.put(lobby.getLobbyId(), lobby);
         return lobby;
@@ -104,16 +106,16 @@ public class LobbyManagerService {
     public Lobby joinLobby(String lobbyId, String playerId) throws GameAlreadyStartedException {
         Lobby lobby = findLobbyByLobbyId(lobbyId);
 
-        if (lobby.isGameStarted()) {
+        if (lobby.isGameStarted() || lobby.isChooseRole()) {
             throw new GameAlreadyStartedException("Game already started");
         }
 
-        PlayerClient newJoiningClient = findClientByClientId(playerId);
-        if (!lobby.getAdminClientId().equals(playerId)) {
-            newJoiningClient.setRole(ROLE.GHOST);
+        Optional <PlayerClient> newJoiningClient = findClientByClientId(playerId);
+        if (!lobby.getAdminClientId().equals(playerId) && newJoiningClient.isPresent() ) {
+            newJoiningClient.get().setRole(ROLE.UNDEFINED);
         }
 
-        lobby.getMembers().add(newJoiningClient);
+        lobby.getMembers().add(newJoiningClient.get());
 
         return lobby;
     }
@@ -208,9 +210,9 @@ public class LobbyManagerService {
             lobby.setGameMap(newGameMap);
         }
 
-        // if (lobby.getGameMap() == null) {
-        //     throw new IllegalStateException("Game map is not set. Unable to start the game.");
-        // }
+        if (lobby.getGameMap() == null) {
+            throw new IllegalStateException("Game map is not set. Unable to start the game.");
+        }
 
         log.info("Starting lobby {}", lobby);
         lobby.startGame();
@@ -245,17 +247,26 @@ public class LobbyManagerService {
     }
 
     /**
+     * Checks weather the snackman-role has already been selected in the lobby
+     * @param lobby the lobby to search in
+     * @return true if the role snackman is already owned by someone
+     */
+    public boolean snackmanAlreadySelected(Lobby lobby){
+        return lobby.getMembers().stream().anyMatch(playerClient -> playerClient.getRole() == ROLE.SNACKMAN);
+    }
+
+    /**
      * Searches the client for their UUID
      *
      * @param clientID UUID of the client
      * @return the client
      */
-    public PlayerClient findClientByClientId(String clientID) {
+    public Optional<PlayerClient> findClientByClientId(String clientID) {
         PlayerClient client = clients.get(clientID);
         if (client == null) {
-            throw new NoSuchElementException();
+            return Optional.of(null);
         } else {
-            return client;
+            return Optional.of(client);
         }
     }
 
@@ -266,4 +277,18 @@ public class LobbyManagerService {
     public MessageLoop getMessageLoop() {
         return messageLoop;
     }
+
+
+    public void chooseRoleTrue(String lobbyId) {
+        Lobby lobby = findLobbyByLobbyId(lobbyId);
+        lobby.setChooseRole();
+    }
+    public void chooseRoleFinish(String lobbyId) {
+        Lobby lobby = findLobbyByLobbyId(lobbyId);
+
+        log.info("Choosing Roles Finish lobby {}", lobby);
+        lobby.setChooseRoleFinsih();
+    }
+
+
 }

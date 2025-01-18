@@ -1,14 +1,5 @@
 package de.hsrm.mi.swt.snackman.services;
 
-import de.hsrm.mi.swt.snackman.controller.leaderboard.LeaderboardDTO;
-import de.hsrm.mi.swt.snackman.controller.leaderboard.LeaderboardEntryDTO;
-import de.hsrm.mi.swt.snackman.entities.leaderboard.Leaderboard;
-import de.hsrm.mi.swt.snackman.entities.leaderboard.LeaderboardEntry;
-import de.hsrm.mi.swt.snackman.messaging.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -16,6 +7,20 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import de.hsrm.mi.swt.snackman.controller.leaderboard.LeaderboardDTO;
+import de.hsrm.mi.swt.snackman.controller.leaderboard.LeaderboardEntryDTO;
+import de.hsrm.mi.swt.snackman.entities.leaderboard.Leaderboard;
+import de.hsrm.mi.swt.snackman.entities.leaderboard.LeaderboardEntry;
+import de.hsrm.mi.swt.snackman.messaging.ChangeType;
+import de.hsrm.mi.swt.snackman.messaging.EventType;
+import de.hsrm.mi.swt.snackman.messaging.FrontendLeaderboardEntryMessageEvent;
+import de.hsrm.mi.swt.snackman.messaging.FrontendMessageService;
 
 /**
  * Service class for managing the leaderboard.
@@ -35,7 +40,8 @@ public class LeaderboardService {
     @Autowired
     public LeaderboardService(FrontendMessageService frontendMessageService) {
         this.frontendMessageService = frontendMessageService;
-        this.filePath = "leaderboard.txt";
+        this.filePath = "./extensions/leaderboard.txt";
+        
         List<String> lines = readInLeaderboard();
         fillLeaderboard(lines);
         log.info("Leaderboard loaded: {}", leaderboard);

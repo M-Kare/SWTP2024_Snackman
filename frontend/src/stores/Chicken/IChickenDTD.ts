@@ -1,9 +1,12 @@
+import * as THREE from 'three'
+
 export interface IChickenDTD {
   id: number,
   chickenPosX: number,
   chickenPosZ: number,
   thickness: ChickenThickness;
   lookingDirection: Direction
+  isScared: boolean
 }
 
 export interface IChicken {
@@ -11,7 +14,8 @@ export interface IChicken {
   chickenPosX: number,
   chickenPosZ: number,
   thickness: ChickenThickness;
-  lookingDirection: Direction
+  lookingQuaternion: THREE.Quaternion
+  isScared: boolean
   meshId: number
 }
 
@@ -20,5 +24,5 @@ export enum ChickenThickness {
 }
 
 export enum Direction {
-  NORTH_WEST, NORTH, NORTH_EAST, EAST, SOUTH_EAST, SOUTH, SOUTH_WEST, WEST
+  ONE_NORTH, ONE_SOUTH, ONE_EAST, ONE_WEST
 }
