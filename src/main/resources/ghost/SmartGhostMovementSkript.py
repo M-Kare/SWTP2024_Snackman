@@ -49,12 +49,6 @@ def choose_next_square(labyrinth):
     if snackman_position is None:
         snackman_position = (0, 0)
 
-    print("Start")
-    print(labyrinth)
-    print(ghost_position)
-    print(snackman_position)
-    print("Ende")
-
     return choose_next_square_finding_snackman(labyrinth, ghost_position, snackman_position)
 
 
