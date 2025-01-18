@@ -70,7 +70,7 @@ public class LobbyController {
             Optional<PlayerClient> client = lobbyManagerService.findClientByClientId(creatorUuid);
 
             try {
-                  Lobby newLobby = lobbyManagerService.createLobby(name, client.get(), lobbyManagerService.getMessageLoop());
+                  Lobby newLobby = lobbyManagerService.createLobby(name, client.get(), lobbyManagerService.getMessageLoop(), GameConfig.SCRIPT_GHOST_DIFFICULTY_MULTIPLAYER);
                   messagingTemplate.convertAndSend("/topic/lobbies", lobbyManagerService.getAllLobbies());
                   logger.info("Creating lobby with name: {} and creatorUuid: {}", name, creatorUuid);
 
