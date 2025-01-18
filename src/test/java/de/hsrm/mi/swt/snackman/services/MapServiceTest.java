@@ -7,6 +7,7 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.SortedMap;
 
+import de.hsrm.mi.swt.snackman.entities.mobileObjects.ScriptGhostDifficulty;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -191,7 +192,7 @@ class MapServiceTest {
         testClient04.setRole(ROLE.GHOST);
         testClient05.setRole(ROLE.GHOST);
 
-        Lobby testLobby = new Lobby("1", "testLobby", testClient01, gameMap, messageLoop);
+        Lobby testLobby = new Lobby("1", "testLobby", testClient01, gameMap, messageLoop, ScriptGhostDifficulty.EASY);
         testLobby.getMembers().add(testClient02);
         testLobby.getMembers().add(testClient03);
         testLobby.getMembers().add(testClient04);
