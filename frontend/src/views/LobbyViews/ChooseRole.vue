@@ -60,7 +60,6 @@ const route = useRoute()
 const router = useRouter()
 const lobbyId = route.params.lobbyId as string
 const lobbiesStore = useLobbiesStore()
-const usedCustomMap = ref(false);
 const buttons = lobbiesStore.buttons
 
 const darkenBackground = ref(false)
@@ -163,14 +162,6 @@ const startGame = async () => {
     return
   }
   if (playerId === lobby.adminClient.playerId) {
-    const status = await changeUsedMapStatus(lobby.lobbyId, usedCustomMap.value);
-    if (status !== "done") {
-      showPopUp.value = true;
-      darkenBackground.value = true;
-      infoHeading.value = "Map Status Error";
-      infoText.value = "Failed to update the map status.";
-      return;
-    }
     lobby.members.forEach(member => {
       if (member.role === 'UNDEFINED') {
         showPopUp.value = true
@@ -207,35 +198,6 @@ const startGame = async () => {
     showPopUp.value = true
     darkenBackground.value = true
     infoText.value = 'Only Admin can start the game!'
-  }
-}
-
-/**
- * Sends a request to update the used map status for a specific lobby.
- *
- * @param {string} lobbyId - The unique identifier of the lobby.
- * @param {boolean} usedCustomMap - Indicates whether a custom map is used (true) or not (false).
- */
-const changeUsedMapStatus = async (lobbyId: string, usedCustomMap: boolean): Promise<string> => {
-  try {
-    const response = await fetch('/api/change-used-map-status', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({lobbyId, usedCustomMap})
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('Error changing the used map status:', errorText);
-      throw new Error(`Failed to change map status: ${errorText}`);
-    }
-
-    return "done";
-  } catch (error) {
-    console.error('Error changing the used map status:', error);
-    throw error;
   }
 }
 
