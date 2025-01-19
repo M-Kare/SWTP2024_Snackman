@@ -81,7 +81,7 @@ export const GameMapRenderer = () => {
     }
     // add chickens
     for (let currentChicken of mapData.chickens) {
-      gameObjectRenderer.createChickenOnFloor(
+      await gameObjectRenderer.createChickenOnFloor(
         currentChicken.chickenPosX,
         currentChicken.chickenPosZ,
         0,
@@ -95,8 +95,7 @@ export const GameMapRenderer = () => {
     console.log("GameMap data ", mapData)
     for (let currentGhost of mapData.scriptGhosts) {
       console.log("Initialising script ghost with x {} y {}", currentGhost.scriptGhostPosX, currentGhost.scriptGhostPosZ)
-      
-      gameObjectRenderer.createGhostOnFloor(
+      await gameObjectRenderer.createGhostOnFloor(
         currentGhost.scriptGhostPosX,
         currentGhost.scriptGhostPosZ,
         0,

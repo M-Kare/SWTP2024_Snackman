@@ -82,7 +82,7 @@ export const useGameMapStore = defineStore('gameMap', () => {
       }
 
       for (const ghost of response.scriptGhosts) {
-        const iGhost = {} as IScriptGhost 
+        const iGhost = {} as IScriptGhost
         iGhost.scriptGhostPosX = ghost.scriptGhostPosX * DEFAULT_SIDE_LENGTH + OFFSET
         iGhost.scriptGhostPosZ = ghost.scriptGhostPosZ * DEFAULT_SIDE_LENGTH + OFFSET
         iGhost.id = ghost.id
@@ -279,7 +279,7 @@ export const useGameMapStore = defineStore('gameMap', () => {
     const savedMeshId = mapData.gameMap.get(squareUpdate.square.id)!.snack.meshId
     removeMeshFromScene(scene, savedMeshId)
     mapData.gameMap.set(squareUpdate.square.id, squareUpdate.square)
-    
+
     const snackToAdd = await gameObjectRenderer.createSnackOnFloor(
       squareUpdate.square.indexX * DEFAULT_SIDE_LENGTH + OFFSET,
       squareUpdate.square.indexZ * DEFAULT_SIDE_LENGTH + OFFSET,
