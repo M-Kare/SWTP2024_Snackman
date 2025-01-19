@@ -88,6 +88,8 @@ role.ghost;Ghost;Geist
 # LobbyView
 lobby.playerCount.player;Players;Spieler
 lobby.linkCopied;Link copied to clipboard;Link in die Zwischenablage kopiert
+lobby.mapName.generated;Generated Map;Generierte Map
+lobby.mapName.uploaded;Uploaded Map;Hochgeladene Map
 
 
 # PopUps

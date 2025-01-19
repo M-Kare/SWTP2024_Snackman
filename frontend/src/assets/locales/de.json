@@ -83,7 +83,11 @@
         "playerCount": {
             "player": "Spieler"
         },
-        "linkCopied": "Link in die Zwischenablage kopiert"
+        "linkCopied": "Link in die Zwischenablage kopiert",
+        "mapName": {
+            "generated": "Generierte Map",
+            "uploaded": "Hochgeladene Map"
+        }
     },
     "popup": {
         "lobbyFull": {

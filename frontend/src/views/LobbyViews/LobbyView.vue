@@ -31,7 +31,7 @@
               :checked="selectedMap === map.mapName"
               @change="selectMap(map.mapName)"
           />
-          <span>{{ map.mapName }}</span>
+          <span>{{ $t(map.translation) }}</span>
         </li>
       </ul>
     </div>
@@ -91,7 +91,6 @@
   >
   </PlayerNameForm>
 
-  <!-- TODO test if condition works fine -->
   <PopUp
     v-if="errorBox && lobbiesStore.lobbydata.currentPlayer.playerName"
     class="popup-box"
@@ -188,8 +187,8 @@ function hidePopUpAndRedirect(){
   router.push({ name: "LobbyListView"})
 }
 
-const mapList = ref<{ mapName: string; fileName: string }[]>([
-  {mapName: 'Generated Map', fileName: `Maze.txt`},
+const mapList = ref<{ mapName: string; fileName: string; translation: string }[]>([
+  { mapName: 'Generated Map', fileName: `Maze.txt`, translation: 'lobby.mapName.generated' }
 ]);
 
 const usedCustomMap = ref(false);
@@ -254,11 +253,12 @@ const uploadFileToServer = async (file: File, lobbyId: string) => {
         if (response.ok) {
             const mapName = 'Uploaded Map';
             const fileName = `SnackManMap_${lobbyId}.txt`;
+            const translation = 'lobby.mapName.uploaded';
 
             if (mapList.value.length > 1) {
-                mapList.value[1] = { mapName, fileName };
+                mapList.value[1] = { mapName, fileName, translation};
             } else {
-                mapList.value.push({ mapName, fileName });
+                mapList.value.push({ mapName, fileName, translation });
             }
 
             selectMap(mapName);
