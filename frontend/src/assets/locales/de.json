@@ -6,16 +6,16 @@
         "save": "Speichern",
         "back": "Zurück",
         "backToMainMenu": " Hauptmenü",
+        "ok": "OK",
+        "cancel": "Abbrechen",
+        "startGame": "Spiel starten",
         "importMap": "Map importieren",
         "exportMap": " Map exportieren",
         "copyLink": " Link kopieren",
-        "ok": "OK",
         "createNewLobby": "Neue Lobby erstellen",
-        "cancel": "Abbrechen",
         "createLobby": "Lobby erstellen",
         "leaveLobby": "Lobby verlassen",
-        "createNewLeaderBoardEntry": " Erstelle einen neuen Bestenlisten-Eintrag",
-        "startGame": "Spiel starten"
+        "createNewLeaderBoardEntry": " Erstelle einen neuen Bestenlisten-Eintrag"
     },
     "savePlayerName": {
         "label": "Bitte gib deinen Namen ein:",
@@ -25,18 +25,15 @@
     },
     "leaderBoard": {
         "date": "Datum",
-        "duration": "Dauer",
-        "entry": {
-            "duration": "Dauer"
-        }
+        "duration": "Dauer"
     },
     "newLeaderBoardEntry": {
         "title": "Neuer Bestenlisten-Eintrag",
         "label": "Bitte gib deinen Name ein:",
+        "playedTime": "Gespielte Zeit: {time} Minuten",
         "error": {
             "playerNameEmpty": "Der Spieler-Name kann nicht leer sein!"
-        },
-        "playedTime": "Gespielte Zeit: {time} Minuten"
+        }
     },
     "difficulty": {
         "easy": "EINFACH",
@@ -73,7 +70,7 @@
                 "text": "Aktualisieren des Map-Status fehlgeschlagen."
             },
             "everyPlayerNeedsRole": "Jeder Spieler muss eine Rolle auswählen!",
-            "exactlyOneSnackMan": "Es muss genau einen SnackMan geben und alle Spieler müssene eine Rolle haben!"
+            "exactlyOneSnackMan": "Es muss genau einen Happenmann geben und alle Spieler müssene eine Rolle haben!"
         }
     },
     "role": {
@@ -106,11 +103,6 @@
             "heading": "Start nicht möglich",
             "notEnoughPlayers": "Nicht genug Spieler um Rollen auszuwählen!",
             "onlyAdminCanInit": "Nur der Admin kann die Wahl der Rollen initiieren!"
-        }
-    },
-    "game": {
-        "HUD": {
-            "maxKcal": "Maximale Kalorien erreicht!"
         }
     },
     "gameEnd": {

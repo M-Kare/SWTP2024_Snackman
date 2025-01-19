@@ -6,16 +6,16 @@
         "save": "Save",
         "back": "Back",
         "backToMainMenu": "Main Menu",
+        "ok": "OK",
+        "cancel": "Cancel",
+        "startGame": "Start Game",
         "importMap": "Import map",
         "exportMap": "Export map",
         "copyLink": "Copy link",
-        "ok": "OK",
         "createNewLobby": "Create new Lobby",
-        "cancel": "Cancel",
         "createLobby": "Create Lobby",
         "leaveLobby": "Leave Lobby",
-        "createNewLeaderBoardEntry": "Create new leaderboard entry",
-        "startGame": "Start Game"
+        "createNewLeaderBoardEntry": "Create new leaderboard entry"
     },
     "savePlayerName": {
         "label": "Please enter your name:",
@@ -25,18 +25,15 @@
     },
     "leaderBoard": {
         "date": "Date",
-        "duration": "Duration",
-        "entry": {
-            "duration": "Duration"
-        }
+        "duration": "Duration"
     },
     "newLeaderBoardEntry": {
         "title": "New Leaderboard entry",
         "label": "Please enter your name:",
+        "playedTime": "Played time: {time} minutes",
         "error": {
             "playerNameEmpty": "Player-name can’t be empty!"
-        },
-        "playedTime": "Played time: {time} minutes"
+        }
     },
     "difficulty": {
         "easy": "EASY",
@@ -106,11 +103,6 @@
             "heading": "Can’t start the game",
             "notEnoughPlayers": "Not enough players to choose Role!",
             "onlyAdminCanInit": "The role selection can only be initiated by the host!"
-        }
-    },
-    "game": {
-        "HUD": {
-            "maxKcal": "Maximum calories reached!"
         }
     },
     "gameEnd": {
