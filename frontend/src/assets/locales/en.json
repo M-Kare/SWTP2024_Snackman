@@ -5,10 +5,16 @@
         "leaderBoard": "Leaderboard",
         "save": "Save",
         "back": "Back",
+        "BackToMainMenu": "Main Menu",
+        "importMap": "Import map",
+        "exportMap": "Export map",
+        "copyLink": "Copy link",
+        "ok": "OK",
         "createNewLobby": "Create new Lobby",
-        "cancelLobbyCreation": "Cancel",
+        "cancel": "Cancel",
         "createLobby": "Create Lobby",
         "leaveLobby": "Leave Lobby",
+        "createNewLeaderBoardEntry": "Create new leaderboard entry",
         "startGame": "Start Game"
     },
     "savePlayerName": {
@@ -17,11 +23,30 @@
             "playerNameEmpty": "Player-name can’t be empty!"
         }
     },
+    "leaderBoard": {
+        "date": "Date",
+        "duration": "Duration",
+        "entry": {
+            "duration": "Duration"
+        }
+    },
+    "newLeaderBoardEntry": {
+        "title": "New Leaderboard entry",
+        "label": "Please enter your name:",
+        "error": {
+            "playerNameEmpty": ""
+        },
+        "playedTime": "Played time: {time} minutes"
+    },
     "difficulty": {
-        "title": "Choose the difficulty level for the ghosts!"
+        "title": "Choose the difficulty level for the ghosts!",
+        "description": ""
     },
     "lobbyList": {
-        "title": "Lobbies"
+        "title": "Lobbies",
+        "playerCount": {
+            "player": "Player"
+        }
     },
     "createLobby": {
         "title": "New Lobby",
@@ -33,19 +58,24 @@
             "lobbyNameDuplicate": "Lobby-name already exists! Please choose another name."
         }
     },
+    "chooseRule": {
+        "title": "Choose your character"
+    },
     "lobby": {
-        "playerCount": "Players",
+        "playerCount": {
+            "player": "Players"
+        },
         "role": {
             "ghost": "Ghost"
         }
     },
     "popup": {
         "lobbyFull": {
-            "title": "Lobby full",
+            "heading": "Lobby full",
             "text": "Please choose or create another one!"
         },
         "cantStart": {
-            "title": "Can’t start the game",
+            "heading": "Can’t start the game",
             "notEnoughPlayers": "Not enough players to start!",
             "onlySnackMan": "Only the host can start the game!"
         }

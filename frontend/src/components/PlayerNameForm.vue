@@ -3,7 +3,7 @@
   <div id="form-box">
     <form id="form" @submit.prevent="savePlayerName">
       <label>
-        Please enter your name:
+        {{ $t('savePlayerName.label') }} 
       </label>
       <input
         v-model.trim="playerName"
@@ -22,14 +22,14 @@
       id="save-name-button"
       class="small-nav-button"
       @click="savePlayerName">
-      Save
+      {{ $t('button.save') }} 
     </SmallNavButton>
   </div>
 </template>
 
 <script setup lang="ts">
 import SmallNavButton from '@/components/SmallNavButton.vue';
-import {onMounted, ref} from 'vue';
+import {ref} from 'vue';
 import {useLobbiesStore} from '@/stores/Lobby/lobbiesstore';
 import {SoundManager} from "@/services/SoundManager";
 import {SoundType} from "@/services/SoundTypes";

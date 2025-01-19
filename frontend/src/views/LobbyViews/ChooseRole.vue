@@ -3,7 +3,7 @@
 
   <div class="outer-box">
     <div class="inner-box">
-      <h1 class="title">Choose your Character</h1>
+      <h1 class="title"> {{ $t('chooseRole.title') }} </h1>
       <div class="character-grid">
         <div
             v-for="button in buttons"
@@ -27,18 +27,18 @@
             class="small-nav-buttons"
             @click="startGame"
         >
-          Start Game
+          {{ $t('button.startGame') }} 
         </SmallNavButton>
       </div>
     </div>
 
     <PopUp v-if="showPopUp" class="popup-box" @hidePopUp="hidePopUp">
-      <p class="info-heading">Can't start the game</p>
+      <p class="info-heading"> {{ $t('popup.cantStart.heading') }} </p>
       <p class="info-text">{{ infoText }}</p>
     </PopUp>
 
     <PopUp v-if="showRolePopup" class="popup-box" @hidePopUp="hidePopUp">
-      <p class="info-heading">Can't start the game</p>
+      <p class="info-heading"> {{ $t('popup.cantStart.heading') }} </p>
       <p class="info-text">{{ infoText }}</p>
     </PopUp>
 

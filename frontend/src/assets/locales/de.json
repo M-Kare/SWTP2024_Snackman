@@ -5,10 +5,16 @@
         "leaderBoard": "Bestenliste",
         "save": "Speichern",
         "back": "Zurück",
+        "BackToMainMenu": " Hauptmenü",
+        "importMap": "Map importieren",
+        "exportMap": " Map exportieren",
+        "copyLink": " Link kopieren",
+        "ok": "OK",
         "createNewLobby": "Neue Lobby erstellen",
-        "cancelLobbyCreation": "Abbrechen",
+        "cancel": "Abbrechen",
         "createLobby": "Lobby erstellen",
         "leaveLobby": "Lobby verlassen",
+        "createNewLeaderBoardEntry": " Erstelle einen neuen Bestenlisten-Eintrag",
         "startGame": "Spiel starten"
     },
     "savePlayerName": {
@@ -17,11 +23,26 @@
             "playerNameEmpty": "Der Spieler-Name kann nicht leer sein!"
         }
     },
+    "leaderBoard": {
+        "date": "Datum",
+        "duration": "Dauer",
+        "entry": {
+            "duration": "Dauer"
+        }
+    },
+    "newLeaderBoardEntry": {
+        "title": "Neuer Bestenlisten-Eintrag",
+        "label": "Bitte gib deinen Name ein:",
+        "playedTime": ""
+    },
     "difficulty": {
         "title": "Wähle den Schwierigkeitsgrad für die Geister!"
     },
     "lobbyList": {
-        "title": "Lobbies"
+        "title": "Lobbies",
+        "playerCount": {
+            "player": "Spieler"
+        }
     },
     "createLobby": {
         "title": "Neue Lobby",
@@ -33,19 +54,24 @@
             "lobbyNameDuplicate": "Lobby-Name existiert bereits! Bitte wähle einen anderen."
         }
     },
+    "chooseRule": {
+        "title": "Wähle deinen Charakter"
+    },
     "lobby": {
-        "playerCount": "Spieler",
+        "playerCount": {
+            "player": "Spieler"
+        },
         "role": {
             "ghost": "Geist"
         }
     },
     "popup": {
         "lobbyFull": {
-            "title": "Lobby voll",
+            "heading": "Lobby voll",
             "text": "Bitte wähle oder erstelle eine andere!"
         },
         "cantStart": {
-            "title": "Start nicht möglich",
+            "heading": "Start nicht möglich",
             "notEnoughPlayers": "Nicht genug Spieler um zu starten!",
             "onlySnackMan": "Nur der Host kann das Spiel starten!"
         }

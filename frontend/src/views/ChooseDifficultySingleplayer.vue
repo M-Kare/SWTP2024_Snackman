@@ -1,7 +1,7 @@
 <template>
   <div id="individual-outer-box-size" class="outer-box">
     <div class="inner-box">
-      <h1 class="title">Choose the difficulty level for the ghosts!</h1>
+      <h1 class="title"> {{ $t('difficulty.title') }} </h1>
       <div id="button-pair">
         <MainMenuButton id="easy-button"
                         :class="{ 'selected': difficulty === ScriptGhostDifficulty.EASY }"
@@ -21,10 +21,10 @@
         always find you (even when they can't see you)!</p>
       <div id="button-box">
         <SmallNavButton id="menu-back-button" class="small-nav-buttons" @click="backToMainMenu">
-          Back to menu
+          {{ $t('button.back') }} 
         </SmallNavButton>
         <SmallNavButton id="start-game-button" class="small-nav-buttons" @click="startSingleplayer">
-          Start Game
+          {{ $t('button.startGame') }} 
         </SmallNavButton>
       </div>
     </div>

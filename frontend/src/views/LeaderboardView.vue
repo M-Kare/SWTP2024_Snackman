@@ -8,8 +8,8 @@
           <tr>
             <td></td>
             <td>Name</td>
-            <td>Date</td>
-            <td>Duration</td>
+            <td> {{ $t('leaderBoard.date') }} </td>
+            <td> {{ $t('leaderBoard.duration') }} </td>
           </tr>
         </thead>
         <tbody>
@@ -28,7 +28,7 @@
         class="small-nav-buttons"
         @click="backToMainMenu"
       >
-        Back to main menu
+        {{ $t('button.back') }} 
       </SmallNavButton>
     </div>
   </div>

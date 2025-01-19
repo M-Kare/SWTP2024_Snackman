@@ -1,30 +1,30 @@
 <template>
   <div class="overlay"></div>
   <div id="form-box">
-    <h1 id="title">New Leaderboard entry</h1>
+    <h1 id="title"> {{ $t('newLeaderBoardEntry.title') }} </h1>
 
     <form id="form" @submit.prevent="createNewLeaderboardEntry">
-      <label>Enter your name: </label>
+      <label> {{ $t('newLeaderBoardEntry.label') }} </label>
       <input v-model.trim="yourName" type="text">
       <p
           id="error-message"
           v-if="errorMessage">
         {{ errorMessage }}
       </p>
-      <p>Played time: {{ playedTime }} minutes</p>
+      <p>{{ $t('newLeaderBoardEntry.playedTime', { time: playedTime }) }}</p>
     </form>
 
     <SmallNavButton
         id="cancel-createNewLeaderboardEntry-creation-button"
         class="small-nav-buttons"
         @click="cancelNewLeaderboardEntryCreation">
-      Cancel
+        {{ $t('button.cancel') }} 
     </SmallNavButton>
     <SmallNavButton
         id="create-createNewLeaderboardEntry-button"
         class="small-nav-buttons"
         @click="createNewLeaderboardEntry">
-      Create new leaderboard entry
+        {{ $t('button.createNewLeaderBoardEntry') }} 
     </SmallNavButton>
   </div>
 </template>

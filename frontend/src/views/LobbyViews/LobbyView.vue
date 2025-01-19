@@ -6,7 +6,7 @@
       <h1 class="title">{{ lobby?.name || 'Lobby Name' }}</h1>
 
       <div id="player-count">
-        {{ playerCount }} / {{ MAX_PLAYER_COUNT }} Player
+        {{ playerCount }} / {{ MAX_PLAYER_COUNT }}  {{ $t('lobby.playerCount.player') }} 
       </div>
     </div>
 
@@ -45,7 +45,7 @@
           class="small-nav-buttons"
           @click="leaveLobby"
         >
-          Leave Lobby
+          {{ $t('button.leaveLobby') }} 
         </SmallNavButton>
         <SmallNavButton
           id="menu-map-importieren"
@@ -53,7 +53,7 @@
           v-if="playerId == adminClientId"
           @click="triggerFileInput"
         >
-          Import map
+          {{ $t('button.importMap') }} 
         </SmallNavButton>
         <input class="input-feld"
             ref="fileInput"
@@ -69,7 +69,7 @@
           class="small-nav-buttons"
           @click="copyToClip()"
         >
-          Copy Link
+          {{ $t('button.copyLink') }} 
         </SmallNavButton>
 
 
@@ -78,7 +78,7 @@
           class="small-nav-buttons"
           @click="chooseRole(lobby)"
         >
-          Start Game
+          {{ $t('button.startGame') }} 
         </SmallNavButton>
       </div>
     </div>
@@ -109,7 +109,7 @@
   </PopUp>
 
   <PopUp v-if="showRolePopup" class="popup-box" @hidePopUp="hidePopUp">
-    <p class="info-heading">Can't start the game</p>
+    <p class="info-heading"> {{ $t('popup.cantStart.heading') }} </p>
     <p class="info-text">{{ infoText }}</p>
   </PopUp>
 
@@ -146,7 +146,6 @@ const members = computed(
   () => lobby.value?.members || ([] as Array<IPlayerClientDTD>),
 )
 const playerCount = computed(() => members.value.length)
-const maxPlayerCount = ref(5)
 const playerNameSaved = lobbiesStore.lobbydata.currentPlayer.playerName;
 const showPlayerNameForm = ref(false);
 

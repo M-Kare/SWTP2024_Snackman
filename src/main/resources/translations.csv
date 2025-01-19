@@ -1,5 +1,5 @@
 # languages;en;de
-
+# placeholder for vue {{ $t('') }} 
 
 # Buttons
 button.singlePlayer;Singleplayer;Einzelspieler
@@ -9,10 +9,21 @@ button.leaderBoard;Leaderboard;Bestenliste
 button.save;Save;Speichern
 button.back;Back;Zurück
 
+button.BackToMainMenu;Main Menu; Hauptmenü
+
+button.importMap;Import map;Map importieren
+button.exportMap;Export map; Map exportieren
+
+button.copyLink;Copy link; Link kopieren
+
+button.ok;OK;OK
+
 button.createNewLobby;Create new Lobby;Neue Lobby erstellen
-button.cancelLobbyCreation;Cancel;Abbrechen
+button.cancel;Cancel;Abbrechen
 button.createLobby;Create Lobby;Lobby erstellen
 button.leaveLobby;Leave Lobby;Lobby verlassen
+
+button.createNewLeaderBoardEntry;Create new leaderboard entry; Erstelle einen neuen Bestenlisten-Eintrag
 
 button.startGame;Start Game;Spiel starten
 
@@ -22,12 +33,27 @@ savePlayerName.label;Please enter your name:;Bitte gib deinen Namen ein:
 savePlayerName.error.playerNameEmpty;Player-name can’t be empty!;Der Spieler-Name kann nicht leer sein!
 
 
+# Leaderboard
+leaderBoard.date;Date;Datum
+leaderBoard.duration;Duration;Dauer
+leaderBoard.entry.duration;Duration;Dauer
+
+
+# CreateNewLeaderBoardEntry
+newLeaderBoardEntry.title;New Leaderboard entry;Neuer Bestenlisten-Eintrag
+newLeaderBoardEntry.label;Please enter your name:;Bitte gib deinen Name ein:
+newLeaderBoardEntry.error.playerNameEmpty;
+newLeaderBoardEntry.playedTime;Played time: {time} minutes;
+
+
 # Difficulty
 difficulty.title;Choose the difficulty level for the ghosts!;Wähle den Schwierigkeitsgrad für die Geister!
+difficulty.description;
 
 
 # LobbyListView
 lobbyList.title;Lobbies;Lobbies
+lobbyList.playerCount.player;Player;Spieler
 
 
 # CreateLobbyForm
@@ -37,16 +63,20 @@ createLobby.error.lobbyNameEmpty;Lobby-name can’t be empty!;Der Lobby-Name kan
 createLobby.error.lobbyNameDuplicate;Lobby-name already exists! Please choose another name.;Lobby-Name existiert bereits! Bitte wähle einen anderen.
 
 
+# ChooseRole
+chooseRule.title;Choose your character;Wähle deinen Charakter
+
+
 # LobbyView
-lobby.playerCount;Players;Spieler
+lobby.playerCount.player;Players;Spieler
 lobby.role.ghost;Ghost;Geist
 
 
 # PopUps
-popup.lobbyFull.title;Lobby full;Lobby voll
+popup.lobbyFull.heading;Lobby full;Lobby voll
 popup.lobbyFull.text;Please choose or create another one!;Bitte wähle oder erstelle eine andere!
 
-popup.cantStart.title;Can’t start the game;Start nicht möglich
+popup.cantStart.heading;Can’t start the game;Start nicht möglich
 popup.cantStart.notEnoughPlayers;Not enough players to start!;Nicht genug Spieler um zu starten!
 popup.cantStart.onlySnackMan;Only the host can start the game!;Nur der Host kann das Spiel starten!
 

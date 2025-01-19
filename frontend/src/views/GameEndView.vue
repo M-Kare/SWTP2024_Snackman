@@ -6,15 +6,16 @@
     <p class="end-reason">The playing time was {{ formatedPlayedTime }} minutes</p>
     <div id="button-pair">
       <SmallNavButton id="menu-back-button" @click="backToMainMenu">
-        Main menu
+        {{ $t('button.backToMainMenu') }} 
       </SmallNavButton>
       <SmallNavButton id="export-map-button" @click="downloadMap">
-        Export map
+        {{ $t('button.exportMap') }} 
       </SmallNavButton>
-      <SmallNavButton v-if="!alreadyEntered && lobbydata.currentPlayer.role == 'SNACKMAN' && winningRole == 'SNACKMAN'"
-                      id="create-leaderboard-entry-button"
-                      @click="showCreateNewLeaderboardEntryForm">
-        Create new leaderboard entry
+      <SmallNavButton
+          v-if="!alreadyEntered && lobbydata.currentPlayer.role == 'SNACKMAN' && winningRole == 'SNACKMAN'"
+          id="create-leaderboard-entry-button"
+          @click="showCreateNewLeaderboardEntryForm">
+            {{ $t('button.createNewLeaderBoardEntry') }} 
       </SmallNavButton>
     </div>
     <CreateNewLeaderboardEntryForm
