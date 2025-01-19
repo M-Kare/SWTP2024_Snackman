@@ -145,14 +145,14 @@ onMounted(async () => {
   // for rendering the scene, create gameMap in 3d and change window size
   const {initRenderer, createGameMap, getScene} = GameMapRenderer()
   const gameObjectRenderer = GameObjectRenderer();
-  
+
   scene = getScene()
   renderer = initRenderer(canvasRef.value)
   //Add gameMap
   try {
     await gameMapStore.initGameMap()
     const mapContent = gameMapStore.mapContent
-    createGameMap(mapContent as IGameMap)
+    await createGameMap(mapContent as IGameMap)
 
   } catch (error) {
     console.error('Error when retrieving the gameMap:', error)

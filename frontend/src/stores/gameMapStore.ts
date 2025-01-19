@@ -82,7 +82,7 @@ export const useGameMapStore = defineStore('gameMap', () => {
       }
 
       for (const ghost of response.scriptGhosts) {
-        const iGhost = {} as IScriptGhost 
+        const iGhost = {} as IScriptGhost
         iGhost.scriptGhostPosX = ghost.scriptGhostPosX * DEFAULT_SIDE_LENGTH + OFFSET
         iGhost.scriptGhostPosZ = ghost.scriptGhostPosZ * DEFAULT_SIDE_LENGTH + OFFSET
         iGhost.id = ghost.id
@@ -279,7 +279,7 @@ export const useGameMapStore = defineStore('gameMap', () => {
     const savedMeshId = mapData.gameMap.get(squareUpdate.square.id)!.snack.meshId
     removeMeshFromScene(scene, savedMeshId)
     mapData.gameMap.set(squareUpdate.square.id, squareUpdate.square)
-    
+
     const snackToAdd = await gameObjectRenderer.createSnackOnFloor(
       squareUpdate.square.indexX * DEFAULT_SIDE_LENGTH + OFFSET,
       squareUpdate.square.indexZ * DEFAULT_SIDE_LENGTH + OFFSET,
@@ -332,7 +332,7 @@ export const useGameMapStore = defineStore('gameMap', () => {
         chickenMesh!.scale.set(ChickenThickness.HEAVY  * 1.5, ChickenThickness.HEAVY, ChickenThickness.HEAVY * 1.4)
         break
       case ChickenThickness.VERY_HEAVY:
-        chickenMesh!.scale.set(ChickenThickness.VERY_HEAVY  * 2, ChickenThickness.VERY_HEAVY, ChickenThickness.VERY_HEAVY * 1.5)
+        chickenMesh!.scale.set(ChickenThickness.VERY_HEAVY  * 3, ChickenThickness.VERY_HEAVY * 2, ChickenThickness.VERY_HEAVY * 2)
         break
       default:
         console.log('ETWAS IST SCHIED GELAUFEN...')
