@@ -1,7 +1,58 @@
 {
-  "button": {
-    "singlePlayer": "Einzelspieler",
-    "multiPlayer": "Mehrspieler",
-    "leaderBoard": "Bestenliste"
-  }
+    "button": {
+        "singlePlayer": "Einzelspieler",
+        "multiPlayer": "Mehrspieler",
+        "leaderBoard": "Bestenliste",
+        "save": "Speichern",
+        "back": "Zurück",
+        "createNewLobby": "Neue Lobby erstellen",
+        "cancelLobbyCreation": "Abbrechen",
+        "createLobby": "Lobby erstellen",
+        "leaveLobby": "Lobby verlassen",
+        "startGame": "Spiel starten"
+    },
+    "savePlayerName": {
+        "label": "Bitte gib deinen Namen ein:",
+        "error": {
+            "playerNameEmpty": "Der Spieler-Name kann nicht leer sein!"
+        }
+    },
+    "difficulty": {
+        "title": "Wähle den Schwierigkeitsgrad für die Geister!"
+    },
+    "lobbyList": {
+        "title": "Lobbies"
+    },
+    "createLobby": {
+        "title": "Neue Lobby",
+        "form": {
+            "label": "Namen eingeben:"
+        },
+        "error": {
+            "lobbyNameEmpty": "Der Lobby-Name kann nicht leer sein!",
+            "lobbyNameDuplicate": "Lobby-Name existiert bereits! Bitte wähle einen anderen."
+        }
+    },
+    "lobby": {
+        "playerCount": "Spieler",
+        "role": {
+            "ghost": "Geist"
+        }
+    },
+    "popup": {
+        "lobbyFull": {
+            "title": "Lobby voll",
+            "text": "Bitte wähle oder erstelle eine andere!"
+        },
+        "cantStart": {
+            "title": "Start nicht möglich",
+            "notEnoughPlayers": "Nicht genug Spieler um zu starten!",
+            "onlySnackMan": "Nur der Host kann das Spiel starten!"
+        }
+    },
+    "game": {
+        "HUD": {
+            "maxKcal": "Maximale Kalorien erreicht!"
+        }
+    }
 }

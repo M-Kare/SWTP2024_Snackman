@@ -1,8 +1,58 @@
 {
     "button": {
-      "singlePlayer": "Singleplayer",
-      "multiPlayer": "Multiplayer",
-      "leaderBoard": "Leaderboard"
+        "singlePlayer": "Singleplayer",
+        "multiPlayer": "Multiplayer",
+        "leaderBoard": "Leaderboard",
+        "save": "Save",
+        "back": "Back",
+        "createNewLobby": "Create new Lobby",
+        "cancelLobbyCreation": "Cancel",
+        "createLobby": "Create Lobby",
+        "leaveLobby": "Leave Lobby",
+        "startGame": "Start Game"
+    },
+    "savePlayerName": {
+        "label": "Please enter your name:",
+        "error": {
+            "playerNameEmpty": "Player-name can’t be empty!"
+        }
+    },
+    "difficulty": {
+        "title": "Choose the difficulty level for the ghosts!"
+    },
+    "lobbyList": {
+        "title": "Lobbies"
+    },
+    "createLobby": {
+        "title": "New Lobby",
+        "form": {
+            "label": "Enter name:"
+        },
+        "error": {
+            "lobbyNameEmpty": "Lobby-name can’t be empty!",
+            "lobbyNameDuplicate": "Lobby-name already exists! Please choose another name."
+        }
+    },
+    "lobby": {
+        "playerCount": "Players",
+        "role": {
+            "ghost": "Ghost"
+        }
+    },
+    "popup": {
+        "lobbyFull": {
+            "title": "Lobby full",
+            "text": "Please choose or create another one!"
+        },
+        "cantStart": {
+            "title": "Can’t start the game",
+            "notEnoughPlayers": "Not enough players to start!",
+            "onlySnackMan": "Only the host can start the game!"
+        }
+    },
+    "game": {
+        "HUD": {
+            "maxKcal": "Maximum calories reached!"
+        }
     }
 }
-  
