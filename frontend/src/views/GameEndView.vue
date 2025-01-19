@@ -243,7 +243,7 @@ onMounted(() => {
   position: absolute;
   bottom: 0;
   width: 100%;
-  height: 20%;
+  height: 22%;
   font-size: 2rem;
   margin-top: 4rem;
   font-weight: bold;
@@ -252,6 +252,7 @@ onMounted(() => {
   text-align: center;
   align-content: center;
   animation: fadeIn 0.5s;
+  z-index: 5;
 }
 
 .feedback-message.success {
