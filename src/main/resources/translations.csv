@@ -64,7 +64,7 @@ createLobby.error.lobbyNameDuplicate;Lobby-name already exists! Please choose an
 
 
 # ChooseRole
-chooseRule.title;Choose your character;Wähle deinen Charakter
+chooseRole.title;Choose your character;Wähle deinen Charakter
 
 
 # LobbyView

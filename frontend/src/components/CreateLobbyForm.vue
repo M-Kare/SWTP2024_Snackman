@@ -21,7 +21,7 @@
       class="small-nav-buttons"
       @click="cancelLobbyCreation"
     >
-      {{ $t('button.cancelLobbyCreation') }} 
+      {{ $t('button.cancel') }} 
     </SmallNavButton>
     <SmallNavButton
       id="create-lobby-button"

@@ -58,7 +58,7 @@
             "lobbyNameDuplicate": "Lobby-name already exists! Please choose another name."
         }
     },
-    "chooseRule": {
+    "chooseRole": {
         "title": "Choose your character"
     },
     "lobby": {

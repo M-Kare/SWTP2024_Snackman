@@ -54,7 +54,7 @@
             "lobbyNameDuplicate": "Lobby-Name existiert bereits! Bitte wähle einen anderen."
         }
     },
-    "chooseRule": {
+    "chooseRole": {
         "title": "Wähle deinen Charakter"
     },
     "lobby": {
