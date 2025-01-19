@@ -42,7 +42,7 @@ leaderBoard.entry.duration;Duration;Dauer
 # CreateNewLeaderBoardEntry
 newLeaderBoardEntry.title;New Leaderboard entry;Neuer Bestenlisten-Eintrag
 newLeaderBoardEntry.label;Please enter your name:;Bitte gib deinen Name ein:
-newLeaderBoardEntry.error.playerNameEmpty;
+newLeaderBoardEntry.error.playerNameEmpty;Player-name can’t be empty!;Der Spieler-Name kann nicht leer sein!
 newLeaderBoardEntry.playedTime;Played time: {time} minutes;
 
 
@@ -70,6 +70,7 @@ chooseRole.title;Choose your character;Wähle deinen Charakter
 # LobbyView
 lobby.playerCount.player;Players;Spieler
 lobby.role.ghost;Ghost;Geist
+lobby.role.snackman;Snackman;Happenmann
 
 
 # PopUps

@@ -39,6 +39,8 @@
     import { onMounted, ref } from 'vue';
     import { useLobbiesStore } from '@/stores/Lobby/lobbiesstore';
     import type { IPlayerClientDTD } from '@/stores/Lobby/IPlayerClientDTD';
+    import { useI18n } from 'vue-i18n';
+
 
     const router = useRouter();
     const lobbiesStore = useLobbiesStore();
@@ -47,6 +49,8 @@
     const lobbyName = ref('');
     const lobbyInput = ref(); // needed for autofocus
     const errorMessage = ref('');
+
+    const { t } = useI18n(); // needed for internationalization
 
     // defines event wich can be triggered by this component
     const emit = defineEmits< (event: 'cancelLobbyCreation') => void >()
@@ -86,7 +90,7 @@
   }
 
         if (!lobbyName.value.trim()) {
-            errorMessage.value = "Lobbyname can't be empty";
+            errorMessage.value = t('createLobby.error.lobbyNameEmpty');
             return;
         }
 
@@ -96,7 +100,7 @@
 
   if (isDuplicateName) {
     errorMessage.value =
-      'Lobby name already exists! Please choose another name.'
+      t('createLobby.error.lobbyNameDuplicate');
     return
   }
 

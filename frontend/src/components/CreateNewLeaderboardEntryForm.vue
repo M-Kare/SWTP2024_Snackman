@@ -34,10 +34,13 @@ import SmallNavButton from '@/components/SmallNavButton.vue';
 import {ref} from 'vue';
 import {useLeaderboardStore} from "@/stores/Leaderboard/leaderboardStore";
 import type {LeaderboardEntry} from "@/stores/Leaderboard/LeaderboardDTD";
+import { useI18n } from 'vue-i18n';
 
 const yourName = ref('');
 const errorMessage = ref('');
 const leaderboardStore = useLeaderboardStore()
+
+const { t } = useI18n();
 
 const emit = defineEmits<{
   (event: 'cancelNewLeaderboardEntryCreation', value: boolean): void;
@@ -72,7 +75,7 @@ const cancelNewLeaderboardEntryCreation = () => {
  */
 const createNewLeaderboardEntry = async () => {
   if (!yourName.value.trim()) {
-    errorMessage.value = "Your name cannot be empty";
+    errorMessage.value = t('newLeaderBoardEntry.error.playerNameEmpty');
     return;
   }
 
