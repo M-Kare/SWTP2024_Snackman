@@ -12,6 +12,7 @@ import java.util.TimerTask;
 
 import org.python.core.PyList;
 import org.python.core.PyObject;
+import org.python.core.PyString;
 import org.python.util.PythonInterpreter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,6 +38,8 @@ public class Chicken extends EatingMob implements Runnable {
     private int waitingTime;
     private final int MAX_CALORIES = GameConfig.MAX_KALORIEN;
     private final int CALORIES_PER_SIXTH = (MAX_CALORIES / 6);
+    private final int MIN_EGG_CALORIES = 300;
+    private final double EGG_CALORIE_PERCENTAGE = 0.3;
     private long id;
     private Thickness thickness = Thickness.THIN;
     private int chickenPosX, chickenPosZ;
@@ -263,8 +266,7 @@ public class Chicken extends EatingMob implements Runnable {
         pythonInterpreter.exec("if '" + jarClassesPath + "/maze' not in sys.path: sys.path.append('" + jarClassesPath + "/maze')");
         pythonInterpreter.exec("if '" + jarClassesPath + "/Lib' not in sys.path: sys.path.append('" + jarClassesPath + "/Lib')");
         log.debug("Chicken Script: " + fileName);
-        this.pythonInterpreter.exec("from " + fileName + " import choose_next_square");
-        this.pythonInterpreter.exec("from " + fileName + " import getWaitingTime");
+        this.pythonInterpreter.exec("import " + fileName);
         setWaitingTime();
     }
 
@@ -272,8 +274,7 @@ public class Chicken extends EatingMob implements Runnable {
      * TODO
      */
     private void setWaitingTime(){
-        PyObject func = pythonInterpreter.get("getWaitingTime");
-        PyObject result = func.__call__();
+        PyObject result = pythonInterpreter.eval(fileName + ".getWaitingTime()");
         this.waitingTime = result.asInt();
     }
 
@@ -286,10 +287,17 @@ public class Chicken extends EatingMob implements Runnable {
      */
     public int executeMovementSkript(List<String> squares) {
         log.debug("Running python chicken script with: {}", squares.toString());
-        PyObject func = pythonInterpreter.get("choose_next_square");
-        PyObject result = func.__call__(new PyList(squares));
+        PyObject result = pythonInterpreter.eval(fileName + ".choose_next_square(" + convertToPyStringList(squares) + ")");
 
         return result.asInt();
+    }
+
+    private PyList convertToPyStringList(List<String> list){
+        PyList pyList = new PyList();
+        for(String e : list){
+            pyList.append(new PyString(e));
+        }
+        return pyList;
     }
 
     public boolean getBlockingPath() {
@@ -384,8 +392,8 @@ public class Chicken extends EatingMob implements Runnable {
             timerRestarted = false;
             Square currentSquare = this.gameMap.getSquareAtIndexXZ(this.chickenPosX, this.chickenPosZ);
 
-            // new egg with current chicken-calories * 1.5
-            int eggCalories = (int) (super.getKcal() * 1.5);
+            int eggCalories = calculateEggCalories();
+
             Snack egg = new Snack(SnackType.EGG);
             egg.setCalories(eggCalories);
             // add egg to current square
@@ -398,6 +406,16 @@ public class Chicken extends EatingMob implements Runnable {
             timerRestarted = true;
             startNewTimer();
         }
+    }
+
+    /**
+     * Calculates the number of calories from eggs based on the total calories
+     * The result is always at least MIN_EGG_CALORIES
+     *
+     * @return The number of calories from eggs
+     */
+    protected int calculateEggCalories() {
+        return Math.max(MIN_EGG_CALORIES, (int) (super.getKcal() * EGG_CALORIE_PERCENTAGE));
     }
 
     /**
@@ -495,5 +513,9 @@ public class Chicken extends EatingMob implements Runnable {
 
     public void setWalking(boolean walking) {
         isWalking = walking;
+    }
+
+    public int getMAX_CALORIES() {
+        return MAX_CALORIES;
     }
 }

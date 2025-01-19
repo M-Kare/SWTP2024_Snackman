@@ -275,13 +275,15 @@ export const useGameMapStore = defineStore('gameMap', () => {
     }
   }
 
-  function spawnSnack(squareUpdate: ISquareUpdateDTD) {
+  async function spawnSnack(squareUpdate: ISquareUpdateDTD) {
     const savedMeshId = mapData.gameMap.get(squareUpdate.square.id)!.snack.meshId
     removeMeshFromScene(scene, savedMeshId)
     mapData.gameMap.set(squareUpdate.square.id, squareUpdate.square)
-    const snackToAdd = gameObjectRenderer.createSnackOnFloor(
+    
+    const snackToAdd = await gameObjectRenderer.createSnackOnFloor(
       squareUpdate.square.indexX * DEFAULT_SIDE_LENGTH + OFFSET,
       squareUpdate.square.indexZ * DEFAULT_SIDE_LENGTH + OFFSET,
+      0, // yPosition für Snacks (z. B. Bodenhöhe)
       DEFAULT_SIDE_LENGTH,
       squareUpdate.square.snack?.snackType,
     )
