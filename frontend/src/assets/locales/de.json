@@ -5,7 +5,7 @@
         "leaderBoard": "Bestenliste",
         "save": "Speichern",
         "back": "Zurück",
-        "BackToMainMenu": " Hauptmenü",
+        "backToMainMenu": " Hauptmenü",
         "importMap": "Map importieren",
         "exportMap": " Map exportieren",
         "copyLink": " Link kopieren",
@@ -33,10 +33,18 @@
     "newLeaderBoardEntry": {
         "title": "Neuer Bestenlisten-Eintrag",
         "label": "Bitte gib deinen Name ein:",
-        "playedTime": ""
+        "error": {
+            "playerNameEmpty": "Der Spieler-Name kann nicht leer sein!"
+        },
+        "playedTime": "Gespielte Zeit: {time} Minuten"
     },
     "difficulty": {
-        "title": "Wähle den Schwierigkeitsgrad für die Geister!"
+        "easy": "EINFACH",
+        "difficult": "SCHWER",
+        "title": "Wähle den Schwierigkeitsgrad für die Geister!",
+        "description1": "Wenn du",
+        "description2": "wählst, verfolgen dich die Geister nur wenn sie dich sehen. Wenn du aber mutig genug bist und",
+        "description3": "wählst, dann werden dich die Geister immer finden (auch wenn sie dich nicht sehen)!"
     },
     "lobbyList": {
         "title": "Lobbies",
@@ -55,30 +63,74 @@
         }
     },
     "chooseRole": {
-        "title": "Wähle deinen Charakter"
+        "title": "Wähle deinen Charakter",
+        "alreadyChosen": "Dieser Charakter wurde bereits gewählt!",
+        "error": {
+            "selection": "Fehler beim Auswählen des Charakters!",
+            "connectionFailed": "Verbindung zum Server fehlgeschlagen!",
+            "mapStatus": {
+                "heading": "Map-Status-Fehler",
+                "text": "Aktualisieren des Map-Status fehlgeschlagen."
+            },
+            "everyPlayerNeedsRole": "Jeder Spieler muss eine Rolle auswählen!",
+            "exactlyOneSnackMan": "Es muss genau einen SnackMan geben und alle Spieler müssene eine Rolle haben!"
+        }
+    },
+    "role": {
+        "snackman": "Happenmann",
+        "ghost": "Geist"
     },
     "lobby": {
         "playerCount": {
             "player": "Spieler"
         },
-        "role": {
-            "ghost": "Geist"
-        }
+        "linkCopied": "Link in die Zwischenablage kopiert"
     },
     "popup": {
         "lobbyFull": {
             "heading": "Lobby voll",
             "text": "Bitte wähle oder erstelle eine andere!"
         },
+        "uploadingFile": {
+            "heading": "Fehler beim Hochladen der Datei"
+        },
+        "mapNotValid": {
+            "heading": "Map-Datei ist nicht gültig",
+            "text": "Bitte lade eine .txt-Datei hoch"
+        },
+        "notExisting": {
+            "heading": "Die Lobby existiert nicht",
+            "text": "Bitte wähle oder erstelle eine andere!"
+        },
         "cantStart": {
             "heading": "Start nicht möglich",
-            "notEnoughPlayers": "Nicht genug Spieler um zu starten!",
-            "onlySnackMan": "Nur der Host kann das Spiel starten!"
+            "notEnoughPlayers": "Nicht genug Spieler um Rollen auszuwählen!",
+            "onlyAdminCanInit": "Nur der Admin kann die Wahl der Rollen initiieren!"
         }
     },
     "game": {
         "HUD": {
             "maxKcal": "Maximale Kalorien erreicht!"
+        }
+    },
+    "gameEnd": {
+        "gameResult": {
+            "winner": {
+                "snackman": "HAPPENMANN IST DER GEWINNER",
+                "ghosts": "DIE GEISTER SIND DIE GEWINNER"
+            }
+        },
+        "gameReason": {
+            "calorieTarget": "Happenmann hat sein Kalorienziel erreicht!",
+            "noCaloriesLeft": "Die Geister haben den Happenmann so oft erschreckt, bis er keine Kalorien mehr hatte!",
+            "timeIsUp": "Die Zeit ist um und der Happenmann hat nicht genug Kalorien gesammelt!"
+        },
+        "playingTime": "Das Spiel lief {time} Minuten",
+        "feedback": {
+            "mapSaved": "Map gespeichert",
+            "success": "Erfolg",
+            "mapNotSaved": " Map nicht gespeichert",
+            "error": "Fehler"
         }
     }
 }

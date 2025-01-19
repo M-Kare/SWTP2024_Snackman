@@ -5,7 +5,6 @@ import type {ILobbyDTD} from './ILobbyDTD';
 import type {IPlayerClientDTD} from './IPlayerClientDTD';
 import router from "@/router";
 
-
 // const wsurl = `ws://${window.location.host}/stompbroker`
 const DEST = '/topic/lobbies'
 const ROLEDEST = "/topic/lobbies/chooseRole"
@@ -32,11 +31,11 @@ export const useLobbiesStore = defineStore('lobbiesstore', () => {
     } as IPlayerClientDTD //PlayerClient for each window, for check the sync
   })
   const buttons = ref<Button[]>([
-    {id: 1, name: 'Snackman', image: '/kirby.png', selected: false},
-    {id: 2, name: 'Ghost', image: '/ghost.png', selected: false},
-    {id: 3, name: 'Ghost', image: '/ghost.png', selected: false},
-    {id: 4, name: 'Ghost', image: '/ghost.png', selected: false},
-    {id: 5, name: 'Ghost', image: '/ghost.png', selected: false}
+    {id: 1, name: 'role.snackman', image: '/kirby.png', selected: false},
+    {id: 2, name: 'role.ghost', image: '/ghost.png', selected: false},
+    {id: 3, name: 'role.ghost', image: '/ghost.png', selected: false},
+    {id: 4, name: 'role.ghost', image: '/ghost.png', selected: false},
+    {id: 5, name: 'role.ghost', image: '/ghost.png', selected: false}
   ])
 
   const updateButtonSelection = (buttonId: string, playerId: string) => {

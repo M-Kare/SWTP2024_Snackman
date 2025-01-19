@@ -17,7 +17,7 @@
                :style="button.selected ? { pointerEvents: 'none' } : {}">
             <img :src="button.image" :alt="button.name" class="character-image">
           </div>
-          <p class="character-name">{{ button.name }}</p>
+          <p class="character-name">{{ $t(button.name) }}</p>
         </div>
       </div>
       <div id="button-box">
@@ -55,6 +55,9 @@ import {useRoute, useRouter} from "vue-router";
 import PopUp from "@/components/PopUp.vue";
 import type {Button} from "@/stores/Lobby/lobbiesstore"
 import {useLobbiesStore} from "@/stores/Lobby/lobbiesstore";
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 const route = useRoute()
 const router = useRouter()
@@ -94,7 +97,7 @@ const selectCharacter = async (button: Button) => {
 
   // already choosen Role
   if (button.selected) {
-    infoText.value = "Dieser Charakter wurde bereits gewählt!";
+    infoText.value = t('chooseRole.alreadyChosen');
     showPopUp.value = true;
     darkenBackground.value = true;
     return;
@@ -121,18 +124,18 @@ const selectCharacter = async (button: Button) => {
       selectedCharacter.value = button;
       darkenBackground.value = true;
     } else if (response.status === 409) {
-      infoText.value = "This Character already selected!";
+      infoText.value = t('chooseRole.alreadyChosen');
       showPopUp.value = true;
       darkenBackground.value = true;
     } else {
-      infoText.value = "Error while selecting character!";
+      infoText.value = t('chooseRole.error.selection');
       showPopUp.value = true;
       darkenBackground.value = true;
     }
 
   } catch (error) {
     console.error("Error selecting character:", error);
-    infoText.value = "Failed to connect to the server!";
+    infoText.value = t('chooseRole.error.connectionFailed');
     showPopUp.value = true;
     darkenBackground.value = true;
   }
@@ -167,15 +170,15 @@ const startGame = async () => {
     if (status !== "done") {
       showPopUp.value = true;
       darkenBackground.value = true;
-      infoHeading.value = "Map Status Error";
-      infoText.value = "Failed to update the map status.";
+      infoHeading.value = t('chooseRole.error.mapStatus.heading');
+      infoText.value = t('chooseRole.error.mapStatus.text');
       return;
     }
     lobby.members.forEach(member => {
       if (member.role === 'UNDEFINED') {
         showPopUp.value = true
         darkenBackground.value = true
-        infoText.value = 'Every Player has to choose a Role!'
+        infoText.value = t('chooseRole.error.everyPlayerNeedsRole');
         return
       } else if (member.role === 'SNACKMAN') {
         snackmanCounter++
@@ -201,12 +204,12 @@ const startGame = async () => {
     } else {
       showPopUp.value = true
       darkenBackground.value = true
-      infoText.value = 'There must be exactly one SnackMan and all players must have a role!'
+      infoText.value = t('chooseRole.error.exactlyOneSnackMan');
     }
   } else {
     showPopUp.value = true
     darkenBackground.value = true
-    infoText.value = 'Only Admin can start the game!'
+    infoText.value = t('popup.cantStart.onlyAdminCanStart');
   }
 }
 

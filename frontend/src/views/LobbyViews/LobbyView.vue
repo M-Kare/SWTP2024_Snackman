@@ -16,10 +16,6 @@
           <div class="player-name">
             {{ member.playerName.replace(/"/g, '') }} <!-- replace all " in String using RegEx modifier /g (find all) -->
           </div>
-
-          <div class="player-character">
-            {{ member.role }}
-          </div>
         </li>
       </ul>
     </div>
@@ -128,6 +124,9 @@ import {computed, onMounted, ref, watchEffect} from 'vue'
 import {useLobbiesStore} from '@/stores/Lobby/lobbiesstore'
 import type {IPlayerClientDTD} from '@/stores/Lobby/IPlayerClientDTD'
 import type {ILobbyDTD} from '@/stores/Lobby/ILobbyDTD'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n();
 
 const router = useRouter()
 const route = useRoute()
@@ -227,8 +226,8 @@ const handleFileImport = (event: Event) => {
         } else {
             showPopUp.value = true;
             darkenBackground.value = true;
-            infoHeading.value = "File Map is not valid"
-            infoText.value = "Please upload file .txt"
+            infoHeading.value = t('popup.mapNotValid.heading');
+            infoText.value = t('popup.mapNotValid.text');
         }
     }
 }
@@ -264,14 +263,14 @@ const uploadFileToServer = async (file: File, lobbyId: string) => {
             const errorMessage = await response.text();
             showPopUp.value = true;
             darkenBackground.value = true;
-            infoHeading.value = "File Map is not valid";
+            infoHeading.value = t('popup.mapNotValid.heading');
             infoText.value = errorMessage;
         }
     } catch (error) {
         console.error('Error uploading file:', error);
         showPopUp.value = true;
         darkenBackground.value = true;
-        infoHeading.value = "Error uploading file";
+        infoHeading.value = t('popup.uploadingFile.heading');
         infoText.value = error;
     }
 }
@@ -345,8 +344,8 @@ onMounted(async () => {
   await lobbiesStore.fetchLobbyList()
 
   if (!lobby.value) {
-    infoHeading.value = 'Lobby does not exist'
-    infoText.value = 'Please choose or create another one!'
+    infoHeading.value = t('popup.notExisting.heading');
+    infoText.value = t('popup.notExisting.text');
     errorBox.value = true
     darkenBackground.value = true;
   }
@@ -363,8 +362,8 @@ onMounted(async () => {
     darkenBackground.value = true;
 
     if (lobby.value!.members.length >= MAX_PLAYER_COUNT) {
-      infoHeading.value = 'Lobby full'
-      infoText.value = 'Please choose or create another one!'
+      infoHeading.value = t('popup.lobbyFull.heading');
+      infoText.value = t('popup.lobbyFull.text');
       errorBox.value = true
       darkenBackground.value = true
     }
@@ -442,7 +441,7 @@ const chooseRole = async(lobby: ILobbyDTD | undefined ) =>{
   if (lobby.members.length < 2) {
     showPopUp.value = true
     darkenBackground.value = true
-    infoText.value = 'Not enough players to choose Role!'
+    infoText.value = t('popup.cantStart.notEnoughPlayers');
     return
   }
 
@@ -451,14 +450,14 @@ const chooseRole = async(lobby: ILobbyDTD | undefined ) =>{
   } else {
     showPopUp.value = true
     darkenBackground.value = true
-    infoText.value = 'The role selection can only be initiated by the host!'
+    infoText.value = t('popup.cantStart.onlyAdminCanInit');
   }
 
 }
 
 function copyToClip() {
   navigator.clipboard.writeText(document.URL)
-  infoText.value = 'Link copied to clipboard'
+  infoText.value = t('lobby.linkCopied');
   showInfo.value = true
   mouseInfoBox.value = document.getElementById('infoBox')
   moveToMouse(mouseInfoBox.value!)
