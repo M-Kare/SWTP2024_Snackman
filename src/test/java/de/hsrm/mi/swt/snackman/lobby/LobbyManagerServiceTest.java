@@ -104,7 +104,7 @@ public class LobbyManagerServiceTest {
       @Test
       public void testCreateLobbySuccess() throws LobbyAlreadyExistsException {
             PlayerClient adminPlayer = lobbyManagerService.createNewClient("AdminPlayer");
-            Lobby lobby = lobbyManagerService.createLobby("TestLobby", adminPlayer, null);
+            Lobby lobby = lobbyManagerService.createLobby("TestLobby", adminPlayer, null, "EASY");
 
             assertNotNull(lobby);
             assertEquals("TestLobby", lobby.getName());
@@ -117,15 +117,15 @@ public class LobbyManagerServiceTest {
             PlayerClient adminPlayer = lobbyManagerService.createNewClient("AdminPlayer");
 
             assertThrows(LobbyAlreadyExistsException.class, () -> {
-                  lobbyManagerService.createLobby("DuplicateLobby", adminPlayer, null);
-                  lobbyManagerService.createLobby("DuplicateLobby", adminPlayer, null);
+                  lobbyManagerService.createLobby("DuplicateLobby", adminPlayer, null, "EASY");
+                  lobbyManagerService.createLobby("DuplicateLobby", adminPlayer, null, "EASY");
             });
       }
 
       @Test
       public void testJoinLobbySuccess() throws LobbyAlreadyExistsException, GameAlreadyStartedException {
             PlayerClient adminPlayer = lobbyManagerService.createNewClient("AdminPlayer");
-            Lobby lobby = lobbyManagerService.createLobby("TestLobby", adminPlayer, null);
+            Lobby lobby = lobbyManagerService.createLobby("TestLobby", adminPlayer, null, "EASY");
             PlayerClient secondPlayer = lobbyManagerService.createNewClient("2.Player");
             lobby = lobbyManagerService.joinLobby(lobby.getLobbyId(), secondPlayer.getPlayerId());
 
@@ -138,7 +138,7 @@ public class LobbyManagerServiceTest {
       public void testJoinLobbyGameAlreadyStarted() throws LobbyAlreadyExistsException {
             PlayerClient adminPlayer = lobbyManagerService.createNewClient("AdminPlayer");
             PlayerClient secondPlayer = lobbyManagerService.createNewClient("2.Player");
-            Lobby lobby = lobbyManagerService.createLobby("TestLobby", adminPlayer, null);
+            Lobby lobby = lobbyManagerService.createLobby("TestLobby", adminPlayer, null, "EASY");
 
             assertDoesNotThrow(() -> {
                   lobbyManagerService.joinLobby(lobby.getLobbyId(), secondPlayer.getPlayerId());
@@ -154,7 +154,7 @@ public class LobbyManagerServiceTest {
       @Test
       public void testLeaveLobbySuccess() throws LobbyAlreadyExistsException {
             PlayerClient adminPlayer = lobbyManagerService.createNewClient("AdminPlayer");
-            Lobby lobby = lobbyManagerService.createLobby("TestLobby", adminPlayer, null);
+            Lobby lobby = lobbyManagerService.createLobby("TestLobby", adminPlayer, null, "EASY");
 
             PlayerClient secondPlayer = lobbyManagerService.createNewClient("2.Player");
 
@@ -170,7 +170,7 @@ public class LobbyManagerServiceTest {
       @Test
       public void testLeaveLobbyAdminLeavesDeletesLobby() throws LobbyAlreadyExistsException {
             PlayerClient adminPlayer = lobbyManagerService.createNewClient("AdminPlayer");
-            Lobby lobby = lobbyManagerService.createLobby("TestLobby", adminPlayer, null);
+            Lobby lobby = lobbyManagerService.createLobby("TestLobby", adminPlayer, null, "EASY");
             lobbyManagerService.leaveLobby(lobby.getLobbyId(), adminPlayer.getPlayerId());
 
             assertThrows(NoSuchElementException.class, () -> {
@@ -181,7 +181,7 @@ public class LobbyManagerServiceTest {
       @Test
       public void testStartGameSuccess() throws LobbyAlreadyExistsException {
             PlayerClient adminPlayer = lobbyManagerService.createNewClient("AdminPlayer");
-            Lobby lobby = lobbyManagerService.createLobby("TestLobby", adminPlayer, null);
+            Lobby lobby = lobbyManagerService.createLobby("TestLobby", adminPlayer, null, "EASY");
 
             PlayerClient secondPlayer = lobbyManagerService.createNewClient("2.Player");
             PlayerClient thirdPlayer = lobbyManagerService.createNewClient("3.Player");
@@ -198,7 +198,7 @@ public class LobbyManagerServiceTest {
       @Test
       public void testStartGameNotEnoughPlayers() throws LobbyAlreadyExistsException {
             PlayerClient adminPlayer = lobbyManagerService.createNewClient("AdminPlayer");
-            Lobby lobby = lobbyManagerService.createLobby("TestLobby", adminPlayer, null);
+            Lobby lobby = lobbyManagerService.createLobby("TestLobby", adminPlayer, null, "EASY");
 
             assertThrows(IllegalStateException.class, () -> {
                   lobbyManagerService.startGame(lobby.getLobbyId());
@@ -208,7 +208,7 @@ public class LobbyManagerServiceTest {
       @Test
       public void testFindLobbyByUUIDSuccess() throws LobbyAlreadyExistsException {
             PlayerClient adminPlayer = lobbyManagerService.createNewClient("AdminPlayer");
-            Lobby lobby = lobbyManagerService.createLobby("TestLobby", adminPlayer, null);
+            Lobby lobby = lobbyManagerService.createLobby("TestLobby", adminPlayer, null, "EASY");
 
             Lobby foundLobby = lobbyManagerService.findLobbyByLobbyId(lobby.getLobbyId());
 
@@ -226,7 +226,7 @@ public class LobbyManagerServiceTest {
     @Test
     public void testAssignSnackmanSuccess() throws LobbyAlreadyExistsException {
         PlayerClient adminPlayer = lobbyManagerService.createNewClient("AdminPlayer");
-        Lobby lobby = lobbyManagerService.createLobby("TestLobby", adminPlayer, messageLoop);
+        Lobby lobby = lobbyManagerService.createLobby("TestLobby", adminPlayer, messageLoop, "EASY");
         lobby.setGameStarted();
 
         ResponseEntity<Void> response = lobbyController.switchRoles("SNACKMAN", lobby,   adminPlayer, true, "1");
@@ -238,7 +238,7 @@ public class LobbyManagerServiceTest {
     @Test
     public void testAssignGhostSuccess() throws LobbyAlreadyExistsException {
         PlayerClient adminPlayer = lobbyManagerService.createNewClient("AdminPlayer");
-        Lobby lobby = lobbyManagerService.createLobby("TestLobby", adminPlayer, messageLoop);
+        Lobby lobby = lobbyManagerService.createLobby("TestLobby", adminPlayer, messageLoop, "EASY");
         lobby.setGameStarted();
 
         ResponseEntity<Void> response = lobbyController.switchRoles("GHOST", lobby, adminPlayer, true, "1");
@@ -250,7 +250,7 @@ public class LobbyManagerServiceTest {
     @Test
     public void testNoJoiningWhenChoosingRoles() throws LobbyAlreadyExistsException {
         PlayerClient adminPlayer = lobbyManagerService.createNewClient("AdminPlayer");
-        Lobby lobby = lobbyManagerService.createLobby("TestLobby", adminPlayer, messageLoop);
+        Lobby lobby = lobbyManagerService.createLobby("TestLobby", adminPlayer, messageLoop, "EASY");
         lobby.setChooseRole();
 
         PlayerClient secondPlayer = lobbyManagerService.createNewClient("SecondPlayer");
@@ -264,7 +264,7 @@ public class LobbyManagerServiceTest {
     public void testRoleSnackmanAlreadySelected() throws LobbyAlreadyExistsException {
         PlayerClient adminPlayer = lobbyManagerService.createNewClient("AdminPlayer");
         PlayerClient secondPlayer = lobbyManagerService.createNewClient("SecondPlayer");
-        Lobby lobby = lobbyManagerService.createLobby("TestLobby", adminPlayer, messageLoop);
+        Lobby lobby = lobbyManagerService.createLobby("TestLobby", adminPlayer, messageLoop, "EASY");
         adminPlayer.setRole(ROLE.SNACKMAN);
         lobby.getMembers().add(secondPlayer);
 
@@ -278,7 +278,7 @@ public class LobbyManagerServiceTest {
     @Test
     public void testAssignInvalidRole() throws LobbyAlreadyExistsException {
         PlayerClient adminPlayer = lobbyManagerService.createNewClient("AdminPlayer");
-        Lobby lobby = lobbyManagerService.createLobby("TestLobby", adminPlayer, messageLoop);
+        Lobby lobby = lobbyManagerService.createLobby("TestLobby", adminPlayer, messageLoop, "EASY");
         lobby.setGameStarted();
 
         ResponseEntity<Void> response = lobbyController.switchRoles("UNDEFINED", lobby,  adminPlayer, true, "1");

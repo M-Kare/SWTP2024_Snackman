@@ -68,22 +68,22 @@ export const GameMapRenderer = () => {
       if (square.type === MapObjectType.FLOOR) {
 
         if (square.snack != null && square.snack.snackType != SnackType.EMPTY) {
-          const snackToAdd = gameObjectRenderer.createSnackOnFloor(
+          const snackToAdd = await gameObjectRenderer.createSnackOnFloor(
             square.indexX * DEFAULT_SIDE_LENGTH + OFFSET,
             square.indexZ * DEFAULT_SIDE_LENGTH + OFFSET,
+            0,
             DEFAULT_SIDE_LENGTH,
-            square.snack?.snackType,
-          )
-          scene.add(snackToAdd)
-          gameMapStore.setSnackMeshId(id, snackToAdd.id)
-        }
-      }
+            square.snack.snackType
+        )
+        scene.add(snackToAdd)
+        gameMapStore.setSnackMeshId(id, snackToAdd.id)
+      }}
     }
     // add chickens
     for (let currentChicken of mapData.chickens) {
       gameObjectRenderer.createChickenOnFloor(
-        currentChicken.chickenPosX * DEFAULT_SIDE_LENGTH + OFFSET,
-        currentChicken.chickenPosZ * DEFAULT_SIDE_LENGTH + OFFSET,
+        currentChicken.chickenPosX,
+        currentChicken.chickenPosZ,
         0,
         currentChicken.thickness,
       ).then((chickenToAdd) =>{
@@ -97,8 +97,8 @@ export const GameMapRenderer = () => {
       console.log("Initialising script ghost with x {} y {}", currentGhost.scriptGhostPosX, currentGhost.scriptGhostPosZ)
       
       gameObjectRenderer.createGhostOnFloor(
-        currentGhost.scriptGhostPosX * DEFAULT_SIDE_LENGTH + OFFSET,
-        currentGhost.scriptGhostPosZ * DEFAULT_SIDE_LENGTH + OFFSET,
+        currentGhost.scriptGhostPosX,
+        currentGhost.scriptGhostPosZ,
         0,
         DEFAULT_SIDE_LENGTH
       ).then((scriptGhostToAdd) => {

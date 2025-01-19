@@ -12,6 +12,7 @@ import java.util.TimerTask;
 
 import org.python.core.PyList;
 import org.python.core.PyObject;
+import org.python.core.PyString;
 import org.python.util.PythonInterpreter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -135,12 +136,19 @@ public class Chicken extends EatingMob implements Runnable {
         this.lookingDirection = walkingDirection;
         Square oldPosition = this.gameMap.getSquareAtIndexXZ(this.chickenPosX, this.chickenPosZ);
         Square newPosition = walkingDirection.getNewPosition(this.gameMap, this.chickenPosX, this.chickenPosZ,
-                walkingDirection);
+        walkingDirection);
+        try {
+            log.debug("Waiting " + waitingTime + " sec before walking on next square.");
+            Thread.sleep(waitingTime/2);
+        } catch (InterruptedException e) {
+            log.error(e.getMessage());
+            Thread.currentThread().interrupt();
+        }
         propertyChangeSupport.firePropertyChange("chicken", null, this);
 
         try {
             log.debug("Waiting " + waitingTime + " sec before walking on next square.");
-            Thread.sleep(waitingTime);
+            Thread.sleep(waitingTime/2);
         } catch (InterruptedException e) {
             log.error(e.getMessage());
             Thread.currentThread().interrupt();
@@ -256,8 +264,7 @@ public class Chicken extends EatingMob implements Runnable {
         pythonInterpreter.exec("if '" + jarClassesPath + "/maze' not in sys.path: sys.path.append('" + jarClassesPath + "/maze')");
         pythonInterpreter.exec("if '" + jarClassesPath + "/Lib' not in sys.path: sys.path.append('" + jarClassesPath + "/Lib')");
         log.debug("Chicken Script: " + fileName);
-        this.pythonInterpreter.exec("from " + fileName + " import choose_next_square");
-        this.pythonInterpreter.exec("from " + fileName + " import getWaitingTime");
+        this.pythonInterpreter.exec("import " + fileName);
         setWaitingTime();
     }
 
@@ -265,8 +272,7 @@ public class Chicken extends EatingMob implements Runnable {
      * TODO
      */
     private void setWaitingTime(){
-        PyObject func = pythonInterpreter.get("getWaitingTime");
-        PyObject result = func.__call__();
+        PyObject result = pythonInterpreter.eval(fileName + ".getWaitingTime()");
         this.waitingTime = result.asInt();
     }
 
@@ -279,10 +285,17 @@ public class Chicken extends EatingMob implements Runnable {
      */
     public int executeMovementSkript(List<String> squares) {
         log.debug("Running python chicken script with: {}", squares.toString());
-        PyObject func = pythonInterpreter.get("choose_next_square");
-        PyObject result = func.__call__(new PyList(squares));
+        PyObject result = pythonInterpreter.eval(fileName + ".choose_next_square(" + convertToPyStringList(squares) + ")");
 
         return result.asInt();
+    }
+
+    private PyList convertToPyStringList(List<String> list){
+        PyList pyList = new PyList();
+        for(String e : list){
+            pyList.append(new PyString(e));
+        }
+        return pyList;
     }
 
     public boolean getBlockingPath() {

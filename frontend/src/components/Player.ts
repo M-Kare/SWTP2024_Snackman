@@ -18,14 +18,15 @@ export class Player {
   private moveRight: boolean;
   private canJump: boolean;
   private sprinting: boolean;
-
+  
   private radius: number;
   private speed: number;
   private sprintMultiplier: number;
-
+  
   private camera: THREE.PerspectiveCamera;
   private controls: PointerLockControls;
-
+  
+  private targetPosition: THREE.Vector3
   private movementDirection: THREE.Vector3;
 
   private isJumping: boolean;
@@ -66,6 +67,7 @@ export class Player {
     this.canJump = true;
     this.sprinting = false;
     this.movementDirection = new THREE.Vector3();
+    this.targetPosition = new THREE.Vector3(posX, posY, posZ) // marks the current position in the backend (used as a target for moving (lerping) the camera position towards)
     this.calories = 0;
 
     this.isJumping = false;
@@ -229,15 +231,22 @@ export class Player {
   }
 
   /**
-   * lerp is used to interpolate the two positions
+   * Set target position to lerp towards
    */
   public setPosition(pos: THREE.Vector3) {
-    this.camera.position.lerp(pos, 0.5);
-
-    if (pos.y <= 2) {
+    this.targetPosition = pos;
+    if (this.targetPosition.y <= 2) {
       this.isJumping = false
       this.doubleJump = false
     }
+
+  }
+  
+  /**
+   * Moves the camera position towards the target position by t (0.1) ammount
+   */
+  public lerpPosition(){
+    this.camera.position.lerp(this.targetPosition, 0.1)
   }
 
   /**
