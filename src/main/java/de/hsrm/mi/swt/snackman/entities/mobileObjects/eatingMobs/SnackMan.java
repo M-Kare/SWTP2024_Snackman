@@ -27,6 +27,9 @@ public class SnackMan extends EatingMob {
     private SprintHandler sprintHandler = new SprintHandler();
     private boolean isScared = false;
     private boolean hasDoubleJumped = false;
+    private long jumpStartTime = 0;
+    private long elapsedTime = 0;
+    private double gravity = GameConfig.GRAVITY;
 
     public SnackMan(GameMap gameMap, Square currentSquare, double posX, double posY, double posZ) {
         this(gameMap, GameConfig.SNACKMAN_SPEED, GameConfig.SNACKMAN_RADIUS, posX, posY, posZ);
@@ -75,7 +78,15 @@ public class SnackMan extends EatingMob {
 
     public void updateJumpPosition(double deltaTime) {
         if (isJumping) {
-            this.velocityY += GameConfig.GRAVITY * deltaTime;
+            if (jumpStartTime == 0) {
+                jumpStartTime = System.currentTimeMillis();
+            }
+            elapsedTime = System.currentTimeMillis() - jumpStartTime;
+            if (elapsedTime >= 1000) {
+                gravity = -100;
+            }
+
+            this.velocityY += gravity * deltaTime;
             this.setPosY(this.getPosY() + this.velocityY * deltaTime);
 
             if (this.getPosY() <= GameConfig.SQUARE_HEIGHT && squareUnderneathIsWall()) {
@@ -208,6 +219,8 @@ public class SnackMan extends EatingMob {
                 this.isJumping = false;
                 this.velocityY = 0;
                 this.hasDoubleJumped = false;
+                jumpStartTime = 0;
+                gravity = GameConfig.GRAVITY;
             }
         }
     }
