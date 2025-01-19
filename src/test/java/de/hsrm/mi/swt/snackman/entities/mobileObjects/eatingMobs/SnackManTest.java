@@ -166,6 +166,7 @@ class SnackManTest {
         assertTrue(snackMan.getVelocityY() > 0);
         snackMan.updateJumpPosition(deltaTime);
 
+        //ERROR?
         while (snackMan.getPosY() > GameConfig.SNACKMAN_GROUND_LEVEL) {
             snackMan.updateJumpPosition(deltaTime);
         }

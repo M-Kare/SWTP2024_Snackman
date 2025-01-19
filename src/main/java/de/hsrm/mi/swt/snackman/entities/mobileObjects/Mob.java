@@ -24,7 +24,7 @@ public abstract class Mob {
     private Quaterniond quat;
     private double speed;
     private Vector3d spawn;
-    private Vector3d forward;
+    private Vector3d forward = new Vector3d(0, 0, -1);
     private GameMap gameMap;
 
     /**
@@ -45,7 +45,7 @@ public abstract class Mob {
         setCurrentSquareWithIndex(position.x, position.z);
         setPositionWithIndexXZ(position.x, position.z);
         id = generateId();
-        forward = new Vector3d(0, 0, -1);
+        //forward = new Vector3d(0, 0, -1);
     }
 
     public Mob() {
@@ -369,9 +369,11 @@ public abstract class Mob {
 
     public void pushback() {
         double stepDistance = 0.1;
-        Vector3d backward = new Vector3d(forward).normalize().negate();
+        Vector3d backward = new Vector3d(forward);
+        backward.normalize().negate();
         while (squareUnderneathIsWall()) {
-            Vector3d displacement = new Vector3d(backward).mul(stepDistance);
+            Vector3d displacement = new Vector3d(backward);
+            displacement.mul(stepDistance);
             displacement.y = 0;
             position.add(displacement);
         }
