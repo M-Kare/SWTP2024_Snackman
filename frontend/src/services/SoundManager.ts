@@ -238,12 +238,11 @@ export class SoundManager {
      * Initializes the sound for eating a snack.
      */
     private static async initEatSnackSound(): Promise<void> {
-        const sound = new THREE.PositionalAudio(this.ingameListener);
+        const sound = new THREE.Audio(this.ingameListener);
         const buffer = await this.loadAudioAsync('sounds/snackman/collect_snack_sound.mp3');
         sound.setBuffer(buffer);
-        sound.setRefDistance(20);
 
-        this.characterSounds.set(SoundType.EAT_SNACK, sound);
+        this.backgroundSounds.set(SoundType.EAT_SNACK, sound);
     }
 
     /**
