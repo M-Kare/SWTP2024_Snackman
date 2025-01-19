@@ -3,7 +3,6 @@ import { type IGameMap, MapObjectType } from '@/stores/IGameMapDTD'
 import { useGameMapStore } from '@/stores/gameMapStore'
 import { GameObjectRenderer } from '@/renderer/GameObjectRenderer'
 import { SnackType } from '@/stores/Snack/ISnackDTD'
-import { Sky } from 'three/examples/jsm/Addons.js'
 
 /**
  * for rendering the game map
@@ -27,6 +26,10 @@ export const GameMapRenderer = () => {
   const hemiLight = new THREE.HemisphereLight(0xffffbb, 0x080820, 1)
   scene.add(hemiLight)
 
+  const skyboxUrls = ['skyPx.jpg', 'skyNx.jpg', 'skyPy.jpg', 'skyNy.jpg', 'skyPz.jpg', 'skyNz.jpg']
+  const skyboxCubemap = new THREE.CubeTextureLoader().load(skyboxUrls)
+  scene.background = skyboxCubemap
+
   /**
    * initialize renderer
    *
@@ -41,6 +44,7 @@ export const GameMapRenderer = () => {
     renderer.setSize(window.innerWidth, window.innerHeight)
     renderer.setPixelRatio(window.devicePixelRatio)
     renderer.shadowMap.enabled = true // activates the shadow calculation
+    renderer.toneMapping = THREE.ACESFilmicToneMapping
 
     return renderer
   }
@@ -108,22 +112,7 @@ export const GameMapRenderer = () => {
       })
     }
 
-    // Skybox
-    const sky = new Sky()
-    sky.scale.setScalar(450000)
-    scene.add(sky)
 
-    const phi = THREE.MathUtils.degToRad( 90 );
-    const theta = THREE.MathUtils.degToRad( 180 );
-    const sunPosition = new THREE.Vector3().setFromSphericalCoords( 1, phi, theta );
-    sky.material.uniforms.turbidity.value = 2
-    sky.material.uniforms.mieCoefficient.value = 0.01
-    sky.material.uniforms.mieDirectionalG.value = 0.25
-    sky.material.uniforms.sunPosition.value = sunPosition
-
-    renderer.toneMapping = THREE.ACESFilmicToneMapping
-
-    
   }
 
   const getScene = () => {
