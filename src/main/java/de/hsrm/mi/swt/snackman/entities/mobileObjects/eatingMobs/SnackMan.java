@@ -43,11 +43,15 @@ public class SnackMan extends EatingMob {
         super(gameMap, speed, radius, posX, posY, posZ);
     }
 
-    public void isScaredFromGhost() {
-        // Calorsies reduced by 300 if Ghost hit
-        if (super.getKcal() > GameConfig.GHOST_DAMAGE) {
-            setKcal(getKcal() - GameConfig.GHOST_DAMAGE);
-        } else super.setKcal(GAME_FINISH_BECAUSE_OF_TOO_FEW_CKAL);
+    public void isScaredFromGhost(boolean scared) {
+        if (scared) {
+            if (super.getKcal() > GameConfig.GHOST_DAMAGE) {
+                setKcal(getKcal() - GameConfig.GHOST_DAMAGE);
+                isScared = true;
+            } else super.setKcal(GAME_FINISH_BECAUSE_OF_TOO_FEW_CKAL);
+        } else {
+            isScared = false;
+        }
     }
 
     //JUMPING
@@ -248,7 +252,9 @@ public class SnackMan extends EatingMob {
         // when snackman runs into a ghost
         for (Mob mob : newSquare.getMobs()) {
             if (mob instanceof Ghost || mob instanceof ScriptGhost) {
-                this.isScaredFromGhost();
+                this.isScaredFromGhost(true);
+            } else {
+                this.isScaredFromGhost(false);
             }
         }
     }
@@ -319,5 +325,9 @@ public class SnackMan extends EatingMob {
 
     public void setHasDoubleJumped(boolean valueHasDoubleJumped) {
         hasDoubleJumped = valueHasDoubleJumped;
+    }
+
+    public boolean isScared() {
+        return isScared;
     }
 }

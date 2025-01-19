@@ -173,6 +173,12 @@ public abstract class Mob {
         move.z = move.z * delta * speed;
         double xNew = position.x + move.x;
         double zNew = position.z + move.z;
+
+        if((position.y < 2) || (calcMapIndexOfCoordinate(xNew) < 0 || calcMapIndexOfCoordinate(xNew) >= gameMap.getGameMapSquares().length) ||  calcMapIndexOfCoordinate(zNew) < 0 || calcMapIndexOfCoordinate(zNew) >= gameMap.getGameMapSquares()[0].length){
+            respawn();
+            return;
+        }
+
         try {
             result = checkWallCollision(xNew, zNew, gameMap);
         } catch (IndexOutOfBoundsException e) {
@@ -208,7 +214,8 @@ public abstract class Mob {
     public void respawn() {
         this.position.x = spawn.x;
         this.position.z = spawn.z;
-        setCurrentSquareWithIndex(position.x, position.z);
+        this.position.y = GameConfig.SNACKMAN_GROUND_LEVEL;
+        //setCurrentSquareWithIndex(position.x, position.z);
 
     /*
     TODO unterschied zwischen snackman und geistern beachten in konstructor ändern!!
