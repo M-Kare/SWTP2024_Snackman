@@ -174,9 +174,12 @@ public abstract class Mob {
         double xNew = position.x + move.x;
         double zNew = position.z + move.z;
 
-        if((position.y < 2) || (calcMapIndexOfCoordinate(xNew) < 0 || calcMapIndexOfCoordinate(xNew) >= gameMap.getGameMapSquares().length) ||  calcMapIndexOfCoordinate(zNew) < 0 || calcMapIndexOfCoordinate(zNew) >= gameMap.getGameMapSquares()[0].length){
-            respawn();
-            return;
+        //RESPAWN AUSSERHALB DES LABYRINTHS
+        if (gameMap.getGameMapSquares() != null) {
+            if((position.y < 1) || (calcMapIndexOfCoordinate(xNew) < 0 || calcMapIndexOfCoordinate(xNew) >= gameMap.getGameMapSquares().length) ||  calcMapIndexOfCoordinate(zNew) < 0 || calcMapIndexOfCoordinate(zNew) >= gameMap.getGameMapSquares()[0].length){
+                respawn();
+                return;
+            }
         }
 
         try {
