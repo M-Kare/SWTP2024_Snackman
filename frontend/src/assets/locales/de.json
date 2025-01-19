@@ -19,17 +19,19 @@
     },
     "savePlayerName": {
         "label": "Bitte gib deinen Namen ein:",
+        "placeholder": "max. 16 Buchstaben",
         "error": {
             "playerNameEmpty": "Der Spieler-Name kann nicht leer sein!"
         }
     },
     "leaderBoard": {
+        "title": "Bestenliste",
         "date": "Datum",
         "duration": "Dauer"
     },
     "newLeaderBoardEntry": {
         "title": "Neuer Bestenlisten-Eintrag",
-        "label": "Bitte gib deinen Name ein:",
+        "label": "Bitte gib deinen Namen ein:",
         "playedTime": "Gespielte Zeit: {time} Minuten",
         "error": {
             "playerNameEmpty": "Der Spieler-Name kann nicht leer sein!"
@@ -40,8 +42,8 @@
         "difficult": "SCHWER",
         "title": "Wähle den Schwierigkeitsgrad für die Geister!",
         "description1": "Wenn du",
-        "description2": "wählst, verfolgen dich die Geister nur wenn sie dich sehen. Wenn du aber mutig genug bist und",
-        "description3": "wählst, dann werden dich die Geister immer finden (auch wenn sie dich nicht sehen)!"
+        "description2": "wählst, verfolgen dich die Geister nur, wenn sie dich sehen. Wenn du aber mutig genug bist und",
+        "description3": "wählst, werden dich die Geister immer finden (auch wenn sie dich nicht sehen)!"
     },
     "lobbyList": {
         "title": "Lobbies",
@@ -52,7 +54,7 @@
     "createLobby": {
         "title": "Neue Lobby",
         "form": {
-            "label": "Namen eingeben:"
+            "label": "Name eingeben:"
         },
         "error": {
             "lobbyNameEmpty": "Der Lobby-Name kann nicht leer sein!",
@@ -69,8 +71,8 @@
                 "heading": "Map-Status-Fehler",
                 "text": "Aktualisieren des Map-Status fehlgeschlagen."
             },
-            "everyPlayerNeedsRole": "Jeder Spieler muss eine Rolle auswählen!",
-            "exactlyOneSnackMan": "Es muss genau einen Happenmann geben und alle Spieler müssene eine Rolle haben!"
+            "everyPlayerNeedsRole": "Jeder Spieler muss eine Rolle wählen  !",
+            "exactlyOneSnackMan": "Es muss genau einen Happenmann geben und alle Spieler müssen eine Rolle haben!"
         }
     },
     "role": {
@@ -109,7 +111,7 @@
         "gameResult": {
             "winner": {
                 "snackman": "HAPPENMANN IST DER GEWINNER",
-                "ghosts": "DIE GEISTER SIND DIE GEWINNER"
+                "ghosts": "DIE GEISTER HABEN GEWINNER"
             }
         },
         "gameReason": {

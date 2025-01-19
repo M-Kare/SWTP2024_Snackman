@@ -9,7 +9,7 @@
         v-model.trim="playerName"
         autofocus
         maxlength="16"
-        placeholder="max. 16 characters"
+        :placeholder="$t('savePlayerName.placeholder')"
         type="text">
       <p
         v-if="errorMessage"

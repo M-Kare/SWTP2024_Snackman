@@ -1,7 +1,7 @@
 <template>
   <ViewBackground></ViewBackground>
   <div id="individual-outer-box-size" class="outer-box">
-    <h1 class="info-heading">Leaderboard</h1>
+    <h1 class="info-heading">{{ $t('leaderBoard.title') }}</h1>
     <div class="table-container">
       <table>
         <thead>

@@ -19,11 +19,13 @@
     },
     "savePlayerName": {
         "label": "Please enter your name:",
+        "placeholder": "max. 16 characters",
         "error": {
             "playerNameEmpty": "Player-name can’t be empty!"
         }
     },
     "leaderBoard": {
+        "title": "Leaderboard",
         "date": "Date",
         "duration": "Duration"
     },
