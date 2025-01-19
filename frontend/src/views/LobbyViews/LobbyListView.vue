@@ -1,5 +1,8 @@
 <template>
   <MenuBackground :isLobbyView="true">
+
+    <LanguageSwitch></LanguageSwitch>
+
     <div id="individual-outer-box-size" class="outer-box">
       <h1 class="title"> {{ $t('lobbyList.title') }} </h1>
       <SmallNavButton
@@ -56,6 +59,7 @@ import MenuBackground from '@/components/MenuBackground.vue'
 import SmallNavButton from '@/components/SmallNavButton.vue'
 import CreateLobbyForm from '@/components/CreateLobbyForm.vue'
 import PopUp from '@/components/PopUp.vue'
+import LanguageSwitch from '@/components/LanguageSwitch.vue'
 
 import {useRouter} from 'vue-router'
 import {computed, onMounted, ref} from 'vue'

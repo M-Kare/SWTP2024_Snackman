@@ -1,6 +1,9 @@
 <template>
 
   <MenuBackground>
+    
+    <LanguageSwitch></LanguageSwitch>
+
     <div v-if="darkenBackground" id="darken-background"></div>
 
     <PlayerNameForm
@@ -8,11 +11,6 @@
       @hidePlayerNameForm="hidePlayerNameForm"
     >
     </PlayerNameForm>
-
-    <div id="language-container">
-      <img src="@/assets/uk_flag.svg" alt="English" class="language-icon" @click="changeLocale('en')">
-      <img src="@/assets/german_flag.svg" alt="German" class="language-icon" @click="changeLocale('de')">
-    </div>
 
     <ChooseDifficultySingleplayer
       v-if="showChooseSingleplayerDifficulty"
@@ -37,7 +35,7 @@ import {onMounted, ref} from 'vue';
 import {SoundManager} from "@/services/SoundManager";
 import {SoundType} from "@/services/SoundTypes";
 import ChooseDifficultySingleplayer from "@/views/ChooseDifficultySingleplayer.vue";
-import { i18n } from '@/main';
+import LanguageSwitch from '@/components/LanguageSwitch.vue';
 
 const router = useRouter()
 const lobbiesStore = useLobbiesStore()
@@ -47,15 +45,7 @@ const darkenBackground = ref(false);
 const showPlayerNameForm = ref(false);
 const showChooseSingleplayerDifficulty = ref(false);
 
-/**
- * triggered by clicking on flag images
- * changes locale and therefore the language
- * 
- * @param locale with according language
- */
-const changeLocale = (locale: 'en' | 'de') => {
-  i18n.global.locale.value = locale;
-}
+
 
 const hidePlayerNameForm = () => {
   showPlayerNameForm.value = false;
@@ -99,25 +89,6 @@ onMounted(() => {
 .button-container > * {
   width: 100%;
   text-align: center;
-}
-
-#language-container {
-  display: flex;
-  gap: 1.2rem;
-  position: fixed;
-  top: 1.5rem;
-  left: 2rem;
-}
-
-.language-icon {
-  width: 4vw;
-  height: auto;
-  cursor: pointer;
-  transition: transform 0.1s ease;
-}
-
-.language-icon:hover {
-  transform: scale(1.1);
 }
 
 #darken-background {

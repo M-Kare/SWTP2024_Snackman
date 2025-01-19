@@ -1,6 +1,8 @@
 <template>
   <MenuBackground></MenuBackground>
 
+  <LanguageSwitch></LanguageSwitch>
+
   <div id="individual-outer-box-size" class="outer-box">
     <div class="item-row">
       <h1 class="title">{{ lobby?.name || 'Lobby Name' }}</h1>
@@ -118,6 +120,7 @@ import MenuBackground from '@/components/MenuBackground.vue'
 import SmallNavButton from '@/components/SmallNavButton.vue'
 import PlayerNameForm from '@/components/PlayerNameForm.vue'
 import PopUp from '@/components/PopUp.vue'
+import LanguageSwitch from '@/components/LanguageSwitch.vue'
 
 import {useRoute, useRouter} from 'vue-router'
 import {computed, onMounted, ref, watchEffect} from 'vue'
