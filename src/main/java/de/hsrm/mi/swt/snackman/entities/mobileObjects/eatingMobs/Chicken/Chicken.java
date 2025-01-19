@@ -38,6 +38,8 @@ public class Chicken extends EatingMob implements Runnable {
     private int waitingTime;
     private final int MAX_CALORIES = GameConfig.MAX_KALORIEN;
     private final int CALORIES_PER_SIXTH = (MAX_CALORIES / 6);
+    private final int MIN_EGG_CALORIES = 300;
+    private final double EGG_CALORIE_PERCENTAGE = 0.3;
     private long id;
     private Thickness thickness = Thickness.THIN;
     private int chickenPosX, chickenPosZ;
@@ -390,8 +392,8 @@ public class Chicken extends EatingMob implements Runnable {
             timerRestarted = false;
             Square currentSquare = this.gameMap.getSquareAtIndexXZ(this.chickenPosX, this.chickenPosZ);
 
-            // new egg with current chicken-calories * 1.5
-            int eggCalories = (int) (super.getKcal() * 1.5);
+            int eggCalories = calculateEggCalories();
+
             Snack egg = new Snack(SnackType.EGG);
             egg.setCalories(eggCalories);
             // add egg to current square
@@ -404,6 +406,16 @@ public class Chicken extends EatingMob implements Runnable {
             timerRestarted = true;
             startNewTimer();
         }
+    }
+
+    /**
+     * Calculates the number of calories from eggs based on the total calories
+     * The result is always at least MIN_EGG_CALORIES
+     *
+     * @return The number of calories from eggs
+     */
+    protected int calculateEggCalories() {
+        return Math.max(MIN_EGG_CALORIES, (int) (super.getKcal() * EGG_CALORIE_PERCENTAGE));
     }
 
     /**
@@ -501,5 +513,9 @@ public class Chicken extends EatingMob implements Runnable {
 
     public void setWalking(boolean walking) {
         isWalking = walking;
+    }
+
+    public int getMAX_CALORIES() {
+        return MAX_CALORIES;
     }
 }
