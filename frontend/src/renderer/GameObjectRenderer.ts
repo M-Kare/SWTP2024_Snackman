@@ -197,15 +197,13 @@ export const GameObjectRenderer = () => {
 
   const createGround = () => {
     // ground setup
-    const groundTexture = new THREE.TextureLoader().load('./textures/ground_white_comic_2.jpg')
+    const groundTexture = new THREE.TextureLoader().load('./textures/green-grass-512x512.jpg')
     groundTexture.wrapS = THREE.RepeatWrapping;
     groundTexture.wrapT = THREE.RepeatWrapping;
     groundTexture.repeat.set(1000, 1000);
     const groundGeometry = new THREE.PlaneGeometry(GROUNDSIZE, GROUNDSIZE)
     const groundMaterial = new THREE.MeshStandardMaterial({
                               map: groundTexture,
-                              color: 0xffffff,
-                              emissive: 0x000000,
                               roughness: 0.7,
                               metalness: 0.1,
                             })
@@ -238,7 +236,7 @@ export const GameObjectRenderer = () => {
                                   map: wallTexture,
                                   color: 0xffd133,
                                   emissive: 0x000000,
-                                  emissiveIntensity: 0.5,
+                                  emissiveIntensity: 0.7,
                                   roughness: 0.9,
                                 })
     const wallGeometry = new THREE.BoxGeometry(sideLength, height, sideLength)
