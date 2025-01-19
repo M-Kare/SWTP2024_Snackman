@@ -83,7 +83,7 @@ public class SnackMan extends EatingMob {
             }
             elapsedTime = System.currentTimeMillis() - jumpStartTime;
             if (elapsedTime >= 1000) {
-                gravity = -100;
+                gravity = GameConfig.GRAVITY_AFTER_TIMEOUT;
             }
 
             this.velocityY += gravity * deltaTime;
