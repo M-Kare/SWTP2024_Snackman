@@ -15,7 +15,8 @@ export interface Button {
   name: string,
   image: string,
   selected:boolean,
-  selectedBy?:string
+  selectedBy?:string,
+  translation: string
 }
 
 
@@ -31,11 +32,11 @@ export const useLobbiesStore = defineStore('lobbiesstore', () => {
     } as IPlayerClientDTD //PlayerClient for each window, for check the sync
   })
   const buttons = ref<Button[]>([
-    {id: 1, name: 'role.snackman', image: '/kirby.png', selected: false},
-    {id: 2, name: 'role.ghost', image: '/ghost.png', selected: false},
-    {id: 3, name: 'role.ghost', image: '/ghost.png', selected: false},
-    {id: 4, name: 'role.ghost', image: '/ghost.png', selected: false},
-    {id: 5, name: 'role.ghost', image: '/ghost.png', selected: false}
+    {id: 1, name: 'snackman', image: '/kirby.png', selected: false, translation: 'role.snackman'},
+    {id: 2, name: 'ghost', image: '/ghost.png', selected: false, translation: 'role.ghost'},
+    {id: 3, name: 'ghost', image: '/ghost.png', selected: false, translation: 'role.ghost'},
+    {id: 4, name: 'ghost', image: '/ghost.png', selected: false, translation: 'role.ghost'},
+    {id: 5, name: 'ghost', image: '/ghost.png', selected: false, translation: 'role.ghost'}
   ])
 
   const updateButtonSelection = (buttonId: string, playerId: string) => {

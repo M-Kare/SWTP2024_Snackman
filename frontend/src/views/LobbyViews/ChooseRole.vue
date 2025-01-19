@@ -17,7 +17,7 @@
                :style="button.selected ? { pointerEvents: 'none' } : {}">
             <img :src="button.image" :alt="button.name" class="character-image">
           </div>
-          <p class="character-name">{{ $t(button.name) }}</p>
+          <p class="character-name">{{ $t(button.translation) }}</p>
         </div>
       </div>
       <div id="button-box">
