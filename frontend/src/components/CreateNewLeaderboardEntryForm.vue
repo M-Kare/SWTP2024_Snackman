@@ -41,7 +41,6 @@ const errorMessage = ref('');
 const leaderboardStore = useLeaderboardStore()
 
 const { t } = useI18n();
-
 const emit = defineEmits<{
   (event: 'cancelNewLeaderboardEntryCreation', value: boolean): void;
   (event: 'createNewLeaderboardEntry', value: string): void;

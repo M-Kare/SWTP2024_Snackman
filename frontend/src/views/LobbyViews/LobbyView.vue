@@ -1,6 +1,5 @@
 <template>
   <MenuBackground></MenuBackground>
-
   <LanguageSwitch></LanguageSwitch>
 
   <div id="individual-outer-box-size" class="outer-box">

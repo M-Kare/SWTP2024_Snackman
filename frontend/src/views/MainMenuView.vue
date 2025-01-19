@@ -1,9 +1,6 @@
 <template>
-
   <MenuBackground>
-    
     <LanguageSwitch></LanguageSwitch>
-
     <div v-if="darkenBackground" id="darken-background"></div>
 
     <PlayerNameForm

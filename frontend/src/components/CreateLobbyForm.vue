@@ -41,7 +41,6 @@
     import type { IPlayerClientDTD } from '@/stores/Lobby/IPlayerClientDTD';
     import { useI18n } from 'vue-i18n';
 
-
     const router = useRouter();
     const lobbiesStore = useLobbiesStore();
     const currentPlayer = lobbiesStore.lobbydata.currentPlayer as IPlayerClientDTD;
@@ -51,7 +50,6 @@
     const errorMessage = ref('');
 
     const { t } = useI18n(); // needed for internationalization
-
     // defines event wich can be triggered by this component
     const emit = defineEmits< (event: 'cancelLobbyCreation') => void >()
 
