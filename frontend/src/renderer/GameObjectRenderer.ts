@@ -12,7 +12,7 @@ export const GameObjectRenderer = () => {
   const GROUNDSIZE = 1000
   const loader = new GLTFLoader()
   const ghostGLB = "/ghost.glb"
-  const chickenGLB = "/chicken.glb"
+  const chickenGLB = "/chicken_5.glb"
   let ghostModel: THREE.Group | null = null
   let chickenModel: THREE.Group | null = null
 
