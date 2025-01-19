@@ -193,13 +193,21 @@ const mapList = ref<{ mapName: string; fileName: string; translation: string }[]
 const usedCustomMap = ref(false);
 const selectedMap = ref<string | null>(null);
 
-const selectMap = (mapName: string) => {
+const selectMap = async (mapName: string) => {
     selectedMap.value = mapName;
 
-  if (selectedMap.value === 'Generated Map') {
-        usedCustomMap.value = false;
-  } else if (selectedMap.value === 'Uploaded Map') {
-        usedCustomMap.value = true;
+    if (selectedMap.value === 'Generated Map') {
+          usedCustomMap.value = false;
+    } else if (selectedMap.value === 'Uploaded Map') {
+          usedCustomMap.value = true;
+    }
+
+    const status = await changeUsedMapStatus(lobbyId, usedCustomMap.value);
+    if (status !== "done") {
+      showPopUp.value = true;
+      darkenBackground.value = true;
+      infoHeading.value = "Map Status Error";
+      infoText.value = "Failed to update the map status.";
     }
 };
 
