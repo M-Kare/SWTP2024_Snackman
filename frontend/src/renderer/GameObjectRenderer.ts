@@ -13,7 +13,7 @@ export const GameObjectRenderer = () => {
   const loader = new GLTFLoader()
   const ghostGLB = "/ghost.glb"
   const chickenGLB = "/chicken.glb"
-  let ghostModel: THREE.Group | null = null 
+  let ghostModel: THREE.Group | null = null
   let chickenModel: THREE.Group | null = null
 
   const snackModels = {
@@ -42,31 +42,31 @@ export const GameObjectRenderer = () => {
         new THREE.MeshStandardMaterial({ color: "gray", opacity: 0.5, transparent: true })
       );
     }
-  
+
     if (!snackModelCache[type]) {
       try {
         const gltf = await loader.loadAsync(modelPath);
         const snackModel = gltf.scene;
-  
+
         // Calculate scaling
         const box = new THREE.Box3().setFromObject(snackModel);
         const size = new THREE.Vector3();
         box.getSize(size);
-  
+
         const maxDimension = Math.max(size.x, size.y, size.z);
         const scale = (sideLength / 3) / maxDimension; // Standardised scaling based on `sideLength`.
         snackModel.scale.set(scale, scale, scale);
-  
+
         const yOffset = box.min.y * scale; // Bottom edge of the model after scaling
         snackModel.position.y -= yOffset;
-  
+
         snackModel.traverse((child: any) => {
           if (child.isMesh) {
             child.castShadow = true;
             child.receiveShadow = true;
           }
         });
-  
+
         snackModelCache[type] = snackModel;
       } catch (error) {
         console.error(`Error loading snack model for ${type}:`, error);
@@ -76,7 +76,7 @@ export const GameObjectRenderer = () => {
         );
       }
     }
-  
+
     const clonedSnack = snackModelCache[type]!.clone();
     clonedSnack.position.set(xPosition, yPosition, zPosition);
     return clonedSnack;
@@ -87,7 +87,7 @@ export const GameObjectRenderer = () => {
     zPosition: number,
     yPosition: number,
     thickness: ChickenThickness,
-  ): Promise<THREE.Group> {  
+  ): Promise<THREE.Group> {
     const scale = ChickenThickness[thickness as unknown as keyof typeof ChickenThickness]
     // If the model is already loaded, clone it
     if (chickenModel) {
@@ -98,7 +98,7 @@ export const GameObjectRenderer = () => {
       clonedChicken.receiveShadow = true
       return clonedChicken
     }
-  
+
     // Load model asynchronously and replace placeholder
     return new Promise((resolve, reject) => {
       loader.load(
@@ -146,7 +146,7 @@ export const GameObjectRenderer = () => {
     zPosition: number,
     yPosition: number,
     sideLength: number
-  ): Promise<THREE.Group> {  
+  ): Promise<THREE.Group> {
     // If the model is already loaded, clone it
     if (ghostModel) {
       const clonedGhost = ghostModel.clone()
@@ -156,7 +156,7 @@ export const GameObjectRenderer = () => {
       clonedGhost.receiveShadow = true
       return clonedGhost
     }
-  
+
     // Load model asynchronously and replace placeholder
     return new Promise((resolve, reject) => {
       loader.load(
@@ -197,15 +197,13 @@ export const GameObjectRenderer = () => {
 
   const createGround = () => {
     // ground setup
-    const groundTexture = new THREE.TextureLoader().load('./textures/ground_white_comic_2.jpg')
+    const groundTexture = new THREE.TextureLoader().load('./textures/green-grass-512x512.jpg')
     groundTexture.wrapS = THREE.RepeatWrapping;
     groundTexture.wrapT = THREE.RepeatWrapping;
     groundTexture.repeat.set(1000, 1000);
     const groundGeometry = new THREE.PlaneGeometry(GROUNDSIZE, GROUNDSIZE)
     const groundMaterial = new THREE.MeshStandardMaterial({
                               map: groundTexture,
-                              color: 0xffffff,
-                              emissive: 0x000000,
                               roughness: 0.7,
                               metalness: 0.1,
                             })
@@ -238,7 +236,7 @@ export const GameObjectRenderer = () => {
                                   map: wallTexture,
                                   color: 0xffd133,
                                   emissive: 0x000000,
-                                  emissiveIntensity: 0.5,
+                                  emissiveIntensity: 0.7,
                                   roughness: 0.9,
                                 })
     const wallGeometry = new THREE.BoxGeometry(sideLength, height, sideLength)

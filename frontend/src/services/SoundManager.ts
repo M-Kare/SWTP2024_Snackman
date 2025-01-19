@@ -66,15 +66,17 @@ export class SoundManager {
         meshOrModel: THREE.Group<THREE.Object3DEventMap> | THREE.Mesh | Object3D,
         soundType: SoundType
     ) {
-        if (soundType === SoundType.CHICKEN && this.chickenSoundsToChooseFrom.length > 0) {
+
+          if (soundType === SoundType.CHICKEN && this.chickenSoundsToChooseFrom.length > 0) {
+            console.debug("Chicken atteched to Modeel")
             const randomIndex = Math.floor(Math.random() * this.chickenSoundsToChooseFrom.length);
             const selectedSound = this.chickenSoundsToChooseFrom[randomIndex];
 
             const soundClone = new THREE.PositionalAudio(selectedSound.listener);
             if (selectedSound.buffer) {
-                soundClone.setBuffer(selectedSound.buffer);
+              soundClone.setBuffer(selectedSound.buffer);
             } else {
-                console.error("The selected sound's buffer is null and cannot be set.");
+              console.error("The selected sound's buffer is null and cannot be set.");
             }
             soundClone.setRefDistance(3); // maximum volume at x units of distance
             soundClone.setMaxDistance(12);
@@ -153,13 +155,18 @@ export class SoundManager {
      */
     public static playSound(soundType: SoundType) {
         if (soundType === SoundType.CHICKEN) {
+          console.debug("chicken sound is playing");
             this.chickenSounds.forEach((chickenSound) => {
+              if(!chickenSound.isPlaying){
                 chickenSound.play();
+              }
             });
         } else if (soundType === SoundType.GHOST) {
             this.ghostSounds.forEach((ghostSound) => {
               console.debug("ghost sound is playing");
+              if(!ghostSound.isPlaying){
                 ghostSound.play();
+              }
             });
         } else {
             const sound = this.characterSounds.get(soundType) || this.backgroundSounds.get(soundType);
@@ -231,12 +238,11 @@ export class SoundManager {
      * Initializes the sound for eating a snack.
      */
     private static async initEatSnackSound(): Promise<void> {
-        const sound = new THREE.PositionalAudio(this.ingameListener);
+        const sound = new THREE.Audio(this.ingameListener);
         const buffer = await this.loadAudioAsync('sounds/snackman/collect_snack_sound.mp3');
         sound.setBuffer(buffer);
-        sound.setRefDistance(20);
 
-        this.characterSounds.set(SoundType.EAT_SNACK, sound);
+        this.backgroundSounds.set(SoundType.EAT_SNACK, sound);
     }
 
     /**
