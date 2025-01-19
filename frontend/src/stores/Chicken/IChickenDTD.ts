@@ -1,3 +1,5 @@
+import * as THREE from 'three'
+
 export interface IChickenDTD {
   id: number,
   chickenPosX: number,
@@ -12,7 +14,7 @@ export interface IChicken {
   chickenPosX: number,
   chickenPosZ: number,
   thickness: ChickenThickness;
-  lookingDirection: Direction
+  lookingQuaternion: THREE.Quaternion
   isScared: boolean
   meshId: number
 }

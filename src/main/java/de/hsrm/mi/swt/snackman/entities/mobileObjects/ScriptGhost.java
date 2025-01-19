@@ -9,6 +9,7 @@ import java.util.List;
 
 import org.python.core.PyList;
 import org.python.core.PyObject;
+import org.python.core.PyString;
 import org.python.util.PythonInterpreter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -183,9 +184,9 @@ public class ScriptGhost extends Mob implements Runnable {
     public int executeMovementSkript(List<String> squares) {
         try {
             log.debug("Running python ghost script with: {}", squares.toString());
-
-            PyObject func = pythonInterpreter.get("choose_next_square");
-            PyObject result = func.__call__(new PyList(squares));
+            pythonInterpreter.exec(GameConfig.GHOST_SCRIPT_HARD + ".choose_next_square");
+            PyObject result = pythonInterpreter.eval(GameConfig.GHOST_SCRIPT_EASY + ".choose_next_square("+ convertToPyStringList(squares) +")");
+            // PyObject result = func.__call__(new PyList(squares));
 
             return Integer.parseInt(result.toString());
         } catch (Exception ex) {
@@ -195,6 +196,16 @@ public class ScriptGhost extends Mob implements Runnable {
         }
     }
 
+    private PyList convertToPyStringList(List<String> list){
+        PyList pyList = new PyList();
+        for(String e : list){
+            pyList.append(new PyString(e));
+        }
+        return pyList;
+    }
+
+    
+
     /**
      * Executes the ghost's movement script written in Python and determines the
      * next move.
@@ -203,11 +214,14 @@ public class ScriptGhost extends Mob implements Runnable {
      * @return the index of the next move resulting from the Python script's execution.
      */
     public int executeMovementSkriptDifficult(List<List<String>> pythonList) {
+        PyList pyListList = new PyList();
+        for(List<String> list : pythonList){
+            pyListList.append(convertToPyStringList(list));
+        }
         try {
             log.debug("Running python ghost script with: {}", pythonList.toString());
-
-            PyObject func = pythonInterpreter.get("choose_next_square");
-            PyObject result = func.__call__(new PyList(pythonList));
+            PyObject result = pythonInterpreter.eval(GameConfig.GHOST_SCRIPT_HARD + ".choose_next_square("+ pyListList +")");
+            // PyObject result = func.__call__(new PyList(pythonList));
 
             return Integer.parseInt(result.toString());
         } catch (Exception ex) {
@@ -236,11 +250,8 @@ public class ScriptGhost extends Mob implements Runnable {
         pythonInterpreter.exec("if '" + jarClassesPath + "/maze' not in sys.path: sys.path.append('" + jarClassesPath + "/maze')");
         pythonInterpreter.exec("if '" + jarClassesPath + "/Lib' not in sys.path: sys.path.append('" + jarClassesPath + "/Lib')");
 
-        if(this.difficulty == ScriptGhostDifficulty.EASY) {
-            this.pythonInterpreter.exec("from " + GameConfig.GHOST_SCRIPT_EASY + " import choose_next_square");
-        } else {
-            this.pythonInterpreter.exec("from " + GameConfig.GHOST_SCRIPT_HARD + " import choose_next_square");
-        }
+        this.pythonInterpreter.exec("import " + GameConfig.GHOST_SCRIPT_EASY);
+        this.pythonInterpreter.exec("import " + GameConfig.GHOST_SCRIPT_HARD);
     }
 
     /**
@@ -255,10 +266,17 @@ public class ScriptGhost extends Mob implements Runnable {
         this.lookingDirection = walkingDirection;
         Square oldPosition = this.gameMap.getSquareAtIndexXZ(this.ghostPosX, this.ghostPosZ);
         Square newPosition = walkingDirection.getNewPosition(this.gameMap, this.ghostPosX, this.ghostPosZ, walkingDirection);
+
+        try {
+            Thread.sleep(WAITING_TIME/2);
+        } catch (InterruptedException e) {
+            log.error(e.getMessage());
+        }
+
         propertyChangeSupport.firePropertyChange("scriptGhost", null, this);
 
         try {
-            Thread.sleep(WAITING_TIME);
+            Thread.sleep(WAITING_TIME/2);
         } catch (InterruptedException e) {
             log.error(e.getMessage());
         }
