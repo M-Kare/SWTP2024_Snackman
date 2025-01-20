@@ -6,7 +6,6 @@ def search_free_field_adjacent(maze, x, y):
     if maze is None:
         print("Maze is none")
 
-    print(x, y)
     if maze[x + 1][y + 1] != '#':
         return (x + 1, y + 1)
     elif maze[x][y+1] != '#':

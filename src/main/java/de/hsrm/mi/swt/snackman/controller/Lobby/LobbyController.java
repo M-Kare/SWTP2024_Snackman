@@ -222,8 +222,6 @@ public class LobbyController {
         String buttonId = requestBody.get("buttonId");
         boolean selected = Boolean.parseBoolean(requestBody.get("selected"));
 
-        System.out.println("Character id :" + selected);
-
         Lobby currentLobby = lobbyManagerService.findLobbyByLobbyId(lobbyId);
         Optional<PlayerClient> player = lobbyManagerService.findClientByClientId(playerId);
 
@@ -272,7 +270,6 @@ public class LobbyController {
         String lobbyId = requestBody.get("lobbyId");
 
         if (lobbyId == null || lobbyId.isEmpty()) {
-            System.out.println("Lobby data  not found ");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
         lobbyManagerService.chooseRoleTrue(lobbyId);
