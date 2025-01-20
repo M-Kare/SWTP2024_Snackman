@@ -42,10 +42,10 @@
 
     <div v-if="darkenBackground" id="darken-background"></div>
 
-  <PopUp v-if="showPopUp" class="popup-box" @hidePopUp="hidePopUp">
-    <p class="info-heading"> {{ $t('popup.lobbyFull.heading') }} </p>
-    <p class="info-text">{{ $t('popup.lobbyFull.text') }} </p>
-  </PopUp>
+    <PopUp v-if="showPopUp" class="popup-box" @hidePopUp="hidePopUp">
+      <p class="info-heading"> {{ $t('popup.lobbyFull.heading') }} </p>
+      <p class="info-text">{{ $t('popup.lobbyFull.text') }} </p>
+    </PopUp>
 
     <CreateLobbyForm
       v-if="showLobbyForm"
@@ -135,11 +135,11 @@ const joinLobby = async (lobby: ILobbyDTD) => {
   }
 }
 
-    onMounted(async () => {
-        await lobbiesStore.fetchLobbyList();
+onMounted(async () => {
+  await lobbiesStore.fetchLobbyList();
 
-      lobbiesStore.startLobbyLiveUpdate();
-    })
+  lobbiesStore.startLobbyLiveUpdate();
+})
 
 </script>
 
@@ -222,13 +222,13 @@ const joinLobby = async (lobby: ILobbyDTD) => {
 }
 
 #darken-background {
-    z-index: 1;
-    position: fixed;
-    top: 0;
-    width: 100vw;
-    height: 100vh;
-    background: rgba(0, 0, 0, 50%);
+  z-index: 1;
+  position: fixed;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 50%);
 
-    transition: background 0.3s ease;
+  transition: background 0.3s ease;
 }
 </style>
