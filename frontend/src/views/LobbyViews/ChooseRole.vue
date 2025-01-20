@@ -270,12 +270,7 @@ watchEffect(() => {
   width: 100%;
   display: flex;
   justify-content: center;
-  padding: 3vh 0 1vh 0;
-}
-
-#button-box:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+  padding: 10vh 0 1vh 0;
 }
 
 #player-count {
@@ -358,7 +353,8 @@ watchEffect(() => {
 #start-game-button {
   position: absolute;
   bottom: 7%;
-  left: 45%;
+  left: 50%;
+  transform: translate(-50%);
 }
 
 @media (max-width: 1300px) {
