@@ -3,7 +3,9 @@
   <div id="individual-outer-box-size" class="outer-box">
     <h1 class="result-title">{{ gameResult }}</h1>
     <p class="end-reason">{{ gameReason }}</p>
-    <p class="end-reason">{{ $t('gameEnd.playingTime', {time: formatedPlayedTime}) }}</p>
+    <p class="end-reason">
+      {{ $t('gameEnd.playingTime', { time: formatedPlayedTime }) }}
+    </p>
     <div id="button-pair">
       <SmallNavButton id="menu-back-button" @click="backToMainMenu">
         {{ $t('button.backToMainMenu') }}
@@ -12,9 +14,14 @@
         {{ $t('button.exportMap') }}
       </SmallNavButton>
       <SmallNavButton
-        v-if="!alreadyEntered && lobbydata.currentPlayer.role == 'SNACKMAN' && winningRole == 'SNACKMAN'"
+        v-if="
+          !alreadyEntered &&
+          lobbydata.currentPlayer.role == 'SNACKMAN' &&
+          winningRole == 'SNACKMAN'
+        "
         id="create-leaderboard-entry-button"
-        @click="showCreateNewLeaderboardEntryForm">
+        @click="showCreateNewLeaderboardEntryForm"
+      >
         {{ $t('button.createNewLeaderBoardEntry') }}
       </SmallNavButton>
     </div>
@@ -52,22 +59,22 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, onMounted, ref} from 'vue'
-import {useRoute, useRouter} from 'vue-router'
+import { computed, onMounted, ref } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import CreateNewLeaderboardEntryForm from '@/components/CreateNewLeaderboardEntryForm.vue'
-import {useLobbiesStore} from '@/stores/Lobby/lobbiesstore'
+import { useLobbiesStore } from '@/stores/Lobby/lobbiesstore'
 import ViewBackground from '@/components/ViewBackground.vue'
-import SmallNavButton from "@/components/SmallNavButton.vue";
-import {SoundManager} from "@/services/SoundManager";
-import {useI18n} from 'vue-i18n'
+import SmallNavButton from '@/components/SmallNavButton.vue'
+import { SoundManager } from '@/services/SoundManager'
+import { useI18n } from 'vue-i18n'
 
-const {t} = useI18n();
+const { t } = useI18n()
 
 const route = useRoute()
 const router = useRouter()
 const showCreateNewLeaderboardEntry = ref(false)
 const alreadyEntered = ref(false)
-const {lobbydata} = useLobbiesStore()
+const { lobbydata } = useLobbiesStore()
 
 // Read player role and game result from query parameters
 const lobbyId = (route.query.lobbyId as string) || '-'
@@ -75,12 +82,12 @@ const winningRole = (route.query.winningRole as string) || '-'
 const playedTime = (route.query.timePlayed as unknown as number) || 0
 const formatedPlayedTime = formatTime(playedTime)
 const kcalCollected = (route.query.kcalCollected as unknown as number) || 0
-const gameResult = ref<string>("")
+const gameResult = ref<string>('')
 
 if (winningRole == 'SNACKMAN') {
-  gameResult.value = t('gameEnd.gameResult.winner.snackman');
+  gameResult.value = t('gameEnd.gameResult.winner.snackman')
 } else {
-  gameResult.value = t('gameEnd.gameResult.winner.ghosts');
+  gameResult.value = t('gameEnd.gameResult.winner.ghosts')
 }
 
 /**
@@ -90,22 +97,22 @@ if (winningRole == 'SNACKMAN') {
 // Compute the game reason dynamically or display '-' if no data is available
 const gameReason = computed(() => {
   if (winningRole === 'SNACKMAN') {
-    return t('gameEnd.gameReason.calorieTarget');
+    return t('gameEnd.gameReason.calorieTarget')
   } else if (winningRole === 'GHOST' && kcalCollected < 0) {
-    return t('gameEnd.gameReason.noCaloriesLeft');
+    return t('gameEnd.gameReason.noCaloriesLeft')
   }
-  return t('gameEnd.gameReason.timeIsUp');
+  return t('gameEnd.gameReason.timeIsUp')
 })
 
 const showLeaderboard = () => {
   if (winningRole && winningRole !== '-') {
     router.push({
       name: 'Leaderboard',
-      query: {winningRole: winningRole},
+      query: { winningRole: winningRole },
     })
   } else {
     console.debug('no winning role')
-    router.push({name: 'Leaderboard'})
+    router.push({ name: 'Leaderboard' })
   }
 }
 
@@ -124,7 +131,7 @@ const hideCreateNewLeaderboardEntryForm = () => {
 }
 
 const backToMainMenu = () => {
-  router.push({name: 'MainMenu'})
+  router.push({ name: 'MainMenu' })
 }
 
 /**
@@ -133,9 +140,9 @@ const backToMainMenu = () => {
  * @returns {string} The formatted time string.
  */
 function formatTime(seconds: number): string {
-  const minutes = Math.floor(seconds / 60);
-  const remainingSeconds = seconds % 60;
-  return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+  const minutes = Math.floor(seconds / 60)
+  const remainingSeconds = seconds % 60
+  return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`
 }
 
 const feedbackMessage = ref('')
@@ -165,11 +172,11 @@ const downloadMap = async () => {
     URL.revokeObjectURL(url)
 
     // Success feedback
-    feedbackMessage.value = t('gameEnd.feedback.mapSaved');
+    feedbackMessage.value = t('gameEnd.feedback.mapSaved')
     feedbackClass.value = 'success'
   } catch (error: any) {
     // Failure feedback
-    feedbackMessage.value = t('gameEnd.feedback.mapNotSaved');
+    feedbackMessage.value = t('gameEnd.feedback.mapNotSaved')
     feedbackClass.value = 'error'
   }
   // Clear feedback after 3 seconds
@@ -293,10 +300,6 @@ onMounted(() => {
     top: 20%;
     width: 60%;
   }
-}
-
-@media (min-width: 1500px) and (max-width: 1899px) {
-
 }
 
 @media (max-width: 1000px) {

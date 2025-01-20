@@ -39,11 +39,9 @@ import de.hsrm.mi.swt.snackman.services.LobbyManagerService;
 @RequestMapping("/api")
 public class GameMapController {
 
+    Logger log = LoggerFactory.getLogger(GameMapController.class);
     @Autowired
     private LobbyManagerService lobbyManagerService;
-
-    Logger log = LoggerFactory.getLogger(GameMapController.class);
-
 
     @GetMapping("/lobby/{lobbyId}/game-map")
     public ResponseEntity<GameMapDTO> getGameMap(@PathVariable("lobbyId") String lobbyId) {
@@ -55,22 +53,22 @@ public class GameMapController {
      * Downloads the last map file as "SnackManMap.txt".
      *
      * @return ResponseEntity containing the map file as a resource, or:
-     *         - HTTP 404 (Not Found) if the file does not exist.
-     *         - HTTP 409 (Conflict) if an error occurs during the process.
+     * - HTTP 404 (Not Found) if the file does not exist.
+     * - HTTP 409 (Conflict) if an error occurs during the process.
      */
     @GetMapping("/download")
-    public ResponseEntity<Resource> downloadMap(@RequestParam("lobbyId") String lobbyId){
-        try{
+    public ResponseEntity<Resource> downloadMap(@RequestParam("lobbyId") String lobbyId) {
+        try {
             String fileName = String.format("LastMap_%s.txt", lobbyId);
             Path filePath = Paths.get("./extensions/map/" + fileName).toAbsolutePath();
             Resource resource = new UrlResource(filePath.toUri());
 
-            if(!resource.exists()){
+            if (!resource.exists()) {
                 return ResponseEntity.notFound().build();
             }
 
             return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"SnackManMap.txt\"").body(resource);
-        } catch (Exception e){
+        } catch (Exception e) {
             log.error("Error occurred: ", e);
             return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
         }
@@ -78,15 +76,16 @@ public class GameMapController {
 
     /**
      * Upload custom map and save in folder "./extensions/map"
-     * @param file uploaded File
+     *
+     * @param file    uploaded File
      * @param lobbyId lobbyId, where upload custom map
      * @return ResponseEntity: file is uploaded sucessfully or
-     *          400 (Bad Request) file is not valid
-     *          409 (Conflict) status of an error occurs during the upload process
+     * 400 (Bad Request) file is not valid
+     * 409 (Conflict) status of an error occurs during the upload process
      */
     @PostMapping("/upload")
-    public ResponseEntity<String> uploadMap(@RequestParam("file") MultipartFile file, @RequestParam("lobbyId") String lobbyId){
-        try{
+    public ResponseEntity<String> uploadMap(@RequestParam("file") MultipartFile file, @RequestParam("lobbyId") String lobbyId) {
+        try {
             if (!file.getOriginalFilename().endsWith(".txt")) {
                 return ResponseEntity.badRequest().body("Invalid file type. Only .txt files are allowed.");
             }
@@ -97,7 +96,7 @@ public class GameMapController {
 
             if (!fileContent.matches(validPattern)) {
                 return ResponseEntity.badRequest().body(
-                    "The map file is only allowed to contain the following characters: S, G, C, o, #, and spaces."
+                        "The map file is only allowed to contain the following characters: S, G, C, o, #, and spaces."
                 );
             }
 
@@ -120,7 +119,7 @@ public class GameMapController {
 
             Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
             return ResponseEntity.ok("File uploaded successfully");
-        } catch (Exception e){
+        } catch (Exception e) {
             log.error("Error occurred: ", e);
             return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
         }
@@ -130,14 +129,15 @@ public class GameMapController {
      * Deletes the map file associated with a given lobby ID.
      * This method is invoked when a lobby no longer exists, and the map file
      * for that lobby needs to be deleted from the server.
+     *
      * @param lobbyId
      * @return Returns an HTTP status code:
-     *     - HTTP 200 (OK) if the file was successfully deleted.
-     *     - HTTP 404 (Not Found) if the file does not exist.
-     *     - HTTP 500 (Internal Server Error) if an error occurs during the deletion process.
+     * - HTTP 200 (OK) if the file was successfully deleted.
+     * - HTTP 404 (Not Found) if the file does not exist.
+     * - HTTP 500 (Internal Server Error) if an error occurs during the deletion process.
      */
     @DeleteMapping("/deleteMap")
-    public ResponseEntity<Void> deleteUploadedMap(@RequestParam("lobbyId") String lobbyId){
+    public ResponseEntity<Void> deleteUploadedMap(@RequestParam("lobbyId") String lobbyId) {
         try {
             String customMapName = String.format("SnackManMap_%s.txt", lobbyId);
             Path customMapPath = Paths.get("./extensions/map/" + customMapName).toAbsolutePath();
@@ -165,13 +165,13 @@ public class GameMapController {
      *                    - lobbyId          :The ID of the lobby (String).
      *                    - usedCustomMap    :The custom map usage status (Boolean).
      * @return Returns an HTTP status code:
-     *         - 200 OK if the update is successful.
-     *         - 404 Not Found if the lobby is not found.
-     *         - 409 (Conflict) status of an error occurs during the upload process.
+     * - 200 OK if the update is successful.
+     * - 404 Not Found if the lobby is not found.
+     * - 409 (Conflict) status of an error occurs during the upload process.
      */
     @PostMapping("/change-used-map-status")
-    public ResponseEntity<Void> updateUsedMapStatus(@RequestBody Map<String, Object> requestBody){
-        try{
+    public ResponseEntity<Void> updateUsedMapStatus(@RequestBody Map<String, Object> requestBody) {
+        try {
             String lobbyId = (String) requestBody.get("lobbyId");
             Boolean usedCustomMap = (Boolean) requestBody.get("usedCustomMap");
 
@@ -197,7 +197,7 @@ public class GameMapController {
      * @return the remaining playing time in milliseconds
      */
     @GetMapping("/lobby/{lobbyId}/current-playing-time")
-    public ResponseEntity<Long> getCurrentPlayTime(@PathVariable("lobbyId") String lobbyId){
+    public ResponseEntity<Long> getCurrentPlayTime(@PathVariable("lobbyId") String lobbyId) {
         long gameStartTime = lobbyManagerService.findLobbyByLobbyId(lobbyId).getGameStartTime();
         long currentTime = System.currentTimeMillis();
 

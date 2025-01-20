@@ -7,6 +7,7 @@ public enum ScriptGhostDifficulty {
 
     /**
      * Gets a random script ghost difficulty
+     *
      * @return random script ghost difficulty
      */
     public static ScriptGhostDifficulty getRandomScriptGhostDifficulty() {
@@ -18,10 +19,11 @@ public enum ScriptGhostDifficulty {
 
     /**
      * Converts a string into a difficulty level for the script ghosts.
+     *
      * @param difficulty to be converted
      * @return the difficulty as enum type
      */
-    public static ScriptGhostDifficulty getScriptGhostDifficulty(String difficulty){
+    public static ScriptGhostDifficulty getScriptGhostDifficulty(String difficulty) {
         if (difficulty.equals("DIFFICULT")) {
             return ScriptGhostDifficulty.DIFFICULT;
         }

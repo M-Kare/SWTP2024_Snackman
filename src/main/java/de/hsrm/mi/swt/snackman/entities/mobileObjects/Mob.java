@@ -1,5 +1,7 @@
 package de.hsrm.mi.swt.snackman.entities.mobileObjects;
 
+import de.hsrm.mi.swt.snackman.entities.map.GameMap;
+
 import org.joml.Quaterniond;
 import org.joml.Vector3d;
 
@@ -44,7 +46,6 @@ public abstract class Mob {
         setCurrentSquareWithIndex(position.x, position.z);
         setPositionWithIndexXZ(position.x, position.z);
         id = generateId();
-        //forward = new Vector3d(0, 0, -1);
     }
 
     public Mob() {
@@ -180,7 +181,6 @@ public abstract class Mob {
                 return;
             }
         }
-
         try {
             result = checkWallCollision(xNew, zNew, gameMap);
         } catch (IndexOutOfBoundsException e) {
@@ -194,12 +194,24 @@ public abstract class Mob {
                 break;
             case 1:
                 position.z += move.z;
+                position.x += move.x;
+                if (Math.round(position.x) < position.x) {
+                    position.x = Math.round(position.x) + this.radius;
+                } else {
+                    position.x = Math.round(position.x) - this.radius;
+                }
                 break;
             case 2:
                 position.x += move.x;
+                position.z += move.z;
+                if (Math.round(position.z) < position.z) {
+                    position.z = Math.round(position.z) + this.radius;
+                } else {
+                    position.z = Math.round(position.z) - this.radius;
+                }
                 break;
             case 3:
-                return;
+                break;
             default:
                 break;
         }
@@ -337,6 +349,10 @@ public abstract class Mob {
         quat.w = qW;
     }
 
+    public void setPosition(Vector3d position) {
+        this.position = position;
+    }
+
     public int calcMapIndexOfCoordinate(double a) {
         return (int) (a / GameConfig.SQUARE_SIZE);
     }
@@ -351,10 +367,6 @@ public abstract class Mob {
 
     public Vector3d getPosition() {
         return position;
-    }
-
-    public void setPosition(Vector3d position) {
-        this.position = position;
     }
 
     public long getId() {
@@ -599,13 +611,13 @@ public abstract class Mob {
             while (gameMap.getSquareAtIndexXZ(calcMapIndexOfCoordinate(tempX), calcMapIndexOfCoordinate(tempZ)).getId() == idOfSquare) {
                 tempZ = tempZ - 1;
             }
-            
+
             double wallCenterX = tempX + (GameConfig.SQUARE_SIZE / 2);
             double wallCenterZ = tempZ + (GameConfig.SQUARE_SIZE / 2);
-            
+
             boolean isAboveCenter = position.z < wallCenterZ;
             boolean isLeftOfCenter = position.x < wallCenterX;
-            
+
             if (isAboveCenter && isLeftOfCenter) {
                 return WallSectionStatus.CASE1_TOP_LEFT;
             } else if (isAboveCenter && !isLeftOfCenter) {
@@ -620,7 +632,7 @@ public abstract class Mob {
         return WallSectionStatus.CASE0_NONE;
     }
 
-    /*    
+    /*
     public GameMap getGameMapForForTest() {
         return gameMap;
     }
@@ -629,7 +641,7 @@ public abstract class Mob {
     public void setGameMapForTest(GameMap gameMap) {
         this.gameMap = gameMap;
     }
-    
+
 
     @Override
     public String toString() {

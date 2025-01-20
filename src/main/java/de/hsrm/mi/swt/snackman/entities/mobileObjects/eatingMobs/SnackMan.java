@@ -15,6 +15,9 @@ import de.hsrm.mi.swt.snackman.entities.mobileObjects.Ghost;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.Mob;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.ScriptGhost;
 
+import static de.hsrm.mi.swt.snackman.configuration.GameConfig.DOUBLE_JUMP_CALORIE_COSTS;
+import static de.hsrm.mi.swt.snackman.configuration.GameConfig.SINGLE_JUMP_CALORIE_COSTS;
+
 public class SnackMan extends EatingMob {
     private final Logger log = LoggerFactory.getLogger(SnackMan.class);
     private final int GAME_FINISH_BECAUSE_OF_TOO_FEW_CKAL = -1;
@@ -235,12 +238,12 @@ public class SnackMan extends EatingMob {
     }
 
     public void subtractCaloriesSingleJump() {
-        setKcal(getKcal() - 100);
+        setKcal(getKcal() - SINGLE_JUMP_CALORIE_COSTS);
     }
 
     public void subtractCaloriesDoubleJump() {
         if (!hasDoubleJumped) {
-            setKcal(getKcal() - 100);
+            setKcal(getKcal() - DOUBLE_JUMP_CALORIE_COSTS);
         }
     }
 

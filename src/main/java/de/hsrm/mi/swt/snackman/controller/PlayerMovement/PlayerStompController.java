@@ -1,9 +1,7 @@
 package de.hsrm.mi.swt.snackman.controller.PlayerMovement;
 
 import de.hsrm.mi.swt.snackman.configuration.GameConfig;
-import de.hsrm.mi.swt.snackman.controller.Lobby.LobbyController;
 import de.hsrm.mi.swt.snackman.entities.lobby.ROLE;
-import de.hsrm.mi.swt.snackman.entities.mobileObjects.Mob;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,10 +20,9 @@ import java.util.NoSuchElementException;
 @Controller
 public class PlayerStompController {
 
+    private final Logger log = LoggerFactory.getLogger(PlayerStompController.class);
     @Autowired
     private LobbyManagerService lobbyService;
-
-    private final Logger log = LoggerFactory.getLogger(PlayerStompController.class);
 
     @MessageMapping("/topic/lobbies/{lobbyId}/player/update")
     public void spreadPlayerUpdate(@DestinationVariable("lobbyId") String lobbyId, PlayerToBackendDTO player) {
@@ -46,7 +43,7 @@ public class PlayerStompController {
         playerMob.move(player.forward(), player.backward(), player.left(), player.right(), player.delta(), currentLobby.getGameMap());
     }
 
-    private Ghost updateGhost (Lobby currentLobby, Ghost ghost){
+    private Ghost updateGhost(Lobby currentLobby, Ghost ghost) {
         SnackMan snackman = getSnackman(currentLobby);
         checkWinningCondition(snackman, currentLobby);
 
