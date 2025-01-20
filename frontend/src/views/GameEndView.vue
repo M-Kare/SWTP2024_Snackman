@@ -12,9 +12,9 @@
         {{ $t('button.exportMap') }}
       </SmallNavButton>
       <SmallNavButton
-          v-if="!alreadyEntered && lobbydata.currentPlayer.role == 'SNACKMAN' && winningRole == 'SNACKMAN'"
-          id="create-leaderboard-entry-button"
-          @click="showCreateNewLeaderboardEntryForm">
+        v-if="!alreadyEntered && lobbydata.currentPlayer.role == 'SNACKMAN' && winningRole == 'SNACKMAN'"
+        id="create-leaderboard-entry-button"
+        @click="showCreateNewLeaderboardEntryForm">
         {{ $t('button.createNewLeaderBoardEntry') }}
       </SmallNavButton>
     </div>
@@ -61,7 +61,7 @@ import SmallNavButton from "@/components/SmallNavButton.vue";
 import {SoundManager} from "@/services/SoundManager";
 import {useI18n} from 'vue-i18n'
 
-const { t } = useI18n();
+const {t} = useI18n();
 
 const route = useRoute()
 const router = useRouter()
@@ -101,11 +101,11 @@ const showLeaderboard = () => {
   if (winningRole && winningRole !== '-') {
     router.push({
       name: 'Leaderboard',
-      query: { winningRole: winningRole },
+      query: {winningRole: winningRole},
     })
   } else {
     console.debug('no winning role')
-    router.push({ name: 'Leaderboard' })
+    router.push({name: 'Leaderboard'})
   }
 }
 
@@ -166,11 +166,11 @@ const downloadMap = async () => {
 
     // Success feedback
     feedbackMessage.value = t('gameEnd.feedback.mapSaved');
-    feedbackClass.value = t('gameEnd.feedback.success');
+    feedbackClass.value = 'success'
   } catch (error: any) {
     // Failure feedback
     feedbackMessage.value = t('gameEnd.feedback.mapNotSaved');
-    feedbackClass.value = t('gameEnd.feedback.error');
+    feedbackClass.value = 'error'
   }
   // Clear feedback after 3 seconds
   setTimeout(() => {
