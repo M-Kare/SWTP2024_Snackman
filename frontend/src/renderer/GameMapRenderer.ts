@@ -26,6 +26,10 @@ export const GameMapRenderer = () => {
   const hemiLight = new THREE.HemisphereLight(0xffffbb, 0x080820, 1)
   scene.add(hemiLight)
 
+  const skyboxUrls = ['skyPx.jpg', 'skyNx.jpg', 'skyPy.jpg', 'skyNy.jpg', 'skyPz.jpg', 'skyNz.jpg']
+  const skyboxCubemap = new THREE.CubeTextureLoader().load(skyboxUrls)
+  scene.background = skyboxCubemap
+
   /**
    * initialize renderer
    *
@@ -40,6 +44,7 @@ export const GameMapRenderer = () => {
     renderer.setSize(window.innerWidth, window.innerHeight)
     renderer.setPixelRatio(window.devicePixelRatio)
     renderer.shadowMap.enabled = true // activates the shadow calculation
+    renderer.toneMapping = THREE.ACESFilmicToneMapping
 
     return renderer
   }
@@ -105,6 +110,8 @@ export const GameMapRenderer = () => {
         gameMapStore.setScriptGhostMeshId(scriptGhostToAdd.id, currentGhost.id)
       })
     }
+
+
   }
 
   const getScene = () => {
@@ -112,4 +119,10 @@ export const GameMapRenderer = () => {
   }
 
   return {initRenderer, createGameMap, getScene}
+}
+
+
+
+function initSky(){
+  
 }
