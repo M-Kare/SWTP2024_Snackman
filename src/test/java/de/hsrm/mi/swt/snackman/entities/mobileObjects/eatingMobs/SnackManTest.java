@@ -167,7 +167,7 @@ class SnackManTest {
         when(squareMock.getType()).thenReturn(MapObjectType.FLOOR);
         when(gameMapMock.getSquareAtIndexXZ(anyInt(), anyInt())).thenReturn(squareMock);
 
-        snackMan.setKcal(100);
+        snackMan.setKcal(GameConfig.SINGLE_JUMP_CALORIE_COSTS);
         snackMan.jump();
         double deltaTime = 0.016;
         snackMan.setPosY(3);
