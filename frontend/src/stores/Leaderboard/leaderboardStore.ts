@@ -48,7 +48,7 @@ export const useLeaderboardStore = defineStore('leaderboard', () => {
    */
     async function startLeaderboardUpdate() {
         const protocol = window.location.protocol.replace('http', 'ws')
-        const wsurl = `${protocol}//${window.location.host}/stompbroker`
+        const wsurl = `${protocol}//${window.location.host}/ws`
         const DEST_SQUARE = '/topic/leaderboard'
 
         if (!leaderboardStompClient) {
