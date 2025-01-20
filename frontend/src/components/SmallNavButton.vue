@@ -11,9 +11,10 @@
 .small-nav-button {
   background-color: var(--background-for-text-color);
   position: inherit;
-  font-size: 1.2rem;
+  font-size: 1.3rem;
+  font-weight: bold;
   width: auto;
-  padding: 0.8rem 1rem;
+  padding: 0.8rem 1.2rem;
   height: auto;
   text-align: center;
   cursor: pointer;
@@ -21,5 +22,9 @@
   border-radius: 0.2rem;
   box-shadow: 4px 3px 0 var(--primary-text-color);
   font-family: var(--font-main);
+}
+
+.small-nav-button:hover {
+  background-color: var(--primary-highlight-color);
 }
 </style>

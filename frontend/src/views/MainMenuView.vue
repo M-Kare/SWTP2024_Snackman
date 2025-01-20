@@ -15,9 +15,13 @@
     </ChooseDifficultySingleplayer>
 
     <div class="button-container">
-      <MainMenuButton v-if="!showChooseSingleplayerDifficulty" @click="startSingleplayer">{{$t('button.singlePlayer')}}</MainMenuButton>
-      <MainMenuButton v-if="!showChooseSingleplayerDifficulty" @click="showLobbies">{{$t('button.multiPlayer')}}</MainMenuButton>
-      <MainMenuButton v-if="!showChooseSingleplayerDifficulty" @click="showLeaderboard">{{$t('button.leaderBoard')}}</MainMenuButton>
+      <MainMenuButton v-if="!showChooseSingleplayerDifficulty" @click="startSingleplayer">
+        {{ $t('button.singlePlayer') }}
+      </MainMenuButton>
+      <MainMenuButton v-if="!showChooseSingleplayerDifficulty" @click="showLobbies">{{ $t('button.multiPlayer') }}
+      </MainMenuButton>
+      <MainMenuButton v-if="!showChooseSingleplayerDifficulty" @click="showLeaderboard">{{ $t('button.leaderBoard') }}
+      </MainMenuButton>
     </div>
   </MenuBackground>
 </template>
@@ -41,7 +45,6 @@ const playerNameSaved = lobbiesStore.lobbydata.currentPlayer.playerName;
 const darkenBackground = ref(false);
 const showPlayerNameForm = ref(false);
 const showChooseSingleplayerDifficulty = ref(false);
-
 
 
 const hidePlayerNameForm = () => {
@@ -95,7 +98,6 @@ onMounted(() => {
   width: 100vw;
   height: 100vh;
   background: rgba(0, 0, 0, 50%);
-
   transition: background 0.3s ease;
 }
 </style>
