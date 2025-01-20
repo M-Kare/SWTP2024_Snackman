@@ -22,7 +22,7 @@
       id="save-name-button"
       class="small-nav-button"
       @click="savePlayerName">
-      {{ $t('button.save') }} 
+      {{ $t('button.save') }}
     </SmallNavButton>
   </div>
 </template>
@@ -33,7 +33,7 @@ import {ref} from 'vue';
 import {useLobbiesStore} from '@/stores/Lobby/lobbiesstore';
 import {SoundManager} from "@/services/SoundManager";
 import {SoundType} from "@/services/SoundTypes";
-import { useI18n } from 'vue-i18n';
+import {useI18n} from 'vue-i18n';
 
 const lobbiesStore = useLobbiesStore();
 
@@ -89,55 +89,21 @@ const savePlayerName = async () => {
 </script>
 
 <style scoped>
-#form-box {
-  z-index: 2;
-  position: absolute;
-  left: 50%;
-  top: 40%;
-  transform: translateX(-50%);
-  width: 60%;
-  max-width: 600px;
-  height: 12rem;
-  border-radius: 0.3rem;
-}
-
 input::placeholder {
   color: var(--secondary-text-color);
   font-weight: bold;
 }
 
-#form-box {
-  z-index: 2;
-  position: absolute;
+#individual-form-box-size {
   left: 50%;
   top: 25%;
   transform: translateX(-50%);
-  width: 70%;
-  max-width: 600px;
+  width: 30%;
   height: 30rem;
-
-  background-image: url('@/assets/background-design-lobbies.png');
-  background-size: cover;
-  background-position: center;
-
-  border: var(--border-for-popup-color) solid 4px;
-  border-radius: 0.5rem;
-  box-shadow: 10px 8px 0 var(--border-for-popup-color);
-}
-
-#form-box::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: #000000dd;
-  border-radius: 0.5rem;
 }
 
 #form {
-  top: 35%;
+  top: 30%;
   width: 100%;
   font-size: 1.5rem;
   font-weight: bold;
@@ -156,7 +122,8 @@ input::placeholder {
   padding: 1.2rem;
 }
 
-#form > label {
+#label-text {
+  font-size: 1.8rem;
   display: block;
   margin-bottom: 1rem;
   text-align: center;
@@ -169,7 +136,6 @@ input::placeholder {
   padding: 1.2rem;
 }
 
-
 #error-message {
   font-size: 1.1rem;
   font-style: italic;
@@ -178,17 +144,20 @@ input::placeholder {
 }
 
 #save-name-button {
-  bottom: 15%;
+  bottom: 20%;
   left: 50%;
   transform: translate(-50%);
-  font-size: 1.1rem;
-  font-weight: bold;
-  padding: 0.5rem;
-  height: auto;
-  width: auto;
 }
 
-#save-name-button:hover {
-  background-color: var(--primary-highlight-color);
+@media (max-width: 1900px) {
+  #individual-form-box-size {
+    width: 50%;
+  }
+}
+
+@media (max-width: 1440px) {
+  #individual-form-box-size {
+    width: 70%;
+  }
 }
 </style>
