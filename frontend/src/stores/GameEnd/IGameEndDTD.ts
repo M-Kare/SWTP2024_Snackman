@@ -6,5 +6,5 @@ export interface IGameEndDTD {
 }
 
 export enum ROLE {
-  SNACKMAN= "SNACKMAN", GHOST="GHOST"
+  SNACKMAN = "SNACKMAN", GHOST = "GHOST"
 }

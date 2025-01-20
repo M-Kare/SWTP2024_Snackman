@@ -21,7 +21,7 @@ import {useRouter} from "vue-router";
 import type {IGameEndDTD} from "@/stores/GameEnd/IGameEndDTD";
 import {SoundManager} from "@/services/SoundManager";
 import {SoundType} from "@/services/SoundTypes";
-import type { IOtherPlayer } from './IOtherPlayer';
+import type {IOtherPlayer} from './IOtherPlayer';
 
 /**
  * Defines the pinia store used for saving the map from
@@ -36,7 +36,6 @@ export const useGameMapStore = defineStore('gameMap', () => {
   const scene = new THREE.Scene()
   const gameObjectRenderer = GameObjectRenderer()
   const {lobbydata} = useLobbiesStore()
-  const CHICKEN_MOVEMENT_SPEED = 0.1    // step size of the interpolation: between 0 and 1
   let player: Player
   let otherPlayers: Map<String, IOtherPlayer>
   let OFFSET: number
@@ -76,7 +75,7 @@ export const useGameMapStore = defineStore('gameMap', () => {
         iChicken.isScared = chicken.isScared
         iChicken.thickness = chicken.thickness
         iChicken.lookingQuaternion = new THREE.Quaternion()
-        iChicken.lookingQuaternion.setFromAxisAngle(new THREE.Vector3(0,1,0), 0)
+        iChicken.lookingQuaternion.setFromAxisAngle(new THREE.Vector3(0, 1, 0), 0)
 
         mapData.chickens.push(iChicken)
       }
@@ -87,7 +86,7 @@ export const useGameMapStore = defineStore('gameMap', () => {
         iGhost.scriptGhostPosZ = ghost.scriptGhostPosZ * DEFAULT_SIDE_LENGTH + OFFSET
         iGhost.id = ghost.id
         iGhost.lookingQuaternion = new THREE.Quaternion()
-        iGhost.lookingQuaternion.setFromAxisAngle(new THREE.Vector3(0,1,0), 0)
+        iGhost.lookingQuaternion.setFromAxisAngle(new THREE.Vector3(0, 1, 0), 0)
         mapData.scriptGhosts.push(iGhost)
       }
     } catch (reason) {
@@ -149,7 +148,7 @@ export const useGameMapStore = defineStore('gameMap', () => {
                   }
                   otherPlayers.get(mobUpdate.playerId)!.rotation.set(mobUpdate.rotation.x, mobUpdate.rotation.y, mobUpdate.rotation.z, mobUpdate.rotation.w)
                   //TODO adjust player height
-                  otherPlayers.get(mobUpdate.playerId)!.targetPosition.set(mobUpdate.position.x, mobUpdate.position.y-2, mobUpdate.position.z)
+                  otherPlayers.get(mobUpdate.playerId)!.targetPosition.set(mobUpdate.position.x, mobUpdate.position.y - 2, mobUpdate.position.z)
                 }
                 break;
 
@@ -166,7 +165,7 @@ export const useGameMapStore = defineStore('gameMap', () => {
                     continue;
                   }
                   otherPlayers.get(ghostUpdate.playerId)!.rotation.set(ghostUpdate.rotation.x, ghostUpdate.rotation.y, ghostUpdate.rotation.z, ghostUpdate.rotation.w)
-                  otherPlayers.get(ghostUpdate.playerId)!.targetPosition.set(ghostUpdate.position.x, ghostUpdate.position.y-2, ghostUpdate.position.z)
+                  otherPlayers.get(ghostUpdate.playerId)!.targetPosition.set(ghostUpdate.position.x, ghostUpdate.position.y - 2, ghostUpdate.position.z)
 
                 }
                 break;
@@ -214,7 +213,7 @@ export const useGameMapStore = defineStore('gameMap', () => {
    * @param gameEndUpdate - Contains the details about the game end, including the winning role,
    *                        the time played, and the calories collected during the game.
    */
-  function endGame(gameEndUpdate: IGameEndDTD , lobbyId: string ) {
+  function endGame(gameEndUpdate: IGameEndDTD, lobbyId: string) {
     router.push({
       name: 'GameEnd',
       query: {
@@ -234,20 +233,18 @@ export const useGameMapStore = defineStore('gameMap', () => {
           scene.remove(scene.children[i])
         }
         const lobby = lobbydata.lobbies.find(l => l.lobbyId === lobbyId)
-      if ( lobby ){
-        for (const member of lobby.members){
-          if (member.playerId === lobbydata.currentPlayer.playerId){
-            member.role ='UNDEFINED'
+      if (lobby) {
+        for (const member of lobby.members) {
+          if (member.playerId === lobbydata.currentPlayer.playerId) {
+            member.role = 'UNDEFINED'
           }
         }
       }
-
         lobbydata.currentPlayer.joinedLobbyId = ""
 
         SoundManager.playSound(SoundType.GAME_END)
       }
     )
-
   }
 
   function updateChicken(change: IChickenDTD) {
@@ -299,7 +296,7 @@ export const useGameMapStore = defineStore('gameMap', () => {
     otherPlayers = other
   }
 
-  function getOtherPlayers(){
+  function getOtherPlayers() {
     return otherPlayers
   }
 
@@ -323,16 +320,16 @@ export const useGameMapStore = defineStore('gameMap', () => {
         chickenMesh!.scale.set(ChickenThickness.THIN, ChickenThickness.THIN, ChickenThickness.THIN)
         break
       case ChickenThickness.SLIGHTLY_THICK:
-        chickenMesh!.scale.set(ChickenThickness.SLIGHTLY_THICK  * 1.2, ChickenThickness.SLIGHTLY_THICK, ChickenThickness.SLIGHTLY_THICK * 1.2)
+        chickenMesh!.scale.set(ChickenThickness.SLIGHTLY_THICK * 1.2, ChickenThickness.SLIGHTLY_THICK, ChickenThickness.SLIGHTLY_THICK * 1.2)
         break
       case ChickenThickness.MEDIUM:
-        chickenMesh!.scale.set(ChickenThickness.MEDIUM  * 1.4, ChickenThickness.MEDIUM, ChickenThickness.MEDIUM * 1.4)
+        chickenMesh!.scale.set(ChickenThickness.MEDIUM * 1.4, ChickenThickness.MEDIUM, ChickenThickness.MEDIUM * 1.4)
         break
       case ChickenThickness.HEAVY:
-        chickenMesh!.scale.set(ChickenThickness.HEAVY  * 1.7, ChickenThickness.HEAVY, ChickenThickness.HEAVY * 1.7)
+        chickenMesh!.scale.set(ChickenThickness.HEAVY * 1.7, ChickenThickness.HEAVY, ChickenThickness.HEAVY * 1.7)
         break
       case ChickenThickness.VERY_HEAVY:
-        chickenMesh!.scale.set(ChickenThickness.VERY_HEAVY  * 1.9, ChickenThickness.VERY_HEAVY, ChickenThickness.VERY_HEAVY * 1.9)
+        chickenMesh!.scale.set(ChickenThickness.VERY_HEAVY * 1.9, ChickenThickness.VERY_HEAVY, ChickenThickness.VERY_HEAVY * 1.9)
         break
       default:
         console.warn('ETWAS IST SCHIED GELAUFEN...')
@@ -348,16 +345,16 @@ export const useGameMapStore = defineStore('gameMap', () => {
       lookingDir // rotates the chicken depending on what its looking direction is
       ) {
       case Direction.ONE_NORTH:
-        currentChicken.lookingQuaternion.setFromAxisAngle(new THREE.Vector3(0,1,0), Math.PI/2)
+        currentChicken.lookingQuaternion.setFromAxisAngle(new THREE.Vector3(0, 1, 0), Math.PI / 2)
         break;
       case Direction.ONE_SOUTH:
-        currentChicken.lookingQuaternion.setFromAxisAngle(new THREE.Vector3(0,1,0), (3*Math.PI)/2)
+        currentChicken.lookingQuaternion.setFromAxisAngle(new THREE.Vector3(0, 1, 0), (3 * Math.PI) / 2)
         break;
       case Direction.ONE_EAST:
-        currentChicken.lookingQuaternion.setFromAxisAngle(new THREE.Vector3(0,1,0), Math.PI)
+        currentChicken.lookingQuaternion.setFromAxisAngle(new THREE.Vector3(0, 1, 0), Math.PI)
         break
       case Direction.ONE_WEST:
-        currentChicken.lookingQuaternion.setFromAxisAngle(new THREE.Vector3(0,1,0), 0)
+        currentChicken.lookingQuaternion.setFromAxisAngle(new THREE.Vector3(0, 1, 0), 0)
         break
     }
   }
@@ -366,16 +363,16 @@ export const useGameMapStore = defineStore('gameMap', () => {
     const lookDir = Direction[scriptGhostUpdate.lookingDirection as unknown as keyof typeof Direction]
     switch (lookDir) {
       case Direction.ONE_NORTH:
-        currentScriptGhost.lookingQuaternion.setFromAxisAngle(new THREE.Vector3(0,1,0), Math.PI/2)
+        currentScriptGhost.lookingQuaternion.setFromAxisAngle(new THREE.Vector3(0, 1, 0), Math.PI / 2)
         break;
       case Direction.ONE_SOUTH:
-        currentScriptGhost.lookingQuaternion.setFromAxisAngle(new THREE.Vector3(0,1,0), (3*Math.PI)/2)
+        currentScriptGhost.lookingQuaternion.setFromAxisAngle(new THREE.Vector3(0, 1, 0), (3 * Math.PI) / 2)
         break;
       case Direction.ONE_EAST:
-        currentScriptGhost.lookingQuaternion.setFromAxisAngle(new THREE.Vector3(0,1,0), Math.PI)
+        currentScriptGhost.lookingQuaternion.setFromAxisAngle(new THREE.Vector3(0, 1, 0), Math.PI)
         break
       case Direction.ONE_WEST:
-        currentScriptGhost.lookingQuaternion.setFromAxisAngle(new THREE.Vector3(0,1,0), 0)
+        currentScriptGhost.lookingQuaternion.setFromAxisAngle(new THREE.Vector3(0, 1, 0), 0)
         break
     }
   }

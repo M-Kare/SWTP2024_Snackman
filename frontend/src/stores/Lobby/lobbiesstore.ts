@@ -14,8 +14,8 @@ export interface Button {
   id: number,
   name: string,
   image: string,
-  selected:boolean,
-  selectedBy?:string,
+  selected: boolean,
+  selectedBy?: string,
   translation: string
 }
 
@@ -56,18 +56,17 @@ export const useLobbiesStore = defineStore('lobbiesstore', () => {
     }
   }
 
-
-    /**
-     * Creates a new player client.
-     * @param name The name of the player.
-     * @returns The newly created player client object.
-     */
-    async function createPlayer(name: string){
-        const newPlayerClient: IPlayerClientDTD = {
-            playerId: '',
-            playerName: name,
-            role: '',
-        }
+  /**
+   * Creates a new player client.
+   * @param name The name of the player.
+   * @returns The newly created player client object.
+   */
+  async function createPlayer(name: string) {
+    const newPlayerClient: IPlayerClientDTD = {
+      playerId: '',
+      playerName: name,
+      role: '',
+    }
 
     try {
       const url = `/api/lobbies/create/player`
@@ -164,16 +163,16 @@ export const useLobbiesStore = defineStore('lobbiesstore', () => {
       return
     }
 
-        stompclient.onConnect = (frame) => {
-            if (stompclient) {
-                stompclient.subscribe(DEST, async (message) => {
-                    const updatedLobbies = JSON.parse(message.body)
-                    lobbydata.lobbies = [...updatedLobbies]
-                })
-            } else {
-                console.error('STOMP client is not initialized.')
-            }
-        }
+    stompclient.onConnect = (frame) => {
+      if (stompclient) {
+        stompclient.subscribe(DEST, async (message) => {
+          const updatedLobbies = JSON.parse(message.body)
+          lobbydata.lobbies = [...updatedLobbies]
+        })
+      } else {
+        console.error('STOMP client is not initialized.')
+      }
+    }
 
     stompclient.onWebSocketError = (error) => {
       console.error('WebSocket Error:', error)
@@ -204,7 +203,7 @@ export const useLobbiesStore = defineStore('lobbiesstore', () => {
           if (updatedLobbyWithRole.chooseRole && updatedLobbyWithRole.members.some((member :{ playerId: string}) => member.playerId === lobbydata.currentPlayer.playerId) ){
             // Push the update to all clients at /ChooseRole/{lobbyId}
             if (stompclient && stompclient.connected) {
-              router.push({ name: 'ChooseRole', params: { lobbyId: updatedLobbyWithRole.lobbyId } })
+              router.push({name: 'ChooseRole', params: {lobbyId: updatedLobbyWithRole.lobbyId}})
               console.debug(`Pushed update to /ChooseRole/${updatedLobbyWithRole.lobbyId}`)
             }
           }
@@ -228,7 +227,7 @@ export const useLobbiesStore = defineStore('lobbiesstore', () => {
             }
           }
           updateButtonSelection(buttonId, selectedBy)
-          const isMember = updatedLobby.members.some( (member :{ playerId: string})=>
+          const isMember = updatedLobby.members.some((member: { playerId: string }) =>
             member.playerId === lobbydata.currentPlayer.playerId
           )
           // Nur Mitglieder der Lobby weiterleiten
@@ -313,7 +312,7 @@ export const useLobbiesStore = defineStore('lobbiesstore', () => {
         console.error('Lobby is full. Cannot join.');
         return null;
       }
-      if (currentLobby && currentLobby.chooseRole){
+      if (currentLobby && currentLobby.chooseRole) {
         console.error('Game has already started.')
         return null;
       }
