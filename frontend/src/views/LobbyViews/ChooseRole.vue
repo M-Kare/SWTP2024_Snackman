@@ -6,12 +6,12 @@
       <h1 class="title"> {{ $t('chooseRole.title') }} </h1>
       <div class="character-grid">
         <div
-            v-for="button in buttons"
-            :key="button.id"
-            :class="{ 'selected': button.selected }"
-            :style="button.selected ? { opacity: 0.3, cursor: 'not-allowed' } : {}"
-            class="character-item"
-            @click="selectCharacter(button)"
+          v-for="button in buttons"
+          :key="button.id"
+          :class="{ 'selected': button.selected }"
+          :style="button.selected ? { opacity: 0.3, cursor: 'not-allowed' } : {}"
+          class="character-item"
+          @click="selectCharacter(button)"
         >
           <div class="image-container"
                :style="button.selected ? { pointerEvents: 'none' } : {}">
@@ -22,10 +22,10 @@
       </div>
       <div id="button-box">
         <SmallNavButton
-            v-if="isPlayerAdmin"
-            id="start-game-button"
-            class="small-nav-buttons"
-            @click="startGame"
+          v-if="isPlayerAdmin"
+          id="start-game-button"
+          class="small-nav-buttons"
+          @click="startGame"
         >
           {{ $t('button.startGame') }}
         </SmallNavButton>
@@ -57,7 +57,7 @@ import type {Button} from "@/stores/Lobby/lobbiesstore"
 import {useLobbiesStore} from "@/stores/Lobby/lobbiesstore";
 import {useI18n} from 'vue-i18n';
 
-const { t } = useI18n();
+const {t} = useI18n();
 
 const route = useRoute()
 const router = useRouter()
@@ -209,10 +209,10 @@ watchEffect(() => {
     const updatedLobby = lobbiesStore.lobbydata.lobbies.find(
       lobby => lobby.lobbyId === lobbyUrl,
     )
-    if (updatedLobby &&  updatedLobby.gameStarted) {
+    if (updatedLobby && updatedLobby.gameStarted) {
 
       const currentPlayerId = lobbiesStore.lobbydata.currentPlayer.playerId
-      const currentPlayerInUpdatedLobby = updatedLobby.members.find( member => member.playerId == currentPlayerId)
+      const currentPlayerInUpdatedLobby = updatedLobby.members.find(member => member.playerId == currentPlayerId)
 
       if (currentPlayerInUpdatedLobby) {
         buttons.forEach(button => button.selected = false)
