@@ -1,11 +1,11 @@
 <template>
   <div class="overlay"></div>
   <div id="form-box">
-    <h1 id="title">New Lobby</h1>
+    <h1 id="title"> {{ $t('createLobby.title') }} </h1>
 
     <form id="form" @submit.prevent="createLobby">
       <label>
-        Enter Name:
+        {{ $t('createLobby.form.label') }} 
       </label>
       <input ref="lobbyInput" v-model.trim="lobbyName" placeholder="Lobbyname" type="text">
       <p
@@ -21,14 +21,14 @@
       class="small-nav-buttons"
       @click="cancelLobbyCreation"
     >
-      Cancel
+      {{ $t('button.cancel') }} 
     </SmallNavButton>
     <SmallNavButton
       id="create-lobby-button"
       class="small-nav-buttons"
       @click="createLobby"
     >
-      Create Lobby
+      {{ $t('button.createLobby') }}
     </SmallNavButton>
   </div>
 </template>
@@ -39,6 +39,7 @@
     import { onMounted, ref } from 'vue';
     import { useLobbiesStore } from '@/stores/Lobby/lobbiesstore';
     import type { IPlayerClientDTD } from '@/stores/Lobby/IPlayerClientDTD';
+    import { useI18n } from 'vue-i18n';
 
     const router = useRouter();
     const lobbiesStore = useLobbiesStore();
@@ -48,6 +49,7 @@
     const lobbyInput = ref(); // needed for autofocus
     const errorMessage = ref('');
 
+    const { t } = useI18n(); // needed for internationalization
     // defines event wich can be triggered by this component
     const emit = defineEmits< (event: 'cancelLobbyCreation') => void >()
 
@@ -86,7 +88,7 @@
   }
 
         if (!lobbyName.value.trim()) {
-            errorMessage.value = "Lobbyname can't be empty";
+            errorMessage.value = t('createLobby.error.lobbyNameEmpty');
             return;
         }
 
@@ -96,7 +98,7 @@
 
   if (isDuplicateName) {
     errorMessage.value =
-      'Lobby name already exists! Please choose another name.'
+      t('createLobby.error.lobbyNameDuplicate');
     return
   }
 

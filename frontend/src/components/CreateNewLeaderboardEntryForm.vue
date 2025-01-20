@@ -1,30 +1,30 @@
 <template>
   <div class="overlay"></div>
   <div id="form-box">
-    <h1 id="title">New Leaderboard entry</h1>
+    <h1 id="title"> {{ $t('newLeaderBoardEntry.title') }} </h1>
 
     <form id="form" @submit.prevent="createNewLeaderboardEntry">
-      <label>Enter your name: </label>
+      <label> {{ $t('newLeaderBoardEntry.label') }} </label>
       <input v-model.trim="yourName" type="text">
       <p
           id="error-message"
           v-if="errorMessage">
         {{ errorMessage }}
       </p>
-      <p>Played time: {{ playedTime }} minutes</p>
+      <p>{{ $t('newLeaderBoardEntry.playedTime', { time: playedTime }) }}</p>
     </form>
 
     <SmallNavButton
         id="cancel-createNewLeaderboardEntry-creation-button"
         class="small-nav-buttons"
         @click="cancelNewLeaderboardEntryCreation">
-      Cancel
+        {{ $t('button.cancel') }} 
     </SmallNavButton>
     <SmallNavButton
         id="create-createNewLeaderboardEntry-button"
         class="small-nav-buttons"
         @click="createNewLeaderboardEntry">
-      Create new leaderboard entry
+        {{ $t('button.createNewLeaderBoardEntry') }} 
     </SmallNavButton>
   </div>
 </template>
@@ -34,11 +34,13 @@ import SmallNavButton from '@/components/SmallNavButton.vue';
 import {ref} from 'vue';
 import {useLeaderboardStore} from "@/stores/Leaderboard/leaderboardStore";
 import type {LeaderboardEntry} from "@/stores/Leaderboard/LeaderboardDTD";
+import { useI18n } from 'vue-i18n';
 
 const yourName = ref('');
 const errorMessage = ref('');
 const leaderboardStore = useLeaderboardStore()
 
+const { t } = useI18n();
 const emit = defineEmits<{
   (event: 'cancelNewLeaderboardEntryCreation', value: boolean): void;
   (event: 'createNewLeaderboardEntry', value: string): void;
@@ -72,7 +74,7 @@ const cancelNewLeaderboardEntryCreation = () => {
  */
 const createNewLeaderboardEntry = async () => {
   if (!yourName.value.trim()) {
-    errorMessage.value = "Your name cannot be empty";
+    errorMessage.value = t('newLeaderBoardEntry.error.playerNameEmpty');
     return;
   }
 

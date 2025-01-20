@@ -3,18 +3,19 @@
   <div id="individual-outer-box-size" class="outer-box">
     <h1 class="result-title">{{ gameResult }}</h1>
     <p class="end-reason">{{ gameReason }}</p>
-    <p class="end-reason">The playing time was {{ formatedPlayedTime }} minutes</p>
+    <p class="end-reason">{{ $t('gameEnd.playingTime', {time: formatedPlayedTime}) }}</p>
     <div id="button-pair">
       <SmallNavButton id="menu-back-button" @click="backToMainMenu">
-        Main menu
+        {{ $t('button.backToMainMenu') }} 
       </SmallNavButton>
       <SmallNavButton id="export-map-button" @click="downloadMap">
-        Export map
+        {{ $t('button.exportMap') }} 
       </SmallNavButton>
-      <SmallNavButton v-if="!alreadyEntered && lobbydata.currentPlayer.role == 'SNACKMAN' && winningRole == 'SNACKMAN'"
-                      id="create-leaderboard-entry-button"
-                      @click="showCreateNewLeaderboardEntryForm">
-        Create new leaderboard entry
+      <SmallNavButton
+          v-if="!alreadyEntered && lobbydata.currentPlayer.role == 'SNACKMAN' && winningRole == 'SNACKMAN'"
+          id="create-leaderboard-entry-button"
+          @click="showCreateNewLeaderboardEntryForm">
+            {{ $t('button.createNewLeaderBoardEntry') }} 
       </SmallNavButton>
     </div>
     <CreateNewLeaderboardEntryForm
@@ -58,6 +59,9 @@ import {useLobbiesStore} from '@/stores/Lobby/lobbiesstore'
 import ViewBackground from '@/components/ViewBackground.vue'
 import SmallNavButton from "@/components/SmallNavButton.vue";
 import {SoundManager} from "@/services/SoundManager";
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n();
 
 const route = useRoute()
 const router = useRouter()
@@ -74,9 +78,9 @@ const kcalCollected = (route.query.kcalCollected as unknown as number) || 0
 const gameResult = ref<string>("")
 
 if (winningRole == 'SNACKMAN') {
-  gameResult.value = 'SNACKMAN IS THE WINNER'
+  gameResult.value = t('gameEnd.gameResult.winner.snackman');
 } else {
-  gameResult.value = 'GHOSTS ARE THE WINNER'
+  gameResult.value = t('gameEnd.gameResult.winner.ghosts');
 }
 
 /**
@@ -86,11 +90,11 @@ if (winningRole == 'SNACKMAN') {
 // Compute the game reason dynamically or display '-' if no data is available
 const gameReason = computed(() => {
   if (winningRole === 'SNACKMAN') {
-    return 'SnackMan has reached the calorie target!'
+    return t('gameEnd.gameReason.calorieTarget');
   } else if (winningRole === 'GHOST' && kcalCollected < 0) {
-    return 'The ghosts scared Snackman too many times until he had no calories left!'
+    return t('gameEnd.gameReason.noCaloriesLeft');
   }
-  return "The time is up and SnackMan hasn't collected enough calories!"
+  return t('gameEnd.gameReason.timeIsUp');
 })
 
 const showLeaderboard = () => {
@@ -161,12 +165,12 @@ const downloadMap = async () => {
     URL.revokeObjectURL(url)
 
     // Success feedback
-    feedbackMessage.value = 'Map saved'
-    feedbackClass.value = 'success'
+    feedbackMessage.value = t('gameEnd.feedback.mapSaved');
+    feedbackClass.value = t('gameEnd.feedback.success');
   } catch (error: any) {
     // Failure feedback
-    feedbackMessage.value = 'Map not saved'
-    feedbackClass.value = 'error'
+    feedbackMessage.value = t('gameEnd.feedback.mapNotSaved');
+    feedbackClass.value = t('gameEnd.feedback.error');
   }
   // Clear feedback after 3 seconds
   setTimeout(() => {
