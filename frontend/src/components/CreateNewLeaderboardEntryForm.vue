@@ -1,6 +1,6 @@
 <template>
   <div class="overlay"></div>
-  <div id="form-box">
+  <div id="individual-form-box-size" class="form-box">
     <h1 id="title"> {{ $t('newLeaderBoardEntry.title') }} </h1>
 
     <form id="form" @submit.prevent="createNewLeaderboardEntry">
@@ -18,13 +18,13 @@
         id="cancel-createNewLeaderboardEntry-creation-button"
         class="small-nav-buttons"
         @click="cancelNewLeaderboardEntryCreation">
-        {{ $t('button.cancel') }} 
+      {{ $t('button.cancel') }}
     </SmallNavButton>
     <SmallNavButton
         id="create-createNewLeaderboardEntry-button"
         class="small-nav-buttons"
         @click="createNewLeaderboardEntry">
-        {{ $t('button.createNewLeaderBoardEntry') }} 
+      {{ $t('button.createNewLeaderBoardEntry') }}
     </SmallNavButton>
   </div>
 </template>
@@ -34,7 +34,7 @@ import SmallNavButton from '@/components/SmallNavButton.vue';
 import {ref} from 'vue';
 import {useLeaderboardStore} from "@/stores/Leaderboard/leaderboardStore";
 import type {LeaderboardEntry} from "@/stores/Leaderboard/LeaderboardDTD";
-import { useI18n } from 'vue-i18n';
+import {useI18n} from 'vue-i18n';
 
 const yourName = ref('');
 const errorMessage = ref('');
@@ -121,34 +121,13 @@ input::placeholder {
   font-weight: bold;
 }
 
-#form-box {
-  z-index: 2;
-  position: absolute;
+#individual-form-box-size {
   left: 50%;
   top: 25%;
   transform: translateX(-50%);
   width: 70%;
   max-width: 600px;
   height: 30rem;
-
-  background-image: url('@/assets/background-design-lobbies.png');
-  background-size: cover;
-  background-position: center;
-
-  border: var(--border-for-popup-color) solid 4px;
-  border-radius: 0.5rem;
-  box-shadow: 10px 8px 0 var(--border-for-popup-color);
-}
-
-#form-box::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: #000000dd;
-  border-radius: 0.5rem;
 }
 
 #form {
@@ -178,7 +157,6 @@ input::placeholder {
 .small-nav-buttons {
   bottom: 7%;
   font-size: 0.9rem;
-  font-weight: bold;
   padding: 0.7rem;
 }
 

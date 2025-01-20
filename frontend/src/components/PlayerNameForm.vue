@@ -1,9 +1,9 @@
 <template>
   <div class="overlay"></div>
-  <div id="form-box">
+  <div id="individual-form-box-size" class="form-box">
     <form id="form" @submit.prevent="savePlayerName">
-      <label>
-        {{ $t('savePlayerName.label') }} 
+      <label id="label-text">
+        {{ $t('savePlayerName.label') }}
       </label>
       <input
         v-model.trim="playerName"

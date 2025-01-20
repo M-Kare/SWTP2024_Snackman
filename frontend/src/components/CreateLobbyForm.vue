@@ -1,11 +1,11 @@
 <template>
   <div class="overlay"></div>
-  <div id="form-box">
+  <div id="individual-form-box-size" class="form-box">
     <h1 id="title"> {{ $t('createLobby.title') }} </h1>
 
     <form id="form" @submit.prevent="createLobby">
       <label>
-        {{ $t('createLobby.form.label') }} 
+        {{ $t('createLobby.form.label') }}
       </label>
       <input ref="lobbyInput" v-model.trim="lobbyName" placeholder="Lobbyname" type="text">
       <p
@@ -21,7 +21,7 @@
       class="small-nav-buttons"
       @click="cancelLobbyCreation"
     >
-      {{ $t('button.cancel') }} 
+      {{ $t('button.cancel') }}
     </SmallNavButton>
     <SmallNavButton
       id="create-lobby-button"
@@ -34,14 +34,14 @@
 </template>
 
 <script setup lang="ts">
-    import SmallNavButton from '@/components/SmallNavButton.vue';
-    import { useRouter } from 'vue-router';
-    import { onMounted, ref } from 'vue';
-    import { useLobbiesStore } from '@/stores/Lobby/lobbiesstore';
-    import type { IPlayerClientDTD } from '@/stores/Lobby/IPlayerClientDTD';
-    import { useI18n } from 'vue-i18n';
+import SmallNavButton from '@/components/SmallNavButton.vue';
+import {useRouter} from 'vue-router';
+import {onMounted, ref} from 'vue';
+import {useLobbiesStore} from '@/stores/Lobby/lobbiesstore';
+import type {IPlayerClientDTD} from '@/stores/Lobby/IPlayerClientDTD';
+import {useI18n} from 'vue-i18n';
 
-    const router = useRouter();
+const router = useRouter();
     const lobbiesStore = useLobbiesStore();
     const currentPlayer = lobbiesStore.lobbydata.currentPlayer as IPlayerClientDTD;
 
@@ -142,34 +142,13 @@ input::placeholder {
   font-weight: bold;
 }
 
-#form-box {
-  z-index: 2;
-  position: absolute;
+#individual-form-box-size {
   left: 50%;
   top: 25%;
   transform: translateX(-50%);
   width: 60%;
   max-width: 600px;
   height: 20rem;
-
-  background-image: url('@/assets/background-design-lobbies.png');
-  background-size: cover;
-  background-position: center;
-
-  border: var(--border-for-popup-color) solid 4px;
-  border-radius: 0.5rem;
-  box-shadow: 10px 8px 0 var(--border-for-popup-color);
-}
-
-#form-box::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: #000000dd;
-  border-radius: 0.5rem;
 }
 
 #form {

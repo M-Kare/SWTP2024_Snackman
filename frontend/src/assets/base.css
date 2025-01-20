@@ -119,3 +119,27 @@ p,
   background-color: var(--outer-box-background-color);
   border-radius: 0.5rem;
 }
+
+.form-box {
+  z-index: 2;
+  position: absolute;
+
+  background-image: url('./background-design-lobbies.png');
+  background-size: cover;
+  background-position: center;
+
+  border: var(--border-for-popup-color) solid 4px;
+  border-radius: 0.5rem;
+  box-shadow: 10px 8px 0 var(--border-for-popup-color);
+}
+
+.form-box::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: var(--outer-box-background-color);
+  border-radius: 0.5rem;
+}
