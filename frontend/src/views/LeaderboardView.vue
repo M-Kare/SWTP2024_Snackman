@@ -189,7 +189,7 @@ tr td:not(:first-child):not(:last-child) {
 
 #menu-back-button {
   position: absolute;
-  bottom: 7%;
+  bottom: 3%;
   left: 45%;
 }
 
@@ -251,15 +251,15 @@ tr td:not(:first-child):not(:last-child) {
 
   .character-image {
     width: 350px;
-    bottom: 10%;
+    bottom: 7%;
   }
 
   #snackman {
-    left: 15%;
+    left: 12%;
   }
 
   #ghost {
-    right: 15%;
+    right: 12%;
   }
 }
 
@@ -270,17 +270,26 @@ tr td:not(:first-child):not(:last-child) {
   }
 
   #snackman {
-    left: 10%;
+    left: 11%;
   }
 
   #ghost {
-    right: 10%;
+    right: 11%;
   }
 }
 
 @media (min-width: 1500px) and (max-width: 1899px) {
   #individual-outer-box-size {
-    top: 15% !important;
+    top: 12% !important;
+    height: 75%;
+  }
+
+  #snackman {
+    left: 9%;
+  }
+
+  #ghost {
+    right: 9%;
   }
 }
 </style>
