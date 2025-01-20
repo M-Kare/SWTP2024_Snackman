@@ -36,15 +36,10 @@ public class GameMap {
     }
 
     public Square getSquareAtIndexXZ(int x, int z) {
-        if((x < 0 || x >= gameMapSquares.length) || z < 0 || z >= gameMapSquares[0].length){
+        if ((x < 0 || x >= gameMapSquares.length) || z < 0 || z >= gameMapSquares[0].length) {
             return new Square(MapObjectType.WALL, 0, 0); //returns pseudo-Suare Wall, because its out of hameMap
         }
 
         return gameMapSquares[x][z];
     }
-
-    public void setGameMap(Square square, int x, int y){
-        gameMapSquares[x][y] = square;
-    }
-
 }

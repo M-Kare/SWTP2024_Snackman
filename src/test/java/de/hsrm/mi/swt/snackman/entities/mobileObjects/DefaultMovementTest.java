@@ -27,7 +27,7 @@ class DefaultMovementTest {
                                 {new Square(2,0), new Square(2,1), new Square(2,2)} };
         this.gameMap = new GameMap(emptyMap);
 
-        snackman = new SnackMan(gameMap, 10, 0.3, 1.5 * GameConfig.SQUARE_SIZE,1,1.5 * GameConfig.SQUARE_SIZE);
+        snackman = new SnackMan(gameMap, 10, 0.3, 1.5 * GameConfig.SQUARE_SIZE,2 ,1.5 * GameConfig.SQUARE_SIZE);
     }
 
 

@@ -1,7 +1,7 @@
 import * as THREE from "three";
 
-export interface IOtherPlayer{
-    model: THREE.Group,
-    rotation: THREE.Quaternion,
-    targetPosition: THREE.Vector3
+export interface IOtherPlayer {
+  model: THREE.Group,
+  rotation: THREE.Quaternion,
+  targetPosition: THREE.Vector3
 }

@@ -5,7 +5,6 @@ import type {ILobbyDTD} from './ILobbyDTD';
 import type {IPlayerClientDTD} from './IPlayerClientDTD';
 import router from "@/router";
 
-
 // const wsurl = `ws://${window.location.host}/stompbroker`
 const DEST = '/topic/lobbies'
 const ROLEDEST = "/topic/lobbies/chooseRole"
@@ -15,8 +14,9 @@ export interface Button {
   id: number,
   name: string,
   image: string,
-  selected:boolean,
-  selectedBy?:string
+  selected: boolean,
+  selectedBy?: string,
+  translation: string
 }
 
 
@@ -32,11 +32,11 @@ export const useLobbiesStore = defineStore('lobbiesstore', () => {
     } as IPlayerClientDTD //PlayerClient for each window, for check the sync
   })
   const buttons = ref<Button[]>([
-    {id: 1, name: 'Snackman', image: '/kirby.png', selected: false},
-    {id: 2, name: 'Ghost', image: '/ghost.png', selected: false},
-    {id: 3, name: 'Ghost', image: '/ghost.png', selected: false},
-    {id: 4, name: 'Ghost', image: '/ghost.png', selected: false},
-    {id: 5, name: 'Ghost', image: '/ghost.png', selected: false}
+    {id: 1, name: 'snackman', image: '/kirby.png', selected: false, translation: 'role.snackman'},
+    {id: 2, name: 'ghost', image: '/ghost.png', selected: false, translation: 'role.ghost'},
+    {id: 3, name: 'ghost', image: '/ghost.png', selected: false, translation: 'role.ghost'},
+    {id: 4, name: 'ghost', image: '/ghost.png', selected: false, translation: 'role.ghost'},
+    {id: 5, name: 'ghost', image: '/ghost.png', selected: false, translation: 'role.ghost'}
   ])
 
   const updateButtonSelection = (buttonId: string, playerId: string) => {
@@ -56,18 +56,17 @@ export const useLobbiesStore = defineStore('lobbiesstore', () => {
     }
   }
 
-
-    /**
-     * Creates a new player client.
-     * @param name The name of the player.
-     * @returns The newly created player client object.
-     */
-    async function createPlayer(name: string){
-        const newPlayerClient: IPlayerClientDTD = {
-            playerId: '',
-            playerName: name,
-            role: '',
-        }
+  /**
+   * Creates a new player client.
+   * @param name The name of the player.
+   * @returns The newly created player client object.
+   */
+  async function createPlayer(name: string) {
+    const newPlayerClient: IPlayerClientDTD = {
+      playerId: '',
+      playerName: name,
+      role: '',
+    }
 
     try {
       const url = `/api/lobbies/create/player`
@@ -164,16 +163,16 @@ export const useLobbiesStore = defineStore('lobbiesstore', () => {
       return
     }
 
-        stompclient.onConnect = (frame) => {
-            if (stompclient) {
-                stompclient.subscribe(DEST, async (message) => {
-                    const updatedLobbies = JSON.parse(message.body)
-                    lobbydata.lobbies = [...updatedLobbies]
-                })
-            } else {
-                console.error('STOMP client is not initialized.')
-            }
-        }
+    stompclient.onConnect = (frame) => {
+      if (stompclient) {
+        stompclient.subscribe(DEST, async (message) => {
+          const updatedLobbies = JSON.parse(message.body)
+          lobbydata.lobbies = [...updatedLobbies]
+        })
+      } else {
+        console.error('STOMP client is not initialized.')
+      }
+    }
 
     stompclient.onWebSocketError = (error) => {
       console.error('WebSocket Error:', error)
@@ -188,15 +187,15 @@ export const useLobbiesStore = defineStore('lobbiesstore', () => {
       if (stompclient) {
         // Subscribe to Lobby updates (existing)
         stompclient.subscribe(DEST, async (message) => {
-          console.log('STOMP Client subscribe to Lobbies')
+          console.debug('STOMP Client subscribe to Lobbies')
           const updatedLobbies = JSON.parse(message.body)
           lobbydata.lobbies = [...updatedLobbies]
-          console.log('Received lobby update:', updatedLobbies)
+          console.debug('Received lobby update:', updatedLobbies)
         })
 
         // Subscribe to RoleView
         stompclient.subscribe(ROLEDEST, async (message) => {
-          console.log('STOMP Client subscribe to Role Changes')
+          console.debug('STOMP Client subscribe to Role Changes')
           const updatedLobbyWithRole = JSON.parse(message.body)
           const lobbyId = updatedLobbyWithRole.lobbyId
 
@@ -206,8 +205,8 @@ export const useLobbiesStore = defineStore('lobbiesstore', () => {
           }) => member.playerId === lobbydata.currentPlayer.playerId)) {
             // Push the update to all clients at /ChooseRole/{lobbyId}
             if (stompclient && stompclient.connected) {
-              router.push({ name: 'ChooseRole', params: { lobbyId: updatedLobbyWithRole.lobbyId } })
-              console.log(`Pushed update to /ChooseRole/${updatedLobbyWithRole.lobbyId}`)
+              router.push({name: 'ChooseRole', params: {lobbyId: updatedLobbyWithRole.lobbyId}})
+              console.debug(`Pushed update to /ChooseRole/${updatedLobbyWithRole.lobbyId}`)
             }
           }
         })
@@ -320,7 +319,7 @@ export const useLobbiesStore = defineStore('lobbiesstore', () => {
         console.error('Lobby is full. Cannot join.');
         return null;
       }
-      if (currentLobby && currentLobby.chooseRole){
+      if (currentLobby && currentLobby.chooseRole) {
         console.error('Game has already started.')
         return null;
       }
@@ -409,7 +408,7 @@ export const useLobbiesStore = defineStore('lobbiesstore', () => {
       if (lobby) {
         lobby.gameStarted = true
       }
-      console.log(`Game started successfully in lobby: ${lobbyId}`)
+      console.debug(`Game started successfully in lobby: ${lobbyId}`)
     } catch (error: any) {
       console.error(`Error starting game in lobby ${lobbyId}:`, error)
       throw new Error('Could not start the game. Please try again.')

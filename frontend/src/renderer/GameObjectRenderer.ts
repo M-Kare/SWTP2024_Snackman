@@ -1,8 +1,7 @@
 import * as THREE from 'three'
 import {SnackType} from '@/stores/Snack/ISnackDTD'
 import {ChickenThickness} from '@/stores/Chicken/IChickenDTD'
-
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
+import {GLTFLoader} from 'three/examples/jsm/loaders/GLTFLoader.js'
 
 /**
  * for creating the objects in the map
@@ -12,7 +11,7 @@ export const GameObjectRenderer = () => {
   const GROUNDSIZE = 1000
   const loader = new GLTFLoader()
   const ghostGLB = "/ghost.glb"
-  const chickenGLB = "/chicken.glb"
+  const chickenGLB = "/chicken_5.glb"
   let ghostModel: THREE.Group | null = null
   let chickenModel: THREE.Group | null = null
 
@@ -39,7 +38,7 @@ export const GameObjectRenderer = () => {
       console.error(`No model found for SnackType: ${type}`);
       return new THREE.Mesh(
         new THREE.BoxGeometry(sideLength / 3, 1, sideLength / 3),
-        new THREE.MeshStandardMaterial({ color: "gray", opacity: 0.5, transparent: true })
+        new THREE.MeshStandardMaterial({color: "gray", opacity: 0.5, transparent: true})
       );
     }
 
@@ -72,7 +71,7 @@ export const GameObjectRenderer = () => {
         console.error(`Error loading snack model for ${type}:`, error);
         return new THREE.Mesh(
           new THREE.BoxGeometry(sideLength / 3, 1, sideLength / 3),
-          new THREE.MeshStandardMaterial({ color: 'gray', opacity: 0.5, transparent: true })
+          new THREE.MeshStandardMaterial({color: 'gray', opacity: 0.5, transparent: true})
         );
       }
     }
@@ -115,31 +114,6 @@ export const GameObjectRenderer = () => {
       )
     })
   }
-  //   xPosition: number,
-  //   zPosition: number,
-  //   sideLength: number,
-  //   thickness: ChickenThickness,
-  // ) => {
-  //   const color = 'black'
-  //   const CHICKEN_WIDTH_AND_DEPTH = sideLength / 2
-  //   const CHICKEN_HEIGHT = 15
-  //   const scale =
-  //     ChickenThickness[thickness as unknown as keyof typeof ChickenThickness]
-
-  //   //@TODO add correct chicken-material-design
-  //   const chickenMaterial = new THREE.MeshStandardMaterial({ color: color })
-  //   const chickenGeometry = new THREE.BoxGeometry(
-  //     CHICKEN_WIDTH_AND_DEPTH * scale,
-  //     CHICKEN_HEIGHT,
-  //     CHICKEN_WIDTH_AND_DEPTH * scale,
-  //   )
-  //   const chicken = new THREE.Mesh(chickenGeometry, chickenMaterial)
-  //   chicken.castShadow = true
-  //   chicken.receiveShadow = true
-
-  //   chicken.position.set(xPosition, 0, zPosition)
-
-  //   return chicken
 
   async function createGhostOnFloor(
     xPosition: number,
@@ -181,7 +155,7 @@ export const GameObjectRenderer = () => {
   ) => {
     // TODO squareHeight is set for seeing it actually in game
     const squareHeight = 0.1
-    const squareMaterial = new THREE.MeshStandardMaterial({ color: 'green' })
+    const squareMaterial = new THREE.MeshStandardMaterial({color: 'green'})
     const squareGeometry = new THREE.BoxGeometry(
       sideLength,
       squareHeight,
@@ -203,10 +177,10 @@ export const GameObjectRenderer = () => {
     groundTexture.repeat.set(1000, 1000);
     const groundGeometry = new THREE.PlaneGeometry(GROUNDSIZE, GROUNDSIZE)
     const groundMaterial = new THREE.MeshStandardMaterial({
-                              map: groundTexture,
-                              roughness: 0.7,
-                              metalness: 0.1,
-                            })
+      map: groundTexture,
+      roughness: 0.7,
+      metalness: 0.1,
+    })
     const ground = new THREE.Mesh(groundGeometry, groundMaterial)
     ground.castShadow = true
     ground.receiveShadow = true
@@ -233,12 +207,12 @@ export const GameObjectRenderer = () => {
     wallTexture.repeat.set(1, 1.87);
 
     const wallMaterial = new THREE.MeshStandardMaterial({
-                                  map: wallTexture,
-                                  color: 0xffd133,
-                                  emissive: 0x000000,
-                                  emissiveIntensity: 0.7,
-                                  roughness: 0.9,
-                                })
+      map: wallTexture,
+      color: 0xffd133,
+      emissive: 0x000000,
+      emissiveIntensity: 0.7,
+      roughness: 0.9,
+    })
     const wallGeometry = new THREE.BoxGeometry(sideLength, height, sideLength)
     const wall = new THREE.Mesh(wallGeometry, wallMaterial)
 

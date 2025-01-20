@@ -1,5 +1,6 @@
 <template>
   <MenuBackground>
+    <LanguageSwitch></LanguageSwitch>
     <div v-if="darkenBackground" id="darken-background"></div>
 
     <PlayerNameForm
@@ -14,9 +15,13 @@
     </ChooseDifficultySingleplayer>
 
     <div class="button-container">
-      <MainMenuButton v-if="!showChooseSingleplayerDifficulty" @click="startSingleplayer">Singleplayer</MainMenuButton>
-      <MainMenuButton v-if="!showChooseSingleplayerDifficulty" @click="showLobbies">Multiplayer</MainMenuButton>
-      <MainMenuButton v-if="!showChooseSingleplayerDifficulty" @click="showLeaderboard">Leaderboard</MainMenuButton>
+      <MainMenuButton v-if="!showChooseSingleplayerDifficulty" @click="startSingleplayer">
+        {{ $t('button.singlePlayer') }}
+      </MainMenuButton>
+      <MainMenuButton v-if="!showChooseSingleplayerDifficulty" @click="showLobbies">{{ $t('button.multiPlayer') }}
+      </MainMenuButton>
+      <MainMenuButton v-if="!showChooseSingleplayerDifficulty" @click="showLeaderboard">{{ $t('button.leaderBoard') }}
+      </MainMenuButton>
     </div>
   </MenuBackground>
 </template>
@@ -31,6 +36,7 @@ import {onMounted, ref} from 'vue';
 import {SoundManager} from "@/services/SoundManager";
 import {SoundType} from "@/services/SoundTypes";
 import ChooseDifficultySingleplayer from "@/views/ChooseDifficultySingleplayer.vue";
+import LanguageSwitch from '@/components/LanguageSwitch.vue';
 
 const router = useRouter()
 const lobbiesStore = useLobbiesStore()
@@ -39,6 +45,7 @@ const playerNameSaved = lobbiesStore.lobbydata.currentPlayer.playerName;
 const darkenBackground = ref(false);
 const showPlayerNameForm = ref(false);
 const showChooseSingleplayerDifficulty = ref(false);
+
 
 const hidePlayerNameForm = () => {
   showPlayerNameForm.value = false;
@@ -91,7 +98,6 @@ onMounted(() => {
   width: 100vw;
   height: 100vh;
   background: rgba(0, 0, 0, 50%);
-
   transition: background 0.3s ease;
 }
 </style>
