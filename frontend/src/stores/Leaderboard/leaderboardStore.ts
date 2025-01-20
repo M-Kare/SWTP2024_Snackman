@@ -33,7 +33,7 @@ export const useLeaderboardStore = defineStore('leaderboard', () => {
                 leaderboard.leaderboardEntries.push(entry as LeaderboardEntry)
             }
 
-            console.log("Initialised leaderboard data {}", leaderboard)
+            console.debug("Initialised leaderboard data {}", leaderboard)
         } catch (reason) {
             throw reason
         }
