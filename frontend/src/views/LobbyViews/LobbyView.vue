@@ -495,7 +495,7 @@ function moveToMouse(element: HTMLElement) {
 .title {
   font-size: 3rem;
   font-weight: bold;
-  color: var(--background-for-text-color);
+  color: var(--main-text-color);
   text-align: left;
 }
 
@@ -510,13 +510,13 @@ function moveToMouse(element: HTMLElement) {
   position: absolute;
   border-radius: 0.5rem;
   background: rgba(255, 255, 255, 60%);
-  color: #000000;
+  color: var(--primary-text-color);
 }
 
 #player-count {
   font-size: 3rem;
   font-weight: bold;
-  color: var(--background-for-text-color);
+  color: var(--main-text-color);
   text-align: right;
 }
 

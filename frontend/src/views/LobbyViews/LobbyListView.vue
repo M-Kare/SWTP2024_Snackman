@@ -152,7 +152,7 @@ const joinLobby = async (lobby: ILobbyDTD) => {
   padding: 1.5rem 0 1rem 0;
   font-size: 3rem;
   font-weight: bold;
-  color: var(--background-for-text-color);
+  color: var(--main-text-color);
   text-align: center;
 }
 

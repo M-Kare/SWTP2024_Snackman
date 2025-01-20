@@ -101,7 +101,7 @@ const leaderboardEntries = computed(
 .info-heading {
   font-size: 3rem;
   font-weight: bold;
-  color: var(--background-for-text-color);
+  color: var(--main-text-color);
   text-align: center;
 }
 
@@ -128,7 +128,7 @@ tr {
 
 thead tr td {
   background: transparent;
-  color: var(--background-for-text-color);
+  color: var(--main-text-color);
   font-weight: bold;
   border: none;
   padding: 0 10px;
@@ -137,7 +137,7 @@ thead tr td {
 thead tr td {
   background: transparent;
   vertical-align: bottom;
-  color: var(--background-for-text-color);
+  color: var(--main-text-color);
   font-weight: bold;
   border: none;
   padding: 5px 10px;

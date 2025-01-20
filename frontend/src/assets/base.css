@@ -1,9 +1,16 @@
 /* colors for implement final wireframes */
 :root {
+  --main-text-color: #ffffff;
   --primary-text-color: #000000;
   --secondary-text-color: #cecece;
+
   --background-for-text-color: #ffffff;
   --background-for-popup-color: #232323;
+  --border-for-popup-color: #ffffff;
+
+  --overlay-color: #0000007F;
+  --outer-box-background-color: #000000dd;
+
   --primary-highlight-color: #ebaf2f;
   --accent-color: #c11818;
   --primary-sprint-bar-color: #19cc33;
@@ -32,7 +39,7 @@
 body {
   min-height: 100vh;
   font-family: var(--font-main);
-  color: var(--white);
+  color: var(--main-text-color);
   background-color: var(--black);
   transition:
     color 0.5s,
@@ -86,7 +93,18 @@ p,
 .copy,
 .text {
   font-size: 24px;
-  color: var(--white);
+  color: var(--main-text-color);
+}
+
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: var(--overlay-color);
+  backdrop-filter: blur(5px);
+  z-index: 1;
 }
 
 .outer-box {
@@ -99,9 +117,9 @@ p,
   background-size: cover;
   background-position: center;
 
-  border: var(--background-for-text-color) solid 4px;
+  border: var(--border-for-popup-color) solid 4px;
   border-radius: 0.5rem;
-  box-shadow: 10px 8px 0 var(--background-for-text-color);
+  box-shadow: 10px 8px 0 var(--border-for-popup-color);
 }
 
 .outer-box::before {
@@ -111,6 +129,6 @@ p,
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: #000000dd;
+  background-color: var(--outer-box-background-color);
   border-radius: 0.5rem;
 }

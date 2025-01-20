@@ -98,7 +98,7 @@ const startSingleplayer = async () => {
 }
 
 #description {
-  color: var(--background-for-text-color);
+  color: var(--main-text-color);
   text-align: center;
   font-size: 28px;
 }

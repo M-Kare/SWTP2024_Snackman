@@ -98,17 +98,6 @@ const createNewLeaderboardEntry = async () => {
 </script>
 
 <style scoped>
-.overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(5px);
-  z-index: 1;
-}
-
 #title {
   position: absolute;
   top: 1rem;
@@ -146,9 +135,9 @@ input::placeholder {
   background-size: cover;
   background-position: center;
 
-  border: var(--background-for-text-color) solid 4px;
+  border: var(--border-for-popup-color) solid 4px;
   border-radius: 0.5rem;
-  box-shadow: 10px 8px 0 var(--background-for-text-color);
+  box-shadow: 10px 8px 0 var(--border-for-popup-color);
 }
 
 #form-box::before {
@@ -167,7 +156,7 @@ input::placeholder {
   width: 100%;
   font-size: 1.5rem;
   font-weight: bold;
-  color: var(--background-for-text-color);
+  color: var(--main-text-color);
 }
 
 #form > input {

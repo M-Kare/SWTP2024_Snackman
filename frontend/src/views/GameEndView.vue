@@ -204,7 +204,7 @@ onMounted(() => {
 }
 
 .end-reason {
-  color: var(--background-for-text-color);
+  color: var(--main-text-color);
   font-size: 2rem;
   margin-bottom: 2rem;
 }

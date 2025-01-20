@@ -32,7 +32,7 @@ import SmallNavButton from '@/components/SmallNavButton.vue';
   border-radius: 0.3rem;
   text-align: left;
   padding: 1rem;
-  color: var(--background-for-text-color);
+  color: var(--main-text-color);
 }
 
 #message {

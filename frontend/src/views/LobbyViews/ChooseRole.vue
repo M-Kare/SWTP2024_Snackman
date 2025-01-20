@@ -27,7 +27,7 @@
             class="small-nav-buttons"
             @click="startGame"
         >
-          {{ $t('button.startGame') }} 
+          {{ $t('button.startGame') }}
         </SmallNavButton>
       </div>
     </div>
@@ -48,14 +48,14 @@
 </template>
 
 <script setup lang="ts">
-import {onMounted, ref, watchEffect, computed} from 'vue';
+import {computed, onMounted, ref, watchEffect} from 'vue';
 import MenuBackground from '@/components/MenuBackground.vue';
 import SmallNavButton from '@/components/SmallNavButton.vue';
 import {useRoute, useRouter} from "vue-router";
 import PopUp from "@/components/PopUp.vue";
 import type {Button} from "@/stores/Lobby/lobbiesstore"
 import {useLobbiesStore} from "@/stores/Lobby/lobbiesstore";
-import { useI18n } from 'vue-i18n';
+import {useI18n} from 'vue-i18n';
 
 const { t } = useI18n();
 
@@ -237,7 +237,7 @@ watchEffect(() => {
   top: 1rem;
   text-align: center;
   font-weight: bold;
-  color: var(--background-for-text-color);
+  color: var(--main-text-color);
 }
 
 #button-box {
@@ -311,7 +311,7 @@ watchEffect(() => {
 
 .character-name {
   font-weight: bold;
-  color: #000000;
+  color: var(--primary-text-color);
   margin: 0;
 }
 
