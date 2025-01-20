@@ -23,6 +23,7 @@ public abstract class Mob {
     private Vector3d spawn;
     private Vector3d forward = new Vector3d(0, 0, -1);
     private GameMap gameMap;
+    private Vector3d tempPosition  = new Vector3d(0, 0, -1);
 
     /**
      * Base constructor for Map with spawn-location at center of Map
@@ -367,7 +368,16 @@ public abstract class Mob {
         }
     }
 
+    public boolean squareUnderneathIsFloor() {
+        if (gameMap.getSquareAtIndexXZ(calcMapIndexOfCoordinate(position.x), calcMapIndexOfCoordinate(position.z)).getType() == MapObjectType.FLOOR) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     public void pushback() {
+        tempPosition = position;
         double stepDistance = 0.1;
         Vector3d backward = new Vector3d(forward);
         backward.normalize().negate();
@@ -375,12 +385,19 @@ public abstract class Mob {
             Vector3d displacement = new Vector3d(backward);
             displacement.mul(stepDistance);
             displacement.y = 0;
-            position.add(displacement);
+            //position.add(displacement);
+            tempPosition.add(displacement);
         }
-        position.y = GameConfig.SNACKMAN_GROUND_LEVEL;
+        //position.y = GameConfig.SNACKMAN_GROUND_LEVEL;
+        tempPosition.y = GameConfig.SNACKMAN_GROUND_LEVEL;
         Vector3d additionalDisplacement = new Vector3d(backward).mul(radius);
         additionalDisplacement.y = 0;
-        position.add(additionalDisplacement);
+        tempPosition.add(additionalDisplacement);
+        if (squareUnderneathIsFloor()) {
+            position = tempPosition;
+        } else {
+            respawn();
+        }
     }
 
     public void push_forward() {
@@ -389,12 +406,19 @@ public abstract class Mob {
         while (squareUnderneathIsWall()) {
             Vector3d displacement = new Vector3d(pushForwardVector).mul(stepDistance);
             displacement.y = 0;
-            position.add(displacement);
+            //position.add(displacement);
+            tempPosition.add(displacement);
         }
-        position.y = GameConfig.SNACKMAN_GROUND_LEVEL;
+        //position.y = GameConfig.SNACKMAN_GROUND_LEVEL;
+        tempPosition.y = GameConfig.SNACKMAN_GROUND_LEVEL;
         Vector3d additionalDisplacement = new Vector3d(pushForwardVector).mul(radius);
         additionalDisplacement.y = 0;
-        position.add(additionalDisplacement);
+        tempPosition.add(additionalDisplacement);
+        if (squareUnderneathIsFloor()) {
+            position = tempPosition;
+        } else {
+            respawn();
+        }
     }
 
     public void push_backward() {
@@ -403,12 +427,19 @@ public abstract class Mob {
         while (squareUnderneathIsWall()) {
             Vector3d displacement = new Vector3d(pushBackwardVector).mul(stepDistance);
             displacement.y = 0;
-            position.add(displacement);
+            //position.add(displacement);
+            tempPosition.add(displacement);
         }
-        position.y = GameConfig.SNACKMAN_GROUND_LEVEL;
+        //position.y = GameConfig.SNACKMAN_GROUND_LEVEL;
+        tempPosition.y = GameConfig.SNACKMAN_GROUND_LEVEL;
         Vector3d additionalDisplacement = new Vector3d(pushBackwardVector).mul(radius);
         additionalDisplacement.y = 0;
-        position.add(additionalDisplacement);
+        tempPosition.add(additionalDisplacement);
+        if (squareUnderneathIsFloor()) {
+            position = tempPosition;
+        } else {
+            respawn();
+        }
     }
 
     public void push_left() {
@@ -417,12 +448,19 @@ public abstract class Mob {
         while (squareUnderneathIsWall()) {
             Vector3d displacement = new Vector3d(pushLeftVector).mul(stepDistance);
             displacement.y = 0;
-            position.add(displacement);
+            //position.add(displacement);
+            tempPosition.add(displacement);
         }
-        position.y = GameConfig.SNACKMAN_GROUND_LEVEL;
+        //position.y = GameConfig.SNACKMAN_GROUND_LEVEL;
+        tempPosition.y = GameConfig.SNACKMAN_GROUND_LEVEL;
         Vector3d additionalDisplacement = new Vector3d(pushLeftVector).mul(radius);
         additionalDisplacement.y = 0;
-        position.add(additionalDisplacement);
+        tempPosition.add(additionalDisplacement);
+        if (squareUnderneathIsFloor()) {
+            position = tempPosition;
+        } else {
+            respawn();
+        }
     }
 
     public void push_right() {
@@ -431,12 +469,19 @@ public abstract class Mob {
         while (squareUnderneathIsWall()) {
             Vector3d displacement = new Vector3d(pushRightVector).mul(stepDistance);
             displacement.y = 0;
-            position.add(displacement);
+            //position.add(displacement);
+            tempPosition.add(displacement);
         }
-        position.y = GameConfig.SNACKMAN_GROUND_LEVEL;
+        //position.y = GameConfig.SNACKMAN_GROUND_LEVEL;
+        tempPosition.y = GameConfig.SNACKMAN_GROUND_LEVEL;
         Vector3d additionalDisplacement = new Vector3d(pushRightVector).mul(radius);
         additionalDisplacement.y = 0;
-        position.add(additionalDisplacement);
+        tempPosition.add(additionalDisplacement);
+        if (squareUnderneathIsFloor()) {
+            position = tempPosition;
+        } else {
+            respawn();
+        }
     }
 
     public WallAlignmentStatus checkWallAlignment() {

@@ -77,6 +77,16 @@ public class SnackMan extends EatingMob {
 
     public void updateJumpPosition(double deltaTime) {
         if (isJumping) {
+
+            if (this.getPosY() < GameConfig.SNACKMAN_GROUND_LEVEL) {
+                this.isJumping = false;
+                this.velocityY = 0;
+                this.hasDoubleJumped = false;
+                jumpStartTime = 0;
+                gravity = GameConfig.GRAVITY;
+                respawn();
+            }
+
             if (jumpStartTime == 0) {
                 jumpStartTime = System.currentTimeMillis();
             }
