@@ -32,7 +32,6 @@ public class SnackMan extends EatingMob {
     private double gravity = GameConfig.GRAVITY;
     private boolean squareUnderneathIsWall = false;
 
-
     public SnackMan(GameMap gameMap, Square currentSquare, double posX, double posY, double posZ) {
         this(gameMap, GameConfig.SNACKMAN_SPEED, GameConfig.SNACKMAN_RADIUS, posX, posY, posZ);
 
@@ -80,7 +79,6 @@ public class SnackMan extends EatingMob {
 
     public void updateJumpPosition(double deltaTime) {
         if (isJumping) {
-
             if (this.getPosY() < GameConfig.SNACKMAN_GROUND_LEVEL) {
                 this.isJumping = false;
                 this.velocityY = 0;
