@@ -42,4 +42,5 @@ public class GameMap {
 
         return gameMapSquares[x][z];
     }
+
 }

@@ -29,7 +29,7 @@ public class GameEnd {
         return kcalCollected;
     }
 
-    public String getLobbyId(){
+    public String getLobbyId() {
         return lobbyId;
     }
 }

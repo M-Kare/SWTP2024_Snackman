@@ -32,12 +32,12 @@ import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.SnackMan;
 public class ScriptGhost extends Mob implements Runnable {
 
     private static long idCounter = 0;
-    private long id;
     private final PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
     private final Logger log = LoggerFactory.getLogger(ScriptGhost.class);
+    private final int WAITING_TIME = 2000;  // in ms
+    private long id;
     private Direction lookingDirection;
     private boolean isWalking;
-    private final int WAITING_TIME = 2000;  // in ms
     private int ghostPosX, ghostPosZ;
     // python
     private PythonInterpreter pythonInterpreter = null;
@@ -152,7 +152,7 @@ public class ScriptGhost extends Mob implements Runnable {
     /**
      * @return an array of strings representing the game map
      */
-    public String[][] getStringMap(){
+    public String[][] getStringMap() {
         int rows = this.gameMap.getGameMapSquares().length;
         int cols = this.gameMap.getGameMapSquares()[0].length;
         String[][] result = new String[rows][cols];
@@ -170,7 +170,7 @@ public class ScriptGhost extends Mob implements Runnable {
     /**
      * @return true if the ghost is not standing on the same square as snackman
      */
-    protected boolean notStandingOnSameSquareAsSnackman(){
+    protected boolean notStandingOnSameSquareAsSnackman() {
         return this.gameMap.getSquareAtIndexXZ(this.ghostPosX, this.ghostPosZ).getMobs().stream().noneMatch(mob -> mob instanceof SnackMan);
     }
 
@@ -185,7 +185,7 @@ public class ScriptGhost extends Mob implements Runnable {
         try {
             log.debug("Running python ghost script with: {}", squares.toString());
             pythonInterpreter.exec(GameConfig.GHOST_SCRIPT_HARD + ".choose_next_square");
-            PyObject result = pythonInterpreter.eval(GameConfig.GHOST_SCRIPT_EASY + ".choose_next_square("+ convertToPyStringList(squares) +")");
+            PyObject result = pythonInterpreter.eval(GameConfig.GHOST_SCRIPT_EASY + ".choose_next_square(" + convertToPyStringList(squares) + ")");
             // PyObject result = func.__call__(new PyList(squares));
 
             return Integer.parseInt(result.toString());
@@ -196,15 +196,14 @@ public class ScriptGhost extends Mob implements Runnable {
         }
     }
 
-    private PyList convertToPyStringList(List<String> list){
+    private PyList convertToPyStringList(List<String> list) {
         PyList pyList = new PyList();
-        for(String e : list){
+        for (String e : list) {
             pyList.append(new PyString(e));
         }
         return pyList;
     }
 
-    
 
     /**
      * Executes the ghost's movement script written in Python and determines the
@@ -215,12 +214,12 @@ public class ScriptGhost extends Mob implements Runnable {
      */
     public int executeMovementSkriptDifficult(List<List<String>> pythonList) {
         PyList pyListList = new PyList();
-        for(List<String> list : pythonList){
+        for (List<String> list : pythonList) {
             pyListList.append(convertToPyStringList(list));
         }
         try {
             log.debug("Running python ghost script with: {}", pythonList.toString());
-            PyObject result = pythonInterpreter.eval(GameConfig.GHOST_SCRIPT_HARD + ".choose_next_square("+ pyListList +")");
+            PyObject result = pythonInterpreter.eval(GameConfig.GHOST_SCRIPT_HARD + ".choose_next_square(" + pyListList + ")");
             // PyObject result = func.__call__(new PyList(pythonList));
 
             return Integer.parseInt(result.toString());
@@ -268,7 +267,7 @@ public class ScriptGhost extends Mob implements Runnable {
         Square newPosition = walkingDirection.getNewPosition(this.gameMap, this.ghostPosX, this.ghostPosZ, walkingDirection);
 
         try {
-            Thread.sleep(WAITING_TIME/2);
+            Thread.sleep(WAITING_TIME / 2);
         } catch (InterruptedException e) {
             log.error(e.getMessage());
         }
@@ -276,7 +275,7 @@ public class ScriptGhost extends Mob implements Runnable {
         propertyChangeSupport.firePropertyChange("scriptGhost", null, this);
 
         try {
-            Thread.sleep(WAITING_TIME/2);
+            Thread.sleep(WAITING_TIME / 2);
         } catch (InterruptedException e) {
             log.error(e.getMessage());
         }

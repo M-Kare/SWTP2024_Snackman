@@ -1,10 +1,8 @@
 package de.hsrm.mi.swt.snackman.services;
 
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -110,8 +108,8 @@ public class LobbyManagerService {
             throw new GameAlreadyStartedException("Game already started");
         }
 
-        Optional <PlayerClient> newJoiningClient = findClientByClientId(playerId);
-        if (!lobby.getAdminClientId().equals(playerId) && newJoiningClient.isPresent() ) {
+        Optional<PlayerClient> newJoiningClient = findClientByClientId(playerId);
+        if (!lobby.getAdminClientId().equals(playerId) && newJoiningClient.isPresent()) {
             newJoiningClient.get().setRole(ROLE.UNDEFINED);
         }
 
@@ -139,6 +137,7 @@ public class LobbyManagerService {
      * Stops all threads of chickens and script ghosts.
      * Removes all players from the lobby and deletes the
      * lobby afterward.
+     *
      * @param lobbyId the id of the lobby to be closed
      */
     public void closeAndDeleteLobby(String lobbyId) {
@@ -152,6 +151,7 @@ public class LobbyManagerService {
 
     /**
      * Stops all threads of chickens and script ghosts.
+     *
      * @param lobby the lobby where to stop the scripts
      */
     private void stopAllScriptThreads(Lobby lobby) {
@@ -167,6 +167,7 @@ public class LobbyManagerService {
     /**
      * Removes all players from the lobby and deletes the
      * lobby afterward.
+     *
      * @param lobby the lobby where to stop the scripts
      */
     private void removeAllPlayersFromLobby(Lobby lobby) {
@@ -196,7 +197,7 @@ public class LobbyManagerService {
         }
 
         // If Admin want to play with custom map
-        if(lobby.getUsedCustomMap()){
+        if (lobby.getUsedCustomMap()) {
             String customMapName = String.format("SnackManMap_%s.txt", lobbyId);
 
             Path customMapPath = Paths.get("./extensions/map/" + customMapName).toAbsolutePath();
@@ -240,7 +241,7 @@ public class LobbyManagerService {
     public Lobby findLobbyByLobbyId(String lobbyID) {
         Lobby lobby = lobbies.get(lobbyID);
         if (lobby == null) {
-                throw new NoSuchElementException("There is not lobby with the id " + lobbyID);
+            throw new NoSuchElementException("There is not lobby with the id " + lobbyID);
         } else {
             return lobby;
         }
@@ -248,10 +249,11 @@ public class LobbyManagerService {
 
     /**
      * Checks weather the snackman-role has already been selected in the lobby
+     *
      * @param lobby the lobby to search in
      * @return true if the role snackman is already owned by someone
      */
-    public boolean snackmanAlreadySelected(Lobby lobby){
+    public boolean snackmanAlreadySelected(Lobby lobby) {
         return lobby.getMembers().stream().anyMatch(playerClient -> playerClient.getRole() == ROLE.SNACKMAN);
     }
 
@@ -283,12 +285,5 @@ public class LobbyManagerService {
         Lobby lobby = findLobbyByLobbyId(lobbyId);
         lobby.setChooseRole();
     }
-    public void chooseRoleFinish(String lobbyId) {
-        Lobby lobby = findLobbyByLobbyId(lobbyId);
-
-        log.info("Choosing Roles Finish lobby {}", lobby);
-        lobby.setChooseRoleFinsih();
-    }
-
 
 }

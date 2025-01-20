@@ -7,10 +7,7 @@ import de.hsrm.mi.swt.snackman.entities.leaderboard.LeaderboardEntry;
  * Encapsulates the name, duration, and release date of a leaderboard entry.
  */
 public record LeaderboardEntryDTO(String name, String duration, String releaseDate) {
-    public static LeaderboardEntryDTO fromLeaderboardEntry(LeaderboardEntry leaderboardEntry){
+    public static LeaderboardEntryDTO fromLeaderboardEntry(LeaderboardEntry leaderboardEntry) {
         return new LeaderboardEntryDTO(leaderboardEntry.getName(), leaderboardEntry.getDuration().toString(), leaderboardEntry.getReleaseDate().toString());
-    }
-    public static LeaderboardEntry toLeaderboardEntry(LeaderboardEntryDTO dto){
-        return new LeaderboardEntry(dto.name(), dto.duration(), dto.releaseDate());
     }
 }

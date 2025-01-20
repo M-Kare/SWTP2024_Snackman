@@ -31,16 +31,12 @@ public abstract class EatingMob extends Mob {
         super();
     }
 
-    public void setKcal(int value) {
-        kcal = value;
-    }
-
     public int getKcal() {
         return kcal;
     }
 
-    public int getMAXKCAL() {
-        return MAXKCAL;
+    public void setKcal(int value) {
+        kcal = value;
     }
 
     protected void gainKcal(int addingKcal) throws Exception {
@@ -81,7 +77,7 @@ public abstract class EatingMob extends Mob {
             if ((kcal + snackOnSquare.getCalories()) >= MAXKCAL) {
                 setKcal(MAXKCAL);
             } else {
-                setKcal( kcal += snackOnSquare.getCalories() );
+                setKcal(kcal += snackOnSquare.getCalories());
             }
 
             //set snack to null after consuming it

@@ -2,6 +2,7 @@ package de.hsrm.mi.swt.snackman.entities.leaderboard;
 
 import de.hsrm.mi.swt.snackman.services.LeaderboardService;
 import org.jetbrains.annotations.NotNull;
+
 import java.time.LocalDate;
 import java.time.LocalTime;
 
@@ -26,7 +27,7 @@ public class LeaderboardEntry implements Comparable<LeaderboardEntry> {
      *
      * @param o the other {@link LeaderboardEntry} to compare against
      * @return a negative integer, zero, or a positive integer if this entry is less than,
-     *         equal to, or greater than the specified entry
+     * equal to, or greater than the specified entry
      */
     @Override
     public int compareTo(@NotNull LeaderboardEntry o) {
@@ -46,7 +47,7 @@ public class LeaderboardEntry implements Comparable<LeaderboardEntry> {
      *
      * @return a string formatted for CSV storage
      */
-    public String getEntryAsFileLine(){
+    public String getEntryAsFileLine() {
         return this.name + LeaderboardService.CSV_LINE_SPLITTER + this.duration.toString() + LeaderboardService.CSV_LINE_SPLITTER + this.releaseDate.toString() + "\n";
     }
 

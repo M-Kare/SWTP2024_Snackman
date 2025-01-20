@@ -1,6 +1,7 @@
 package de.hsrm.mi.swt.snackman.controller.leaderboard;
 
 import de.hsrm.mi.swt.snackman.entities.leaderboard.Leaderboard;
+
 import java.util.List;
 
 /**
@@ -8,12 +9,9 @@ import java.util.List;
  * This record encapsulates a list of {@link LeaderboardEntryDTO} objects.
  */
 public record LeaderboardDTO(List<LeaderboardEntryDTO> leaderboardEntries) {
-    public static LeaderboardDTO fromLeaderboardDTO(Leaderboard leaderboard){
+    public static LeaderboardDTO fromLeaderboardDTO(Leaderboard leaderboard) {
         return new LeaderboardDTO(leaderboard.getLeaderboard().stream()
                 .map(LeaderboardEntryDTO::fromLeaderboardEntry)
                 .toList());
-    }
-    public static Leaderboard toLeaderboard(LeaderboardDTO leaderboardDTO){
-        return new Leaderboard(leaderboardDTO.leaderboardEntries().stream().map(LeaderboardEntryDTO::toLeaderboardEntry).toList());
     }
 }
