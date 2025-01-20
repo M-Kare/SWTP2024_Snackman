@@ -10,7 +10,9 @@ public record FrontedLobbyRoleUpdateEvent(Lobby lobby, String selectedBy, boolea
         return lobby;
     }
 
-    public boolean selected(){return selected;}
+    public boolean selected() {
+        return selected;
+    }
 
     @Override
     public String toString() {

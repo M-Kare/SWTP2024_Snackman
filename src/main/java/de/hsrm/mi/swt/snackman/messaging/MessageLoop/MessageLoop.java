@@ -26,18 +26,14 @@ import de.hsrm.mi.swt.snackman.services.LobbyManagerService;
 
 @Service
 public class MessageLoop {
-    
+
+    Logger log = LoggerFactory.getLogger(MessageLoop.class);
     @Autowired
     private LobbyManagerService lobbyService;
-
     @Autowired
     private MapService mapService;
-
     @Autowired
     private SimpMessagingTemplate messagingTemplate;
-    
-    Logger log = LoggerFactory.getLogger(MessageLoop.class);
-
     private Map<String, List<Square>> changedSquares = new HashMap<>();
     // private Map<String, List<KollisionEvent>> kollisions;
 
@@ -47,14 +43,14 @@ public class MessageLoop {
 
     private Map<String, List<GameEnd>> changedGameEnd = new HashMap<>();
 
-    @Scheduled(fixedRate=50)
-    public void messageLoop(){
+    @Scheduled(fixedRate = 50)
+    public void messageLoop() {
         List<Lobby> lobbys = lobbyService.getAllLobbies();
-        if(lobbys.isEmpty()){
+        if (lobbys.isEmpty()) {
             return;
         }
-        for (Lobby lobby : lobbys){
-            if(!lobby.isGameStarted()){
+        for (Lobby lobby : lobbys) {
+            if (!lobby.isGameStarted()) {
                 continue;
             }
             List<Message> messages = new ArrayList<>();
@@ -62,8 +58,8 @@ public class MessageLoop {
             List<GameEnd> gameEndQueue = changedGameEnd.get(lobby.getLobbyId());
             changedGameEnd.remove(lobby.getLobbyId());
 
-            if(gameEndQueue != null){
-                for(GameEnd gameEnd : gameEndQueue){
+            if (gameEndQueue != null) {
+                for (GameEnd gameEnd : gameEndQueue) {
                     log.info("The game {} has been ended.", lobby.getLobbyId());
                     messages.add(new Message<>(EventEnum.GameEnd, GameEndDTO.fromGameEnd(gameEnd)));
                     lobbyService.closeAndDeleteLobby(lobby.getLobbyId());
@@ -81,41 +77,41 @@ public class MessageLoop {
             List<ScriptGhost> scriptGhostQueue = changedScriptGhosts.get(lobby.getLobbyId());
             changedScriptGhosts.remove(lobby.getLobbyId());
 
-            for(String client : lobby.getClientMobMap().keySet()){
+            for (String client : lobby.getClientMobMap().keySet()) {
                 Mob mob = lobby.getClientMobMap().get(client);
 
                 switch (mob) {
                     case SnackMan snackMan -> {
                         messages.add(new Message<>(EventEnum.SnackManUpdate, new MobUpdateMessage(snackMan.getPosition(),
-                        snackMan.getQuat(), snackMan.getRadius(), snackMan.getSpeed(), client, snackMan.getSprintTimeLeft(),
+                                snackMan.getQuat(), snackMan.getRadius(), snackMan.getSpeed(), client, snackMan.getSprintTimeLeft(),
                                 snackMan.isSprinting(), snackMan.isInCooldown(), snackMan.getCurrentCalories(),
                                 snackMan.getCurrentCalories() >= GameConfig.MAX_KALORIEN ?
                                         GameConfig.MAX_KALORIEN_MESSAGE : null, snackMan.isScared()
                         )));
                     }
-                    case Ghost ghost ->{
-                        messages.add(new Message <> (EventEnum.GhostUpdate, GhostUpdateMessage.fromGhost(ghost, client)));
+                    case Ghost ghost -> {
+                        messages.add(new Message<>(EventEnum.GhostUpdate, GhostUpdateMessage.fromGhost(ghost, client)));
                     }
                     default -> throw new IllegalStateException("Unexpected value: " + mob);
                 }
             }
-            if(squareQueue != null){
-                for(Square square : squareQueue){
+            if (squareQueue != null) {
+                for (Square square : squareQueue) {
                     messages.add(new Message<>(EventEnum.SquareUpdate, new SquareUpdateMessage(SquareDTO.fromSquare(square))));
                 }
             }
-            if(chickenQueue != null){
-                for(Chicken chicken : chickenQueue){
+            if (chickenQueue != null) {
+                for (Chicken chicken : chickenQueue) {
                     messages.add(new Message<>(EventEnum.ChickenUpdate, ChickenUpdateMessage.fromChicken(chicken)));
                 }
             }
-            if(scriptGhostQueue != null){
-                for(ScriptGhost scriptGhost : scriptGhostQueue){
+            if (scriptGhostQueue != null) {
+                for (ScriptGhost scriptGhost : scriptGhostQueue) {
                     messages.add(new Message<>(EventEnum.ScriptGhostUpdate, ScriptGhostDTO.fromScriptGhost(scriptGhost)));
                 }
             }
 
-            if(messages.isEmpty()){
+            if (messages.isEmpty()) {
                 return;
             }
             messagingTemplate.convertAndSend("/topic/lobbies/" + lobby.getLobbyId() + "/update", messages);
@@ -127,8 +123,8 @@ public class MessageLoop {
         }
     }
 
-    public void addSquareToQueue(Square square, String lobbyId){
-        if(changedSquares.containsKey(lobbyId)){
+    public void addSquareToQueue(Square square, String lobbyId) {
+        if (changedSquares.containsKey(lobbyId)) {
             changedSquares.get(lobbyId).add(square);
         } else {
             List<Square> temp = new ArrayList<>();
@@ -138,7 +134,7 @@ public class MessageLoop {
     }
 
     public void addChickenToQueue(Chicken chicken, String lobbyId) {
-        if(changedChicken.containsKey(lobbyId)){
+        if (changedChicken.containsKey(lobbyId)) {
             changedChicken.get(lobbyId).add(chicken);
         } else {
             List<Chicken> temp = new ArrayList<>();
@@ -148,7 +144,7 @@ public class MessageLoop {
     }
 
     public void addScriptGhostToQueue(ScriptGhost scriptGhost, String lobbyId) {
-        if(changedScriptGhosts.containsKey(lobbyId)){
+        if (changedScriptGhosts.containsKey(lobbyId)) {
             changedScriptGhosts.get(lobbyId).add(scriptGhost);
         } else {
             List<ScriptGhost> temp = new ArrayList<>();
@@ -158,11 +154,11 @@ public class MessageLoop {
     }
 
     public void addGameEndToQueue(GameEnd gameEnd, String lobbyId) {
-        if(changedGameEnd.containsKey(lobbyId)){
+        if (changedGameEnd.containsKey(lobbyId)) {
             changedGameEnd.get(lobbyId).add(gameEnd);
             // Lobby Role entfernen
             Lobby l = lobbyService.findLobbyByLobbyId(lobbyId);
-            for (PlayerClient p : l.getMembers()){
+            for (PlayerClient p : l.getMembers()) {
                 p.setRole(ROLE.UNDEFINED);
             }
         } else {

@@ -4,9 +4,9 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 /**
- * Handles sprinting mechanics, including sprint duration, cooldown management, 
- * and timers for both states. This class ensures that sprinting cannot occur 
- * indefinitely and introduces a cooldown period after sprinting is stopped or 
+ * Handles sprinting mechanics, including sprint duration, cooldown management,
+ * and timers for both states. This class ensures that sprinting cannot occur
+ * indefinitely and introduces a cooldown period after sprinting is stopped or
  * the sprint time is exhausted.
  */
 public class SprintHandler {
@@ -55,7 +55,7 @@ public class SprintHandler {
     }
 
     /**
-     * Stops sprinting, calculates the cooldown duration based on the elapsed sprint time, 
+     * Stops sprinting, calculates the cooldown duration based on the elapsed sprint time,
      * and starts the cooldown timer.
      */
     public void stopSprint() {

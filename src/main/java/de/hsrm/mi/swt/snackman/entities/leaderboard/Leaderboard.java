@@ -10,13 +10,8 @@ import java.util.List;
 public class Leaderboard {
     private List<LeaderboardEntry> leaderboard;
 
-    public Leaderboard(List<LeaderboardEntry> list) {
-        this();
-        this.leaderboard = list;
-    }
-
     public Leaderboard() {
-        leaderboard = new ArrayList<LeaderboardEntry>();
+        leaderboard = new ArrayList<>();
     }
 
     public List<LeaderboardEntry> getLeaderboard() {

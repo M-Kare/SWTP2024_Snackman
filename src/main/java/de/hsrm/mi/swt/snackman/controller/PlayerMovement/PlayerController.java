@@ -16,12 +16,11 @@ import de.hsrm.mi.swt.snackman.services.LobbyManagerService;
 public class PlayerController {
     @Autowired
     private LobbyManagerService lobbyService;
-    
+
     // Zum Registrieren eines neuen Spielers
 
     @GetMapping("/lobbies/{lobbyId}/player/{playerId}")
     public ResponseEntity<PlayerToFrontendDTO> initSnackman(@PathVariable("lobbyId") String lobbyId, @PathVariable("playerId") String playerId) {
-        System.out.println(playerId);
         var playerMob = lobbyService.findLobbyByLobbyId(lobbyId).getClientMobMap().get(playerId);
 
         return ResponseEntity.ok(new PlayerToFrontendDTO(playerMob.getPosX(), playerMob.getPosY(), playerMob.getPosZ(),

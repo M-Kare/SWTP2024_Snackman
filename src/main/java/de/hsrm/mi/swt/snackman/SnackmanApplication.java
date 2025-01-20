@@ -26,9 +26,9 @@ public class SnackmanApplication {
     public static void checkAndCopyResources() {
         Path workFolder = Paths.get("extensions").toAbsolutePath();
         String[] foldersToCopy = {"maze", "ghost", "chicken"};
-        for(String folder : foldersToCopy){
+        for (String folder : foldersToCopy) {
             Path temp = workFolder.resolve(folder);
-            if(!Files.exists(temp)){
+            if (!Files.exists(temp)) {
                 try {
                     Files.createDirectories(temp);
                 } catch (IOException e) {
@@ -47,13 +47,13 @@ public class SnackmanApplication {
         }
         Path leaderboardPath = Paths.get(workFolder.toString() + "/leaderboard.txt");
         File leaderboardFile = leaderboardPath.toFile();
-        if(!leaderboardFile.exists()){
+        if (!leaderboardFile.exists()) {
             try {
                 Files.write(leaderboardFile.toPath(), List.of(
-                    "Mulan;02:23;2024-03-04",
-                    "König der Löwen, Mufasa;01:05;2024-03-02",
-                    "Biene Maja;00:58;2024-12-10",
-                    "Livia;00:20;2025-01-01"
+                        "Mulan;02:23;2024-03-04",
+                        "König der Löwen, Mufasa;01:05;2024-03-02",
+                        "Biene Maja;00:58;2024-12-10",
+                        "Livia;00:20;2025-01-01"
                 ));
             } catch (IOException e) {
                 // TODO Auto-generated catch block
@@ -73,7 +73,7 @@ public class SnackmanApplication {
             Path mapFolderPath = workFolder.resolve(folderToCreate);
             Files.createDirectories(mapFolderPath);
         } catch (IOException e) {
-            log.severe("Failed to create extensions directory or copy folders: " + e.getMessage()+ " Stacktrace: ");
+            log.severe("Failed to create extensions directory or copy folders: " + e.getMessage() + " Stacktrace: ");
             e.printStackTrace();
         }
     }
@@ -94,7 +94,7 @@ public class SnackmanApplication {
             try {
                 Files.createDirectories(mapFolderPath);
             } catch (IOException e) {
-                log.severe("Failed to create Map directory: " + e.getMessage()+ " Stacktrace: ");
+                log.severe("Failed to create Map directory: " + e.getMessage() + " Stacktrace: ");
                 e.printStackTrace();
             }
         }
@@ -105,7 +105,7 @@ public class SnackmanApplication {
             Files.createDirectories(targetPath);
             copyFolder(srcPath, targetPath);
         } catch (IOException e) {
-            log.severe("Failed to create directory or copy files: " + e.getMessage()+ " Stacktrace: ");
+            log.severe("Failed to create directory or copy files: " + e.getMessage() + " Stacktrace: ");
             e.printStackTrace();
         }
     }
