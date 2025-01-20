@@ -162,8 +162,7 @@ onMounted(async () => {
   clients.forEach(it => {
     if (it.playerId === lobbydata.currentPlayer.playerId) {
       // that's you
-      player = new Player(renderer, playerData.posX, playerData.posY, playerData.posZ, playerData.radius,
-        playerData.speed, playerData.sprintMultiplier)
+      player = new Player(renderer, playerData.posX, playerData.posY, playerData.posZ)
     } else {
       // other players that are not you
       loadPlayerModel(it.playerId, it.role, gameObjectRenderer);
