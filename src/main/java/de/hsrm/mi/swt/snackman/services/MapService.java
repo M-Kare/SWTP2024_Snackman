@@ -302,15 +302,11 @@ public class MapService {
         for (int i = 0; i < map.getGameMapSquares().length; i++) {
             for (int j = 0; j < map.getGameMapSquares()[0].length; j++) {
                 Square square = map.getSquareAtIndexXZ(i, j);
-                if (square.getType() == MapObjectType.FLOOR && square.getSnack().getSnackType() != SnackType.EGG) {
+                if (square.getType() == MapObjectType.FLOOR && square.getSnack().getSnackType() == SnackType.EMPTY) {
                     double rand = Math.random();
                     if (rand <= probability) {
                         addRandomSnackToSquare(square);
-                    } else {
-                        square.setSnack(new Snack(SnackType.EMPTY));
                     }
-                } else {
-                    continue;
                 }
             }
         }

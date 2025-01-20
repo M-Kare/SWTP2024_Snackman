@@ -110,7 +110,7 @@ def save_file(maze, filename="Maze.txt"):
             file.write("".join(row) + "\n")
 
 def main():
-    width, height = 35, 35
+    width, height = 21, 21
     maze = generate_labyrinth(width, height)
     save_file(maze)
     
