@@ -5,7 +5,7 @@ import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken.Directi
 
 public record ScriptGhostDTO(long id, int scriptGhostPosX, int scriptGhostPosZ, Direction lookingDirection) {
 
-    public static ScriptGhostDTO fromScriptGhost(ScriptGhost scriptGhost){
+    public static ScriptGhostDTO fromScriptGhost(ScriptGhost scriptGhost) {
         return new ScriptGhostDTO(scriptGhost.getId(), scriptGhost.getGhostPosX(), scriptGhost.getGhostPosZ(), scriptGhost.getLookingDirection());
     }
 
