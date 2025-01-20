@@ -33,10 +33,10 @@ export const useLobbiesStore = defineStore('lobbiesstore', () => {
   })
   const buttons = ref<Button[]>([
     {id: 1, name: 'snackman', image: '/kirby.png', selected: false, translation: 'role.snackman'},
-    {id: 2, name: 'ghost', image: '/ghost.png', selected: false, translation: 'role.ghost'},
-    {id: 3, name: 'ghost', image: '/ghost.png', selected: false, translation: 'role.ghost'},
-    {id: 4, name: 'ghost', image: '/ghost.png', selected: false, translation: 'role.ghost'},
-    {id: 5, name: 'ghost', image: '/ghost.png', selected: false, translation: 'role.ghost'}
+    {id: 2, name: 'ghost', image: '/characters/ghost.png', selected: false, translation: 'role.ghost'},
+    {id: 3, name: 'ghost', image: '/characters/ghost.png', selected: false, translation: 'role.ghost'},
+    {id: 4, name: 'ghost', image: '/characters/ghost.png', selected: false, translation: 'role.ghost'},
+    {id: 5, name: 'ghost', image: '/characters/ghost.png', selected: false, translation: 'role.ghost'}
   ])
 
   const updateButtonSelection = (buttonId: string, playerId: string) => {
@@ -200,7 +200,9 @@ export const useLobbiesStore = defineStore('lobbiesstore', () => {
           const lobbyId = updatedLobbyWithRole.lobbyId
 
           const updatedLobby = lobbydata.lobbies.find(lobby => lobby.lobbyId === lobbyId)
-          if (updatedLobbyWithRole.chooseRole && updatedLobbyWithRole.members.some((member :{ playerId: string}) => member.playerId === lobbydata.currentPlayer.playerId) ){
+          if (updatedLobbyWithRole.chooseRole && updatedLobbyWithRole.members.some((member: {
+            playerId: string
+          }) => member.playerId === lobbydata.currentPlayer.playerId)) {
             // Push the update to all clients at /ChooseRole/{lobbyId}
             if (stompclient && stompclient.connected) {
               router.push({name: 'ChooseRole', params: {lobbyId: updatedLobbyWithRole.lobbyId}})
@@ -216,17 +218,22 @@ export const useLobbiesStore = defineStore('lobbiesstore', () => {
           const lobbyId = updatedLobby.lobbyId
           const selectedBy = data.selectedBy
 
-          //wenn kein Element gefunden mit Index, wird -1 returnt
-          const lobbyIndex = lobbydata.lobbies.findIndex(lobby => lobby.lobbyId === updatedLobby.lobbyId)
-          if (lobbyIndex !== -1) {
-            lobbydata.lobbies[lobbyIndex] = updatedLobby;
+          const foundLobby = lobbydata.lobbies.find(lobby => lobby.lobbyId === lobbyId)
+          if (foundLobby!.lobbyId === updatedLobby.lobbyId) {
+            console.log("Lobby", foundLobby, "get Lobby", updatedLobby)
             for (let member of updatedLobby.members) {
-              if (member.playerId == lobbydata.currentPlayer.playerId) {
+
+              if ( member.playerId === lobbydata.currentPlayer.playerId) {
                 lobbydata.currentPlayer.role = member.role
+                updateButtonSelection(buttonId, selectedBy)
+              }
+              for (let memberInFound of foundLobby!.members) {
+                if (memberInFound.playerId === member.playerId) {
+                  memberInFound.role = member.role
+                }
               }
             }
           }
-          updateButtonSelection(buttonId, selectedBy)
           const isMember = updatedLobby.members.some((member: { playerId: string }) =>
             member.playerId === lobbydata.currentPlayer.playerId
           )
