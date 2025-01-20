@@ -12,12 +12,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.MockedStatic;
-
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -29,6 +28,8 @@ import de.hsrm.mi.swt.snackman.SnackmanApplication;
 import de.hsrm.mi.swt.snackman.configuration.GameConfig;
 import de.hsrm.mi.swt.snackman.entities.map.GameMap;
 import de.hsrm.mi.swt.snackman.entities.map.Square;
+import de.hsrm.mi.swt.snackman.entities.map.enums.WallAlignmentStatus;
+import de.hsrm.mi.swt.snackman.entities.map.enums.WallSectionStatus;
 import de.hsrm.mi.swt.snackman.entities.mapObject.MapObjectType;
 import de.hsrm.mi.swt.snackman.entities.mapObject.snack.Snack;
 import de.hsrm.mi.swt.snackman.entities.mapObject.snack.SnackType;
@@ -156,37 +157,15 @@ class SnackManTest {
         assertFalse(snackMan.hasDoubleJumped());
     }
 
-    /*
     @Test
     void testUpdateJumpPosition() {
-        snackMan.setKcal(100);
-        snackMan.jump();
-        double deltaTime = 0.016;
-        snackMan.setPosY(3);
+        GameMap gameMapMock = mock(GameMap.class);
+        Square squareMock = mock(Square.class);
 
-        assertTrue(snackMan.isJumping());
-        assertTrue(snackMan.getVelocityY() > 0);
-        snackMan.updateJumpPosition(deltaTime);
+        snackMan.setGameMap(gameMapMock); 
 
-        //ERROR?
-        while (snackMan.getPosY() > GameConfig.SNACKMAN_GROUND_LEVEL) {
-            snackMan.updateJumpPosition(deltaTime);
-        }
-
-        assertEquals(GameConfig.SNACKMAN_GROUND_LEVEL, snackMan.getPosY());
-        assertFalse(snackMan.isJumping());
-        assertEquals(0, snackMan.getVelocityY());
-    }
-    */
-    /*
-    @Test
-    void testUpdateJumpPosition() {
-        GameMap gameMapMock = mock(GameMap.class);  // Mock für GameMap
-        MapObjectType wallMock = mock(MapObjectType.class); // Mock für MapObjectType
-
-        snackMan.setGameMap(gameMapMock);
-
-        when(gameMapMock.getSquareAtIndexXZ(anyInt(), anyInt()).getType()).thenReturn(MapObjectType.WALL);
+        when(squareMock.getType()).thenReturn(MapObjectType.FLOOR);
+        when(gameMapMock.getSquareAtIndexXZ(anyInt(), anyInt())).thenReturn(squareMock);
 
         snackMan.setKcal(100);
         snackMan.jump();
@@ -200,12 +179,10 @@ class SnackManTest {
             snackMan.updateJumpPosition(deltaTime);
         }
 
-        assertEquals(GameConfig.SNACKMAN_GROUND_LEVEL, snackMan.getPosY(), 0.01);
+        assertEquals((double) GameConfig.SNACKMAN_GROUND_LEVEL, snackMan.getPosY(), 0.01);
         assertFalse(snackMan.isJumping());
         assertEquals(0, snackMan.getVelocityY(), 0.01);
     }
-    */
-
 
     @Test
     void testMoveWhileSprintingCanSprint() {

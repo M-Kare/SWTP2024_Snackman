@@ -1,17 +1,14 @@
 package de.hsrm.mi.swt.snackman.entities.mobileObjects;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
-import de.hsrm.mi.swt.snackman.entities.map.GameMap;
-
 import org.joml.Quaterniond;
 import org.joml.Vector3d;
 
 import de.hsrm.mi.swt.snackman.configuration.GameConfig;
+import de.hsrm.mi.swt.snackman.entities.map.GameMap;
 import de.hsrm.mi.swt.snackman.entities.map.Square;
-import de.hsrm.mi.swt.snackman.entities.mapObject.MapObjectType;
 import de.hsrm.mi.swt.snackman.entities.map.enums.WallAlignmentStatus;
 import de.hsrm.mi.swt.snackman.entities.map.enums.WallSectionStatus;
+import de.hsrm.mi.swt.snackman.entities.mapObject.MapObjectType;
 
 /**
  * A mobile object with the ability to move its position
@@ -381,7 +378,6 @@ public abstract class Mob {
             position.add(displacement);
         }
         position.y = GameConfig.SNACKMAN_GROUND_LEVEL;
-        //Verschiebe zusätzlich um den Radius entlang des Pushback-Vektors.
         Vector3d additionalDisplacement = new Vector3d(backward).mul(radius);
         additionalDisplacement.y = 0;
         position.add(additionalDisplacement);
@@ -513,7 +509,6 @@ public abstract class Mob {
 
 
     public WallSectionStatus getWallSection() {
-        // Die Position des Mobs auf der Karte berechnen
         if (gameMap != null) {
             int mobX = calcMapIndexOfCoordinate(position.x);
             int mobZ = calcMapIndexOfCoordinate(position.z);
@@ -528,26 +523,33 @@ public abstract class Mob {
             while (gameMap.getSquareAtIndexXZ(calcMapIndexOfCoordinate(tempX), calcMapIndexOfCoordinate(tempZ)).getId() == idOfSquare) {
                 tempZ = tempZ - 1;
             }
-            // Die Koordinaten des Wall-Elements
+            
             double wallCenterX = tempX + (GameConfig.SQUARE_SIZE / 2);
             double wallCenterZ = tempZ + (GameConfig.SQUARE_SIZE / 2);
-            //Berechnung der vier Bereiche:
-            //Vergleiche die Position des Mobs mit dem Zentrum des Wall-Elements
+            
             boolean isAboveCenter = position.z < wallCenterZ;
             boolean isLeftOfCenter = position.x < wallCenterX;
-            //Bestimmen des Bereichs basierend auf der Position des Mobs
+            
             if (isAboveCenter && isLeftOfCenter) {
-                return WallSectionStatus.CASE1_TOP_LEFT; // Bereich 1 (oben links)
+                return WallSectionStatus.CASE1_TOP_LEFT;
             } else if (isAboveCenter && !isLeftOfCenter) {
-                return WallSectionStatus.CASE2_TOP_RIGHT; // Bereich 2 (oben rechts)
+                return WallSectionStatus.CASE2_TOP_RIGHT;
             } else if (!isAboveCenter && isLeftOfCenter) {
-                return WallSectionStatus.CASE3_BOTTOM_LEFT; // Bereich 3 (unten links)
+                return WallSectionStatus.CASE3_BOTTOM_LEFT;
             } else if (!isAboveCenter && !isLeftOfCenter) {
-                return WallSectionStatus.CASE4_BOTTOM_RIGHT; // Bereich 4 (unten rechts)
+                return WallSectionStatus.CASE4_BOTTOM_RIGHT;
             }
         }
 
-        return WallSectionStatus.CASE0_NONE; //Keine gültige Bereichszuordnung
+        return WallSectionStatus.CASE0_NONE;
+    }
+
+    public GameMap getGameMap() {
+        return gameMap;
+    }
+
+    public void setGameMap(GameMap gameMap) {
+        this.gameMap = gameMap;
     }
 
     @Override

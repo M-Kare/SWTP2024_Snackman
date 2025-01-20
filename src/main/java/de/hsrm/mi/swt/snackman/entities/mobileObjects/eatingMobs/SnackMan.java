@@ -3,9 +3,6 @@ package de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import de.hsrm.mi.swt.snackman.configuration.GameConfig;
 import de.hsrm.mi.swt.snackman.entities.map.GameMap;
 import de.hsrm.mi.swt.snackman.entities.map.Square;
@@ -30,6 +27,8 @@ public class SnackMan extends EatingMob {
     private long jumpStartTime = 0;
     private long elapsedTime = 0;
     private double gravity = GameConfig.GRAVITY;
+    private boolean squareUnderneathIsWall = false;
+
 
     public SnackMan(GameMap gameMap, Square currentSquare, double posX, double posY, double posZ) {
         this(gameMap, GameConfig.SNACKMAN_SPEED, GameConfig.SNACKMAN_RADIUS, posX, posY, posZ);
@@ -89,7 +88,9 @@ public class SnackMan extends EatingMob {
             this.velocityY += gravity * deltaTime;
             this.setPosY(this.getPosY() + this.velocityY * deltaTime);
 
-            if (this.getPosY() <= GameConfig.SQUARE_HEIGHT && squareUnderneathIsWall()) {
+            squareUnderneathIsWall = squareUnderneathIsWall();
+
+            if (this.getPosY() <= GameConfig.SQUARE_HEIGHT && squareUnderneathIsWall) {
                 WallAlignmentStatus wallAlignment = checkWallAlignment();
                 WallSectionStatus wallSection = getWallSection();
 
