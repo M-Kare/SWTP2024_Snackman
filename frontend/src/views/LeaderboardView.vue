@@ -28,7 +28,7 @@
         class="small-nav-buttons"
         @click="backToMainMenu"
       >
-        {{ $t('button.back') }} 
+        {{ $t('button.back') }}
       </SmallNavButton>
     </div>
   </div>
@@ -202,10 +202,6 @@ tr td:not(:first-child):not(:last-child) {
   justify-content: center;
   gap: 20px;
   padding-top: 2em;
-}
-
-#menu-back-button:hover {
-  background: var(--primary-highlight-color);
 }
 
 .character-image {

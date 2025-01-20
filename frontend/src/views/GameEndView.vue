@@ -6,16 +6,16 @@
     <p class="end-reason">{{ $t('gameEnd.playingTime', {time: formatedPlayedTime}) }}</p>
     <div id="button-pair">
       <SmallNavButton id="menu-back-button" @click="backToMainMenu">
-        {{ $t('button.backToMainMenu') }} 
+        {{ $t('button.backToMainMenu') }}
       </SmallNavButton>
       <SmallNavButton id="export-map-button" @click="downloadMap">
-        {{ $t('button.exportMap') }} 
+        {{ $t('button.exportMap') }}
       </SmallNavButton>
       <SmallNavButton
           v-if="!alreadyEntered && lobbydata.currentPlayer.role == 'SNACKMAN' && winningRole == 'SNACKMAN'"
           id="create-leaderboard-entry-button"
           @click="showCreateNewLeaderboardEntryForm">
-            {{ $t('button.createNewLeaderBoardEntry') }} 
+        {{ $t('button.createNewLeaderBoardEntry') }}
       </SmallNavButton>
     </div>
     <CreateNewLeaderboardEntryForm
@@ -59,7 +59,7 @@ import {useLobbiesStore} from '@/stores/Lobby/lobbiesstore'
 import ViewBackground from '@/components/ViewBackground.vue'
 import SmallNavButton from "@/components/SmallNavButton.vue";
 import {SoundManager} from "@/services/SoundManager";
-import { useI18n } from 'vue-i18n'
+import {useI18n} from 'vue-i18n'
 
 const { t } = useI18n();
 
@@ -215,12 +215,6 @@ onMounted(() => {
   display: flex;
   flex-direction: row;
   padding-top: 2em;
-}
-
-#menu-back-button:hover,
-#export-map-button:hover,
-#create-leaderboard-entry-button:hover {
-  background: var(--primary-highlight-color);
 }
 
 .character-image {

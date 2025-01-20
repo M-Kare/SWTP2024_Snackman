@@ -199,7 +199,6 @@ input::placeholder {
 
 .small-nav-buttons {
   bottom: 7%;
-  font-weight: bold;
 }
 
 #cancel-lobby-creation-button {
@@ -208,10 +207,5 @@ input::placeholder {
 
 #create-lobby-button {
   right: 5%;
-}
-
-#cancel-lobby-creation-button:hover,
-#create-lobby-button:hover {
-  background: var(--primary-highlight-color);
 }
 </style>

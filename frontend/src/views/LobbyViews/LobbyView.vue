@@ -7,7 +7,7 @@
       <h1 class="title">{{ lobby?.name || 'Lobby Name' }}</h1>
 
       <div id="player-count">
-        {{ playerCount }} / {{ MAX_PLAYER_COUNT }}  {{ $t('lobby.playerCount.player') }} 
+        {{ playerCount }} / {{ MAX_PLAYER_COUNT }} {{ $t('lobby.playerCount.player') }}
       </div>
     </div>
 
@@ -42,7 +42,7 @@
           class="small-nav-buttons"
           @click="leaveLobby"
         >
-          {{ $t('button.leaveLobby') }} 
+          {{ $t('button.leaveLobby') }}
         </SmallNavButton>
         <SmallNavButton
           id="menu-map-importieren"
@@ -50,7 +50,7 @@
           v-if="playerId == adminClientId"
           @click="triggerFileInput"
         >
-          {{ $t('button.importMap') }} 
+          {{ $t('button.importMap') }}
         </SmallNavButton>
         <input class="input-feld"
             ref="fileInput"
@@ -66,7 +66,7 @@
           class="small-nav-buttons"
           @click="copyToClip()"
         >
-          {{ $t('button.copyLink') }} 
+          {{ $t('button.copyLink') }}
         </SmallNavButton>
 
 
@@ -75,7 +75,7 @@
           class="small-nav-buttons"
           @click="chooseRole(lobby)"
         >
-          {{ $t('button.startGame') }} 
+          {{ $t('button.startGame') }}
         </SmallNavButton>
       </div>
     </div>
@@ -125,7 +125,7 @@ import {computed, onMounted, ref, watchEffect} from 'vue'
 import {useLobbiesStore} from '@/stores/Lobby/lobbiesstore'
 import type {IPlayerClientDTD} from '@/stores/Lobby/IPlayerClientDTD'
 import type {ILobbyDTD} from '@/stores/Lobby/ILobbyDTD'
-import { useI18n } from 'vue-i18n'
+import {useI18n} from 'vue-i18n'
 
 const { t } = useI18n();
 
@@ -576,13 +576,6 @@ function moveToMouse(element: HTMLElement) {
 #button-pair {
   display: flex;
   gap: 20px;
-}
-
-#menu-back-button:hover,
-#copyToClip:hover,
-#start-game-button:hover,
-#menu-map-importieren:hover {
-  background: var(--primary-highlight-color);
 }
 
 .map-list{

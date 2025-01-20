@@ -139,11 +139,6 @@ const startSingleplayer = async () => {
   background-color: var(--accent-color);
 }
 
-#menu-back-button:hover,
-#start-game-button:hover {
-  background: var(--primary-highlight-color);
-}
-
 @media (max-width: 1000px) {
   .title {
     font-size: 60px;

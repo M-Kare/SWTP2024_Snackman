@@ -10,14 +10,14 @@
         class="small-nav-buttons"
         @click="backToMainMenu"
       >
-        {{ $t('button.back') }} 
+        {{ $t('button.back') }}
       </SmallNavButton>
       <SmallNavButton
         id="show-lobby-creation-button"
         class="small-nav-buttons"
         @click="showCreateLobbyForm"
       >
-        {{ $t('button.createLobby') }} 
+        {{ $t('button.createLobby') }}
       </SmallNavButton>
 
       <div class="inner-box">
@@ -33,7 +33,7 @@
             </div>
 
             <div class="playercount">
-              {{ lobby.members.length }} / {{ MAX_PLAYER_COUNT }}  {{ $t('lobbyList.playerCount.player') }} 
+              {{ lobby.members.length }} / {{ MAX_PLAYER_COUNT }} {{ $t('lobbyList.playerCount.player') }}
             </div>
           </li>
         </ul>
@@ -209,11 +209,6 @@ const joinLobby = async (lobby: ILobbyDTD) => {
 
 #show-lobby-creation-button {
   right: 3%;
-}
-
-#menu-back-button:hover,
-#show-lobby-creation-button:hover {
-  background: var(--primary-highlight-color);
 }
 
 .info-heading {

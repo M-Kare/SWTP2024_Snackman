@@ -7,7 +7,7 @@
       id="ok-button"
       @click="$emit('hidePopUp')">
 
-      {{ $t('button.ok') }} 
+      {{ $t('button.ok') }}
     </SmallNavButton>
   </div>
 </template>
@@ -45,9 +45,5 @@ import SmallNavButton from '@/components/SmallNavButton.vue';
   font-size: 1.2rem;
   margin-top: 1rem;
   padding: 0.7rem;
-}
-
-#ok-button:hover {
-  background: var(--primary-highlight-color);
 }
 </style>

@@ -189,9 +189,4 @@ input::placeholder {
 #create-createNewLeaderboardEntry-button {
   right: 5%;
 }
-
-#cancel-createNewLeaderboardEntry-creation-button:hover,
-#create-createNewLeaderboardEntry-button:hover {
-  background: var(--primary-highlight-color);
-}
 </style>

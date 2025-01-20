@@ -315,10 +315,6 @@ watchEffect(() => {
   margin: 0;
 }
 
-#start-game-button:hover {
-  background-color: var(--primary-highlight-color);
-}
-
 @media (max-width: 1300px) {
   .character-grid {
     display: grid;
