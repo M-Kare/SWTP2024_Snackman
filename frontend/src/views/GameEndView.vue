@@ -6,16 +6,16 @@
     <p class="end-reason">{{ $t('gameEnd.playingTime', {time: formatedPlayedTime}) }}</p>
     <div id="button-pair">
       <SmallNavButton id="menu-back-button" @click="backToMainMenu">
-        {{ $t('button.backToMainMenu') }} 
+        {{ $t('button.backToMainMenu') }}
       </SmallNavButton>
       <SmallNavButton id="export-map-button" @click="downloadMap">
-        {{ $t('button.exportMap') }} 
+        {{ $t('button.exportMap') }}
       </SmallNavButton>
       <SmallNavButton
-          v-if="!alreadyEntered && lobbydata.currentPlayer.role == 'SNACKMAN' && winningRole == 'SNACKMAN'"
-          id="create-leaderboard-entry-button"
-          @click="showCreateNewLeaderboardEntryForm">
-            {{ $t('button.createNewLeaderBoardEntry') }} 
+        v-if="!alreadyEntered && lobbydata.currentPlayer.role == 'SNACKMAN' && winningRole == 'SNACKMAN'"
+        id="create-leaderboard-entry-button"
+        @click="showCreateNewLeaderboardEntryForm">
+        {{ $t('button.createNewLeaderBoardEntry') }}
       </SmallNavButton>
     </div>
     <CreateNewLeaderboardEntryForm
@@ -59,9 +59,9 @@ import {useLobbiesStore} from '@/stores/Lobby/lobbiesstore'
 import ViewBackground from '@/components/ViewBackground.vue'
 import SmallNavButton from "@/components/SmallNavButton.vue";
 import {SoundManager} from "@/services/SoundManager";
-import { useI18n } from 'vue-i18n'
+import {useI18n} from 'vue-i18n'
 
-const { t } = useI18n();
+const {t} = useI18n();
 
 const route = useRoute()
 const router = useRouter()
@@ -101,11 +101,11 @@ const showLeaderboard = () => {
   if (winningRole && winningRole !== '-') {
     router.push({
       name: 'Leaderboard',
-      query: { winningRole: winningRole },
+      query: {winningRole: winningRole},
     })
   } else {
     console.debug('no winning role')
-    router.push({ name: 'Leaderboard' })
+    router.push({name: 'Leaderboard'})
   }
 }
 
@@ -166,11 +166,11 @@ const downloadMap = async () => {
 
     // Success feedback
     feedbackMessage.value = t('gameEnd.feedback.mapSaved');
-    feedbackClass.value = t('gameEnd.feedback.success');
+    feedbackClass.value = 'success'
   } catch (error: any) {
     // Failure feedback
     feedbackMessage.value = t('gameEnd.feedback.mapNotSaved');
-    feedbackClass.value = t('gameEnd.feedback.error');
+    feedbackClass.value = 'error'
   }
   // Clear feedback after 3 seconds
   setTimeout(() => {
@@ -186,7 +186,7 @@ onMounted(() => {
 
 <style scoped>
 #individual-outer-box-size {
-  top: 5%;
+  top: 10%;
   width: 80%;
   text-align: center;
   display: flex;
@@ -204,7 +204,7 @@ onMounted(() => {
 }
 
 .end-reason {
-  color: var(--background-for-text-color);
+  color: var(--main-text-color);
   font-size: 2rem;
   margin-bottom: 2rem;
 }
@@ -215,12 +215,6 @@ onMounted(() => {
   display: flex;
   flex-direction: row;
   padding-top: 2em;
-}
-
-#menu-back-button:hover,
-#export-map-button:hover,
-#create-leaderboard-entry-button:hover {
-  background: var(--primary-highlight-color);
 }
 
 .character-image {
@@ -273,6 +267,36 @@ onMounted(() => {
   to {
     opacity: 1;
   }
+}
+
+@media (min-width: 2500px) {
+  #individual-outer-box-size {
+    top: 30%;
+    width: 50%;
+  }
+
+  .character-image {
+    bottom: 10%;
+  }
+
+  #snackman {
+    left: 10%;
+  }
+
+  #ghost {
+    right: 10%;
+  }
+}
+
+@media (min-width: 1900px) and (max-width: 2499px) {
+  #individual-outer-box-size {
+    top: 20%;
+    width: 60%;
+  }
+}
+
+@media (min-width: 1500px) and (max-width: 1899px) {
+
 }
 
 @media (max-width: 1000px) {

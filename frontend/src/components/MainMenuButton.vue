@@ -34,7 +34,6 @@ const handleClick = () => {
   box-shadow: 8px 8px 0px 0px var(--primary-text-color);
 
   font-size: 2.5rem;
-  font-family: var(--font-main);
   font-weight: bold;
   cursor: pointer;
   transition: all 0.3s ease-in-out;

@@ -67,7 +67,7 @@ export class SoundManager {
         soundType: SoundType
     ) {
 
-          if (soundType === SoundType.CHICKEN && this.chickenSoundsToChooseFrom.length > 0) {
+      if (soundType === SoundType.CHICKEN && this.chickenSoundsToChooseFrom.length > 0) {
             console.debug("Chicken atteched to Modeel")
             const randomIndex = Math.floor(Math.random() * this.chickenSoundsToChooseFrom.length);
             const selectedSound = this.chickenSoundsToChooseFrom[randomIndex];
@@ -157,14 +157,14 @@ export class SoundManager {
         if (soundType === SoundType.CHICKEN) {
           console.debug("chicken sound is playing");
             this.chickenSounds.forEach((chickenSound) => {
-              if(!chickenSound.isPlaying){
+              if (!chickenSound.isPlaying) {
                 chickenSound.play();
               }
             });
         } else if (soundType === SoundType.GHOST) {
             this.ghostSounds.forEach((ghostSound) => {
               console.debug("ghost sound is playing");
-              if(!ghostSound.isPlaying){
+              if (!ghostSound.isPlaying) {
                 ghostSound.play();
               }
             });

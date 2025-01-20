@@ -6,12 +6,12 @@
       <h1 class="title"> {{ $t('chooseRole.title') }} </h1>
       <div class="character-grid">
         <div
-            v-for="button in buttons"
-            :key="button.id"
-            :class="{ 'selected': button.selected }"
-            :style="button.selected ? { opacity: 0.3, cursor: 'not-allowed' } : {}"
-            class="character-item"
-            @click="selectCharacter(button)"
+          v-for="button in buttons"
+          :key="button.id"
+          :class="{ 'selected': button.selected }"
+          :style="button.selected ? { opacity: 0.3, cursor: 'not-allowed' } : {}"
+          class="character-item"
+          @click="selectCharacter(button)"
         >
           <div class="image-container"
                :style="button.selected ? { pointerEvents: 'none' } : {}">
@@ -22,12 +22,12 @@
       </div>
       <div id="button-box">
         <SmallNavButton
-            v-if="isPlayerAdmin"
-            id="start-game-button"
-            class="small-nav-buttons"
-            @click="startGame"
+          v-if="isPlayerAdmin"
+          id="start-game-button"
+          class="small-nav-buttons"
+          @click="startGame"
         >
-          {{ $t('button.startGame') }} 
+          {{ $t('button.startGame') }}
         </SmallNavButton>
       </div>
     </div>
@@ -48,16 +48,16 @@
 </template>
 
 <script setup lang="ts">
-import {onMounted, ref, watchEffect, computed} from 'vue';
+import {computed, onMounted, ref, watchEffect} from 'vue';
 import MenuBackground from '@/components/MenuBackground.vue';
 import SmallNavButton from '@/components/SmallNavButton.vue';
 import {useRoute, useRouter} from "vue-router";
 import PopUp from "@/components/PopUp.vue";
 import type {Button} from "@/stores/Lobby/lobbiesstore"
 import {useLobbiesStore} from "@/stores/Lobby/lobbiesstore";
-import { useI18n } from 'vue-i18n';
+import {useI18n} from 'vue-i18n';
 
-const { t } = useI18n();
+const {t} = useI18n();
 
 const route = useRoute()
 const router = useRouter()
@@ -209,10 +209,10 @@ watchEffect(() => {
     const updatedLobby = lobbiesStore.lobbydata.lobbies.find(
       lobby => lobby.lobbyId === lobbyUrl,
     )
-    if (updatedLobby &&  updatedLobby.gameStarted) {
+    if (updatedLobby && updatedLobby.gameStarted) {
 
       const currentPlayerId = lobbiesStore.lobbydata.currentPlayer.playerId
-      const currentPlayerInUpdatedLobby = updatedLobby.members.find( member => member.playerId == currentPlayerId)
+      const currentPlayerInUpdatedLobby = updatedLobby.members.find(member => member.playerId == currentPlayerId)
 
       if (currentPlayerInUpdatedLobby) {
         buttons.forEach(button => button.selected = false)
@@ -237,7 +237,7 @@ watchEffect(() => {
   top: 1rem;
   text-align: center;
   font-weight: bold;
-  color: var(--background-for-text-color);
+  color: var(--main-text-color);
 }
 
 #button-box {
@@ -311,12 +311,8 @@ watchEffect(() => {
 
 .character-name {
   font-weight: bold;
-  color: #000000;
+  color: var(--primary-text-color);
   margin: 0;
-}
-
-#start-game-button:hover {
-  background-color: var(--primary-highlight-color);
 }
 
 @media (max-width: 1300px) {

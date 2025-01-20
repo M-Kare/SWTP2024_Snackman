@@ -14,7 +14,7 @@
     </div>
 
     <div class="time">
-      <img alt="clock" class="clock-icon" src="@/assets/clock-icon.svg" />
+      <img alt="clock" class="clock-icon" src="@/assets/clock-icon.svg"/>
       <p>{{ formattedTime }}</p>
     </div>
 
@@ -36,10 +36,10 @@ import {useRoute} from 'vue-router';
 import type {IPlayerDTD} from '@/stores/Player/IPlayerDTD';
 import {SoundManager} from "@/services/SoundManager";
 import {SoundType} from "@/services/SoundTypes";
-import { GameObjectRenderer } from '@/renderer/GameObjectRenderer';
-import type { IOtherPlayer } from '@/stores/IOtherPlayer';
+import {GameObjectRenderer} from '@/renderer/GameObjectRenderer';
+import type {IOtherPlayer} from '@/stores/IOtherPlayer';
 
-const { lobbydata } = useLobbiesStore();
+const {lobbydata} = useLobbiesStore();
 const gameMapStore = useGameMapStore()
 gameMapStore.startGameMapLiveUpdate()
 
@@ -87,22 +87,22 @@ function animate() {
   currentCalories.value = player.getCalories()
   fps = 1 / clock.getDelta()
   player.lerpPosition()
-  gameMapStore.mapContent.chickens.forEach((chicken)=>{
+  gameMapStore.mapContent.chickens.forEach((chicken) => {
     const chickenModel = scene.getObjectById(chicken.meshId)
-    if(chickenModel){
+    if (chickenModel) {
       chickenModel.position.lerp(new THREE.Vector3(chicken.chickenPosX, 0, chicken.chickenPosZ), 0.2)
       chickenModel.quaternion.slerp(chicken.lookingQuaternion, 0.05)
     }
   })
-  gameMapStore.mapContent.scriptGhosts.forEach((scriptGhost)=>{
+  gameMapStore.mapContent.scriptGhosts.forEach((scriptGhost) => {
     const scriptGhostModel = scene.getObjectById(scriptGhost.meshId)
-    if(scriptGhostModel){
+    if (scriptGhostModel) {
       scriptGhostModel.position.lerp(new THREE.Vector3(scriptGhost.scriptGhostPosX, 0, scriptGhost.scriptGhostPosZ), 0.2)
       scriptGhostModel.quaternion.slerp(scriptGhost.lookingQuaternion, 0.05)
     }
   })
-  gameMapStore.getOtherPlayers().forEach((otherPlayer)=>{
-    if(otherPlayer.model){
+  gameMapStore.getOtherPlayers().forEach((otherPlayer) => {
+    if (otherPlayer.model) {
       otherPlayer.model.position.lerp(otherPlayer.targetPosition, 0.2)
       otherPlayer.model.quaternion.slerp(otherPlayer.rotation, 0.5)
     }
@@ -162,8 +162,7 @@ onMounted(async () => {
   clients.forEach(it => {
     if (it.playerId === lobbydata.currentPlayer.playerId) {
       // that's you
-      player = new Player(renderer, playerData.posX, playerData.posY, playerData.posZ, playerData.radius,
-        playerData.speed, playerData.sprintMultiplier)
+      player = new Player(renderer, playerData.posX, playerData.posY, playerData.posZ)
     } else {
       // other players that are not you
       loadPlayerModel(it.playerId, it.role, gameObjectRenderer);
@@ -362,10 +361,10 @@ const getCurrentPlayingTime = async () => {
     const currentPlayingTime = await response.json();
     return currentPlayingTime;
 
-    } catch (error: any) {
-      console.error('Error:', error)
-      return null
-    }
+  } catch (error: any) {
+    console.error('Error:', error)
+    return null
+  }
 }
 
 const formattedTime = computed(() => {
@@ -390,7 +389,6 @@ const startCountDown = async () => {
     }
   }, 1000)
 }
-
 </script>
 
 <style>
