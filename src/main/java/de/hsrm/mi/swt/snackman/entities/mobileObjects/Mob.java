@@ -544,13 +544,16 @@ public abstract class Mob {
         return WallSectionStatus.CASE0_NONE;
     }
 
-    public GameMap getGameMap() {
+    /*    
+    public GameMap getGameMapForForTest() {
         return gameMap;
     }
+    */
 
-    public void setGameMap(GameMap gameMap) {
+    public void setGameMapForTest(GameMap gameMap) {
         this.gameMap = gameMap;
     }
+    
 
     @Override
     public String toString() {

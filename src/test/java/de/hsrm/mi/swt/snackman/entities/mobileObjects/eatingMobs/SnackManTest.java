@@ -162,7 +162,7 @@ class SnackManTest {
         GameMap gameMapMock = mock(GameMap.class);
         Square squareMock = mock(Square.class);
 
-        snackMan.setGameMap(gameMapMock); 
+        snackMan.setGameMapForTest(gameMapMock); 
 
         when(squareMock.getType()).thenReturn(MapObjectType.FLOOR);
         when(gameMapMock.getSquareAtIndexXZ(anyInt(), anyInt())).thenReturn(squareMock);
