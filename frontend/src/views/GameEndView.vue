@@ -186,7 +186,7 @@ onMounted(() => {
 
 <style scoped>
 #individual-outer-box-size {
-  top: 5%;
+  top: 10%;
   width: 80%;
   text-align: center;
   display: flex;
@@ -267,6 +267,36 @@ onMounted(() => {
   to {
     opacity: 1;
   }
+}
+
+@media (min-width: 2500px) {
+  #individual-outer-box-size {
+    top: 30%;
+    width: 50%;
+  }
+
+  .character-image {
+    bottom: 10%;
+  }
+
+  #snackman {
+    left: 10%;
+  }
+
+  #ghost {
+    right: 10%;
+  }
+}
+
+@media (min-width: 1900px) and (max-width: 2499px) {
+  #individual-outer-box-size {
+    top: 20%;
+    width: 60%;
+  }
+}
+
+@media (min-width: 1500px) and (max-width: 1899px) {
+
 }
 
 @media (max-width: 1000px) {
