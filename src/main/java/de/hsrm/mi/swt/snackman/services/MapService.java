@@ -30,7 +30,6 @@ import de.hsrm.mi.swt.snackman.entities.mapObject.snack.Snack;
 import de.hsrm.mi.swt.snackman.entities.mapObject.snack.SnackType;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.Ghost;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.ScriptGhost;
-import de.hsrm.mi.swt.snackman.entities.mobileObjects.ScriptGhostDifficulty;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken.Chicken;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.SnackMan;
 import de.hsrm.mi.swt.snackman.messaging.MessageLoop.MessageLoop;
@@ -159,9 +158,9 @@ public class MapService {
     protected String loadChickenScripts() {
         String name = Paths.get("extensions/chicken/").normalize().toAbsolutePath().toString();
         File folder = new File(name);
-        
+
         List<String> filenames = new ArrayList<String>();
-        if(folder.exists()){
+        if (folder.exists()) {
 
             for (File currFile : folder.listFiles()) {
                 if (currFile.getName().endsWith(".py")) {
@@ -171,8 +170,8 @@ public class MapService {
                 }
             }
         }
-        
-        if(filenames.isEmpty()){
+
+        if (filenames.isEmpty()) {
             filenames.addAll(Arrays.asList(GameConfig.DEFAULT_CHICKEN_SCRIPTS));
         }
         Random rn = new Random();
@@ -288,7 +287,6 @@ public class MapService {
         }
     }
 
-   
 
     public double calcCenterPositionFromMapIndex(int index) {
         return (index * GameConfig.SQUARE_SIZE) + (GameConfig.SQUARE_SIZE / 2);
@@ -297,6 +295,7 @@ public class MapService {
     /**
      * Removes and respawns snacks on all floor square with a set probability.
      * Eggs are not removed.
+     *
      * @param map
      */
     public void respawnSnacks(GameMap map, double probability) {
@@ -319,7 +318,7 @@ public class MapService {
 
     /**
      * Save the last map in LastMap.txt in Game-Beginn, for later to download.
-     * 
+     *
      * @param lobbyId  Id of the lobby
      * @param filePath path of last map file
      */

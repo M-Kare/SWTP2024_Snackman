@@ -71,16 +71,4 @@ public class ReadMazeService {
         interpreter.exec("Maze.main()");
     }
 
-    // /**
-    //  * Generates a new Maze and saves it in a Maze.txt file
-    //  */
-    // public void generateNewMaze() {
-    //     pythonProps.setProperty("python.path", "src/main/java/de/hsrm/mi/swt/snackman");
-    //     PythonInterpreter.initialize(System.getProperties(), pythonProps, new String[0]);
-    //     this.pythonInterpreter = new PythonInterpreter();
-    //     pythonInterpreter.exec("from Maze import main");
-    //     PyObject func = pythonInterpreter.get("main");
-    //     func.__call__();
-    // }
-
 }
