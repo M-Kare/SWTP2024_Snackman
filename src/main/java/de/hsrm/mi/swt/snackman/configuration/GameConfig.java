@@ -5,7 +5,7 @@ public class GameConfig {
     //MAP
     public static final int SQUARE_SIZE = 2;
     public static final int SQUARE_HEIGHT = 5;
-    
+
     // SNACKMAN
     public static final int SNACKMAN_GROUND_LEVEL = 2;
     public static final double SNACKMAN_RADIUS = 0.3;
@@ -24,18 +24,16 @@ public class GameConfig {
 
     //Chicken
     public static final String[] DEFAULT_CHICKEN_SCRIPTS = {"ChickenMovementSkript", "SonicChickenMovementSkript", "TalaChickenMovementSkript"};
-    public static final int WAITING_TIME = 2000;
     public static final int MAX_KALORIEN = 3000;
     public static final String MAX_KALORIEN_MESSAGE = "Maximum calories reached!";
 
     //GHOST
     public static final String GHOST_SCRIPT_EASY = "GhostMovementSkript";
     public static final String GHOST_SCRIPT_HARD = "SmartGhostMovementSkript";
-    public static final int GHOST_GROUND_LEVEL = 2;
     public static final double GHOST_RADIUS = 0.3;
     public static final int GHOST_SPEED = 10;
-    public  static  final int GHOST_DAMAGE = 300;
-    public  static  final int AMOUNT_PLAYERS = 5;
+    public static final int GHOST_DAMAGE = 300;
+    public static final int AMOUNT_PLAYERS = 5;
     public static final String SCRIPT_GHOST_DIFFICULTY_MULTIPLAYER = "EASY";
 
     //GAME

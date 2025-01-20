@@ -22,10 +22,9 @@ import java.util.NoSuchElementException;
 @Controller
 public class PlayerStompController {
 
+    private final Logger log = LoggerFactory.getLogger(PlayerStompController.class);
     @Autowired
     private LobbyManagerService lobbyService;
-
-    private final Logger log = LoggerFactory.getLogger(PlayerStompController.class);
 
     @MessageMapping("/topic/lobbies/{lobbyId}/player/update")
     public void spreadPlayerUpdate(@DestinationVariable("lobbyId") String lobbyId, PlayerToBackendDTO player) {
@@ -46,7 +45,7 @@ public class PlayerStompController {
         playerMob.move(player.forward(), player.backward(), player.left(), player.right(), player.delta(), currentLobby.getGameMap());
     }
 
-    private Ghost updateGhost (Lobby currentLobby, Ghost ghost){
+    private Ghost updateGhost(Lobby currentLobby, Ghost ghost) {
         SnackMan snackman = getSnackman(currentLobby);
         checkWinningCondition(snackman, currentLobby);
 

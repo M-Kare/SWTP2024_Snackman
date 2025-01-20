@@ -16,7 +16,7 @@ import de.hsrm.mi.swt.snackman.services.LobbyManagerService;
 public class PlayerController {
     @Autowired
     private LobbyManagerService lobbyService;
-    
+
     // Zum Registrieren eines neuen Spielers
 
     @GetMapping("/lobbies/{lobbyId}/player/{playerId}")

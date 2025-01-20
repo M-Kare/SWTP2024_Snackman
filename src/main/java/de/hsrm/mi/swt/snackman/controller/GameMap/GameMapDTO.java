@@ -13,7 +13,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public record GameMapDTO(int DEFAULT_SQUARE_SIDE_LENGTH, int DEFAULT_WALL_HEIGHT, List<SquareDTO> gameMap, List<ChickenDTO> chickens, List<ScriptGhostDTO> scriptGhosts) {
+public record GameMapDTO(int DEFAULT_SQUARE_SIDE_LENGTH, int DEFAULT_WALL_HEIGHT, List<SquareDTO> gameMap,
+                         List<ChickenDTO> chickens, List<ScriptGhostDTO> scriptGhosts) {
 
     public static GameMapDTO fromGameMap(GameMap gameMap) {
         List<SquareDTO> squareDTOs = Stream.of(gameMap.getGameMapSquares())
