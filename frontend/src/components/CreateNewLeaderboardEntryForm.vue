@@ -5,25 +5,25 @@
 
     <form id="form" @submit.prevent="createNewLeaderboardEntry">
       <label> {{ $t('newLeaderBoardEntry.label') }} </label>
-      <input v-model.trim="yourName" type="text">
+      <input v-model.trim="yourName" placeholder="name" type="text">
       <p
-          id="error-message"
-          v-if="errorMessage">
+        v-if="errorMessage"
+        id="error-message">
         {{ errorMessage }}
       </p>
-      <p>{{ $t('newLeaderBoardEntry.playedTime', { time: playedTime }) }}</p>
+      <p>{{ $t('newLeaderBoardEntry.playedTime', {time: playedTime}) }}</p>
     </form>
 
     <SmallNavButton
-        id="cancel-createNewLeaderboardEntry-creation-button"
-        class="small-nav-buttons"
-        @click="cancelNewLeaderboardEntryCreation">
+      id="cancel-createNewLeaderboardEntry-creation-button"
+      class="small-nav-buttons"
+      @click="cancelNewLeaderboardEntryCreation">
       {{ $t('button.cancel') }}
     </SmallNavButton>
     <SmallNavButton
-        id="create-createNewLeaderboardEntry-button"
-        class="small-nav-buttons"
-        @click="createNewLeaderboardEntry">
+      id="create-createNewLeaderboardEntry-button"
+      class="small-nav-buttons"
+      @click="createNewLeaderboardEntry">
       {{ $t('button.createNewLeaderBoardEntry') }}
     </SmallNavButton>
   </div>
@@ -40,7 +40,7 @@ const yourName = ref('');
 const errorMessage = ref('');
 const leaderboardStore = useLeaderboardStore()
 
-const { t } = useI18n();
+const {t} = useI18n();
 const emit = defineEmits<{
   (event: 'cancelNewLeaderboardEntryCreation', value: boolean): void;
   (event: 'createNewLeaderboardEntry', value: string): void;
@@ -85,11 +85,11 @@ const createNewLeaderboardEntry = async () => {
     releaseDate: today.toISOString().slice(0, 10)
   }
 
-  try{
+  try {
     emit('entryCreated')
     await leaderboardStore.addNewLeaderboardEntry(data)
     cancelNewLeaderboardEntryCreation()
-  } catch (error){
+  } catch (error) {
     console.error('Error:', error);
     alert("Error creating new leaderboard entry!");
   }
@@ -99,16 +99,12 @@ const createNewLeaderboardEntry = async () => {
 
 <style scoped>
 #title {
+  width: 100%;
+  font-size: 50px;
   position: absolute;
-  top: 1rem;
+  top: 3rem;
   left: 50%;
   transform: translateX(-50%);
-  font-size: 2rem;
-  font-weight: bold;
-  color: #fff;
-  text-align: center;
-  width: 90%;
-  overflow: hidden;
 }
 
 input::placeholder {
@@ -116,23 +112,20 @@ input::placeholder {
   font-weight: bold;
 }
 
-#input-textmessage {
-  padding-bottom: 10px;
-  font-weight: bold;
-}
-
 #individual-form-box-size {
   left: 50%;
-  top: 25%;
+  top: 15%;
   transform: translateX(-50%);
-  width: 70%;
-  max-width: 600px;
-  height: 30rem;
+  width: 60%;
+  height: 35rem;
 }
 
 #form {
   top: 35%;
-  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
   font-size: 1.5rem;
   font-weight: bold;
   color: var(--main-text-color);
@@ -156,8 +149,6 @@ input::placeholder {
 
 .small-nav-buttons {
   bottom: 7%;
-  font-size: 0.9rem;
-  padding: 0.7rem;
 }
 
 #cancel-createNewLeaderboardEntry-creation-button {

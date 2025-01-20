@@ -15,7 +15,8 @@
       <ul>
         <li v-for="member in members" class="player-list-items">
           <div class="player-name">
-            {{ member.playerName.replace(/"/g, '') }} <!-- replace all " in String using RegEx modifier /g (find all) -->
+            {{ member.playerName.replace(/"/g, '') }}
+            <!-- replace all " in String using RegEx modifier /g (find all) -->
           </div>
         </li>
       </ul>
@@ -24,11 +25,11 @@
     <div class="item-row">
       <ul class="map-list" v-if="playerId == adminClientId">
         <li class="map-list-item" v-for="map in mapList" :key="map.mapName" v-if="mapList.length > 1">
-            <input class="map-choose"
-              type="radio"
-              :value="map.mapName"
-              :checked="selectedMap === map.mapName"
-              @change="selectMap(map.mapName)"
+          <input :checked="selectedMap === map.mapName"
+                 :value="map.mapName"
+                 class="map-choose"
+                 type="radio"
+                 @change="selectMap(map.mapName)"
           />
           <span>{{ $t(map.translation) }}</span>
         </li>
@@ -53,10 +54,10 @@
           {{ $t('button.importMap') }}
         </SmallNavButton>
         <input class="input-feld"
-            ref="fileInput"
-            type="file"
-            accept=".txt"
-            @change="handleFileImport"
+               ref="fileInput"
+               accept=".txt"
+               type="file"
+               @change="handleFileImport"
         />
       </div>
 
@@ -81,7 +82,7 @@
     </div>
   </div>
 
-    <div v-if="darkenBackground" id="darken-background"></div>
+  <div v-if="darkenBackground" id="darken-background"></div>
 
   <PlayerNameForm
     v-if="showPlayerNameForm && !playerNameSaved"
@@ -127,7 +128,7 @@ import type {IPlayerClientDTD} from '@/stores/Lobby/IPlayerClientDTD'
 import type {ILobbyDTD} from '@/stores/Lobby/ILobbyDTD'
 import {useI18n} from 'vue-i18n'
 
-const { t } = useI18n();
+const {t} = useI18n();
 
 const router = useRouter()
 const route = useRoute()
@@ -170,7 +171,7 @@ const TIP_SIDE_DIST = 20
 const hidePlayerNameForm = () => {
   showPlayerNameForm.value = false;
 
-  if(!errorBox.value) {
+  if (!errorBox.value) {
     darkenBackground.value = false;
   }
 }
@@ -181,38 +182,38 @@ const hidePopUp = () => {
 }
 
 // needed for errorBox which shows up when lobby does not exist
-function hidePopUpAndRedirect(){
+function hidePopUpAndRedirect() {
   hidePopUp();
-  router.push({ name: "LobbyListView"})
+  router.push({name: "LobbyListView"})
 }
 
 const mapList = ref<{ mapName: string; fileName: string; translation: string }[]>([
-  { mapName: 'Generated Map', fileName: `Maze.txt`, translation: 'lobby.mapName.generated' }
+  {mapName: 'Generated Map', fileName: `Maze.txt`, translation: 'lobby.mapName.generated'}
 ]);
 
 const usedCustomMap = ref(false);
 const selectedMap = ref<string | null>(null);
 
 const selectMap = async (mapName: string) => {
-    selectedMap.value = mapName;
+  selectedMap.value = mapName;
 
-    if (selectedMap.value === 'Generated Map') {
-          usedCustomMap.value = false;
-    } else if (selectedMap.value === 'Uploaded Map') {
-          usedCustomMap.value = true;
-    }
+  if (selectedMap.value === 'Generated Map') {
+    usedCustomMap.value = false;
+  } else if (selectedMap.value === 'Uploaded Map') {
+    usedCustomMap.value = true;
+  }
 
-    const status = await changeUsedMapStatus(lobbyId, usedCustomMap.value);
-    if (status !== "done") {
-      showPopUp.value = true;
-      darkenBackground.value = true;
-      infoHeading.value = "Map Status Error";
-      infoText.value = "Failed to update the map status.";
-    }
+  const status = await changeUsedMapStatus(lobbyId, usedCustomMap.value);
+  if (status !== "done") {
+    showPopUp.value = true;
+    darkenBackground.value = true;
+    infoHeading.value = "Map Status Error";
+    infoText.value = "Failed to update the map status.";
+  }
 };
 
 const triggerFileInput = () => {
-    fileInput.value?.click();
+  fileInput.value?.click();
 }
 
 const fileInput = ref<HTMLInputElement | null>(null);
@@ -226,19 +227,19 @@ const fileInput = ref<HTMLInputElement | null>(null);
  * @param event - The event triggered by the file input change.
  */
 const handleFileImport = (event: Event) => {
-    const input = event.target as HTMLInputElement;
+  const input = event.target as HTMLInputElement;
 
-    if (input.files && input.files.length > 0) {
-        const file = input.files[0];
-        if (file.name.endsWith('.txt')) {
-            uploadFileToServer(file, lobbyId);
-        } else {
-            showPopUp.value = true;
-            darkenBackground.value = true;
-            infoHeading.value = t('popup.mapNotValid.heading');
-            infoText.value = t('popup.mapNotValid.text');
-        }
+  if (input.files && input.files.length > 0) {
+    const file = input.files[0];
+    if (file.name.endsWith('.txt')) {
+      uploadFileToServer(file, lobbyId);
+    } else {
+      showPopUp.value = true;
+      darkenBackground.value = true;
+      infoHeading.value = t('popup.mapNotValid.heading');
+      infoText.value = t('popup.mapNotValid.text');
     }
+  }
 }
 
 /**
@@ -247,42 +248,42 @@ const handleFileImport = (event: Event) => {
  * @param lobbyId - The unique identifier of the lobby.
  */
 const uploadFileToServer = async (file: File, lobbyId: string) => {
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('lobbyId', lobbyId);
+  const formData = new FormData();
+  formData.append('file', file);
+  formData.append('lobbyId', lobbyId);
 
-    try {
-        const response = await fetch('/api/upload', {
-            method: 'POST',
-            body: formData
-        });
+  try {
+    const response = await fetch('/api/upload', {
+      method: 'POST',
+      body: formData
+    });
 
-        if (response.ok) {
-            const mapName = 'Uploaded Map';
-            const fileName = `SnackManMap_${lobbyId}.txt`;
-            const translation = 'lobby.mapName.uploaded';
+    if (response.ok) {
+      const mapName = 'Uploaded Map';
+      const fileName = `SnackManMap_${lobbyId}.txt`;
+      const translation = 'lobby.mapName.uploaded';
 
-            if (mapList.value.length > 1) {
-                mapList.value[1] = { mapName, fileName, translation};
-            } else {
-                mapList.value.push({ mapName, fileName, translation });
-            }
+      if (mapList.value.length > 1) {
+        mapList.value[1] = {mapName, fileName, translation};
+      } else {
+        mapList.value.push({mapName, fileName, translation});
+      }
 
-            selectMap(mapName);
-        } else {
-            const errorMessage = await response.text();
-            showPopUp.value = true;
-            darkenBackground.value = true;
-            infoHeading.value = t('popup.mapNotValid.heading');
-            infoText.value = errorMessage;
-        }
-    } catch (error) {
-        console.error('Error uploading file:', error);
-        showPopUp.value = true;
-        darkenBackground.value = true;
-        infoHeading.value = t('popup.uploadingFile.heading');
-        infoText.value = error;
+      selectMap(mapName);
+    } else {
+      const errorMessage = await response.text();
+      showPopUp.value = true;
+      darkenBackground.value = true;
+      infoHeading.value = t('popup.mapNotValid.heading');
+      infoText.value = errorMessage;
     }
+  } catch (error) {
+    console.error('Error uploading file:', error);
+    showPopUp.value = true;
+    darkenBackground.value = true;
+    infoHeading.value = t('popup.uploadingFile.heading');
+    infoText.value = error;
+  }
 }
 
 /**
@@ -290,20 +291,20 @@ const uploadFileToServer = async (file: File, lobbyId: string) => {
  * @param lobbyId - The unique identifier of the lobby.
  */
 const deleteUploadedFile = async (lobbyId: string) => {
-    const formData = new FormData();
-    formData.append('lobbyId', lobbyId);
+  const formData = new FormData();
+  formData.append('lobbyId', lobbyId);
 
-    fetch('/api/deleteMap', {
-        method: 'DELETE',
-        body: formData
-    })
+  fetch('/api/deleteMap', {
+    method: 'DELETE',
+    body: formData
+  })
     .then(response => {
-        if (!response.ok) {
-            console.error('Error deleting file:', response.text());
-        }
+      if (!response.ok) {
+        console.error('Error deleting file:', response.text());
+      }
     })
     .catch(error => {
-        console.error('Error deleting file:', error);
+      console.error('Error deleting file:', error);
     });
 }
 
@@ -312,28 +313,28 @@ const deleteUploadedFile = async (lobbyId: string) => {
  *
  * @param {string} lobbyId - The unique identifier of the lobby.
  * @param {boolean} usedCustomMap - Indicates whether a custom map is used (true) or not (false).
-*/
+ */
 const changeUsedMapStatus = async (lobbyId: string, usedCustomMap: boolean): Promise<string> => {
-    try {
-        const response = await fetch('/api/change-used-map-status', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ lobbyId, usedCustomMap })
-        });
+  try {
+    const response = await fetch('/api/change-used-map-status', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({lobbyId, usedCustomMap})
+    });
 
-        if (!response.ok) {
-            const errorText = await response.text();
-            console.error('Error changing the used map status:', errorText);
-            throw new Error(`Failed to change map status: ${errorText}`);
-        }
-
-        return "done";
-    } catch (error) {
-        console.error('Error changing the used map status:', error);
-        throw error;
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('Error changing the used map status:', errorText);
+      throw new Error(`Failed to change map status: ${errorText}`);
     }
+
+    return "done";
+  } catch (error) {
+    console.error('Error changing the used map status:', error);
+    throw error;
+  }
 }
 
 watchEffect(() => {
@@ -345,7 +346,7 @@ watchEffect(() => {
       lobbyLoaded = true
     } else if (lobbyLoaded) {
       deleteUploadedFile(lobbyId);
-      router.push({ name: 'LobbyListView' })
+      router.push({name: 'LobbyListView'})
     }
   }
 })
@@ -380,32 +381,32 @@ onMounted(async () => {
   }
 })
 
-  const savePlayerName = async (newName: string) => {
-    try {
-      await lobbiesStore.createPlayer(newName);
-      await joinLobby(lobby.value!)
+const savePlayerName = async (newName: string) => {
+  try {
+    await lobbiesStore.createPlayer(newName);
+    await joinLobby(lobby.value!)
 
-    } catch(error) {
-      console.error("Error saving playerName:", error);
-      alert("Error saving playerName!");
-    }
+  } catch (error) {
+    console.error("Error saving playerName:", error);
+    alert("Error saving playerName!");
   }
+}
 
-  const joinLobby = async (lobby: ILobbyDTD) => {
+const joinLobby = async (lobby: ILobbyDTD) => {
 
-    try {
-      const joinedLobby = await lobbiesStore.joinLobby(
-        lobby.lobbyId,
-        lobbiesStore.lobbydata.currentPlayer.playerId,
-      )
+  try {
+    const joinedLobby = await lobbiesStore.joinLobby(
+      lobby.lobbyId,
+      lobbiesStore.lobbydata.currentPlayer.playerId,
+    )
 
-      if (joinedLobby) {
-        router.push({ name: 'LobbyView', params: { lobbyId: lobby.lobbyId } })
-      }
-    } catch (error: any) {
-      console.error('Error:', error)
+    if (joinedLobby) {
+      router.push({name: 'LobbyView', params: {lobbyId: lobby.lobbyId}})
     }
+  } catch (error: any) {
+    console.error('Error:', error)
   }
+}
 
 /**
  * Leaves the current lobby. If the player is the admin, it will remove other members from the lobby first.
@@ -433,13 +434,13 @@ const leaveLobby = async () => {
   }
 
   await lobbiesStore.leaveLobby(lobby.value.lobbyId, playerId)
-  router.push({ name: 'LobbyListView' })
+  router.push({name: 'LobbyListView'})
 }
 
-const chooseRole = async(lobby: ILobbyDTD | undefined ) =>{
+const chooseRole = async (lobby: ILobbyDTD | undefined) => {
   const playerId = lobbiesStore.lobbydata.currentPlayer.playerId
 
-  if (!lobby){
+  if (!lobby) {
     return
   }
 
@@ -578,7 +579,7 @@ function moveToMouse(element: HTMLElement) {
   gap: 20px;
 }
 
-.map-list{
+.map-list {
   margin-top: 1vh;
   margin-bottom: 1vh;
   display: flex;
@@ -586,7 +587,7 @@ function moveToMouse(element: HTMLElement) {
   padding: 0;
 }
 
-.map-list-item{
+.map-list-item {
   margin-right: 40px;
   display: flex;
   align-items: center;
@@ -596,23 +597,23 @@ function moveToMouse(element: HTMLElement) {
 }
 
 #darken-background {
-    z-index: 1;
-    position: fixed;
-    top: 0;
-    width: 100vw;
-    height: 100vh;
-    background: rgba(0, 0, 0, 50%);
+  z-index: 1;
+  position: fixed;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 50%);
 
-    transition: background 0.3s ease;
+  transition: background 0.3s ease;
 }
 
-.map-choose{
+.map-choose {
   width: 20px;
   height: 20px;
   transform: scale(1.5);
 }
 
-.input-feld{
+.input-feld {
   display: none;
 }
 </style>

@@ -42,41 +42,41 @@ import type {IPlayerClientDTD} from '@/stores/Lobby/IPlayerClientDTD';
 import {useI18n} from 'vue-i18n';
 
 const router = useRouter();
-    const lobbiesStore = useLobbiesStore();
-    const currentPlayer = lobbiesStore.lobbydata.currentPlayer as IPlayerClientDTD;
+const lobbiesStore = useLobbiesStore();
+const currentPlayer = lobbiesStore.lobbydata.currentPlayer as IPlayerClientDTD;
 
-    const lobbyName = ref('');
-    const lobbyInput = ref(); // needed for autofocus
-    const errorMessage = ref('');
+const lobbyName = ref('');
+const lobbyInput = ref(); // needed for autofocus
+const errorMessage = ref('');
 
-    const { t } = useI18n(); // needed for internationalization
-    // defines event wich can be triggered by this component
-    const emit = defineEmits< (event: 'cancelLobbyCreation') => void >()
+const {t} = useI18n(); // needed for internationalization
+// defines event wich can be triggered by this component
+const emit = defineEmits<(event: 'cancelLobbyCreation') => void>()
 
-    /**
-     * Emits an event to cancel the lobby creation process.
-     *
-     * @function cancelLobbyCreation
-     * @returns {void}
-     */
-    const cancelLobbyCreation = () => {
-        emit('cancelLobbyCreation');
-    }
+/**
+ * Emits an event to cancel the lobby creation process.
+ *
+ * @function cancelLobbyCreation
+ * @returns {void}
+ */
+const cancelLobbyCreation = () => {
+  emit('cancelLobbyCreation');
+}
 
-    /**
-     * Creates a new lobby with the specified name and admin client.
-     * Validates the admin client and lobby name before attempting to create the lobby.
-     * Alerts the user if there are any validation errors or if the lobby creation fails.
-     * On success, redirects to the newly created lobby view.
-     *
-     * @async
-     * @function createLobby
-     * @throws {Error} Throws an alert if the admin client is invalid or the lobby name is empty or already taken.
-     * @throws {Error} Shows a popup if there is an error creating the lobby.
-     * @returns {void}
-     */
-    const createLobby = async () => {
-        const adminClient = currentPlayer;
+/**
+ * Creates a new lobby with the specified name and admin client.
+ * Validates the admin client and lobby name before attempting to create the lobby.
+ * Alerts the user if there are any validation errors or if the lobby creation fails.
+ * On success, redirects to the newly created lobby view.
+ *
+ * @async
+ * @function createLobby
+ * @throws {Error} Throws an alert if the admin client is invalid or the lobby name is empty or already taken.
+ * @throws {Error} Shows a popup if there is an error creating the lobby.
+ * @returns {void}
+ */
+const createLobby = async () => {
+  const adminClient = currentPlayer;
 
   if (
     !adminClient ||
@@ -87,10 +87,10 @@ const router = useRouter();
     return
   }
 
-        if (!lobbyName.value.trim()) {
-            errorMessage.value = t('createLobby.error.lobbyNameEmpty');
-            return;
-        }
+  if (!lobbyName.value.trim()) {
+    errorMessage.value = t('createLobby.error.lobbyNameEmpty');
+    return;
+  }
 
   const isDuplicateName = lobbiesStore.lobbydata.lobbies.some(
     lobby => lobby.name === lobbyName.value.trim(),
@@ -109,7 +109,7 @@ const router = useRouter();
     )
     if (newLobby && newLobby.lobbyId) {
       cancelLobbyCreation()
-      router.push({ name: 'LobbyView', params: { lobbyId: newLobby.lobbyId } })
+      router.push({name: 'LobbyView', params: {lobbyId: newLobby.lobbyId}})
     } else {
       throw new Error('Lobby creation returned invalid response.')
     }
@@ -132,9 +132,6 @@ onMounted(() => {
   left: 50%;
   transform: translateX(-50%);
   font-size: 2.3rem;
-  font-weight: bold;
-  color: #fff;
-  text-align: center;
 }
 
 input::placeholder {

@@ -40,7 +40,7 @@ const lobbiesStore = useLobbiesStore();
 const playerName = ref('');
 const errorMessage = ref('');
 
-const { t } = useI18n();
+const {t} = useI18n();
 
 const emit = defineEmits<{
   (e: 'hidePlayerNameForm'): void;
