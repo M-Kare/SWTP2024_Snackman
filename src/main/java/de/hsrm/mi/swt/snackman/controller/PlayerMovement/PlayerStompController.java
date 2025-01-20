@@ -1,9 +1,7 @@
 package de.hsrm.mi.swt.snackman.controller.PlayerMovement;
 
 import de.hsrm.mi.swt.snackman.configuration.GameConfig;
-import de.hsrm.mi.swt.snackman.controller.Lobby.LobbyController;
 import de.hsrm.mi.swt.snackman.entities.lobby.ROLE;
-import de.hsrm.mi.swt.snackman.entities.mobileObjects.Mob;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -13,20 +13,20 @@ import de.hsrm.mi.swt.snackman.entities.mapObject.MapObjectType;
  * A mobile object with the ability to move its position
  */
 public abstract class Mob {
+    private static long idCounter = 0;
     protected long id;
     private Vector3d position;
     private double radius;
     private Quaterniond quat;
     private double speed;
     private Vector3d spawn;
-    private  static long idCounter = 0;
 
     /**
      * Base constructor for Map with spawn-location at center of Map
      *
      * @param gameMap GameMap
-     * @param speed      speed of the mob
-     * @param radius     size of the mob
+     * @param speed   speed of the mob
+     * @param radius  size of the mob
      */
     public Mob(GameMap gameMap, double speed, double radius) {
         this.speed = speed;
@@ -47,11 +47,11 @@ public abstract class Mob {
      * Constructor for Mob with custom spawn point
      *
      * @param gameMap MapService of the map the mob is located on
-     * @param speed      speed of the mob
-     * @param radius     size of the mob
-     * @param posX       x-spawn-position
-     * @param posY       y-spawn-positon
-     * @param posZ       z-spawn-position
+     * @param speed   speed of the mob
+     * @param radius  size of the mob
+     * @param posX    x-spawn-position
+     * @param posY    y-spawn-positon
+     * @param posZ    z-spawn-position
      */
     public Mob(GameMap gameMap, double speed, double radius, double posX, double posY, double posZ) {
         this.speed = speed;
@@ -95,23 +95,15 @@ public abstract class Mob {
         return radius;
     }
 
-    public void setRadius(double radius) {
-        this.radius = radius;
-    }
-
-    public void setSpawn(Vector3d spawn) {
-        this.spawn = spawn;
-    }
-
-    public double getSpeed(){
+    public double getSpeed() {
         return speed;
     }
 
-    public void setSpeed(double speed){
+    public void setSpeed(double speed) {
         this.speed = speed;
     }
 
-    public Quaterniond getRotationQuaternion(){
+    public Quaterniond getRotationQuaternion() {
         return this.quat;
     }
 
@@ -312,10 +304,6 @@ public abstract class Mob {
         quat.w = qW;
     }
 
-    public void setPosition(Vector3d position) {
-        this.position = position;
-    }
-
     public int calcMapIndexOfCoordinate(double a) {
         return (int) (a / GameConfig.SQUARE_SIZE);
     }
@@ -324,8 +312,16 @@ public abstract class Mob {
         return spawn;
     }
 
+    public void setSpawn(Vector3d spawn) {
+        this.spawn = spawn;
+    }
+
     public Vector3d getPosition() {
         return position;
+    }
+
+    public void setPosition(Vector3d position) {
+        this.position = position;
     }
 
     public long getId() {

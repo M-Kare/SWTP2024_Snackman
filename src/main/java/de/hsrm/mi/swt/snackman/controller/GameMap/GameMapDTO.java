@@ -1,11 +1,9 @@
 package de.hsrm.mi.swt.snackman.controller.GameMap;
 
 import de.hsrm.mi.swt.snackman.controller.Chicken.ChickenDTO;
-import de.hsrm.mi.swt.snackman.controller.Ghost.GhostDTO;
 import de.hsrm.mi.swt.snackman.messaging.MessageLoop.ScriptGhostDTO;
 import de.hsrm.mi.swt.snackman.controller.Square.SquareDTO;
 import de.hsrm.mi.swt.snackman.entities.map.GameMap;
-import de.hsrm.mi.swt.snackman.entities.mobileObjects.Ghost;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.ScriptGhost;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken.Chicken;
 
