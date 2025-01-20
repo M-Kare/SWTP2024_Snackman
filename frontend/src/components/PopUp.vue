@@ -7,7 +7,7 @@
       id="ok-button"
       @click="$emit('hidePopUp')">
 
-      OK
+      {{ $t('button.ok') }} 
     </SmallNavButton>
   </div>
 </template>

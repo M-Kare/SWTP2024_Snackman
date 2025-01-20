@@ -3,13 +3,13 @@
   <div id="form-box">
     <form id="form" @submit.prevent="savePlayerName">
       <label>
-        Please enter your name:
+        {{ $t('savePlayerName.label') }} 
       </label>
       <input
         v-model.trim="playerName"
         autofocus
         maxlength="16"
-        placeholder="max. 16 characters"
+        :placeholder="$t('savePlayerName.placeholder')"
         type="text">
       <p
         v-if="errorMessage"
@@ -22,22 +22,25 @@
       id="save-name-button"
       class="small-nav-button"
       @click="savePlayerName">
-      Save
+      {{ $t('button.save') }} 
     </SmallNavButton>
   </div>
 </template>
 
 <script setup lang="ts">
 import SmallNavButton from '@/components/SmallNavButton.vue';
-import {onMounted, ref} from 'vue';
+import {ref} from 'vue';
 import {useLobbiesStore} from '@/stores/Lobby/lobbiesstore';
 import {SoundManager} from "@/services/SoundManager";
 import {SoundType} from "@/services/SoundTypes";
+import { useI18n } from 'vue-i18n';
 
 const lobbiesStore = useLobbiesStore();
 
 const playerName = ref('');
 const errorMessage = ref('');
+
+const { t } = useI18n();
 
 const emit = defineEmits<{
   (e: 'hidePlayerNameForm'): void;
@@ -58,7 +61,7 @@ const emit = defineEmits<{
  */
 const savePlayerName = async () => {
   if (!playerName.value.trim()) {
-    errorMessage.value = "Playername can't be empty";
+    errorMessage.value = t('savePlayerName.error.playerNameEmpty');
     return;
   }
 

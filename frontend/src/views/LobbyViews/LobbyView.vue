@@ -1,12 +1,13 @@
 <template>
   <MenuBackground></MenuBackground>
+  <LanguageSwitch></LanguageSwitch>
 
   <div id="individual-outer-box-size" class="outer-box">
     <div class="item-row">
       <h1 class="title">{{ lobby?.name || 'Lobby Name' }}</h1>
 
       <div id="player-count">
-        {{ playerCount }} / {{ MAX_PLAYER_COUNT }} Player
+        {{ playerCount }} / {{ MAX_PLAYER_COUNT }}  {{ $t('lobby.playerCount.player') }} 
       </div>
     </div>
 
@@ -15,10 +16,6 @@
         <li v-for="member in members" class="player-list-items">
           <div class="player-name">
             {{ member.playerName.replace(/"/g, '') }} <!-- replace all " in String using RegEx modifier /g (find all) -->
-          </div>
-
-          <div class="player-character">
-            {{ member.role }}
           </div>
         </li>
       </ul>
@@ -33,7 +30,7 @@
               :checked="selectedMap === map.mapName"
               @change="selectMap(map.mapName)"
           />
-          <span>{{ map.mapName }}</span>
+          <span>{{ $t(map.translation) }}</span>
         </li>
       </ul>
     </div>
@@ -45,7 +42,7 @@
           class="small-nav-buttons"
           @click="leaveLobby"
         >
-          Leave Lobby
+          {{ $t('button.leaveLobby') }} 
         </SmallNavButton>
         <SmallNavButton
           id="menu-map-importieren"
@@ -53,7 +50,7 @@
           v-if="playerId == adminClientId"
           @click="triggerFileInput"
         >
-          Import map
+          {{ $t('button.importMap') }} 
         </SmallNavButton>
         <input class="input-feld"
             ref="fileInput"
@@ -69,7 +66,7 @@
           class="small-nav-buttons"
           @click="copyToClip()"
         >
-          Copy Link
+          {{ $t('button.copyLink') }} 
         </SmallNavButton>
 
 
@@ -78,7 +75,7 @@
           class="small-nav-buttons"
           @click="chooseRole(lobby)"
         >
-          Start Game
+          {{ $t('button.startGame') }} 
         </SmallNavButton>
       </div>
     </div>
@@ -93,7 +90,6 @@
   >
   </PlayerNameForm>
 
-  <!-- TODO test if condition works fine -->
   <PopUp
     v-if="errorBox && lobbiesStore.lobbydata.currentPlayer.playerName"
     class="popup-box"
@@ -109,7 +105,7 @@
   </PopUp>
 
   <PopUp v-if="showRolePopup" class="popup-box" @hidePopUp="hidePopUp">
-    <p class="info-heading">Can't start the game</p>
+    <p class="info-heading"> {{ $t('popup.cantStart.heading') }} </p>
     <p class="info-text">{{ infoText }}</p>
   </PopUp>
 
@@ -122,12 +118,16 @@ import MenuBackground from '@/components/MenuBackground.vue'
 import SmallNavButton from '@/components/SmallNavButton.vue'
 import PlayerNameForm from '@/components/PlayerNameForm.vue'
 import PopUp from '@/components/PopUp.vue'
+import LanguageSwitch from '@/components/LanguageSwitch.vue'
 
 import {useRoute, useRouter} from 'vue-router'
 import {computed, onMounted, ref, watchEffect} from 'vue'
 import {useLobbiesStore} from '@/stores/Lobby/lobbiesstore'
 import type {IPlayerClientDTD} from '@/stores/Lobby/IPlayerClientDTD'
 import type {ILobbyDTD} from '@/stores/Lobby/ILobbyDTD'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n();
 
 const router = useRouter()
 const route = useRoute()
@@ -146,7 +146,6 @@ const members = computed(
   () => lobby.value?.members || ([] as Array<IPlayerClientDTD>),
 )
 const playerCount = computed(() => members.value.length)
-const maxPlayerCount = ref(5)
 const playerNameSaved = lobbiesStore.lobbydata.currentPlayer.playerName;
 const showPlayerNameForm = ref(false);
 
@@ -187,20 +186,28 @@ function hidePopUpAndRedirect(){
   router.push({ name: "LobbyListView"})
 }
 
-const mapList = ref<{ mapName: string; fileName: string }[]>([
-  {mapName: 'Generated Map', fileName: `Maze.txt`},
+const mapList = ref<{ mapName: string; fileName: string; translation: string }[]>([
+  { mapName: 'Generated Map', fileName: `Maze.txt`, translation: 'lobby.mapName.generated' }
 ]);
 
 const usedCustomMap = ref(false);
 const selectedMap = ref<string | null>(null);
 
-const selectMap = (mapName: string) => {
+const selectMap = async (mapName: string) => {
     selectedMap.value = mapName;
 
-  if (selectedMap.value === 'Generated Map') {
-        usedCustomMap.value = false;
-  } else if (selectedMap.value === 'Uploaded Map') {
-        usedCustomMap.value = true;
+    if (selectedMap.value === 'Generated Map') {
+          usedCustomMap.value = false;
+    } else if (selectedMap.value === 'Uploaded Map') {
+          usedCustomMap.value = true;
+    }
+
+    const status = await changeUsedMapStatus(lobbyId, usedCustomMap.value);
+    if (status !== "done") {
+      showPopUp.value = true;
+      darkenBackground.value = true;
+      infoHeading.value = "Map Status Error";
+      infoText.value = "Failed to update the map status.";
     }
 };
 
@@ -228,8 +235,8 @@ const handleFileImport = (event: Event) => {
         } else {
             showPopUp.value = true;
             darkenBackground.value = true;
-            infoHeading.value = "File Map is not valid"
-            infoText.value = "Please upload file .txt"
+            infoHeading.value = t('popup.mapNotValid.heading');
+            infoText.value = t('popup.mapNotValid.text');
         }
     }
 }
@@ -253,11 +260,12 @@ const uploadFileToServer = async (file: File, lobbyId: string) => {
         if (response.ok) {
             const mapName = 'Uploaded Map';
             const fileName = `SnackManMap_${lobbyId}.txt`;
+            const translation = 'lobby.mapName.uploaded';
 
             if (mapList.value.length > 1) {
-                mapList.value[1] = { mapName, fileName };
+                mapList.value[1] = { mapName, fileName, translation};
             } else {
-                mapList.value.push({ mapName, fileName });
+                mapList.value.push({ mapName, fileName, translation });
             }
 
             selectMap(mapName);
@@ -265,14 +273,14 @@ const uploadFileToServer = async (file: File, lobbyId: string) => {
             const errorMessage = await response.text();
             showPopUp.value = true;
             darkenBackground.value = true;
-            infoHeading.value = "File Map is not valid";
+            infoHeading.value = t('popup.mapNotValid.heading');
             infoText.value = errorMessage;
         }
     } catch (error) {
         console.error('Error uploading file:', error);
         showPopUp.value = true;
         darkenBackground.value = true;
-        infoHeading.value = "Error uploading file";
+        infoHeading.value = t('popup.uploadingFile.heading');
         infoText.value = error;
     }
 }
@@ -346,8 +354,8 @@ onMounted(async () => {
   await lobbiesStore.fetchLobbyList()
 
   if (!lobby.value) {
-    infoHeading.value = 'Lobby does not exist'
-    infoText.value = 'Please choose or create another one!'
+    infoHeading.value = t('popup.notExisting.heading');
+    infoText.value = t('popup.notExisting.text');
     errorBox.value = true
     darkenBackground.value = true;
   }
@@ -364,8 +372,8 @@ onMounted(async () => {
     darkenBackground.value = true;
 
     if (lobby.value!.members.length >= MAX_PLAYER_COUNT) {
-      infoHeading.value = 'Lobby full'
-      infoText.value = 'Please choose or create another one!'
+      infoHeading.value = t('popup.lobbyFull.heading');
+      infoText.value = t('popup.lobbyFull.text');
       errorBox.value = true
       darkenBackground.value = true
     }
@@ -443,7 +451,7 @@ const chooseRole = async(lobby: ILobbyDTD | undefined ) =>{
   if (lobby.members.length < 2) {
     showPopUp.value = true
     darkenBackground.value = true
-    infoText.value = 'Not enough players to choose Role!'
+    infoText.value = t('popup.cantStart.notEnoughPlayers');
     return
   }
 
@@ -452,14 +460,14 @@ const chooseRole = async(lobby: ILobbyDTD | undefined ) =>{
   } else {
     showPopUp.value = true
     darkenBackground.value = true
-    infoText.value = 'The role selection can only be initiated by the host!'
+    infoText.value = t('popup.cantStart.onlyAdminCanInit');
   }
 
 }
 
 function copyToClip() {
   navigator.clipboard.writeText(document.URL)
-  infoText.value = 'Link copied to clipboard'
+  infoText.value = t('lobby.linkCopied');
   showInfo.value = true
   mouseInfoBox.value = document.getElementById('infoBox')
   moveToMouse(mouseInfoBox.value!)
