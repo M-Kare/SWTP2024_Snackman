@@ -210,18 +210,6 @@ public abstract class Mob {
                 }
                 break;
             case 3:
-                position.x += move.x;
-                position.z += move.z;
-                if (Math.round(position.x) < position.x) {
-                    position.x = Math.round(position.x) + this.radius;
-                } else {
-                    position.x = Math.round(position.x) - this.radius;
-                }
-                if (Math.round(position.z) < position.z) {
-                    position.z = Math.round(position.z) + this.radius;
-                } else {
-                    position.z = Math.round(position.z) - this.radius;
-                }
                 break;
             default:
                 break;
