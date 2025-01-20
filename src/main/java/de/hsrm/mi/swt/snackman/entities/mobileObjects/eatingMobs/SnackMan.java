@@ -60,7 +60,7 @@ public class SnackMan extends EatingMob {
 
     //JUMPING
     public void jump() {
-        if (!isJumping && getKcal() >= 100) {
+        if (!isJumping && getKcal() >= SINGLE_JUMP_CALORIE_COSTS) {
             this.velocityY = GameConfig.JUMP_STRENGTH;
             this.isJumping = true;
             this.hasDoubleJumped = false;
@@ -70,7 +70,7 @@ public class SnackMan extends EatingMob {
     }
 
     public void doubleJump() {
-        if (isJumping && getKcal() >= 100) {
+        if (isJumping && getKcal() >= DOUBLE_JUMP_CALORIE_COSTS) {
             this.velocityY += GameConfig.DOUBLEJUMP_STRENGTH;
             subtractCaloriesDoubleJump();
             this.hasDoubleJumped = true;
