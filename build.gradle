@@ -68,7 +68,7 @@ jacocoTestReport {
  }
 }
 
-/*
+
 // Frontend-Erstellung soll zusätzlich bei "./gradlew bootJar" ausgeführt werden
 task build_frontend {
      doLast {
@@ -102,6 +102,5 @@ task clean_frontend {
 }
 clean.dependsOn clean_frontend
 
-*/
 
 
