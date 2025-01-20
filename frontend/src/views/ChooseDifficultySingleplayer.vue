@@ -1,30 +1,32 @@
 <template>
   <div id="individual-outer-box-size" class="outer-box">
     <div class="inner-box">
-      <h1 class="title">Choose the difficulty level for the ghosts!</h1>
+      <h1 class="title"> {{ $t('difficulty.title') }} </h1>
       <div id="button-pair">
         <MainMenuButton id="easy-button"
                         :class="{ 'selected': difficulty === ScriptGhostDifficulty.EASY }"
                         @click="setDifficulty(ScriptGhostDifficulty.EASY)">
-          {{ ScriptGhostDifficulty.EASY }}
+          {{ $t('difficulty.easy') }}
         </MainMenuButton>
         <MainMenuButton id="difficult-button"
                         :class="{ 'selected': difficulty === ScriptGhostDifficulty.DIFFICULT }"
                         @click="setDifficulty(ScriptGhostDifficulty.DIFFICULT)">
-          {{ ScriptGhostDifficulty.DIFFICULT }}
+          {{ $t('difficulty.difficult') }}
         </MainMenuButton>
       </div>
-      <p id="description">When you choose <span id="highlight-difficulty-easy">'{{ ScriptGhostDifficulty.EASY }}'</span>,
-        ghosts will only chase you if they can
-        see you. However, if you are brave enough to choose <span
-          id="highlight-difficulty-difficult">'{{ ScriptGhostDifficulty.DIFFICULT }}'</span>, ghosts will
-        always find you (even when they can't see you)!</p>
+        <p id="description">
+          {{ $t('difficulty.description1') }}
+          <span id="highlight-difficulty-easy">'{{ $t('difficulty.easy') }}'</span>
+          {{ $t('difficulty.description2') }}
+          <span id="highlight-difficulty-difficult">'{{ $t('difficulty.difficult') }}'</span>
+          {{ $t('difficulty.description3') }}
+          </p>
       <div id="button-box">
         <SmallNavButton id="menu-back-button" class="small-nav-buttons" @click="backToMainMenu">
-          Back to menu
+          {{ $t('button.back') }} 
         </SmallNavButton>
         <SmallNavButton id="start-game-button" class="small-nav-buttons" @click="startSingleplayer">
-          Start Game
+          {{ $t('button.startGame') }} 
         </SmallNavButton>
       </div>
     </div>
