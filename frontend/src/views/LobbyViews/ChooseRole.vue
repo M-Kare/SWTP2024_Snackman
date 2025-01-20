@@ -26,6 +26,7 @@
           id="start-game-button"
           class="small-nav-buttons"
           @click="startGame"
+          :disabled="playersWithoutRole > 0"
         >
           {{ $t('button.startGame') }}
         </SmallNavButton>
@@ -260,6 +261,11 @@ watchEffect(() => {
   padding: 3vh 0 1vh 0;
 }
 
+#button-box:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 #player-count {
   margin-top: 0.5vh;
   font-size: 1.3rem;
@@ -287,13 +293,7 @@ watchEffect(() => {
   grid-gap: 20px;
 }
 
-#confirm-button {
-  position: absolute;
-  bottom: 1rem;
-  right: 1rem;
-}
-
-#confirm-button:disabled {
+:disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }
