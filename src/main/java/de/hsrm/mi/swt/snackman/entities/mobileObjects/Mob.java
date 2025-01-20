@@ -173,7 +173,7 @@ public abstract class Mob {
 
         //RESPAWN AUSSERHALB DES LABYRINTHS
         if (gameMap.getGameMapSquares() != null) {
-            if((position.y < 1) || (calcMapIndexOfCoordinate(xNew) < 0 || calcMapIndexOfCoordinate(xNew) >= gameMap.getGameMapSquares().length) ||  calcMapIndexOfCoordinate(zNew) < 0 || calcMapIndexOfCoordinate(zNew) >= gameMap.getGameMapSquares()[0].length){
+            if((position.y < 2) || (calcMapIndexOfCoordinate(xNew) < 0 || calcMapIndexOfCoordinate(xNew) >= gameMap.getGameMapSquares().length) ||  calcMapIndexOfCoordinate(zNew) < 0 || calcMapIndexOfCoordinate(zNew) >= gameMap.getGameMapSquares()[0].length){
                 respawn();
                 return;
             }
