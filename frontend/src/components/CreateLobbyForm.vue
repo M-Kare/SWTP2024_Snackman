@@ -146,15 +146,16 @@ input::placeholder {
   left: 50%;
   top: 25%;
   transform: translateX(-50%);
-  width: 60%;
-  max-width: 600px;
-  height: 20rem;
+  width: 50%;
+  height: 30rem;
 }
 
 #form {
   position: inherit;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   top: 35%;
-  left: 5%;
   width: 100%;
   font-size: 1.5rem;
   font-weight: bold;
@@ -165,7 +166,7 @@ input::placeholder {
   font-size: 1.2rem;
   width: auto;
   height: 2rem;
-  margin: 0.7rem 0 2rem 0.6rem;
+  margin: 1.2rem 0;
   padding: 1.2rem;
 }
 
