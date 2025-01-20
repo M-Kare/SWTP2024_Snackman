@@ -63,6 +63,10 @@
     },
     "chooseRole": {
         "title": "Wähle deinen Charakter",
+        "playerCount": {
+            "onePlayer": "Spieler muss seine Rolle wählen",
+            "twoPlayers": "Spieler müssen ihre Rollen wählen"
+        },
         "alreadyChosen": "Dieser Charakter wurde bereits gewählt!",
         "error": {
             "selection": "Fehler beim Auswählen des Charakters!",

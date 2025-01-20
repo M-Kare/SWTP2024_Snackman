@@ -30,6 +30,9 @@
           {{ $t('button.startGame') }}
         </SmallNavButton>
       </div>
+      <div id="player-count" v-if="playersWithoutRole > 0">
+        {{ playersWithoutRole }} {{ playersWithoutRole === 1 ? $t('chooseRole.playerCount.onePlayer') : $t('chooseRole.playerCount.twoPlayers') }}
+      </div>
     </div>
 
     <PopUp v-if="showPopUp" class="popup-box" @hidePopUp="hidePopUp">
@@ -51,6 +54,7 @@
 import {computed, onMounted, ref, watchEffect} from 'vue';
 import MenuBackground from '@/components/MenuBackground.vue';
 import SmallNavButton from '@/components/SmallNavButton.vue';
+import type {IPlayerClientDTD} from '@/stores/Lobby/IPlayerClientDTD'
 import {useRoute, useRouter} from "vue-router";
 import PopUp from "@/components/PopUp.vue";
 import type {Button} from "@/stores/Lobby/lobbiesstore"
@@ -65,6 +69,16 @@ const lobbyId = route.params.lobbyId as string
 const lobbiesStore = useLobbiesStore()
 const buttons = lobbiesStore.buttons
 
+const lobby = computed(() =>
+  lobbiesStore.lobbydata.lobbies.find(l => l.lobbyId === lobbyUrl),
+)
+const members = computed(
+  () => lobby.value?.members || ([] as Array<IPlayerClientDTD>),
+)
+const playersWithoutRole = computed(() => {
+  return members.value.filter(member => member.role === 'UNDEFINED').length;
+});
+
 const darkenBackground = ref(false)
 const showPopUp = ref(false)
 const showRolePopup = ref(false)
@@ -73,7 +87,6 @@ const hidePopUp = () => {
   showPopUp.value = false
 }
 const lobbyUrl = route.params.lobbyId
-const infoHeading = ref()
 
 const isPlayerAdmin = computed(() => {
   const currentPlayer = lobbiesStore.lobbydata.currentPlayer;
@@ -244,7 +257,15 @@ watchEffect(() => {
   width: 100%;
   display: flex;
   justify-content: center;
-  padding: 3% 0;
+  padding: 3vh 0 1vh 0;
+}
+
+#player-count {
+  margin-top: 0.5vh;
+  font-size: 1.3rem;
+  font-weight: bold;
+  color: var(--main-text-color);
+  text-align: center;
 }
 
 .outer-box {
@@ -260,6 +281,7 @@ watchEffect(() => {
 }
 
 .character-grid {
+  padding: 2% 0;
   display: grid;
   grid-template-columns: repeat(5, 5fr);
   grid-gap: 20px;
