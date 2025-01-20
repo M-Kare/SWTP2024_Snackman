@@ -1,16 +1,19 @@
 package de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import de.hsrm.mi.swt.snackman.configuration.GameConfig;
 import de.hsrm.mi.swt.snackman.entities.map.GameMap;
 import de.hsrm.mi.swt.snackman.entities.map.Square;
+import de.hsrm.mi.swt.snackman.entities.map.enums.WallAlignmentStatus;
+import de.hsrm.mi.swt.snackman.entities.map.enums.WallSectionStatus;
 import de.hsrm.mi.swt.snackman.entities.mapObject.snack.Snack;
 import de.hsrm.mi.swt.snackman.entities.mapObject.snack.SnackType;
 import de.hsrm.mi.swt.snackman.entities.mechanics.SprintHandler;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.Ghost;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.Mob;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.ScriptGhost;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class SnackMan extends EatingMob {
     private final Logger log = LoggerFactory.getLogger(SnackMan.class);
@@ -20,6 +23,12 @@ public class SnackMan extends EatingMob {
     private boolean isSprinting = false;
     private SprintHandler sprintHandler = new SprintHandler();
     private boolean isScared = false;
+    private boolean hasDoubleJumped = false;
+    private long jumpStartTime = 0;
+    private long elapsedTime = 0;
+    private double gravity = GameConfig.GRAVITY;
+    private boolean squareUnderneathIsWall = false;
+
 
     public SnackMan(GameMap gameMap, Square currentSquare, double posX, double posY, double posZ) {
         this(gameMap, GameConfig.SNACKMAN_SPEED, GameConfig.SNACKMAN_RADIUS, posX, posY, posZ);
@@ -52,7 +61,8 @@ public class SnackMan extends EatingMob {
         if (!isJumping && getKcal() >= 100) {
             this.velocityY = GameConfig.JUMP_STRENGTH;
             this.isJumping = true;
-            setKcal(getKcal() - 100);
+            this.hasDoubleJumped = false;
+            subtractCaloriesSingleJump();
         }
 
     }
@@ -60,21 +70,179 @@ public class SnackMan extends EatingMob {
     public void doubleJump() {
         if (isJumping && getKcal() >= 100) {
             this.velocityY += GameConfig.DOUBLEJUMP_STRENGTH;
-            setKcal(getKcal() - 100);
+            subtractCaloriesDoubleJump();
+            this.hasDoubleJumped = true;
         }
-
     }
 
     public void updateJumpPosition(double deltaTime) {
         if (isJumping) {
-            this.velocityY += GameConfig.GRAVITY * deltaTime;
-            setPosY(getPosY() + velocityY * deltaTime);
 
-            if (getPosY() <= GameConfig.SNACKMAN_GROUND_LEVEL) {
-                setPosY(GameConfig.SNACKMAN_GROUND_LEVEL);
+            if (this.getPosY() < GameConfig.SNACKMAN_GROUND_LEVEL) {
                 this.isJumping = false;
                 this.velocityY = 0;
+                this.hasDoubleJumped = false;
+                jumpStartTime = 0;
+                gravity = GameConfig.GRAVITY;
+                respawn();
             }
+
+            if (jumpStartTime == 0) {
+                jumpStartTime = System.currentTimeMillis();
+            }
+            elapsedTime = System.currentTimeMillis() - jumpStartTime;
+            if (elapsedTime >= 1000) {
+                gravity = GameConfig.GRAVITY_AFTER_TIMEOUT;
+            }
+
+            this.velocityY += gravity * deltaTime;
+            this.setPosY(this.getPosY() + this.velocityY * deltaTime);
+
+            squareUnderneathIsWall = squareUnderneathIsWall();
+
+            if (this.getPosY() <= GameConfig.SQUARE_HEIGHT && squareUnderneathIsWall) {
+                WallAlignmentStatus wallAlignment = checkWallAlignment();
+                WallSectionStatus wallSection = getWallSection();
+
+                switch (wallAlignment) {
+                    case WallAlignmentStatus.CASE0_NONE:
+                        pushback();
+                        break;
+                    case WallAlignmentStatus.CASE1_LEFT_RIGHT:
+                        if (wallSection == WallSectionStatus.CASE1_TOP_LEFT || wallSection == WallSectionStatus.CASE2_TOP_RIGHT) {
+                            push_forward();
+                        } else {
+                            push_backward();
+                        }
+                        break;
+                    case WallAlignmentStatus.CASE2_TOP_BOTTOM:
+                        if (wallSection == WallSectionStatus.CASE1_TOP_LEFT || wallSection == WallSectionStatus.CASE3_BOTTOM_LEFT) {
+                            push_left();
+                        } else {
+                            push_right();
+                        }
+                        break;
+                    case WallAlignmentStatus.CASE3_BOTTOM_LEFT:
+                        if (wallSection == WallSectionStatus.CASE1_TOP_LEFT || wallSection == WallSectionStatus.CASE2_TOP_RIGHT) {
+                            push_forward();
+                        } else if (wallSection == WallSectionStatus.CASE4_BOTTOM_RIGHT) {
+                            push_right();
+                        } else {
+                            pushback();
+                        }
+                        break;
+                    case WallAlignmentStatus.CASE4_TOP_LEFT:
+                        if (wallSection == WallSectionStatus.CASE3_BOTTOM_LEFT || wallSection == WallSectionStatus.CASE4_BOTTOM_RIGHT) {
+                            push_backward();
+                        } else if (wallSection == WallSectionStatus.CASE2_TOP_RIGHT) {
+                            push_right();
+                        } else {
+                            pushback();
+                        }
+                        break;
+                    case WallAlignmentStatus.CASE5_TOP_RIGHT:
+                        if (wallSection == WallSectionStatus.CASE1_TOP_LEFT || wallSection == WallSectionStatus.CASE3_BOTTOM_LEFT) {
+                            push_left();
+                        } else if (wallSection == WallSectionStatus.CASE4_BOTTOM_RIGHT) {
+                            push_backward();
+                        } else {
+                            pushback();
+                        }
+                        break;
+                    case WallAlignmentStatus.CASE6_BOTTOM_RIGHT:
+                        if (wallSection == WallSectionStatus.CASE1_TOP_LEFT || wallSection == WallSectionStatus.CASE2_TOP_RIGHT) {
+                            push_forward();
+                        } else if (wallSection == WallSectionStatus.CASE3_BOTTOM_LEFT) {
+                            push_left();
+                        } else {
+                            pushback();
+                        }
+                        break;
+                    case WallAlignmentStatus.CASE7_BOTTOM_LEFT_RIGHT:
+                        if (wallSection == WallSectionStatus.CASE1_TOP_LEFT || wallSection == WallSectionStatus.CASE2_TOP_RIGHT) {
+                            push_forward();
+                        } else {
+                            pushback();
+                        }
+                        break;
+                    case WallAlignmentStatus.CASE8_TOP_BOTTOM_LEFT:
+                        if (wallSection == WallSectionStatus.CASE2_TOP_RIGHT || wallSection == WallSectionStatus.CASE4_BOTTOM_RIGHT) {
+                            push_right();
+                        } else {
+                            pushback();
+                        }
+                        break;
+                    case WallAlignmentStatus.CASE9_TOP_LEFT_RIGHT:
+                        if (wallSection == WallSectionStatus.CASE3_BOTTOM_LEFT || wallSection == WallSectionStatus.CASE4_BOTTOM_RIGHT) {
+                            push_backward();
+                        } else {
+                            pushback();
+                        }
+                        break;
+                    case WallAlignmentStatus.CASE10_TOP_BOTTOM_RIGHT:
+                        if (wallSection == WallSectionStatus.CASE1_TOP_LEFT || wallSection == WallSectionStatus.CASE3_BOTTOM_LEFT) {
+                            push_left();
+                        } else {
+                            pushback();
+                        }
+                        break;
+                    case WallAlignmentStatus.CASE11_BOTTOM:
+                        if (wallSection == WallSectionStatus.CASE1_TOP_LEFT || wallSection == WallSectionStatus.CASE2_TOP_RIGHT) {
+                            push_forward();
+                        } else if (wallSection == WallSectionStatus.CASE3_BOTTOM_LEFT) {
+                            push_left();
+                        } else {
+                            push_right();
+                        }
+                        break;
+                    case WallAlignmentStatus.CASE12_LEFT:
+                        if (wallSection == WallSectionStatus.CASE1_TOP_LEFT) {
+                            push_forward();
+                        } else if (wallSection == WallSectionStatus.CASE2_TOP_RIGHT || wallSection == WallSectionStatus.CASE4_BOTTOM_RIGHT) {
+                            push_right();
+                        } else {
+                            push_backward();
+                        }
+                        break;
+                    case WallAlignmentStatus.CASE13_TOP:
+                        if (wallSection == WallSectionStatus.CASE1_TOP_LEFT) {
+                            push_left();
+                        } else if (wallSection == WallSectionStatus.CASE2_TOP_RIGHT) {
+                            push_right();
+                        } else {
+                            push_backward();
+                        }
+                        break;
+                    case WallAlignmentStatus.CASE14_RIGHT:
+                        if (wallSection == WallSectionStatus.CASE1_TOP_LEFT || wallSection == WallSectionStatus.CASE3_BOTTOM_LEFT) {
+                            push_left();
+                        } else if (wallSection == WallSectionStatus.CASE2_TOP_RIGHT) {
+                            push_forward();
+                        } else {
+                            push_backward();
+                        }
+                        break;
+                }
+            }
+
+            if (this.getPosY() <= GameConfig.SNACKMAN_GROUND_LEVEL) {
+                this.setPosY(GameConfig.SNACKMAN_GROUND_LEVEL);
+                this.isJumping = false;
+                this.velocityY = 0;
+                this.hasDoubleJumped = false;
+                jumpStartTime = 0;
+                gravity = GameConfig.GRAVITY;
+            }
+        }
+    }
+
+    public void subtractCaloriesSingleJump() {
+        setKcal(getKcal() - 100);
+    }
+
+    public void subtractCaloriesDoubleJump() {
+        if (!hasDoubleJumped) {
+            setKcal(getKcal() - 100);
         }
     }
 
@@ -100,6 +268,12 @@ public class SnackMan extends EatingMob {
         super.move(forward, backward, left, right, delta, gameMap);
         Square newSquare = gameMap.getSquareAtIndexXZ(calcMapIndexOfCoordinate(super.getPosX()), calcMapIndexOfCoordinate(super.getPosZ()));
 
+        if (!oldSquare.equals(newSquare)) {
+            oldSquare.removeMob(this);
+            newSquare.addMob(this);
+        }
+
+        // when snackman runs into a ghost
         for (Mob mob : newSquare.getMobs()) {
             if (mob instanceof Ghost || mob instanceof ScriptGhost) {
                 this.isScaredFromGhost(true);
@@ -107,12 +281,6 @@ public class SnackMan extends EatingMob {
                 this.isScaredFromGhost(false);
             }
         }
-
-        if (!oldSquare.equals(newSquare)) {
-            oldSquare.removeMob(this);
-            newSquare.addMob(this);
-        }
-
     }
 
     public int getSprintTimeLeft() {
@@ -163,10 +331,6 @@ public class SnackMan extends EatingMob {
         }
     }
 
-    public boolean isScared() {
-        return isScared;
-    }
-
     public boolean isJumping() {
         return isJumping;
     }
@@ -177,5 +341,17 @@ public class SnackMan extends EatingMob {
 
     public void setSprintHandler(SprintHandler sprintHandler) {
         this.sprintHandler = sprintHandler;
+    }
+
+    public boolean hasDoubleJumped() {
+        return hasDoubleJumped;
+    }
+
+    public void setHasDoubleJumped(boolean valueHasDoubleJumped) {
+        hasDoubleJumped = valueHasDoubleJumped;
+    }
+
+    public boolean isScared() {
+        return isScared;
     }
 }

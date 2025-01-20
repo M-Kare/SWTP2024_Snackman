@@ -102,9 +102,7 @@ function animate() {
     }
   })
   gameMapStore.getOtherPlayers().forEach((otherPlayer)=>{
-    console.log(otherPlayer.targetPosition.x)
     if(otherPlayer.model){
-      console.log(otherPlayer.model.quaternion.x, otherPlayer.model.quaternion.y, otherPlayer.model.quaternion.z)
       otherPlayer.model.position.lerp(otherPlayer.targetPosition, 0.2)
       otherPlayer.model.quaternion.slerp(otherPlayer.rotation, 0.5)
     }
@@ -140,7 +138,6 @@ function animate() {
 
 onMounted(async () => {
   startCountDown()
-  console.log(formattedTime)
 
   // for rendering the scene, create gameMap in 3d and change window size
   const {initRenderer, createGameMap, getScene} = GameMapRenderer()
@@ -159,7 +156,6 @@ onMounted(async () => {
   }
 
   clients = lobbydata.lobbies.find((elem) => elem.lobbyId === lobbydata.currentPlayer.joinedLobbyId)?.members!
-  console.log(clients)
   playerData = await fetchSnackManFromBackend(lobbydata.currentPlayer.joinedLobbyId!, lobbydata.currentPlayer.playerId);
   MAX_CALORIES.value = playerData.maxCalories
 
@@ -364,7 +360,6 @@ const getCurrentPlayingTime = async () => {
     }
 
     const currentPlayingTime = await response.json();
-    console.log('Current Playing Time:', currentPlayingTime);
     return currentPlayingTime;
 
     } catch (error: any) {

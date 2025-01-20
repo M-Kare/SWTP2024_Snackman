@@ -88,7 +88,7 @@ export class Player {
     this.speed = speed;
     this.sprintMultiplier = sprintMultiplier;
 
-    this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 60)
+    this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100)
     this.camera.position.set(posX, posY, posZ)
     this.controls = new PointerLockControls(this.camera, renderer.domElement)
     this.controls.maxPolarAngle = (170/180)*Math.PI;
@@ -296,7 +296,7 @@ export class Player {
     try {
       result = this.checkWallCollision(xNew, zNew);
     } catch (e) {
-      console.log(e)
+      console.error(e)
     }
     switch (result) {
       case 0:

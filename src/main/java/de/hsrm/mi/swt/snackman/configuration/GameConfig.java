@@ -14,9 +14,10 @@ public class GameConfig {
     public static final int SNACKMAN_MAX_CALORIES = 20000;
 
     //SNACKMAN JUMPING PARAM
-    public static final double JUMP_STRENGTH = 8;
+    public static final double JUMP_STRENGTH = 8.7;
     public static final double DOUBLEJUMP_STRENGTH = JUMP_STRENGTH * 0.1;
-    public static final double GRAVITY = -20;
+    public static final double GRAVITY = -27;
+    public static final double GRAVITY_AFTER_TIMEOUT = -100;
 
     //SNACK SPAWN
     public static final int TIME_FOR_SNACKS_TO_RESPAWN = 30000;
