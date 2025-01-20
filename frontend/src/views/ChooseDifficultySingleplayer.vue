@@ -1,33 +1,33 @@
 <template>
   <div id="individual-outer-box-size" class="outer-box">
     <div class="inner-box">
-      <h1 class="title">Choose the difficulty level for the ghosts!</h1>
+      <h1 class="title"> {{ $t('difficulty.title') }} </h1>
       <div id="button-pair">
         <MainMenuButton id="easy-button"
                         :class="{ 'selected': difficulty === ScriptGhostDifficulty.EASY }"
                         @click="setDifficulty(ScriptGhostDifficulty.EASY)">
-          {{ ScriptGhostDifficulty.EASY }}
+          {{ $t('difficulty.easy') }}
         </MainMenuButton>
         <MainMenuButton id="difficult-button"
                         :class="{ 'selected': difficulty === ScriptGhostDifficulty.DIFFICULT }"
                         @click="setDifficulty(ScriptGhostDifficulty.DIFFICULT)">
-          {{ ScriptGhostDifficulty.DIFFICULT }}
+          {{ $t('difficulty.difficult') }}
         </MainMenuButton>
       </div>
-      <p id="description">When you choose <span id="highlight-difficulty-easy">'{{ ScriptGhostDifficulty.EASY }}'</span>,
-        ghosts will only chase you if they can
-        see you. However, if you are brave enough to choose <span
-          id="highlight-difficulty-difficult">'{{ ScriptGhostDifficulty.DIFFICULT }}'</span>, ghosts will
-        always find you (even when they can't see you)!</p>
-      <div id="button-box">
-        <SmallNavButton id="menu-back-button" class="small-nav-buttons" @click="backToMainMenu">
-          Back to menu
-        </SmallNavButton>
-        <SmallNavButton id="start-game-button" class="small-nav-buttons" @click="startSingleplayer">
-          Start Game
-        </SmallNavButton>
-      </div>
+      <p id="description">
+        {{ $t('difficulty.description1') }}
+        <span id="highlight-difficulty-easy">'{{ $t('difficulty.easy') }}'</span>
+        {{ $t('difficulty.description2') }}
+        <span id="highlight-difficulty-difficult">'{{ $t('difficulty.difficult') }}'</span>
+        {{ $t('difficulty.description3') }}
+      </p>
     </div>
+    <SmallNavButton id="menu-back-button" class="small-nav-buttons" @click="backToMainMenu">
+      {{ $t('button.back') }}
+    </SmallNavButton>
+    <SmallNavButton id="start-game-button" class="small-nav-buttons" @click="startSingleplayer">
+      {{ $t('button.startGame') }}
+    </SmallNavButton>
   </div>
 
 </template>
@@ -82,7 +82,7 @@ const startSingleplayer = async () => {
 <style scoped>
 #individual-outer-box-size {
   width: 80%;
-  height: 80%;
+  height: 60%;
   padding: 2%;
   top: 10%;
 }
@@ -96,7 +96,7 @@ const startSingleplayer = async () => {
 }
 
 #description {
-  color: var(--background-for-text-color);
+  color: var(--main-text-color);
   text-align: center;
   font-size: 28px;
 }
@@ -110,13 +110,16 @@ const startSingleplayer = async () => {
   padding: 3em 0;
 }
 
-#button-box {
-  width: 100%;
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  gap: 20px;
-  margin-top: 10%;
+#menu-back-button {
+  position: absolute;
+  left: 5%;
+  bottom: 8%;
+}
+
+#start-game-button {
+  position: absolute;
+  right: 5%;
+  bottom: 8%;
 }
 
 #highlight-difficulty-easy {
@@ -137,14 +140,47 @@ const startSingleplayer = async () => {
   background-color: var(--accent-color);
 }
 
-#menu-back-button:hover,
-#start-game-button:hover {
-  background: var(--primary-highlight-color);
+@media (min-width: 2500px) {
+  #individual-outer-box-size {
+    top: 20%;
+    height: 50%;
+    width: 60%;
+  }
 }
 
-@media (max-width: 1000px) {
+@media (min-width: 2300px) {
   .title {
-    font-size: 60px;
+    font-size: 80px;
+  }
+}
+
+@media (min-width: 1000px) and (min-height: 1500px) {
+  #description {
+    font-size: 35px;
+  }
+}
+
+@media (min-width: 1900px) and (max-width: 2499px) {
+  #individual-outer-box-size {
+    top: 18%;
+    width: 70%;
+    height: 60%;
+  }
+}
+
+@media (min-width: 1500px) and (max-width: 1899px) {
+  #individual-outer-box-size {
+    top: 18%;
+    width: 80%;
+    height: 70%;
+  }
+}
+
+@media (min-width: 500px) and (max-width: 1499px) and (max-height: 1000px) {
+  #individual-outer-box-size {
+    top: 10%;
+    width: 90%;
+    height: 80%;
   }
 }
 </style>

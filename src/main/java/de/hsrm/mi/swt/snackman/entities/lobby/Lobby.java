@@ -1,6 +1,7 @@
 package de.hsrm.mi.swt.snackman.entities.lobby;
 
 import java.util.*;
+
 import de.hsrm.mi.swt.snackman.configuration.GameConfig;
 import de.hsrm.mi.swt.snackman.entities.map.GameMap;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.Mob;
@@ -16,6 +17,7 @@ import org.slf4j.LoggerFactory;
  * Represents a lobby where players can gather to play a game together.
  */
 public class Lobby {
+    private final Logger log = LoggerFactory.getLogger(Lobby.class);
     private String lobbyId;
     private String name;
     private PlayerClient adminClient;
@@ -33,7 +35,6 @@ public class Lobby {
     private ROLE winningRole;
     private long gameStartTime;
     private long endTime;
-    private final Logger log = LoggerFactory.getLogger(Lobby.class);
     private MessageLoop messageLoop;
     private boolean usedCustomMap;
     private ScriptGhostDifficulty scriptGhostDifficulty;
@@ -106,7 +107,7 @@ public class Lobby {
         this.winningRole = winningRole;
         SnackMan snackMan = getSnackman();
 
-        if(snackMan != null) {
+        if (snackMan != null) {
             this.gameTimer.cancel();
             GameEnd gameEnd = new GameEnd(winningRole, this.timePlayed, snackMan.getKcal(), this.lobbyId);
             setGameFinished(true, gameEnd);
@@ -160,7 +161,7 @@ public class Lobby {
      * to the message queue for processing.
      *
      * @param gameFinished {@code true} to mark the game as finished, {@code false} otherwise
-     * @param gameEnd the {@link GameEnd} object representing the final state of the game
+     * @param gameEnd      the {@link GameEnd} object representing the final state of the game
      */
     public void setGameFinished(boolean gameFinished, GameEnd gameEnd) {
         this.isGameFinished = gameFinished;
@@ -179,7 +180,7 @@ public class Lobby {
         return gameMap;
     }
 
-    public void setGameMap(GameMap newGameMap){
+    public void setGameMap(GameMap newGameMap) {
         this.gameMap = newGameMap;
     }
 
@@ -195,12 +196,14 @@ public class Lobby {
         timeSinceLastSnackSpawn = time;
     }
 
-    public void setChooseRole(){
+    public void setChooseRole() {
         this.isChooseRole = true;
     }
-    public void setChooseRoleFinsih(){
+
+    public void setChooseRoleFinsih() {
         this.isChooseRole = false;
     }
+
     public boolean isChooseRole() {
         return isChooseRole;
     }
@@ -212,7 +215,7 @@ public class Lobby {
                 ", name='" + name + '\'' +
                 ", adminClient=" + adminClient +
                 ", isGameStarted=" + isGameStarted +
-                ", isChooseRole="+ isChooseRole +
+                ", isChooseRole=" + isChooseRole +
                 ", members=" + members +
                 ", gameMap=" + gameMap +
                 ", clientMobMap=" + clientMobMap +
@@ -220,11 +223,11 @@ public class Lobby {
                 '}';
     }
 
-    public void addChicken(Chicken chicken){
+    public void addChicken(Chicken chicken) {
         this.chickens.add(chicken);
     }
 
-    public void addScriptGhost(ScriptGhost scriptGhost){
+    public void addScriptGhost(ScriptGhost scriptGhost) {
         this.scriptGhosts.add(scriptGhost);
     }
 
@@ -236,15 +239,15 @@ public class Lobby {
         return scriptGhosts;
     }
 
-    public boolean getUsedCustomMap(){
+    public boolean getUsedCustomMap() {
         return usedCustomMap;
     }
 
-    public void setUsedCustomMap(boolean value){
+    public void setUsedCustomMap(boolean value) {
         this.usedCustomMap = value;
     }
 
-    public long getGameStartTime(){
+    public long getGameStartTime() {
         return this.gameStartTime;
     }
 

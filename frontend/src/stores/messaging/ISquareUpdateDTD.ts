@@ -1,5 +1,5 @@
-import type { ISquare } from "../Square/ISquareDTD";
+import type {ISquare} from "../Square/ISquareDTD";
 
-export interface ISquareUpdateDTD{
-   square: ISquare 
+export interface ISquareUpdateDTD {
+  square: ISquare
 }

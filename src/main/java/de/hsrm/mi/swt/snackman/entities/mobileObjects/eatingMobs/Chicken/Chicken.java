@@ -35,9 +35,11 @@ public class Chicken extends EatingMob implements Runnable {
     private static long idCounter = 0;
     private final PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
     private final Logger log = LoggerFactory.getLogger(Chicken.class);
-    private int waitingTime;
     private final int MAX_CALORIES = GameConfig.MAX_KALORIEN;
     private final int CALORIES_PER_SIXTH = (MAX_CALORIES / 6);
+    private final int MIN_EGG_CALORIES = 300;
+    private final double EGG_CALORIE_PERCENTAGE = 0.3;
+    private int waitingTime;
     private long id;
     private Thickness thickness = Thickness.THIN;
     private int chickenPosX, chickenPosZ;
@@ -81,6 +83,15 @@ public class Chicken extends EatingMob implements Runnable {
     }
 
     /**
+     * Method to generate the next id of a new Chicken. It is synchronized because of thread-safety.
+     *
+     * @return the next incremented id
+     */
+    protected synchronized static long generateId() {
+        return idCounter++;
+    }
+
+    /**
      * Converts a Python list to a Java list.
      *
      * @param pyList the Python list to convert.
@@ -93,15 +104,6 @@ public class Chicken extends EatingMob implements Runnable {
         }
         log.debug("Python script result is {}", javaList);
         return javaList;
-    }
-
-    /**
-     * Method to generate the next id of a new Chicken. It is synchronized because of thread-safety.
-     *
-     * @return the next incremented id
-     */
-    protected synchronized static long generateId() {
-        return idCounter++;
     }
 
     /**
@@ -136,10 +138,10 @@ public class Chicken extends EatingMob implements Runnable {
         this.lookingDirection = walkingDirection;
         Square oldPosition = this.gameMap.getSquareAtIndexXZ(this.chickenPosX, this.chickenPosZ);
         Square newPosition = walkingDirection.getNewPosition(this.gameMap, this.chickenPosX, this.chickenPosZ,
-        walkingDirection);
+                walkingDirection);
         try {
             log.debug("Waiting " + waitingTime + " sec before walking on next square.");
-            Thread.sleep(waitingTime/2);
+            Thread.sleep(waitingTime / 2);
         } catch (InterruptedException e) {
             log.error(e.getMessage());
             Thread.currentThread().interrupt();
@@ -148,7 +150,7 @@ public class Chicken extends EatingMob implements Runnable {
 
         try {
             log.debug("Waiting " + waitingTime + " sec before walking on next square.");
-            Thread.sleep(waitingTime/2);
+            Thread.sleep(waitingTime / 2);
         } catch (InterruptedException e) {
             log.error(e.getMessage());
             Thread.currentThread().interrupt();
@@ -271,7 +273,7 @@ public class Chicken extends EatingMob implements Runnable {
     /**
      * TODO
      */
-    private void setWaitingTime(){
+    private void setWaitingTime() {
         PyObject result = pythonInterpreter.eval(fileName + ".getWaitingTime()");
         this.waitingTime = result.asInt();
     }
@@ -290,20 +292,12 @@ public class Chicken extends EatingMob implements Runnable {
         return result.asInt();
     }
 
-    private PyList convertToPyStringList(List<String> list){
+    private PyList convertToPyStringList(List<String> list) {
         PyList pyList = new PyList();
-        for(String e : list){
+        for (String e : list) {
             pyList.append(new PyString(e));
         }
         return pyList;
-    }
-
-    public boolean getBlockingPath() {
-        return this.blockingPath;
-    }
-
-    public void setBlockingPath(boolean blockingPath) {
-        this.blockingPath = blockingPath;
     }
 
     public Thickness getThickness() {
@@ -390,8 +384,8 @@ public class Chicken extends EatingMob implements Runnable {
             timerRestarted = false;
             Square currentSquare = this.gameMap.getSquareAtIndexXZ(this.chickenPosX, this.chickenPosZ);
 
-            // new egg with current chicken-calories * 1.5
-            int eggCalories = (int) (super.getKcal() * 1.5);
+            int eggCalories = calculateEggCalories();
+
             Snack egg = new Snack(SnackType.EGG);
             egg.setCalories(eggCalories);
             // add egg to current square
@@ -404,6 +398,16 @@ public class Chicken extends EatingMob implements Runnable {
             timerRestarted = true;
             startNewTimer();
         }
+    }
+
+    /**
+     * Calculates the number of calories from eggs based on the total calories
+     * The result is always at least MIN_EGG_CALORIES
+     *
+     * @return The number of calories from eggs
+     */
+    protected int calculateEggCalories() {
+        return Math.max(MIN_EGG_CALORIES, (int) (super.getKcal() * EGG_CALORIE_PERCENTAGE));
     }
 
     /**
@@ -501,5 +505,9 @@ public class Chicken extends EatingMob implements Runnable {
 
     public void setWalking(boolean walking) {
         isWalking = walking;
+    }
+
+    public int getMAX_CALORIES() {
+        return MAX_CALORIES;
     }
 }

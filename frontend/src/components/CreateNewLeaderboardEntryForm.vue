@@ -1,30 +1,30 @@
 <template>
   <div class="overlay"></div>
-  <div id="form-box">
-    <h1 id="title">New Leaderboard entry</h1>
+  <div id="individual-form-box-size" class="form-box">
+    <h1 id="title"> {{ $t('newLeaderBoardEntry.title') }} </h1>
 
     <form id="form" @submit.prevent="createNewLeaderboardEntry">
-      <label>Enter your name: </label>
-      <input v-model.trim="yourName" type="text">
+      <label> {{ $t('newLeaderBoardEntry.label') }} </label>
+      <input v-model.trim="yourName" placeholder="name" type="text">
       <p
-          id="error-message"
-          v-if="errorMessage">
+        v-if="errorMessage"
+        id="error-message">
         {{ errorMessage }}
       </p>
-      <p>Played time: {{ playedTime }} minutes</p>
+      <p>{{ $t('newLeaderBoardEntry.playedTime', {time: playedTime}) }}</p>
     </form>
 
     <SmallNavButton
-        id="cancel-createNewLeaderboardEntry-creation-button"
-        class="small-nav-buttons"
-        @click="cancelNewLeaderboardEntryCreation">
-      Cancel
+      id="cancel-createNewLeaderboardEntry-creation-button"
+      class="small-nav-buttons"
+      @click="cancelNewLeaderboardEntryCreation">
+      {{ $t('button.cancel') }}
     </SmallNavButton>
     <SmallNavButton
-        id="create-createNewLeaderboardEntry-button"
-        class="small-nav-buttons"
-        @click="createNewLeaderboardEntry">
-      Create new leaderboard entry
+      id="create-createNewLeaderboardEntry-button"
+      class="small-nav-buttons"
+      @click="createNewLeaderboardEntry">
+      {{ $t('button.createNewLeaderBoardEntry') }}
     </SmallNavButton>
   </div>
 </template>
@@ -34,11 +34,13 @@ import SmallNavButton from '@/components/SmallNavButton.vue';
 import {ref} from 'vue';
 import {useLeaderboardStore} from "@/stores/Leaderboard/leaderboardStore";
 import type {LeaderboardEntry} from "@/stores/Leaderboard/LeaderboardDTD";
+import {useI18n} from 'vue-i18n';
 
 const yourName = ref('');
 const errorMessage = ref('');
 const leaderboardStore = useLeaderboardStore()
 
+const {t} = useI18n();
 const emit = defineEmits<{
   (event: 'cancelNewLeaderboardEntryCreation', value: boolean): void;
   (event: 'createNewLeaderboardEntry', value: string): void;
@@ -72,7 +74,7 @@ const cancelNewLeaderboardEntryCreation = () => {
  */
 const createNewLeaderboardEntry = async () => {
   if (!yourName.value.trim()) {
-    errorMessage.value = "Your name cannot be empty";
+    errorMessage.value = t('newLeaderBoardEntry.error.playerNameEmpty');
     return;
   }
 
@@ -83,11 +85,11 @@ const createNewLeaderboardEntry = async () => {
     releaseDate: today.toISOString().slice(0, 10)
   }
 
-  try{
+  try {
     emit('entryCreated')
     await leaderboardStore.addNewLeaderboardEntry(data)
     cancelNewLeaderboardEntryCreation()
-  } catch (error){
+  } catch (error) {
     console.error('Error:', error);
     alert("Error creating new leaderboard entry!");
   }
@@ -96,28 +98,13 @@ const createNewLeaderboardEntry = async () => {
 </script>
 
 <style scoped>
-.overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(5px);
-  z-index: 1;
-}
-
 #title {
+  width: 100%;
+  font-size: 50px;
   position: absolute;
-  top: 1rem;
+  top: 3rem;
   left: 50%;
   transform: translateX(-50%);
-  font-size: 2rem;
-  font-weight: bold;
-  color: #fff;
-  text-align: center;
-  width: 90%;
-  overflow: hidden;
 }
 
 input::placeholder {
@@ -125,47 +112,23 @@ input::placeholder {
   font-weight: bold;
 }
 
-#input-textmessage {
-  padding-bottom: 10px;
-  font-weight: bold;
-}
-
-#form-box {
-  z-index: 2;
-  position: absolute;
+#individual-form-box-size {
   left: 50%;
-  top: 25%;
+  top: 15%;
   transform: translateX(-50%);
-  width: 70%;
-  max-width: 600px;
-  height: 30rem;
-
-  background-image: url('@/assets/background-design-lobbies.png');
-  background-size: cover;
-  background-position: center;
-
-  border: var(--background-for-text-color) solid 4px;
-  border-radius: 0.5rem;
-  box-shadow: 10px 8px 0 var(--background-for-text-color);
-}
-
-#form-box::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: #000000dd;
-  border-radius: 0.5rem;
+  width: 60%;
+  height: 35rem;
 }
 
 #form {
   top: 35%;
-  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
   font-size: 1.5rem;
   font-weight: bold;
-  color: var(--background-for-text-color);
+  color: var(--main-text-color);
 }
 
 #form > input {
@@ -186,9 +149,6 @@ input::placeholder {
 
 .small-nav-buttons {
   bottom: 7%;
-  font-size: 0.9rem;
-  font-weight: bold;
-  padding: 0.7rem;
 }
 
 #cancel-createNewLeaderboardEntry-creation-button {
@@ -197,10 +157,5 @@ input::placeholder {
 
 #create-createNewLeaderboardEntry-button {
   right: 5%;
-}
-
-#cancel-createNewLeaderboardEntry-creation-button:hover,
-#create-createNewLeaderboardEntry-button:hover {
-  background: var(--primary-highlight-color);
 }
 </style>

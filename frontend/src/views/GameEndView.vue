@@ -3,18 +3,19 @@
   <div id="individual-outer-box-size" class="outer-box">
     <h1 class="result-title">{{ gameResult }}</h1>
     <p class="end-reason">{{ gameReason }}</p>
-    <p class="end-reason">The playing time was {{ formatedPlayedTime }} minutes</p>
+    <p class="end-reason">{{ $t('gameEnd.playingTime', {time: formatedPlayedTime}) }}</p>
     <div id="button-pair">
       <SmallNavButton id="menu-back-button" @click="backToMainMenu">
-        Main menu
+        {{ $t('button.backToMainMenu') }}
       </SmallNavButton>
       <SmallNavButton id="export-map-button" @click="downloadMap">
-        Export map
+        {{ $t('button.exportMap') }}
       </SmallNavButton>
-      <SmallNavButton v-if="!alreadyEntered && lobbydata.currentPlayer.role == 'SNACKMAN' && winningRole == 'SNACKMAN'"
-                      id="create-leaderboard-entry-button"
-                      @click="showCreateNewLeaderboardEntryForm">
-        Create new leaderboard entry
+      <SmallNavButton
+        v-if="!alreadyEntered && lobbydata.currentPlayer.role == 'SNACKMAN' && winningRole == 'SNACKMAN'"
+        id="create-leaderboard-entry-button"
+        @click="showCreateNewLeaderboardEntryForm">
+        {{ $t('button.createNewLeaderBoardEntry') }}
       </SmallNavButton>
     </div>
     <CreateNewLeaderboardEntryForm
@@ -58,6 +59,9 @@ import {useLobbiesStore} from '@/stores/Lobby/lobbiesstore'
 import ViewBackground from '@/components/ViewBackground.vue'
 import SmallNavButton from "@/components/SmallNavButton.vue";
 import {SoundManager} from "@/services/SoundManager";
+import {useI18n} from 'vue-i18n'
+
+const {t} = useI18n();
 
 const route = useRoute()
 const router = useRouter()
@@ -74,9 +78,9 @@ const kcalCollected = (route.query.kcalCollected as unknown as number) || 0
 const gameResult = ref<string>("")
 
 if (winningRole == 'SNACKMAN') {
-  gameResult.value = 'SNACKMAN IS THE WINNER'
+  gameResult.value = t('gameEnd.gameResult.winner.snackman');
 } else {
-  gameResult.value = 'GHOSTS ARE THE WINNER'
+  gameResult.value = t('gameEnd.gameResult.winner.ghosts');
 }
 
 /**
@@ -86,22 +90,22 @@ if (winningRole == 'SNACKMAN') {
 // Compute the game reason dynamically or display '-' if no data is available
 const gameReason = computed(() => {
   if (winningRole === 'SNACKMAN') {
-    return 'SnackMan has reached the calorie target!'
+    return t('gameEnd.gameReason.calorieTarget');
   } else if (winningRole === 'GHOST' && kcalCollected < 0) {
-    return 'The ghosts scared Snackman too many times until he had no calories left!'
+    return t('gameEnd.gameReason.noCaloriesLeft');
   }
-  return "The time is up and SnackMan hasn't collected enough calories!"
+  return t('gameEnd.gameReason.timeIsUp');
 })
 
 const showLeaderboard = () => {
   if (winningRole && winningRole !== '-') {
     router.push({
       name: 'Leaderboard',
-      query: { winningRole: winningRole },
+      query: {winningRole: winningRole},
     })
   } else {
     console.debug('no winning role')
-    router.push({ name: 'Leaderboard' })
+    router.push({name: 'Leaderboard'})
   }
 }
 
@@ -161,11 +165,11 @@ const downloadMap = async () => {
     URL.revokeObjectURL(url)
 
     // Success feedback
-    feedbackMessage.value = 'Map saved'
+    feedbackMessage.value = t('gameEnd.feedback.mapSaved');
     feedbackClass.value = 'success'
   } catch (error: any) {
     // Failure feedback
-    feedbackMessage.value = 'Map not saved'
+    feedbackMessage.value = t('gameEnd.feedback.mapNotSaved');
     feedbackClass.value = 'error'
   }
   // Clear feedback after 3 seconds
@@ -182,7 +186,7 @@ onMounted(() => {
 
 <style scoped>
 #individual-outer-box-size {
-  top: 5%;
+  top: 10%;
   width: 80%;
   text-align: center;
   display: flex;
@@ -200,7 +204,7 @@ onMounted(() => {
 }
 
 .end-reason {
-  color: var(--background-for-text-color);
+  color: var(--main-text-color);
   font-size: 2rem;
   margin-bottom: 2rem;
 }
@@ -211,12 +215,6 @@ onMounted(() => {
   display: flex;
   flex-direction: row;
   padding-top: 2em;
-}
-
-#menu-back-button:hover,
-#export-map-button:hover,
-#create-leaderboard-entry-button:hover {
-  background: var(--primary-highlight-color);
 }
 
 .character-image {
@@ -239,7 +237,7 @@ onMounted(() => {
   position: absolute;
   bottom: 0;
   width: 100%;
-  height: 20%;
+  height: 22%;
   font-size: 2rem;
   margin-top: 4rem;
   font-weight: bold;
@@ -248,6 +246,7 @@ onMounted(() => {
   text-align: center;
   align-content: center;
   animation: fadeIn 0.5s;
+  z-index: 5;
 }
 
 .feedback-message.success {
@@ -268,6 +267,36 @@ onMounted(() => {
   to {
     opacity: 1;
   }
+}
+
+@media (min-width: 2500px) {
+  #individual-outer-box-size {
+    top: 30%;
+    width: 50%;
+  }
+
+  .character-image {
+    bottom: 10%;
+  }
+
+  #snackman {
+    left: 10%;
+  }
+
+  #ghost {
+    right: 10%;
+  }
+}
+
+@media (min-width: 1900px) and (max-width: 2499px) {
+  #individual-outer-box-size {
+    top: 20%;
+    width: 60%;
+  }
+}
+
+@media (min-width: 1500px) and (max-width: 1899px) {
+
 }
 
 @media (max-width: 1000px) {

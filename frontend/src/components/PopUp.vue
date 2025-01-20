@@ -7,7 +7,7 @@
       id="ok-button"
       @click="$emit('hidePopUp')">
 
-      OK
+      {{ $t('button.ok') }}
     </SmallNavButton>
   </div>
 </template>
@@ -32,7 +32,7 @@ import SmallNavButton from '@/components/SmallNavButton.vue';
   border-radius: 0.3rem;
   text-align: left;
   padding: 1rem;
-  color: var(--background-for-text-color);
+  color: var(--main-text-color);
 }
 
 #message {
@@ -45,9 +45,5 @@ import SmallNavButton from '@/components/SmallNavButton.vue';
   font-size: 1.2rem;
   margin-top: 1rem;
   padding: 0.7rem;
-}
-
-#ok-button:hover {
-  background: var(--primary-highlight-color);
 }
 </style>

@@ -3,42 +3,42 @@
 
   <div class="outer-box">
     <div class="inner-box">
-      <h1 class="title">Choose your Character</h1>
+      <h1 class="title"> {{ $t('chooseRole.title') }} </h1>
       <div class="character-grid">
         <div
-            v-for="button in buttons"
-            :key="button.id"
-            :class="{ 'selected': button.selected }"
-            :style="button.selected ? { opacity: 0.3, cursor: 'not-allowed' } : {}"
-            class="character-item"
-            @click="selectCharacter(button)"
+          v-for="button in buttons"
+          :key="button.id"
+          :class="{ 'selected': button.selected }"
+          :style="button.selected ? { opacity: 0.3, cursor: 'not-allowed' } : {}"
+          class="character-item"
+          @click="selectCharacter(button)"
         >
           <div class="image-container"
                :style="button.selected ? { pointerEvents: 'none' } : {}">
             <img :src="button.image" :alt="button.name" class="character-image">
           </div>
-          <p class="character-name">{{ button.name }}</p>
+          <p class="character-name">{{ $t(button.translation) }}</p>
         </div>
       </div>
       <div id="button-box">
         <SmallNavButton
-            v-if="isPlayerAdmin"
-            id="start-game-button"
-            class="small-nav-buttons"
-            @click="startGame"
+          v-if="isPlayerAdmin"
+          id="start-game-button"
+          class="small-nav-buttons"
+          @click="startGame"
         >
-          Start Game
+          {{ $t('button.startGame') }}
         </SmallNavButton>
       </div>
     </div>
 
     <PopUp v-if="showPopUp" class="popup-box" @hidePopUp="hidePopUp">
-      <p class="info-heading">Can't start the game</p>
+      <p class="info-heading"> {{ $t('popup.cantStart.heading') }} </p>
       <p class="info-text">{{ infoText }}</p>
     </PopUp>
 
     <PopUp v-if="showRolePopup" class="popup-box" @hidePopUp="hidePopUp">
-      <p class="info-heading">Can't start the game</p>
+      <p class="info-heading"> {{ $t('popup.cantStart.heading') }} </p>
       <p class="info-text">{{ infoText }}</p>
     </PopUp>
 
@@ -48,19 +48,21 @@
 </template>
 
 <script setup lang="ts">
-import {onMounted, ref, watchEffect, computed} from 'vue';
+import {computed, onMounted, ref, watchEffect} from 'vue';
 import MenuBackground from '@/components/MenuBackground.vue';
 import SmallNavButton from '@/components/SmallNavButton.vue';
 import {useRoute, useRouter} from "vue-router";
 import PopUp from "@/components/PopUp.vue";
 import type {Button} from "@/stores/Lobby/lobbiesstore"
 import {useLobbiesStore} from "@/stores/Lobby/lobbiesstore";
+import {useI18n} from 'vue-i18n';
+
+const {t} = useI18n();
 
 const route = useRoute()
 const router = useRouter()
 const lobbyId = route.params.lobbyId as string
 const lobbiesStore = useLobbiesStore()
-const usedCustomMap = ref(false);
 const buttons = lobbiesStore.buttons
 
 const darkenBackground = ref(false)
@@ -94,7 +96,7 @@ const selectCharacter = async (button: Button) => {
 
   // already choosen Role
   if (button.selected) {
-    infoText.value = "Dieser Charakter wurde bereits gewählt!";
+    infoText.value = t('chooseRole.alreadyChosen');
     showPopUp.value = true;
     darkenBackground.value = true;
     return;
@@ -121,18 +123,18 @@ const selectCharacter = async (button: Button) => {
       selectedCharacter.value = button;
       darkenBackground.value = true;
     } else if (response.status === 409) {
-      infoText.value = "This Character already selected!";
+      infoText.value = t('chooseRole.alreadyChosen');
       showPopUp.value = true;
       darkenBackground.value = true;
     } else {
-      infoText.value = "Error while selecting character!";
+      infoText.value = t('chooseRole.error.selection');
       showPopUp.value = true;
       darkenBackground.value = true;
     }
 
   } catch (error) {
     console.error("Error selecting character:", error);
-    infoText.value = "Failed to connect to the server!";
+    infoText.value = t('chooseRole.error.connectionFailed');
     showPopUp.value = true;
     darkenBackground.value = true;
   }
@@ -163,19 +165,11 @@ const startGame = async () => {
     return
   }
   if (playerId === lobby.adminClient.playerId) {
-    const status = await changeUsedMapStatus(lobby.lobbyId, usedCustomMap.value);
-    if (status !== "done") {
-      showPopUp.value = true;
-      darkenBackground.value = true;
-      infoHeading.value = "Map Status Error";
-      infoText.value = "Failed to update the map status.";
-      return;
-    }
     lobby.members.forEach(member => {
       if (member.role === 'UNDEFINED') {
         showPopUp.value = true
         darkenBackground.value = true
-        infoText.value = 'Every Player has to choose a Role!'
+        infoText.value = t('chooseRole.error.everyPlayerNeedsRole');
         return
       } else if (member.role === 'SNACKMAN') {
         snackmanCounter++
@@ -201,7 +195,7 @@ const startGame = async () => {
     } else {
       showPopUp.value = true
       darkenBackground.value = true
-      infoText.value = 'There must be exactly one SnackMan and all players must have a role!'
+      infoText.value = t('chooseRole.error.exactlyOneSnackMan');
     }
   } else {
     showPopUp.value = true
@@ -210,44 +204,15 @@ const startGame = async () => {
   }
 }
 
-/**
- * Sends a request to update the used map status for a specific lobby.
- *
- * @param {string} lobbyId - The unique identifier of the lobby.
- * @param {boolean} usedCustomMap - Indicates whether a custom map is used (true) or not (false).
- */
-const changeUsedMapStatus = async (lobbyId: string, usedCustomMap: boolean): Promise<string> => {
-  try {
-    const response = await fetch('/api/change-used-map-status', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({lobbyId, usedCustomMap})
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('Error changing the used map status:', errorText);
-      throw new Error(`Failed to change map status: ${errorText}`);
-    }
-
-    return "done";
-  } catch (error) {
-    console.error('Error changing the used map status:', error);
-    throw error;
-  }
-}
-
 watchEffect(() => {
   if (lobbiesStore.lobbydata && lobbiesStore.lobbydata.lobbies) {
     const updatedLobby = lobbiesStore.lobbydata.lobbies.find(
       lobby => lobby.lobbyId === lobbyUrl,
     )
-    if (updatedLobby &&  updatedLobby.gameStarted) {
+    if (updatedLobby && updatedLobby.gameStarted) {
 
       const currentPlayerId = lobbiesStore.lobbydata.currentPlayer.playerId
-      const currentPlayerInUpdatedLobby = updatedLobby.members.find( member => member.playerId == currentPlayerId)
+      const currentPlayerInUpdatedLobby = updatedLobby.members.find(member => member.playerId == currentPlayerId)
 
       if (currentPlayerInUpdatedLobby) {
         buttons.forEach(button => button.selected = false)
@@ -272,7 +237,7 @@ watchEffect(() => {
   top: 1rem;
   text-align: center;
   font-weight: bold;
-  color: var(--background-for-text-color);
+  color: var(--main-text-color);
 }
 
 #button-box {
@@ -346,12 +311,8 @@ watchEffect(() => {
 
 .character-name {
   font-weight: bold;
-  color: #000000;
+  color: var(--primary-text-color);
   margin: 0;
-}
-
-#start-game-button:hover {
-  background-color: var(--primary-highlight-color);
 }
 
 @media (max-width: 1300px) {

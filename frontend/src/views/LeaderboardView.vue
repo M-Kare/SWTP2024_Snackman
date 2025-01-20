@@ -1,36 +1,34 @@
 <template>
   <ViewBackground></ViewBackground>
   <div id="individual-outer-box-size" class="outer-box">
-    <h1 class="info-heading">Leaderboard</h1>
+    <h1>{{ $t('leaderBoard.title') }}</h1>
     <div class="table-container">
       <table>
         <thead>
-          <tr>
-            <td></td>
-            <td>Name</td>
-            <td>Date</td>
-            <td>Duration</td>
-          </tr>
+        <tr>
+          <td><!-- Should be empty because the placement does not require a headline --></td>
+          <td>Name</td>
+          <td> {{ $t('leaderBoard.date') }}</td>
+          <td> {{ $t('leaderBoard.duration') }}</td>
+        </tr>
         </thead>
         <tbody>
-          <tr v-for="(entry, index) in leaderboardEntries">
-            <td>{{ index + 1 }}</td>
-            <td>{{ entry.name }}</td>
-            <td>{{ entry.releaseDate }}</td>
-            <td>{{ entry.duration }}</td>
-          </tr>
+        <tr v-for="(entry, index) in leaderboardEntries">
+          <td>{{ index + 1 }}</td>
+          <td>{{ entry.name }}</td>
+          <td>{{ entry.releaseDate }}</td>
+          <td>{{ entry.duration }}</td>
+        </tr>
         </tbody>
       </table>
     </div>
-    <div id="button-pair">
-      <SmallNavButton
-        id="menu-back-button"
-        class="small-nav-buttons"
-        @click="backToMainMenu"
-      >
-        Back to main menu
-      </SmallNavButton>
-    </div>
+    <SmallNavButton
+      id="menu-back-button"
+      class="small-nav-buttons"
+      @click="backToMainMenu"
+    >
+      {{ $t('button.back') }}
+    </SmallNavButton>
   </div>
   <img
     id="snackman"
@@ -67,7 +65,7 @@ const route = useRoute()
 const gameResult = ref<'SNACKMAN' | 'GHOST' | null>(null)
 
 const backToMainMenu = () => {
-  router.push({ name: 'MainMenu' })
+  router.push({name: 'MainMenu'})
 }
 
 /**
@@ -98,18 +96,10 @@ const leaderboardEntries = computed(
 </script>
 
 <style scoped>
-.info-heading {
-  font-size: 3rem;
-  font-weight: bold;
-  color: var(--background-for-text-color);
-  text-align: center;
-}
-
 #individual-outer-box-size {
-  top: 10%;
-  width: 70vw;
-  max-width: 1000px;
-  height: 40rem;
+  top: 10% !important;
+  width: 50%;
+  height: 70%;
   max-height: 50rem;
   padding: 30px;
 }
@@ -128,7 +118,7 @@ tr {
 
 thead tr td {
   background: transparent;
-  color: var(--background-for-text-color);
+  color: var(--main-text-color);
   font-weight: bold;
   border: none;
   padding: 0 10px;
@@ -137,7 +127,7 @@ thead tr td {
 thead tr td {
   background: transparent;
   vertical-align: bottom;
-  color: var(--background-for-text-color);
+  color: var(--main-text-color);
   font-weight: bold;
   border: none;
   padding: 5px 10px;
@@ -197,15 +187,10 @@ tr td:not(:first-child):not(:last-child) {
   overflow-y: auto;
 }
 
-#button-pair {
-  display: flex;
-  justify-content: center;
-  gap: 20px;
-  padding-top: 2em;
-}
-
-#menu-back-button:hover {
-  background: var(--primary-highlight-color);
+#menu-back-button {
+  position: absolute;
+  bottom: 7%;
+  left: 45%;
 }
 
 .character-image {
@@ -217,10 +202,85 @@ tr td:not(:first-child):not(:last-child) {
 }
 
 #snackman {
-  left: 6%;
+  left: 15%;
 }
 
 #ghost {
-  right: 6%;
+  right: 15%;
+}
+
+@media (min-width: 3000px) {
+  #individual-outer-box-size {
+    top: 20% !important;
+    width: 40%;
+  }
+
+  .character-image {
+    width: 400px;
+    bottom: 20% !important;
+  }
+
+  #snackman {
+    left: 25% !important;
+  }
+
+  #ghost {
+    right: 25% !important;
+  }
+}
+
+@media (min-width: 3000px) and (min-height: 1400px) {
+  .character-image {
+    width: 350px;
+    bottom: 30%;
+  }
+
+  #snackman {
+    left: 10%;
+  }
+
+  #ghost {
+    right: 10%;
+  }
+}
+
+@media (min-width: 1900px) and (max-width: 2999px) {
+  #individual-outer-box-size {
+    top: 15% !important;
+  }
+
+  .character-image {
+    width: 350px;
+    bottom: 10%;
+  }
+
+  #snackman {
+    left: 15%;
+  }
+
+  #ghost {
+    right: 15%;
+  }
+}
+
+@media (min-width: 1900px) and (min-height: 1400px) {
+  .character-image {
+    width: 350px;
+    bottom: 30%;
+  }
+
+  #snackman {
+    left: 10%;
+  }
+
+  #ghost {
+    right: 10%;
+  }
+}
+
+@media (min-width: 1500px) and (max-width: 1899px) {
+  #individual-outer-box-size {
+    top: 15% !important;
+  }
 }
 </style>

@@ -5,35 +5,36 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import de.hsrm.mi.swt.snackman.entities.mapObject.MapObjectType;
 import org.junit.jupiter.api.AfterAll;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import de.hsrm.mi.swt.snackman.entities.map.GameMap;
-import de.hsrm.mi.swt.snackman.entities.mapObject.MapObjectType;
-import de.hsrm.mi.swt.snackman.services.MapService;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.util.FileSystemUtils;
+
 import de.hsrm.mi.swt.snackman.SnackmanApplication;
 import de.hsrm.mi.swt.snackman.configuration.GameConfig;
+import de.hsrm.mi.swt.snackman.entities.map.GameMap;
 import de.hsrm.mi.swt.snackman.entities.map.Square;
+import de.hsrm.mi.swt.snackman.entities.map.enums.WallAlignmentStatus;
+import de.hsrm.mi.swt.snackman.entities.map.enums.WallSectionStatus;
+import de.hsrm.mi.swt.snackman.entities.mapObject.MapObjectType;
 import de.hsrm.mi.swt.snackman.entities.mapObject.snack.Snack;
 import de.hsrm.mi.swt.snackman.entities.mapObject.snack.SnackType;
 import de.hsrm.mi.swt.snackman.entities.mechanics.SprintHandler;
+import de.hsrm.mi.swt.snackman.services.MapService;
 
 @SpringBootTest
 class SnackManTest {
@@ -112,10 +113,10 @@ class SnackManTest {
 
     @Test
     void testJump() {
-        snackMan.setKcal(200);
+        snackMan.setKcal(10000);
         snackMan.jump();
 
-        assertEquals(100, snackMan.getKcal());
+        assertEquals(10000 - GameConfig.SINGLE_JUMP_CALORIE_COSTS, snackMan.getKcal());
         assertEquals(GameConfig.JUMP_STRENGTH, snackMan.getVelocityY());
         assertTrue(snackMan.isJumping());
     }
@@ -129,45 +130,59 @@ class SnackManTest {
         assertFalse(snackMan.isJumping());
     }
 
-    @Test
+    @Test 
     void testDoubleJump() {
-        snackMan.setKcal(300);
+        snackMan.setKcal(10000);
         snackMan.jump();
+
+        assertTrue(snackMan.isJumping());
+        assertFalse(snackMan.hasDoubleJumped());
+
         snackMan.doubleJump();
 
-        assertEquals(100, snackMan.getKcal());
+        assertTrue(snackMan.hasDoubleJumped());
+        assertEquals(10000 - GameConfig.DOUBLE_JUMP_CALORIE_COSTS - GameConfig.SINGLE_JUMP_CALORIE_COSTS, snackMan.getKcal());
         assertEquals(GameConfig.JUMP_STRENGTH + GameConfig.DOUBLEJUMP_STRENGTH, snackMan.getVelocityY());
     }
 
-    @Test
+    @Test 
     void testDoubleJumpWithoutEnoughKcal() {
-        snackMan.setKcal(100);
+        snackMan.setKcal(GameConfig.SINGLE_JUMP_CALORIE_COSTS);
         snackMan.jump();
         snackMan.doubleJump();
 
         assertEquals(0, snackMan.getKcal());
         assertEquals(GameConfig.JUMP_STRENGTH, snackMan.getVelocityY());
+        assertTrue(snackMan.isJumping());
+        assertFalse(snackMan.hasDoubleJumped());
     }
 
     @Test
     void testUpdateJumpPosition() {
+        GameMap gameMapMock = mock(GameMap.class);
+        Square squareMock = mock(Square.class);
+
+        snackMan.setGameMapForTest(gameMapMock); 
+
+        when(squareMock.getType()).thenReturn(MapObjectType.FLOOR);
+        when(gameMapMock.getSquareAtIndexXZ(anyInt(), anyInt())).thenReturn(squareMock);
+
         snackMan.setKcal(100);
         snackMan.jump();
         double deltaTime = 0.016;
+        snackMan.setPosY(3);
 
         assertTrue(snackMan.isJumping());
         assertTrue(snackMan.getVelocityY() > 0);
-        snackMan.updateJumpPosition(deltaTime);
 
         while (snackMan.getPosY() > GameConfig.SNACKMAN_GROUND_LEVEL) {
             snackMan.updateJumpPosition(deltaTime);
         }
 
-        assertEquals(GameConfig.SNACKMAN_GROUND_LEVEL, snackMan.getPosY());
+        assertEquals((double) GameConfig.SNACKMAN_GROUND_LEVEL, snackMan.getPosY(), 0.01);
         assertFalse(snackMan.isJumping());
-        assertEquals(0, snackMan.getVelocityY());
+        assertEquals(0, snackMan.getVelocityY(), 0.01);
     }
-
 
     @Test
     void testMoveWhileSprintingCanSprint() {

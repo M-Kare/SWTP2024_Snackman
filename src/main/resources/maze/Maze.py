@@ -6,7 +6,6 @@ def search_free_field_adjacent(maze, x, y):
     if maze is None:
         print("Maze is none")
 
-    print(x, y)
     if maze[x + 1][y + 1] != '#':
         return (x + 1, y + 1)
     elif maze[x][y+1] != '#':
@@ -51,9 +50,10 @@ def generate_spawn_chicken(maze):
     return maze
 
 def generate_free_center(maze, width, height):
+    schwelle = 4
     for y in range(len(maze)):
         for x in range(len(maze[y])):
-            if(width/3 < x < 2*width/3 and height/3 < y <(2*height/3)):
+            if(max(width/3, (width/2)-schwelle) < x < min(2*width/3, (width/2)+schwelle) and max(height/3, (height/2)-schwelle) < y <(min(2*height/3, (height/2)+schwelle))):
                 maze[y][x] = " "
     
     return maze
@@ -110,7 +110,7 @@ def save_file(maze, filename="Maze.txt"):
             file.write("".join(row) + "\n")
 
 def main():
-    width, height = 20, 20
+    width, height = 21, 21
     maze = generate_labyrinth(width, height)
     save_file(maze)
     

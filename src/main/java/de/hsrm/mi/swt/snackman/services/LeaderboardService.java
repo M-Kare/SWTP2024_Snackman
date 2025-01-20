@@ -24,24 +24,24 @@ import de.hsrm.mi.swt.snackman.messaging.FrontendMessageService;
 
 /**
  * Service class for managing the leaderboard.
- *
+ * <p>
  * This class is responsible for reading, updating, and providing access
  * to leaderboard data stored in a CSV-formatted file. It also handles
  * communication with the frontend via messaging
  */
 @Service
 public class LeaderboardService {
-    Logger log = LoggerFactory.getLogger(MapService.class);
-    private FrontendMessageService frontendMessageService;
+    public static final String CSV_LINE_SPLITTER = ";";
     private final String filePath;
     private final Leaderboard leaderboard = new Leaderboard();
-    public static final String CSV_LINE_SPLITTER = ";";
+    Logger log = LoggerFactory.getLogger(MapService.class);
+    private FrontendMessageService frontendMessageService;
 
     @Autowired
     public LeaderboardService(FrontendMessageService frontendMessageService) {
         this.frontendMessageService = frontendMessageService;
         this.filePath = "./extensions/leaderboard.txt";
-        
+
         List<String> lines = readInLeaderboard();
         fillLeaderboard(lines);
         log.info("Leaderboard loaded: {}", leaderboard);
@@ -87,7 +87,8 @@ public class LeaderboardService {
     private void fillLeaderboard(List<String> lines) {
         for (String line : lines) {
             String[] parts = line.split(CSV_LINE_SPLITTER);
-            if (parts.length != 3) throw new RuntimeException("Invalid CSV line: " + line + " at " + filePath + " file.");
+            if (parts.length != 3)
+                throw new RuntimeException("Invalid CSV line: " + line + " at " + filePath + " file.");
             this.leaderboard.addEntry(new LeaderboardEntry(parts[0], parts[1], parts[2]));
         }
         Collections.sort(this.leaderboard.getLeaderboard());
@@ -95,7 +96,7 @@ public class LeaderboardService {
 
     /**
      * Adds a new entry to the leaderboard and updates the file and frontend.
-     *
+     * <p>
      * The entry is added to the in-memory leaderboard, saved to the file, and a message
      * is sent to the frontend to notify about the update.
      *

@@ -1,8 +1,8 @@
 import * as THREE from 'three'
-import { type IGameMap, MapObjectType } from '@/stores/IGameMapDTD'
-import { useGameMapStore } from '@/stores/gameMapStore'
-import { GameObjectRenderer } from '@/renderer/GameObjectRenderer'
-import { SnackType } from '@/stores/Snack/ISnackDTD'
+import {type IGameMap, MapObjectType} from '@/stores/IGameMapDTD'
+import {useGameMapStore} from '@/stores/gameMapStore'
+import {GameObjectRenderer} from '@/renderer/GameObjectRenderer'
+import {SnackType} from '@/stores/Snack/ISnackDTD'
 
 /**
  * for rendering the game map
@@ -13,7 +13,6 @@ export const GameMapRenderer = () => {
   const gameObjectRenderer = GameObjectRenderer()
 
   // create new three.js scene
-  const GROUNDSIZE = 1000
   let renderer: THREE.WebGLRenderer
 
   // set up light
@@ -25,6 +24,10 @@ export const GameMapRenderer = () => {
   // add more natural outdoor lighting
   const hemiLight = new THREE.HemisphereLight(0xffffbb, 0x080820, 1)
   scene.add(hemiLight)
+
+  const skyboxUrls = ['skyPx.jpg', 'skyNx.jpg', 'skyPy.jpg', 'skyNy.jpg', 'skyPz.jpg', 'skyNz.jpg']
+  const skyboxCubemap = new THREE.CubeTextureLoader().load(skyboxUrls)
+  scene.background = skyboxCubemap
 
   /**
    * initialize renderer
@@ -40,6 +43,7 @@ export const GameMapRenderer = () => {
     renderer.setSize(window.innerWidth, window.innerHeight)
     renderer.setPixelRatio(window.devicePixelRatio)
     renderer.shadowMap.enabled = true // activates the shadow calculation
+    renderer.toneMapping = THREE.ACESFilmicToneMapping
 
     return renderer
   }
@@ -74,29 +78,29 @@ export const GameMapRenderer = () => {
             0,
             DEFAULT_SIDE_LENGTH,
             square.snack.snackType
-        )
-        scene.add(snackToAdd)
-        gameMapStore.setSnackMeshId(id, snackToAdd.id)
-      }}
+          )
+          scene.add(snackToAdd)
+          gameMapStore.setSnackMeshId(id, snackToAdd.id)
+        }
+      }
     }
     // add chickens
     for (let currentChicken of mapData.chickens) {
-      gameObjectRenderer.createChickenOnFloor(
+      await gameObjectRenderer.createChickenOnFloor(
         currentChicken.chickenPosX,
         currentChicken.chickenPosZ,
         0,
         currentChicken.thickness,
-      ).then((chickenToAdd) =>{
+      ).then((chickenToAdd) => {
         scene.add(chickenToAdd)
         gameMapStore.setChickenMeshId(chickenToAdd.id, currentChicken.id)
       })
     }
 
-    console.log("GameMap data ", mapData)
+    console.debug("GameMap data ", mapData)
     for (let currentGhost of mapData.scriptGhosts) {
-      console.log("Initialising script ghost with x {} y {}", currentGhost.scriptGhostPosX, currentGhost.scriptGhostPosZ)
-      
-      gameObjectRenderer.createGhostOnFloor(
+      console.debug("Initialising script ghost with x {} y {}", currentGhost.scriptGhostPosX, currentGhost.scriptGhostPosZ)
+      await gameObjectRenderer.createGhostOnFloor(
         currentGhost.scriptGhostPosX,
         currentGhost.scriptGhostPosZ,
         0,

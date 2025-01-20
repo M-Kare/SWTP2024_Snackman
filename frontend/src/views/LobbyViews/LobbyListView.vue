@@ -1,20 +1,23 @@
 <template>
   <MenuBackground :isLobbyView="true">
+
+    <LanguageSwitch></LanguageSwitch>
+
     <div id="individual-outer-box-size" class="outer-box">
-      <h1 class="title">Lobbies</h1>
+      <h1 class="title"> {{ $t('lobbyList.title') }} </h1>
       <SmallNavButton
         id="menu-back-button"
         class="small-nav-buttons"
         @click="backToMainMenu"
       >
-        Back
+        {{ $t('button.back') }}
       </SmallNavButton>
       <SmallNavButton
         id="show-lobby-creation-button"
         class="small-nav-buttons"
         @click="showCreateLobbyForm"
       >
-        Create new Lobby
+        {{ $t('button.createLobby') }}
       </SmallNavButton>
 
       <div class="inner-box">
@@ -30,7 +33,7 @@
             </div>
 
             <div class="playercount">
-              {{ lobby.members.length }} / {{ MAX_PLAYER_COUNT }} Spieler
+              {{ lobby.members.length }} / {{ MAX_PLAYER_COUNT }} {{ $t('lobbyList.playerCount.player') }}
             </div>
           </li>
         </ul>
@@ -39,10 +42,10 @@
 
     <div v-if="darkenBackground" id="darken-background"></div>
 
-  <PopUp v-if="showPopUp" class="popup-box" @hidePopUp="hidePopUp">
-    <p class="info-heading">Lobby full</p>
-    <p class="info-text">Please choose or create another one!</p>
-  </PopUp>
+    <PopUp v-if="showPopUp" class="popup-box" @hidePopUp="hidePopUp">
+      <p class="info-heading"> {{ $t('popup.lobbyFull.heading') }} </p>
+      <p class="info-text">{{ $t('popup.lobbyFull.text') }} </p>
+    </PopUp>
 
     <CreateLobbyForm
       v-if="showLobbyForm"
@@ -56,6 +59,7 @@ import MenuBackground from '@/components/MenuBackground.vue'
 import SmallNavButton from '@/components/SmallNavButton.vue'
 import CreateLobbyForm from '@/components/CreateLobbyForm.vue'
 import PopUp from '@/components/PopUp.vue'
+import LanguageSwitch from '@/components/LanguageSwitch.vue'
 
 import {useRouter} from 'vue-router'
 import {computed, onMounted, ref} from 'vue'
@@ -131,11 +135,11 @@ const joinLobby = async (lobby: ILobbyDTD) => {
   }
 }
 
-    onMounted(async () => {
-        await lobbiesStore.fetchLobbyList();
+onMounted(async () => {
+  await lobbiesStore.fetchLobbyList();
 
-      lobbiesStore.startLobbyLiveUpdate();
-    })
+  lobbiesStore.startLobbyLiveUpdate();
+})
 
 </script>
 
@@ -148,7 +152,7 @@ const joinLobby = async (lobby: ILobbyDTD) => {
   padding: 1.5rem 0 1rem 0;
   font-size: 3rem;
   font-weight: bold;
-  color: var(--background-for-text-color);
+  color: var(--main-text-color);
   text-align: center;
 }
 
@@ -207,11 +211,6 @@ const joinLobby = async (lobby: ILobbyDTD) => {
   right: 3%;
 }
 
-#menu-back-button:hover,
-#show-lobby-creation-button:hover {
-  background: var(--primary-highlight-color);
-}
-
 .info-heading {
   font-size: 3rem;
   font-weight: bold;
@@ -223,13 +222,13 @@ const joinLobby = async (lobby: ILobbyDTD) => {
 }
 
 #darken-background {
-    z-index: 1;
-    position: fixed;
-    top: 0;
-    width: 100vw;
-    height: 100vh;
-    background: rgba(0, 0, 0, 50%);
+  z-index: 1;
+  position: fixed;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 50%);
 
-    transition: background 0.3s ease;
+  transition: background 0.3s ease;
 }
 </style>

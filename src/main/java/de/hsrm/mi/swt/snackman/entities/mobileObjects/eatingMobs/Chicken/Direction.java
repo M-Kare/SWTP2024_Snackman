@@ -4,6 +4,7 @@ import de.hsrm.mi.swt.snackman.entities.map.GameMap;
 import de.hsrm.mi.swt.snackman.entities.map.Square;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import java.util.Random;
 
 /**
@@ -38,10 +39,10 @@ public enum Direction {
     TWO_SOUTH_TWO_WEST("", 2, -2), TWO_SOUTH_ONE_WEST("", 2, -1), TWO_SOUTH("", 2, 0), TWO_SOUTH_ONE_EAST("", 2, 1), TWO_SOUTH_TWO_EAST("", 2, 2);
 
 
+    private static final Logger log = LoggerFactory.getLogger(Direction.class);
     private final String indexOfList;
     private final int deltaX;
     private final int deltaZ;
-    private static final Logger log = LoggerFactory.getLogger(Direction.class);
 
     Direction(String indexOfList, int deltaX, int deltaZ) {
         this.indexOfList = indexOfList;
@@ -64,6 +65,18 @@ public enum Direction {
             case 3 -> Direction.ONE_WEST;
             default -> throw new IndexOutOfBoundsException("Chicken is walking into a not defined direction.");
         };
+    }
+
+    /**
+     * Gets a random direction
+     *
+     * @return random direction
+     */
+    public static Direction getRandomDirection() {
+        Direction[] mainDirections = {ONE_NORTH, ONE_SOUTH, ONE_EAST, ONE_WEST};
+        Random random = new Random();
+        int randomIndex = random.nextInt(mainDirections.length);
+        return mainDirections[randomIndex];
     }
 
     /**
@@ -180,22 +193,11 @@ public enum Direction {
 
     public Square get_two_South_two_East_Square(GameMap gameMap, Square currentPosition) {
 
-    return gameMap.getSquareAtIndexXZ(currentPosition.getIndexX() + TWO_SOUTH_TWO_EAST.deltaX, currentPosition.getIndexZ() + TWO_SOUTH_TWO_EAST.deltaZ);
+        return gameMap.getSquareAtIndexXZ(currentPosition.getIndexX() + TWO_SOUTH_TWO_EAST.deltaX, currentPosition.getIndexZ() + TWO_SOUTH_TWO_EAST.deltaZ);
     }
 
     @Override
     public String toString() {
         return indexOfList;
-    }
-
-    /**
-     * Gets a random direction
-     * @return random direction
-     */
-    public static Direction getRandomDirection() {
-        Direction[] mainDirections = {ONE_NORTH, ONE_SOUTH, ONE_EAST, ONE_WEST};
-        Random random = new Random();
-        int randomIndex = random.nextInt(mainDirections.length);
-        return mainDirections[randomIndex];
     }
 }

@@ -1,4 +1,3 @@
-import type {IGameMapDTD} from "@/stores/IGameMapDTD";
 import type {LeaderboardDTD} from "@/stores/Leaderboard/LeaderboardEntryDTD";
 
 /**
