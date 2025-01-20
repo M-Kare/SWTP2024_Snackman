@@ -194,7 +194,7 @@ export const useGameMapStore = defineStore('gameMap', () => {
                 updateScriptGhost(scriptGhostUpdate)
                 break;
               default:
-                console.log(mess.message)
+                console.error(mess.message)
             }
           }
         })
@@ -335,7 +335,7 @@ export const useGameMapStore = defineStore('gameMap', () => {
         chickenMesh!.scale.set(ChickenThickness.VERY_HEAVY  * 1.9, ChickenThickness.VERY_HEAVY, ChickenThickness.VERY_HEAVY * 1.9)
         break
       default:
-        console.log('ETWAS IST SCHIED GELAUFEN...')
+        console.warn('ETWAS IST SCHIED GELAUFEN...')
     }
   }
 

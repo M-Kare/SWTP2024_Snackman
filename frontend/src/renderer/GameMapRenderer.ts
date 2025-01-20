@@ -92,9 +92,9 @@ export const GameMapRenderer = () => {
       })
     }
 
-    console.log("GameMap data ", mapData)
+    console.debug("GameMap data ", mapData)
     for (let currentGhost of mapData.scriptGhosts) {
-      console.log("Initialising script ghost with x {} y {}", currentGhost.scriptGhostPosX, currentGhost.scriptGhostPosZ)
+      console.debug("Initialising script ghost with x {} y {}", currentGhost.scriptGhostPosX, currentGhost.scriptGhostPosZ)
       await gameObjectRenderer.createGhostOnFloor(
         currentGhost.scriptGhostPosX,
         currentGhost.scriptGhostPosZ,

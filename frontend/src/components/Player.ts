@@ -296,7 +296,7 @@ export class Player {
     try {
       result = this.checkWallCollision(xNew, zNew);
     } catch (e) {
-      console.log(e)
+      console.error(e)
     }
     switch (result) {
       case 0:

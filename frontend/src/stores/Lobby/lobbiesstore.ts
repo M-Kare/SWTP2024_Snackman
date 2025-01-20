@@ -188,15 +188,15 @@ export const useLobbiesStore = defineStore('lobbiesstore', () => {
       if (stompclient) {
         // Subscribe to Lobby updates (existing)
         stompclient.subscribe(DEST, async (message) => {
-          console.log('STOMP Client subscribe to Lobbies')
+          console.debug('STOMP Client subscribe to Lobbies')
           const updatedLobbies = JSON.parse(message.body)
           lobbydata.lobbies = [...updatedLobbies]
-          console.log('Received lobby update:', updatedLobbies)
+          console.debug('Received lobby update:', updatedLobbies)
         })
 
         // Subscribe to RoleView
         stompclient.subscribe(ROLEDEST, async (message) => {
-          console.log('STOMP Client subscribe to Role Changes')
+          console.debug('STOMP Client subscribe to Role Changes')
           const updatedLobbyWithRole = JSON.parse(message.body)
           const lobbyId = updatedLobbyWithRole.lobbyId
 
@@ -205,7 +205,7 @@ export const useLobbiesStore = defineStore('lobbiesstore', () => {
             // Push the update to all clients at /ChooseRole/{lobbyId}
             if (stompclient && stompclient.connected) {
               router.push({ name: 'ChooseRole', params: { lobbyId: updatedLobbyWithRole.lobbyId } })
-              console.log(`Pushed update to /ChooseRole/${updatedLobbyWithRole.lobbyId}`)
+              console.debug(`Pushed update to /ChooseRole/${updatedLobbyWithRole.lobbyId}`)
             }
           }
         })
@@ -402,7 +402,7 @@ export const useLobbiesStore = defineStore('lobbiesstore', () => {
       if (lobby) {
         lobby.gameStarted = true
       }
-      console.log(`Game started successfully in lobby: ${lobbyId}`)
+      console.debug(`Game started successfully in lobby: ${lobbyId}`)
     } catch (error: any) {
       console.error(`Error starting game in lobby ${lobbyId}:`, error)
       throw new Error('Could not start the game. Please try again.')
