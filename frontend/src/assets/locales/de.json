@@ -87,6 +87,12 @@
         "mapName": {
             "generated": "Generierte Map",
             "uploaded": "Hochgeladene Map"
+        },
+        "mapFile": {
+            "ghostCount": "Die Map-Datei muss mindestens 4x \"G\" für 4 Ghost-Spieler enthalten.",
+            "invalidChars": "Die Map-Datei darf nur die folgenden Zeichen enthalten: S, G, C, o, # und Leerzeichen.",
+            "exactlyOneS": "Die Map-Datei muss genau ein \"S\" enthalten.",
+            "invalidFileType": "Ungültiger Dateityp. Es sind nur .txt-Dateien zulässig."
         }
     },
     "popup": {
