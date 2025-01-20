@@ -118,9 +118,3 @@ export const GameMapRenderer = () => {
 
   return {initRenderer, createGameMap, getScene}
 }
-
-
-
-function initSky(){
-  
-}
