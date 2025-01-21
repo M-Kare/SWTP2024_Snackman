@@ -77,6 +77,11 @@ public class SnackMan extends EatingMob {
         }
     }
 
+    /**
+     * Updates the player's vertical position during a jump, applying gravity and handling wall interactions. 
+     * The player is pushed based on wall alignment and section, and if the player falls below ground level, they are respawned.
+     * @param deltaTime Time in seconds since the last update, used for position and velocity calculations.
+     */
     public void updateJumpPosition(double deltaTime) {
         if (isJumping) {
             if (this.getPosY() < GameConfig.SNACKMAN_GROUND_LEVEL) {
@@ -334,6 +339,10 @@ public class SnackMan extends EatingMob {
 
     public boolean isJumping() {
         return isJumping;
+    }
+
+    public void setIsJumping(boolean isJumping) {
+        this.isJumping = isJumping;
     }
 
     public double getVelocityY() {

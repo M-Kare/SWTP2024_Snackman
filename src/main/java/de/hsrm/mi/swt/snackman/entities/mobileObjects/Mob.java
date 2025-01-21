@@ -347,6 +347,8 @@ public abstract class Mob {
         quat.y = qY;
         quat.z = qZ;
         quat.w = qW;
+
+        forward.rotate(quat);
     }
 
     public void setPosition(Vector3d position) {
@@ -405,6 +407,9 @@ public abstract class Mob {
         }
     }
 
+    /**
+     * Moves the player in the opposite direction of the view direction step by step if blocked by a wall, finding a valid floor position or triggering a respawn if none is found.
+     */
     public void pushback() {
         tempPosition = position;
         double stepDistance = 0.1;
@@ -415,11 +420,9 @@ public abstract class Mob {
             Vector3d displacement = new Vector3d(backward);
             displacement.mul(stepDistance);
             displacement.y = 0;
-            //position.add(displacement);
             tempPosition.add(displacement);
             squareUnderneathIsWall = squareUnderneathIsWall(tempPosition);
         }
-        //position.y = GameConfig.SNACKMAN_GROUND_LEVEL;
         tempPosition.y = GameConfig.SNACKMAN_GROUND_LEVEL;
         Vector3d additionalDisplacement = new Vector3d(backward).mul(radius);
         additionalDisplacement.y = 0;
@@ -431,6 +434,9 @@ public abstract class Mob {
         }
     }
 
+    /**
+     * Moves the player forward step by step if blocked by a wall, finding a valid floor position or triggering a respawn if none is found.
+     */
     public void push_forward() {
         tempPosition = position;
         double stepDistance = 0.1;
@@ -439,11 +445,9 @@ public abstract class Mob {
         while (squareUnderneathIsWall) {
             Vector3d displacement = new Vector3d(pushForwardVector).mul(stepDistance);
             displacement.y = 0;
-            //position.add(displacement);
             tempPosition.add(displacement);
             squareUnderneathIsWall = squareUnderneathIsWall(tempPosition);
         }
-        //position.y = GameConfig.SNACKMAN_GROUND_LEVEL;
         tempPosition.y = GameConfig.SNACKMAN_GROUND_LEVEL;
         Vector3d additionalDisplacement = new Vector3d(pushForwardVector).mul(radius);
         additionalDisplacement.y = 0;
@@ -455,6 +459,9 @@ public abstract class Mob {
         }
     }
 
+    /**
+     * Moves the player backward step by step if blocked by a wall, finding a valid floor position or triggering a respawn if none is found.
+     */
     public void push_backward() {
         tempPosition = position;
         double stepDistance = 0.1;
@@ -463,11 +470,9 @@ public abstract class Mob {
         while (squareUnderneathIsWall) {
             Vector3d displacement = new Vector3d(pushBackwardVector).mul(stepDistance);
             displacement.y = 0;
-            //position.add(displacement);
             tempPosition.add(displacement);
             squareUnderneathIsWall = squareUnderneathIsWall(tempPosition);
         }
-        //position.y = GameConfig.SNACKMAN_GROUND_LEVEL;
         tempPosition.y = GameConfig.SNACKMAN_GROUND_LEVEL;
         Vector3d additionalDisplacement = new Vector3d(pushBackwardVector).mul(radius);
         additionalDisplacement.y = 0;
@@ -479,6 +484,9 @@ public abstract class Mob {
         }
     }
 
+    /**
+     * Moves the player left step by step if blocked by a wall, finding a valid floor position or triggering a respawn if none is found.
+     */
     public void push_left() {
         tempPosition = position;
         double stepDistance = 0.1;
@@ -487,11 +495,9 @@ public abstract class Mob {
         while (squareUnderneathIsWall) {
             Vector3d displacement = new Vector3d(pushLeftVector).mul(stepDistance);
             displacement.y = 0;
-            //position.add(displacement);
             tempPosition.add(displacement);
             squareUnderneathIsWall = squareUnderneathIsWall(tempPosition);
         }
-        //position.y = GameConfig.SNACKMAN_GROUND_LEVEL;
         tempPosition.y = GameConfig.SNACKMAN_GROUND_LEVEL;
         Vector3d additionalDisplacement = new Vector3d(pushLeftVector).mul(radius);
         additionalDisplacement.y = 0;
@@ -503,6 +509,9 @@ public abstract class Mob {
         }
     }
 
+    /**
+     * Moves the player right step by step if blocked by a wall, finding a valid floor position or triggering a respawn if none is found.
+     */
     public void push_right() {
         tempPosition = position;
         double stepDistance = 0.1;
@@ -511,11 +520,9 @@ public abstract class Mob {
         while (squareUnderneathIsWall) {
             Vector3d displacement = new Vector3d(pushRightVector).mul(stepDistance);
             displacement.y = 0;
-            //position.add(displacement);
             tempPosition.add(displacement);
             squareUnderneathIsWall = squareUnderneathIsWall(tempPosition);
         }
-        //position.y = GameConfig.SNACKMAN_GROUND_LEVEL;
         tempPosition.y = GameConfig.SNACKMAN_GROUND_LEVEL;
         Vector3d additionalDisplacement = new Vector3d(pushRightVector).mul(radius);
         additionalDisplacement.y = 0;
@@ -527,6 +534,11 @@ public abstract class Mob {
         }
     }
 
+    /**
+     * Determines the alignment of walls surrounding the player's current position.
+     * This method checks adjacent squares in the game map to evaluate the presence of walls and identifies a specific wall alignment case based on predefined configurations.
+     * @return WallAlignmentStatus Enum value representing the alignment of walls relative to the player's position.
+     */
     public WallAlignmentStatus checkWallAlignment() {
         int mobX = calcMapIndexOfCoordinate(position.x);
         int mobZ = calcMapIndexOfCoordinate(position.z);
@@ -595,7 +607,11 @@ public abstract class Mob {
         return WallAlignmentStatus.CASE0_NONE;
     }
 
-
+    /**
+     * Determines the specific section of a wall relative to the player's current position.
+     * This method calculates the center of the wall square based on its boundaries and compares the player's position to the center to identify the wall section.
+     * @return WallSectionStatus Enum value representing the section of the wall the player is currently in relative to the wall's center.
+     */
     public WallSectionStatus getWallSection() {
         if (gameMap != null) {
             int mobX = calcMapIndexOfCoordinate(position.x);
@@ -632,16 +648,13 @@ public abstract class Mob {
         return WallSectionStatus.CASE0_NONE;
     }
 
-    /*
-    public GameMap getGameMapForForTest() {
-        return gameMap;
-    }
-    */
-
     public void setGameMapForTest(GameMap gameMap) {
         this.gameMap = gameMap;
     }
 
+    public void setForwardForTest(Vector3d forward) {
+        this.forward = forward;
+    }
 
     @Override
     public String toString() {
