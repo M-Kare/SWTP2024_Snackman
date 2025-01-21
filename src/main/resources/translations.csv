@@ -119,7 +119,7 @@ popup.cantStart.onlyAdminCanInit;The role selection can only be initiated by the
 
 # GameEndView
 gameEnd.gameResult.winner.snackman;SNACKMAN IS THE WINNER;HAPPENMANN IST DER GEWINNER
-gameEnd.gameResult.winner.ghosts;GHOSTS IS THE WINNER;DIE GEISTER HABEN GEWINNER
+gameEnd.gameResult.winner.ghosts;GHOSTS ARE THE WINNER;DIE GEISTER HABEN GEWINNER
 gameEnd.gameReason.calorieTarget;SnackMan has reached the calorie target!;Happenmann hat sein Kalorienziel erreicht!
 gameEnd.gameReason.noCaloriesLeft;The ghosts scared SnackMan too many times until he had no calories left!;Die Geister haben den Happenmann so oft erschreckt, bis er keine Kalorien mehr hatte!
 gameEnd.gameReason.timeIsUp;The time is up and SnackMan hasn't collected enough calories!;Die Zeit ist um und der Happenmann hat nicht genug Kalorien gesammelt!
