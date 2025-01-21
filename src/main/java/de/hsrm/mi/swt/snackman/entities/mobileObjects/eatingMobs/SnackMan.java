@@ -31,6 +31,7 @@ public class SnackMan extends EatingMob {
     private long elapsedTime = 0;
     private double gravity = GameConfig.GRAVITY;
     private boolean squareUnderneathIsWall = false;
+    private long lastHit;
 
     public SnackMan(GameMap gameMap, Square currentSquare, double posX, double posY, double posZ) {
         this(gameMap, GameConfig.SNACKMAN_SPEED, GameConfig.SNACKMAN_RADIUS, posX, posY, posZ);
@@ -47,14 +48,18 @@ public class SnackMan extends EatingMob {
         super(gameMap, speed, radius, posX, posY, posZ);
 
         this.setKcal(GameConfig.SNACKMAN_START_CALORIES);
+        lastHit = System.currentTimeMillis();
     }
 
     public void isScaredFromGhost(boolean scared) {
         if (scared) {
-            if (super.getKcal() > GameConfig.GHOST_DAMAGE) {
-                setKcal(getKcal() - GameConfig.GHOST_DAMAGE);
-                isScared = true;
-            } else super.setKcal(GAME_FINISH_BECAUSE_OF_TOO_FEW_CKAL);
+            if(System.currentTimeMillis() - lastHit >= GameConfig.INVINCIBILITY_TIME){
+                if (super.getKcal() > GameConfig.GHOST_DAMAGE) {
+                    setKcal(getKcal() - GameConfig.GHOST_DAMAGE);
+                    isScared = true;
+                    lastHit = System.currentTimeMillis();
+                } else super.setKcal(GAME_FINISH_BECAUSE_OF_TOO_FEW_CKAL);
+            }
         } else {
             isScared = false;
         }
