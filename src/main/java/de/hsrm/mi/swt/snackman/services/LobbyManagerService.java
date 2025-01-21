@@ -124,9 +124,9 @@ public class LobbyManagerService {
      * @param lobbyId  ID of the lobby
      * @param playerId ID of the player
      */
-    public void leaveLobby(String lobbyId, String playerId) {
+    public synchronized void leaveLobby(String lobbyId, String playerId) {
         Lobby lobby = findLobbyByLobbyId(lobbyId);
-        lobby.getMembers().removeIf(client -> client.getPlayerId().equals(playerId));
+        lobby.removeMember(playerId);
 
         if (lobby.getAdminClientId().equals(playerId) || lobby.getMembers().isEmpty()) {
             lobbies.remove(lobby.getLobbyId());
@@ -140,7 +140,7 @@ public class LobbyManagerService {
      *
      * @param lobbyId the id of the lobby to be closed
      */
-    public void closeAndDeleteLobby(String lobbyId) {
+    public synchronized void closeAndDeleteLobby(String lobbyId) {
         Lobby lobby = findLobbyByLobbyId(lobbyId);
 
         stopAllScriptThreads(lobby);
@@ -170,9 +170,11 @@ public class LobbyManagerService {
      *
      * @param lobby the lobby where to stop the scripts
      */
-    private void removeAllPlayersFromLobby(Lobby lobby) {
+    private synchronized void removeAllPlayersFromLobby(Lobby lobby) {
+        List<PlayerClient> membersToRemove = new ArrayList<>(lobby.getMembers());
         PlayerClient admin = null;
-        for (PlayerClient player : lobby.getMembers()) {
+
+        for (PlayerClient player : membersToRemove) {
             if (!lobby.getAdminClient().equals(player)) {
                 leaveLobby(lobby.getLobbyId(), player.getPlayerId());
             } else {

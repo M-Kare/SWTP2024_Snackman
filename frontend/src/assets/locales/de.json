@@ -125,7 +125,7 @@
         "gameResult": {
             "winner": {
                 "snackman": "HAPPENMANN IST DER GEWINNER",
-                "ghosts": "DIE GEISTER HABEN GEWINNER"
+                "ghosts": "DIE GEISTER HABEN GEWONNEN"
             }
         },
         "gameReason": {
