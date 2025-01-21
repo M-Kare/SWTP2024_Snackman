@@ -27,4 +27,8 @@
 .small-nav-button:hover {
   background-color: var(--primary-highlight-color);
 }
+
+.small-nav-button:disabled:hover {
+  background-color: var(--background-for-text-color); /* Keine Hover-Farbe */
+}
 </style>

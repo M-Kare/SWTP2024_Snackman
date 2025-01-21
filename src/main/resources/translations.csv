@@ -71,6 +71,8 @@ createLobby.error.lobbyNameDuplicate;Lobby-name already exists! Please choose an
 
 # ChooseRole
 chooseRole.title;Choose your character;Wähle deinen Charakter
+chooseRole.playerCount.onePlayer;player needs to choose their role;Spieler muss seine Rolle wählen
+chooseRole.playerCount.twoPlayers;players need to choose their role;Spieler müssen ihre Rollen wählen
 
 chooseRole.alreadyChosen;This character is already chosen!;Dieser Charakter wurde bereits gewählt!
 
@@ -90,6 +92,10 @@ lobby.playerCount.player;Players;Spieler
 lobby.linkCopied;Link copied to clipboard;Link in die Zwischenablage kopiert
 lobby.mapName.generated;Generated Map;Generierte Map
 lobby.mapName.uploaded;Uploaded Map;Hochgeladene Map
+lobby.mapFile.ghostCount;The map file must contain at least 4 "G"s for 4 ghost players.;Die Map-Datei muss mindestens 4x "G" für 4 Ghost-Spieler enthalten.
+lobby.mapFile.invalidChars;The map file is only allowed to contain the following characters: S, G, C, o, #, and spaces.;Die Map-Datei darf nur die folgenden Zeichen enthalten: S, G, C, o, # und Leerzeichen.
+lobby.mapFile.exactlyOneS;The map file must contain exactly one "S".;Die Map-Datei muss genau ein "S" enthalten.
+lobby.mapFile.invalidFileType;Invalid file type. Only .txt files are allowed.;Ungültiger Dateityp. Es sind nur .txt-Dateien zulässig.
 
 
 # PopUps

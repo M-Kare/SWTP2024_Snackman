@@ -87,7 +87,7 @@ public class GameMapController {
     public ResponseEntity<String> uploadMap(@RequestParam("file") MultipartFile file, @RequestParam("lobbyId") String lobbyId) {
         try {
             if (!file.getOriginalFilename().endsWith(".txt")) {
-                return ResponseEntity.badRequest().body("Invalid file type. Only .txt files are allowed.");
+                return ResponseEntity.badRequest().body("lobby.mapFile.invalidFileType");
             }
 
             // Check File-Content
@@ -96,7 +96,7 @@ public class GameMapController {
 
             if (!fileContent.matches(validPattern)) {
                 return ResponseEntity.badRequest().body(
-                        "The map file is only allowed to contain the following characters: S, G, C, o, #, and spaces."
+                        "lobby.mapFile.invalidChars"
                 );
             }
 
@@ -105,11 +105,11 @@ public class GameMapController {
             long countG = fileContent.chars().filter(ch -> ch == 'G').count();
 
             if (countS != 1) {
-                return ResponseEntity.badRequest().body("The map file must contain exactly one 'S'.");
+                return ResponseEntity.badRequest().body("lobby.mapFile.exactlyOneS");
             }
 
             if (countG < 4) {
-                return ResponseEntity.badRequest().body("The map file must contain at least 4 'G's for 4 ghost player.");
+                return ResponseEntity.badRequest().body("lobby.mapFile.ghostCount");
             }
 
             // Save File
