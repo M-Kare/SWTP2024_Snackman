@@ -12,6 +12,7 @@ public class GameConfig {
     public static final double SNACKMAN_SPEED = 6.5;
     public static final double SNACKMAN_SPRINT_MULTIPLIER = 1.5;
     public static final int SNACKMAN_MAX_CALORIES = 20000;
+    public static final int SNACKMAN_START_CALORIES = 1500;
 
     //SNACKMAN JUMPING PARAM
     public static final double JUMP_STRENGTH = 8;
@@ -35,7 +36,7 @@ public class GameConfig {
     public static final String GHOST_SCRIPT_HARD = "SmartGhostMovementSkript";
     public static final double GHOST_RADIUS = 0.3;
     public static final int GHOST_SPEED = 7;
-    public static final int GHOST_DAMAGE = 50;
+    public static final int GHOST_DAMAGE = 150;
     public static final int AMOUNT_PLAYERS = 5;
     public static final String SCRIPT_GHOST_DIFFICULTY_MULTIPLAYER = "EASY";
 
