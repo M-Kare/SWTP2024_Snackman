@@ -21,7 +21,7 @@ public class GameConfig {
     public static final double GRAVITY = -27;
     public static final double GRAVITY_AFTER_TIMEOUT = -100;
     public static final int SINGLE_JUMP_CALORIE_COSTS = 500;
-    public static final int DOUBLE_JUMP_CALORIE_COSTS = 1000;
+    public static final int DOUBLE_JUMP_CALORIE_COSTS = 500;
 
     //SNACK SPAWN
     public static final int TIME_FOR_SNACKS_TO_RESPAWN = 10000;
