@@ -64,6 +64,14 @@ public class Lobby {
     }
 
     /**
+     * Removes a player from the lobby
+     * @param playerId the id of the player to be removed
+     */
+    public synchronized void removeMember(String playerId) {
+        members.removeIf(client -> client.getPlayerId().equals(playerId));
+    }
+
+    /**
      * Starts a new timer for playing the game.
      * After 5 minutes, the game is automatically stopped.
      */

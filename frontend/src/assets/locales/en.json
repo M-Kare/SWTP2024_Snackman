@@ -125,7 +125,7 @@
         "gameResult": {
             "winner": {
                 "snackman": "SNACKMAN IS THE WINNER",
-                "ghosts": "GHOSTS IS THE WINNER"
+                "ghosts": "GHOSTS ARE THE WINNER"
             }
         },
         "gameReason": {

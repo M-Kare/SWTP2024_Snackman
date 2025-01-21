@@ -46,6 +46,8 @@ public class SnackMan extends EatingMob {
 
     public SnackMan(GameMap gameMap, double speed, double radius, double posX, double posY, double posZ) {
         super(gameMap, speed, radius, posX, posY, posZ);
+
+        this.setKcal(GameConfig.SNACKMAN_START_CALORIES);
         lastHit = System.currentTimeMillis();
     }
 
