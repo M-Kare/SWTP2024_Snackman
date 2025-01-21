@@ -1,10 +1,9 @@
 <template>
   <MenuBackground :isLobbyView="true">
-
     <LanguageSwitch></LanguageSwitch>
 
     <div id="individual-outer-box-size" class="outer-box">
-      <h1 class="title"> {{ $t('lobbyList.title') }} </h1>
+      <h1 class="title">{{ $t('lobbyList.title') }}</h1>
       <SmallNavButton
         id="menu-back-button"
         class="small-nav-buttons"
@@ -33,7 +32,8 @@
             </div>
 
             <div class="playercount">
-              {{ lobby.members.length }} / {{ MAX_PLAYER_COUNT }} {{ $t('lobbyList.playerCount.player') }}
+              {{ lobby.members.length }} / {{ MAX_PLAYER_COUNT }}
+              {{ $t('lobbyList.playerCount.player') }}
             </div>
           </li>
         </ul>
@@ -43,8 +43,8 @@
     <div v-if="darkenBackground" id="darken-background"></div>
 
     <PopUp v-if="showPopUp" class="popup-box" @hidePopUp="hidePopUp">
-      <p class="info-heading"> {{ $t('popup.lobbyFull.heading') }} </p>
-      <p class="info-text">{{ $t('popup.lobbyFull.text') }} </p>
+      <p class="info-heading">{{ $t('popup.lobbyFull.heading') }}</p>
+      <p class="info-text">{{ $t('popup.lobbyFull.text') }}</p>
     </PopUp>
 
     <CreateLobbyForm
@@ -61,11 +61,11 @@ import CreateLobbyForm from '@/components/CreateLobbyForm.vue'
 import PopUp from '@/components/PopUp.vue'
 import LanguageSwitch from '@/components/LanguageSwitch.vue'
 
-import {useRouter} from 'vue-router'
-import {computed, onMounted, ref} from 'vue'
-import {useLobbiesStore} from '@/stores/Lobby/lobbiesstore'
-import type {ILobbyDTD} from '@/stores/Lobby/ILobbyDTD'
-import type {IPlayerClientDTD} from '@/stores/Lobby/IPlayerClientDTD'
+import { useRouter } from 'vue-router'
+import { computed, onMounted, ref } from 'vue'
+import { useLobbiesStore } from '@/stores/Lobby/lobbiesstore'
+import type { ILobbyDTD } from '@/stores/Lobby/ILobbyDTD'
+import type { IPlayerClientDTD } from '@/stores/Lobby/IPlayerClientDTD'
 
 const router = useRouter()
 const lobbiesStore = useLobbiesStore()
@@ -89,7 +89,7 @@ const hidePopUp = () => {
 }
 
 const backToMainMenu = () => {
-  router.push({name: 'MainMenu'})
+  router.push({ name: 'MainMenu' })
 }
 
 const showCreateLobbyForm = () => {
@@ -127,7 +127,7 @@ const joinLobby = async (lobby: ILobbyDTD) => {
     )
 
     if (joinedLobby) {
-      router.push({name: 'LobbyView', params: {lobbyId: lobby.lobbyId}})
+      router.push({ name: 'LobbyView', params: { lobbyId: lobby.lobbyId } })
     }
   } catch (error: any) {
     console.error('Error:', error)
@@ -136,11 +136,10 @@ const joinLobby = async (lobby: ILobbyDTD) => {
 }
 
 onMounted(async () => {
-  await lobbiesStore.fetchLobbyList();
+  await lobbiesStore.fetchLobbyList()
 
-  lobbiesStore.startLobbyLiveUpdate();
+  lobbiesStore.startLobbyLiveUpdate()
 })
-
 </script>
 
 <style scoped>
@@ -149,7 +148,6 @@ onMounted(async () => {
 }
 
 .title {
-  padding: 1.5rem 0 1rem 0;
   font-size: 3rem;
   font-weight: bold;
   color: var(--main-text-color);

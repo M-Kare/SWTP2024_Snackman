@@ -58,7 +58,7 @@ const backToMainMenu = () => {
 }
 
 const startSingleplayer = async () => {
-  await lobbiesStore.createPlayer("Single Player")
+
   const player = lobbiesStore.lobbydata.currentPlayer
   const lobby = await lobbiesStore.startSingleplayerGame(player, difficulty.value.toString()) as ILobbyDTD
 

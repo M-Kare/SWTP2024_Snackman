@@ -31,6 +31,7 @@ public class SnackMan extends EatingMob {
     private long elapsedTime = 0;
     private double gravity = GameConfig.GRAVITY;
     private boolean squareUnderneathIsWall = false;
+    private long lastHit;
 
     public SnackMan(GameMap gameMap, Square currentSquare, double posX, double posY, double posZ) {
         this(gameMap, GameConfig.SNACKMAN_SPEED, GameConfig.SNACKMAN_RADIUS, posX, posY, posZ);
@@ -45,14 +46,20 @@ public class SnackMan extends EatingMob {
 
     public SnackMan(GameMap gameMap, double speed, double radius, double posX, double posY, double posZ) {
         super(gameMap, speed, radius, posX, posY, posZ);
+
+        this.setKcal(GameConfig.SNACKMAN_START_CALORIES);
+        lastHit = System.currentTimeMillis();
     }
 
     public void isScaredFromGhost(boolean scared) {
         if (scared) {
-            if (super.getKcal() > GameConfig.GHOST_DAMAGE) {
-                setKcal(getKcal() - GameConfig.GHOST_DAMAGE);
-                isScared = true;
-            } else super.setKcal(GAME_FINISH_BECAUSE_OF_TOO_FEW_CKAL);
+            if(System.currentTimeMillis() - lastHit >= GameConfig.INVINCIBILITY_TIME){
+                if (super.getKcal() > GameConfig.GHOST_DAMAGE) {
+                    setKcal(getKcal() - GameConfig.GHOST_DAMAGE);
+                    isScared = true;
+                    lastHit = System.currentTimeMillis();
+                } else super.setKcal(GAME_FINISH_BECAUSE_OF_TOO_FEW_CKAL);
+            }
         } else {
             isScared = false;
         }
@@ -60,7 +67,7 @@ public class SnackMan extends EatingMob {
 
     //JUMPING
     public void jump() {
-        if (!isJumping && getKcal() >= 100) {
+        if (!isJumping && getKcal() >= SINGLE_JUMP_CALORIE_COSTS) {
             this.velocityY = GameConfig.JUMP_STRENGTH;
             this.isJumping = true;
             this.hasDoubleJumped = false;
@@ -70,7 +77,7 @@ public class SnackMan extends EatingMob {
     }
 
     public void doubleJump() {
-        if (isJumping && getKcal() >= 100) {
+        if (isJumping && getKcal() >= DOUBLE_JUMP_CALORIE_COSTS) {
             this.velocityY += GameConfig.DOUBLEJUMP_STRENGTH;
             subtractCaloriesDoubleJump();
             this.hasDoubleJumped = true;
