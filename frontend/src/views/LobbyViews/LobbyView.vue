@@ -284,10 +284,11 @@ const uploadFileToServer = async (file: File, lobbyId: string) => {
       selectMap(mapName)
     } else {
       const errorMessage = await response.text()
+      const translatedErrorMessage = t(errorMessage)
       showPopUp.value = true
       darkenBackground.value = true
       infoHeading.value = t('popup.mapNotValid.heading')
-      infoText.value = errorMessage
+      infoText.value = translatedErrorMessage
     }
   } catch (error) {
     console.error('Error uploading file:', error)

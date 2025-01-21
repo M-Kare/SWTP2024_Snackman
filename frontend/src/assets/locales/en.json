@@ -91,6 +91,12 @@
         "mapName": {
             "generated": "Generated Map",
             "uploaded": "Uploaded Map"
+        },
+        "mapFile": {
+            "ghostCount": "The map file must contain at least 4 \"G\"s for 4 ghost players.",
+            "invalidChars": "The map file is only allowed to contain the following characters: S, G, C, o, #, and spaces.",
+            "exactlyOneS": "The map file must contain exactly one \"S\".",
+            "invalidFileType": "Invalid file type. Only .txt files are allowed."
         }
     },
     "popup": {
