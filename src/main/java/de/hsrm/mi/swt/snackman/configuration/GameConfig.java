@@ -16,7 +16,7 @@ public class GameConfig {
     public static final int INVINCIBILITY_TIME = 1000;
 
     //SNACKMAN JUMPING PARAM
-    public static final double JUMP_STRENGTH = 8;
+    public static final double JUMP_STRENGTH = 8.5;
     public static final double DOUBLEJUMP_STRENGTH = JUMP_STRENGTH * 0.15;
     public static final double GRAVITY = -27;
     public static final double GRAVITY_AFTER_TIMEOUT = -100;
