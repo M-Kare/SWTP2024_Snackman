@@ -71,6 +71,8 @@ createLobby.error.lobbyNameDuplicate;Lobby-name already exists! Please choose an
 
 # ChooseRole
 chooseRole.title;Choose your character;Wähle deinen Charakter
+chooseRole.playerCount.onePlayer;player needs to choose their role;Spieler muss seine Rolle wählen
+chooseRole.playerCount.twoPlayers;players need to choose their role;Spieler müssen ihre Rollen wählen
 
 chooseRole.alreadyChosen;This character is already chosen!;Dieser Charakter wurde bereits gewählt!
 

@@ -7,7 +7,8 @@
       <h1 class="title">{{ lobby?.name || 'Lobby Name' }}</h1>
 
       <div id="player-count">
-        {{ playerCount }} / {{ MAX_PLAYER_COUNT }} {{ $t('lobby.playerCount.player') }}
+        {{ playerCount }} / {{ MAX_PLAYER_COUNT }}
+        {{ $t('lobby.playerCount.player') }}
       </div>
     </div>
 
@@ -24,19 +25,25 @@
 
     <div class="item-row">
       <ul class="map-list" v-if="playerId == adminClientId">
-        <li class="map-list-item" v-for="map in mapList" :key="map.mapName" v-if="mapList.length > 1">
-          <input :checked="selectedMap === map.mapName"
-                 :value="map.mapName"
-                 class="map-choose"
-                 type="radio"
-                 @change="selectMap(map.mapName)"
+        <li
+          v-for="map in mapList"
+          v-if="mapList.length > 1"
+          :key="map.mapName"
+          class="map-list-item"
+        >
+          <input
+            :checked="selectedMap === map.mapName"
+            :value="map.mapName"
+            class="map-choose"
+            type="radio"
+            @change="selectMap(map.mapName)"
           />
           <span>{{ $t(map.translation) }}</span>
         </li>
       </ul>
     </div>
 
-    <div class="item-row">
+    <div class="bottom-item-row">
       <div id="button-pair">
         <SmallNavButton
           id="menu-back-button"
@@ -53,11 +60,12 @@
         >
           {{ $t('button.importMap') }}
         </SmallNavButton>
-        <input class="input-feld"
-               ref="fileInput"
-               accept=".txt"
-               type="file"
-               @change="handleFileImport"
+        <input
+          ref="fileInput"
+          accept=".txt"
+          class="input-feld"
+          type="file"
+          @change="handleFileImport"
         />
       </div>
 
@@ -69,7 +77,6 @@
         >
           {{ $t('button.copyLink') }}
         </SmallNavButton>
-
 
         <SmallNavButton
           id="start-game-button"
@@ -106,7 +113,7 @@
   </PopUp>
 
   <PopUp v-if="showRolePopup" class="popup-box" @hidePopUp="hidePopUp">
-    <p class="info-heading"> {{ $t('popup.cantStart.heading') }} </p>
+    <p class="info-heading">{{ $t('popup.cantStart.heading') }}</p>
     <p class="info-text">{{ infoText }}</p>
   </PopUp>
 
@@ -114,7 +121,6 @@
 </template>
 
 <script lang="ts" setup>
-
 import MenuBackground from '@/components/MenuBackground.vue'
 import SmallNavButton from '@/components/SmallNavButton.vue'
 import PlayerNameForm from '@/components/PlayerNameForm.vue'
@@ -128,27 +134,27 @@ import type {IPlayerClientDTD} from '@/stores/Lobby/IPlayerClientDTD'
 import type {ILobbyDTD} from '@/stores/Lobby/ILobbyDTD'
 import {useI18n} from 'vue-i18n'
 
-const {t} = useI18n();
+const {t} = useI18n()
 
 const router = useRouter()
 const route = useRoute()
 const lobbiesStore = useLobbiesStore()
 
-const playerId = lobbiesStore.lobbydata.currentPlayer.playerId;
-const lobbyId = route.params.lobbyId as string;
+const playerId = lobbiesStore.lobbydata.currentPlayer.playerId
+const lobbyId = route.params.lobbyId as string
 
 const lobbyUrl = route.params.lobbyId
 let lobbyLoaded = false
 const lobby = computed(() =>
   lobbiesStore.lobbydata.lobbies.find(l => l.lobbyId === lobbyUrl),
 )
-const adminClientId = lobby.value?.adminClient.playerId;
+const adminClientId = lobby.value?.adminClient.playerId
 const members = computed(
   () => lobby.value?.members || ([] as Array<IPlayerClientDTD>),
 )
 const playerCount = computed(() => members.value.length)
-const playerNameSaved = lobbiesStore.lobbydata.currentPlayer.playerName;
-const showPlayerNameForm = ref(false);
+const playerNameSaved = lobbiesStore.lobbydata.currentPlayer.playerName
+const showPlayerNameForm = ref(false)
 
 const darkenBackground = ref(false)
 const showPopUp = ref(false)
@@ -169,10 +175,10 @@ const TIP_TOP_DIST = 30
 const TIP_SIDE_DIST = 20
 
 const hidePlayerNameForm = () => {
-  showPlayerNameForm.value = false;
+  showPlayerNameForm.value = false
 
   if (!errorBox.value) {
-    darkenBackground.value = false;
+    darkenBackground.value = false
   }
 }
 
@@ -183,40 +189,46 @@ const hidePopUp = () => {
 
 // needed for errorBox which shows up when lobby does not exist
 function hidePopUpAndRedirect() {
-  hidePopUp();
-  router.push({name: "LobbyListView"})
+  hidePopUp()
+  router.push({name: 'LobbyListView'})
 }
 
-const mapList = ref<{ mapName: string; fileName: string; translation: string }[]>([
-  {mapName: 'Generated Map', fileName: `Maze.txt`, translation: 'lobby.mapName.generated'}
-]);
+const mapList = ref<
+  { mapName: string; fileName: string; translation: string }[]
+>([
+  {
+    mapName: 'Generated Map',
+    fileName: `Maze.txt`,
+    translation: 'lobby.mapName.generated',
+  },
+])
 
-const usedCustomMap = ref(false);
-const selectedMap = ref<string | null>(null);
+const usedCustomMap = ref(false)
+const selectedMap = ref<string | null>(null)
 
 const selectMap = async (mapName: string) => {
-  selectedMap.value = mapName;
+  selectedMap.value = mapName
 
   if (selectedMap.value === 'Generated Map') {
-    usedCustomMap.value = false;
+    usedCustomMap.value = false
   } else if (selectedMap.value === 'Uploaded Map') {
-    usedCustomMap.value = true;
+    usedCustomMap.value = true
   }
 
-  const status = await changeUsedMapStatus(lobbyId, usedCustomMap.value);
-  if (status !== "done") {
-    showPopUp.value = true;
-    darkenBackground.value = true;
-    infoHeading.value = "Map Status Error";
-    infoText.value = "Failed to update the map status.";
+  const status = await changeUsedMapStatus(lobbyId, usedCustomMap.value)
+  if (status !== 'done') {
+    showPopUp.value = true
+    darkenBackground.value = true
+    infoHeading.value = 'Map Status Error'
+    infoText.value = 'Failed to update the map status.'
   }
-};
-
-const triggerFileInput = () => {
-  fileInput.value?.click();
 }
 
-const fileInput = ref<HTMLInputElement | null>(null);
+const triggerFileInput = () => {
+  fileInput.value?.click()
+}
+
+const fileInput = ref<HTMLInputElement | null>(null)
 
 /**
  * This function processes the file selected by the user in an input field.
@@ -227,17 +239,17 @@ const fileInput = ref<HTMLInputElement | null>(null);
  * @param event - The event triggered by the file input change.
  */
 const handleFileImport = (event: Event) => {
-  const input = event.target as HTMLInputElement;
+  const input = event.target as HTMLInputElement
 
   if (input.files && input.files.length > 0) {
-    const file = input.files[0];
+    const file = input.files[0]
     if (file.name.endsWith('.txt')) {
-      uploadFileToServer(file, lobbyId);
+      uploadFileToServer(file, lobbyId)
     } else {
-      showPopUp.value = true;
-      darkenBackground.value = true;
-      infoHeading.value = t('popup.mapNotValid.heading');
-      infoText.value = t('popup.mapNotValid.text');
+      showPopUp.value = true
+      darkenBackground.value = true
+      infoHeading.value = t('popup.mapNotValid.heading')
+      infoText.value = t('popup.mapNotValid.text')
     }
   }
 }
@@ -248,42 +260,42 @@ const handleFileImport = (event: Event) => {
  * @param lobbyId - The unique identifier of the lobby.
  */
 const uploadFileToServer = async (file: File, lobbyId: string) => {
-  const formData = new FormData();
-  formData.append('file', file);
-  formData.append('lobbyId', lobbyId);
+  const formData = new FormData()
+  formData.append('file', file)
+  formData.append('lobbyId', lobbyId)
 
   try {
     const response = await fetch('/api/upload', {
       method: 'POST',
-      body: formData
-    });
+      body: formData,
+    })
 
     if (response.ok) {
-      const mapName = 'Uploaded Map';
-      const fileName = `SnackManMap_${lobbyId}.txt`;
-      const translation = 'lobby.mapName.uploaded';
+      const mapName = 'Uploaded Map'
+      const fileName = `SnackManMap_${lobbyId}.txt`
+      const translation = 'lobby.mapName.uploaded'
 
       if (mapList.value.length > 1) {
-        mapList.value[1] = {mapName, fileName, translation};
+        mapList.value[1] = {mapName, fileName, translation}
       } else {
-        mapList.value.push({mapName, fileName, translation});
+        mapList.value.push({mapName, fileName, translation})
       }
 
-      selectMap(mapName);
+      selectMap(mapName)
     } else {
-      const errorMessage = await response.text();
-      const translatedErrorMessage = t(errorMessage);
-      showPopUp.value = true;
-      darkenBackground.value = true;
-      infoHeading.value = t('popup.mapNotValid.heading');
-      infoText.value = translatedErrorMessage;
+      const errorMessage = await response.text()
+      const translatedErrorMessage = t(errorMessage)
+      showPopUp.value = true
+      darkenBackground.value = true
+      infoHeading.value = t('popup.mapNotValid.heading')
+      infoText.value = translatedErrorMessage
     }
   } catch (error) {
-    console.error('Error uploading file:', error);
-    showPopUp.value = true;
-    darkenBackground.value = true;
-    infoHeading.value = t('popup.uploadingFile.heading');
-    infoText.value = error;
+    console.error('Error uploading file:', error)
+    showPopUp.value = true
+    darkenBackground.value = true
+    infoHeading.value = t('popup.uploadingFile.heading')
+    infoText.value = error
   }
 }
 
@@ -292,21 +304,21 @@ const uploadFileToServer = async (file: File, lobbyId: string) => {
  * @param lobbyId - The unique identifier of the lobby.
  */
 const deleteUploadedFile = async (lobbyId: string) => {
-  const formData = new FormData();
-  formData.append('lobbyId', lobbyId);
+  const formData = new FormData()
+  formData.append('lobbyId', lobbyId)
 
   fetch('/api/deleteMap', {
     method: 'DELETE',
-    body: formData
+    body: formData,
   })
     .then(response => {
       if (!response.ok) {
-        console.error('Error deleting file:', response.text());
+        console.error('Error deleting file:', response.text())
       }
     })
     .catch(error => {
-      console.error('Error deleting file:', error);
-    });
+      console.error('Error deleting file:', error)
+    })
 }
 
 /**
@@ -315,26 +327,29 @@ const deleteUploadedFile = async (lobbyId: string) => {
  * @param {string} lobbyId - The unique identifier of the lobby.
  * @param {boolean} usedCustomMap - Indicates whether a custom map is used (true) or not (false).
  */
-const changeUsedMapStatus = async (lobbyId: string, usedCustomMap: boolean): Promise<string> => {
+const changeUsedMapStatus = async (
+  lobbyId: string,
+  usedCustomMap: boolean,
+): Promise<string> => {
   try {
     const response = await fetch('/api/change-used-map-status', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({lobbyId, usedCustomMap})
-    });
+      body: JSON.stringify({lobbyId, usedCustomMap}),
+    })
 
     if (!response.ok) {
-      const errorText = await response.text();
-      console.error('Error changing the used map status:', errorText);
-      throw new Error(`Failed to change map status: ${errorText}`);
+      const errorText = await response.text()
+      console.error('Error changing the used map status:', errorText)
+      throw new Error(`Failed to change map status: ${errorText}`)
     }
 
-    return "done";
+    return 'done'
   } catch (error) {
-    console.error('Error changing the used map status:', error);
-    throw error;
+    console.error('Error changing the used map status:', error)
+    throw error
   }
 }
 
@@ -346,7 +361,7 @@ watchEffect(() => {
     if (updatedLobby) {
       lobbyLoaded = true
     } else if (lobbyLoaded) {
-      deleteUploadedFile(lobbyId);
+      deleteUploadedFile(lobbyId)
       router.push({name: 'LobbyListView'})
     }
   }
@@ -356,10 +371,10 @@ onMounted(async () => {
   await lobbiesStore.fetchLobbyList()
 
   if (!lobby.value) {
-    infoHeading.value = t('popup.notExisting.heading');
-    infoText.value = t('popup.notExisting.text');
+    infoHeading.value = t('popup.notExisting.heading')
+    infoText.value = t('popup.notExisting.text')
     errorBox.value = true
-    darkenBackground.value = true;
+    darkenBackground.value = true
   }
   await lobbiesStore.startLobbyLiveUpdate()
 
@@ -370,12 +385,12 @@ onMounted(async () => {
     lobbiesStore.lobbydata.currentPlayer.playerName === ''
   ) {
     // save name to create player, no matter if lobby full or not
-    showPlayerNameForm.value = true;
-    darkenBackground.value = true;
+    showPlayerNameForm.value = true
+    darkenBackground.value = true
 
     if (lobby.value!.members.length >= MAX_PLAYER_COUNT) {
-      infoHeading.value = t('popup.lobbyFull.heading');
-      infoText.value = t('popup.lobbyFull.text');
+      infoHeading.value = t('popup.lobbyFull.heading')
+      infoText.value = t('popup.lobbyFull.text')
       errorBox.value = true
       darkenBackground.value = true
     }
@@ -384,17 +399,15 @@ onMounted(async () => {
 
 const savePlayerName = async (newName: string) => {
   try {
-    await lobbiesStore.createPlayer(newName);
+    await lobbiesStore.createPlayer(newName)
     await joinLobby(lobby.value!)
-
   } catch (error) {
-    console.error("Error saving playerName:", error);
-    alert("Error saving playerName!");
+    console.error('Error saving playerName:', error)
+    alert('Error saving playerName!')
   }
 }
 
 const joinLobby = async (lobby: ILobbyDTD) => {
-
   try {
     const joinedLobby = await lobbiesStore.joinLobby(
       lobby.lobbyId,
@@ -431,7 +444,7 @@ const leaveLobby = async () => {
       }
     }
     // If Admin-Player leave Lobby, delete the uploaded map
-    deleteUploadedFile(lobbyId);
+    deleteUploadedFile(lobbyId)
   }
 
   await lobbiesStore.leaveLobby(lobby.value.lobbyId, playerId)
@@ -453,7 +466,7 @@ const chooseRole = async (lobby: ILobbyDTD | undefined) => {
   if (lobby.members.length < 2) {
     showPopUp.value = true
     darkenBackground.value = true
-    infoText.value = t('popup.cantStart.notEnoughPlayers');
+    infoText.value = t('popup.cantStart.notEnoughPlayers')
     return
   }
 
@@ -462,14 +475,13 @@ const chooseRole = async (lobby: ILobbyDTD | undefined) => {
   } else {
     showPopUp.value = true
     darkenBackground.value = true
-    infoText.value = t('popup.cantStart.onlyAdminCanInit');
+    infoText.value = t('popup.cantStart.onlyAdminCanInit')
   }
-
 }
 
 function copyToClip() {
   navigator.clipboard.writeText(document.URL)
-  infoText.value = t('lobby.linkCopied');
+  infoText.value = t('lobby.linkCopied')
   showInfo.value = true
   mouseInfoBox.value = document.getElementById('infoBox')
   moveToMouse(mouseInfoBox.value!)
@@ -503,9 +515,9 @@ function moveToMouse(element: HTMLElement) {
 
 #individual-outer-box-size {
   width: 60%;
-  height: 60%;
-  max-height: 70%;
+  height: 70%;
   padding: 2%;
+  top: 15%;
 }
 
 #infoBox {
@@ -573,6 +585,16 @@ function moveToMouse(element: HTMLElement) {
 .item-row {
   display: flex;
   justify-content: space-between;
+}
+
+.bottom-item-row {
+  position: absolute;
+  bottom: 5%;
+  left: 2%;
+  padding: 0 5%;
+  width: 100%;
+  display: flex;
+  justify-content: space-around;
 }
 
 #button-pair {
