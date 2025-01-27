@@ -7,4 +7,5 @@ Die Anwendung kann per ./gradlew bootRun gestartet werden. Sie ist dann unter lo
 Alternativ kann auch die Jar im build/libs/ Verzeichnis via "java -jar {name-der-jar}" ausgeführt werden. Die Anwendung ist dann ebenfalls unter localhost:8080 erreichbar.  
 
 # Anmerkung
-Im Projekt ist auch ein kleines Demo-Video zu finden. Danke an Sophia Müller für das Aufnehmen und schneiden des Videos.
+Hier noch ein Link zu einem kleinen Demo-Video: https://next.hessenbox.de/index.php/s/py5Fz7X6QLnWJkS  
+Danke an Sophia Müller für das Aufnehmen und schneiden des Videos.
